@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg14.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql14.php") ?>
 <?php include_once "phpfn14.php" ?>
-<?php include_once "t03_customerinfo.php" ?>
+<?php include_once "t07_satuaninfo.php" ?>
 <?php include_once "t96_employeesinfo.php" ?>
 <?php include_once "userfn14.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t03_customer_edit = NULL; // Initialize page object first
+$t07_satuan_edit = NULL; // Initialize page object first
 
-class ct03_customer_edit extends ct03_customer {
+class ct07_satuan_edit extends ct07_satuan {
 
 	// Page ID
 	var $PageID = 'edit';
@@ -25,10 +25,10 @@ class ct03_customer_edit extends ct03_customer {
 	var $ProjectID = '{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}';
 
 	// Table name
-	var $TableName = 't03_customer';
+	var $TableName = 't07_satuan';
 
 	// Page object name
-	var $PageObjName = 't03_customer_edit';
+	var $PageObjName = 't07_satuan_edit';
 
 	// Page headings
 	var $Heading = '';
@@ -256,10 +256,10 @@ class ct03_customer_edit extends ct03_customer {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t03_customer)
-		if (!isset($GLOBALS["t03_customer"]) || get_class($GLOBALS["t03_customer"]) == "ct03_customer") {
-			$GLOBALS["t03_customer"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t03_customer"];
+		// Table object (t07_satuan)
+		if (!isset($GLOBALS["t07_satuan"]) || get_class($GLOBALS["t07_satuan"]) == "ct07_satuan") {
+			$GLOBALS["t07_satuan"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t07_satuan"];
 		}
 
 		// Table object (t96_employees)
@@ -271,7 +271,7 @@ class ct03_customer_edit extends ct03_customer {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't03_customer', TRUE);
+			define("EW_TABLE_NAME", 't07_satuan', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"]))
@@ -313,7 +313,7 @@ class ct03_customer_edit extends ct03_customer {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
 			if ($Security->CanList())
-				$this->Page_Terminate(ew_GetUrl("t03_customerlist.php"));
+				$this->Page_Terminate(ew_GetUrl("t07_satuanlist.php"));
 			else
 				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
@@ -377,13 +377,13 @@ class ct03_customer_edit extends ct03_customer {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t03_customer;
+		global $EW_EXPORT, $t07_satuan;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t03_customer);
+				$doc = new $class($t07_satuan);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -409,7 +409,7 @@ class ct03_customer_edit extends ct03_customer {
 				$pageName = ew_GetPageName($url);
 				if ($pageName != $this->GetListUrl()) { // Not List page
 					$row["caption"] = $this->GetModalCaption($pageName);
-					if ($pageName == "t03_customerview.php")
+					if ($pageName == "t07_satuanview.php")
 						$row["view"] = "1";
 				} else { // List page should not be shown as modal => error
 					$row["error"] = $this->getFailureMessage();
@@ -489,7 +489,7 @@ class ct03_customer_edit extends ct03_customer {
 		if ($this->TotalRecs <= 0) { // No record found
 			if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 				$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-			$this->Page_Terminate("t03_customerlist.php"); // Return to list page
+			$this->Page_Terminate("t07_satuanlist.php"); // Return to list page
 		} elseif ($loadByPosition) { // Load record by position
 			$this->SetupStartRec(); // Set up start record position
 
@@ -538,13 +538,13 @@ class ct03_customer_edit extends ct03_customer {
 				if (!$loaded) {
 					if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 						$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-					$this->Page_Terminate("t03_customerlist.php"); // Return to list page
+					$this->Page_Terminate("t07_satuanlist.php"); // Return to list page
 				} else {
 				}
 				break;
 			Case "U": // Update
 				$sReturnUrl = $this->getReturnUrl();
-				if (ew_GetPageName($sReturnUrl) == "t03_customerlist.php")
+				if (ew_GetPageName($sReturnUrl) == "t07_satuanlist.php")
 					$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to List page with correct master key if necessary
 				$this->SendEmail = TRUE; // Send email on update success
 				if ($this->EditRow()) { // Update record based on key
@@ -813,25 +813,6 @@ class ct03_customer_edit extends ct03_customer {
 		$sFilter = $this->KeyFilter();
 		$sFilter = $this->ApplyUserIDFilters($sFilter);
 		$conn = &$this->Connection();
-		if ($this->Nama->CurrentValue <> "") { // Check field with unique index
-			$sFilterChk = "(`Nama` = '" . ew_AdjustSql($this->Nama->CurrentValue, $this->DBID) . "')";
-			$sFilterChk .= " AND NOT (" . $sFilter . ")";
-			$this->CurrentFilter = $sFilterChk;
-			$sSqlChk = $this->SQL();
-			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-			$rsChk = $conn->Execute($sSqlChk);
-			$conn->raiseErrorFn = '';
-			if ($rsChk === FALSE) {
-				return FALSE;
-			} elseif (!$rsChk->EOF) {
-				$sIdxErrMsg = str_replace("%f", $this->Nama->FldCaption(), $Language->Phrase("DupIndex"));
-				$sIdxErrMsg = str_replace("%v", $this->Nama->CurrentValue, $sIdxErrMsg);
-				$this->setFailureMessage($sIdxErrMsg);
-				$rsChk->Close();
-				return FALSE;
-			}
-			$rsChk->Close();
-		}
 		$this->CurrentFilter = $sFilter;
 		$sSql = $this->SQL();
 		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
@@ -889,7 +870,7 @@ class ct03_customer_edit extends ct03_customer {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t03_customerlist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t07_satuanlist.php"), "", $this->TableVar, TRUE);
 		$PageId = "edit";
 		$Breadcrumb->Add("edit", $PageId, $url);
 	}
@@ -982,29 +963,29 @@ class ct03_customer_edit extends ct03_customer {
 <?php
 
 // Create page object
-if (!isset($t03_customer_edit)) $t03_customer_edit = new ct03_customer_edit();
+if (!isset($t07_satuan_edit)) $t07_satuan_edit = new ct07_satuan_edit();
 
 // Page init
-$t03_customer_edit->Page_Init();
+$t07_satuan_edit->Page_Init();
 
 // Page main
-$t03_customer_edit->Page_Main();
+$t07_satuan_edit->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t03_customer_edit->Page_Render();
+$t07_satuan_edit->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "edit";
-var CurrentForm = ft03_customeredit = new ew_Form("ft03_customeredit", "edit");
+var CurrentForm = ft07_satuanedit = new ew_Form("ft07_satuanedit", "edit");
 
 // Validate form
-ft03_customeredit.Validate = function() {
+ft07_satuanedit.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -1020,7 +1001,7 @@ ft03_customeredit.Validate = function() {
 		$fobj.data("rowindex", infix);
 			elm = this.GetElements("x" + infix + "_Nama");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t03_customer->Nama->FldCaption(), $t03_customer->Nama->ReqErrMsg)) ?>");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t07_satuan->Nama->FldCaption(), $t07_satuan->Nama->ReqErrMsg)) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -1039,7 +1020,7 @@ ft03_customeredit.Validate = function() {
 }
 
 // Form_CustomValidate event
-ft03_customeredit.Form_CustomValidate = 
+ft07_satuanedit.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid.
@@ -1047,7 +1028,7 @@ ft03_customeredit.Form_CustomValidate =
  }
 
 // Use JavaScript validation or not
-ft03_customeredit.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
+ft07_satuanedit.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
 
 // Dynamic selection lists
 // Form object for search
@@ -1057,132 +1038,132 @@ ft03_customeredit.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) 
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php $t03_customer_edit->ShowPageHeader(); ?>
+<?php $t07_satuan_edit->ShowPageHeader(); ?>
 <?php
-$t03_customer_edit->ShowMessage();
+$t07_satuan_edit->ShowMessage();
 ?>
-<?php if (!$t03_customer_edit->IsModal) { ?>
+<?php if (!$t07_satuan_edit->IsModal) { ?>
 <form name="ewPagerForm" class="form-horizontal ewForm ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
-<?php if (!isset($t03_customer_edit->Pager)) $t03_customer_edit->Pager = new cPrevNextPager($t03_customer_edit->StartRec, $t03_customer_edit->DisplayRecs, $t03_customer_edit->TotalRecs, $t03_customer_edit->AutoHidePager) ?>
-<?php if ($t03_customer_edit->Pager->RecordCount > 0 && $t03_customer_edit->Pager->Visible) { ?>
+<?php if (!isset($t07_satuan_edit->Pager)) $t07_satuan_edit->Pager = new cPrevNextPager($t07_satuan_edit->StartRec, $t07_satuan_edit->DisplayRecs, $t07_satuan_edit->TotalRecs, $t07_satuan_edit->AutoHidePager) ?>
+<?php if ($t07_satuan_edit->Pager->RecordCount > 0 && $t07_satuan_edit->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t03_customer_edit->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t03_customer_edit->PageUrl() ?>start=<?php echo $t03_customer_edit->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t07_satuan_edit->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t07_satuan_edit->PageUrl() ?>start=<?php echo $t07_satuan_edit->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t03_customer_edit->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t03_customer_edit->PageUrl() ?>start=<?php echo $t03_customer_edit->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t07_satuan_edit->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t07_satuan_edit->PageUrl() ?>start=<?php echo $t07_satuan_edit->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t03_customer_edit->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t07_satuan_edit->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t03_customer_edit->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t03_customer_edit->PageUrl() ?>start=<?php echo $t03_customer_edit->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t07_satuan_edit->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t07_satuan_edit->PageUrl() ?>start=<?php echo $t07_satuan_edit->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t03_customer_edit->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t03_customer_edit->PageUrl() ?>start=<?php echo $t03_customer_edit->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t07_satuan_edit->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t07_satuan_edit->PageUrl() ?>start=<?php echo $t07_satuan_edit->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t03_customer_edit->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t07_satuan_edit->Pager->PageCount ?></span>
 </div>
 <?php } ?>
 <div class="clearfix"></div>
 </form>
 <?php } ?>
-<form name="ft03_customeredit" id="ft03_customeredit" class="<?php echo $t03_customer_edit->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t03_customer_edit->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t03_customer_edit->Token ?>">
+<form name="ft07_satuanedit" id="ft07_satuanedit" class="<?php echo $t07_satuan_edit->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t07_satuan_edit->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t07_satuan_edit->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t03_customer">
+<input type="hidden" name="t" value="t07_satuan">
 <input type="hidden" name="a_edit" id="a_edit" value="U">
-<input type="hidden" name="modal" value="<?php echo intval($t03_customer_edit->IsModal) ?>">
+<input type="hidden" name="modal" value="<?php echo intval($t07_satuan_edit->IsModal) ?>">
 <div class="ewEditDiv"><!-- page* -->
-<?php if ($t03_customer->Nama->Visible) { // Nama ?>
+<?php if ($t07_satuan->Nama->Visible) { // Nama ?>
 	<div id="r_Nama" class="form-group">
-		<label id="elh_t03_customer_Nama" for="x_Nama" class="<?php echo $t03_customer_edit->LeftColumnClass ?>"><?php echo $t03_customer->Nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="<?php echo $t03_customer_edit->RightColumnClass ?>"><div<?php echo $t03_customer->Nama->CellAttributes() ?>>
-<span id="el_t03_customer_Nama">
-<input type="text" data-table="t03_customer" data-field="x_Nama" name="x_Nama" id="x_Nama" size="30" maxlength="50" placeholder="<?php echo ew_HtmlEncode($t03_customer->Nama->getPlaceHolder()) ?>" value="<?php echo $t03_customer->Nama->EditValue ?>"<?php echo $t03_customer->Nama->EditAttributes() ?>>
+		<label id="elh_t07_satuan_Nama" for="x_Nama" class="<?php echo $t07_satuan_edit->LeftColumnClass ?>"><?php echo $t07_satuan->Nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="<?php echo $t07_satuan_edit->RightColumnClass ?>"><div<?php echo $t07_satuan->Nama->CellAttributes() ?>>
+<span id="el_t07_satuan_Nama">
+<input type="text" data-table="t07_satuan" data-field="x_Nama" name="x_Nama" id="x_Nama" size="30" maxlength="25" placeholder="<?php echo ew_HtmlEncode($t07_satuan->Nama->getPlaceHolder()) ?>" value="<?php echo $t07_satuan->Nama->EditValue ?>"<?php echo $t07_satuan->Nama->EditAttributes() ?>>
 </span>
-<?php echo $t03_customer->Nama->CustomMsg ?></div></div>
+<?php echo $t07_satuan->Nama->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div><!-- /page* -->
-<input type="hidden" data-table="t03_customer" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($t03_customer->id->CurrentValue) ?>">
-<?php if (!$t03_customer_edit->IsModal) { ?>
+<input type="hidden" data-table="t07_satuan" data-field="x_id" name="x_id" id="x_id" value="<?php echo ew_HtmlEncode($t07_satuan->id->CurrentValue) ?>">
+<?php if (!$t07_satuan_edit->IsModal) { ?>
 <div class="form-group"><!-- buttons .form-group -->
-	<div class="<?php echo $t03_customer_edit->OffsetColumnClass ?>"><!-- buttons offset -->
+	<div class="<?php echo $t07_satuan_edit->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("SaveBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t03_customer_edit->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t07_satuan_edit->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
 	</div><!-- /buttons offset -->
 </div><!-- /buttons .form-group -->
 <?php } ?>
-<?php if (!$t03_customer_edit->IsModal) { ?>
-<?php if (!isset($t03_customer_edit->Pager)) $t03_customer_edit->Pager = new cPrevNextPager($t03_customer_edit->StartRec, $t03_customer_edit->DisplayRecs, $t03_customer_edit->TotalRecs, $t03_customer_edit->AutoHidePager) ?>
-<?php if ($t03_customer_edit->Pager->RecordCount > 0 && $t03_customer_edit->Pager->Visible) { ?>
+<?php if (!$t07_satuan_edit->IsModal) { ?>
+<?php if (!isset($t07_satuan_edit->Pager)) $t07_satuan_edit->Pager = new cPrevNextPager($t07_satuan_edit->StartRec, $t07_satuan_edit->DisplayRecs, $t07_satuan_edit->TotalRecs, $t07_satuan_edit->AutoHidePager) ?>
+<?php if ($t07_satuan_edit->Pager->RecordCount > 0 && $t07_satuan_edit->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t03_customer_edit->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t03_customer_edit->PageUrl() ?>start=<?php echo $t03_customer_edit->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t07_satuan_edit->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t07_satuan_edit->PageUrl() ?>start=<?php echo $t07_satuan_edit->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t03_customer_edit->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t03_customer_edit->PageUrl() ?>start=<?php echo $t03_customer_edit->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t07_satuan_edit->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t07_satuan_edit->PageUrl() ?>start=<?php echo $t07_satuan_edit->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t03_customer_edit->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t07_satuan_edit->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t03_customer_edit->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t03_customer_edit->PageUrl() ?>start=<?php echo $t03_customer_edit->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t07_satuan_edit->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t07_satuan_edit->PageUrl() ?>start=<?php echo $t07_satuan_edit->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t03_customer_edit->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t03_customer_edit->PageUrl() ?>start=<?php echo $t03_customer_edit->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t07_satuan_edit->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t07_satuan_edit->PageUrl() ?>start=<?php echo $t07_satuan_edit->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t03_customer_edit->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t07_satuan_edit->Pager->PageCount ?></span>
 </div>
 <?php } ?>
 <div class="clearfix"></div>
 <?php } ?>
 </form>
 <script type="text/javascript">
-ft03_customeredit.Init();
+ft07_satuanedit.Init();
 </script>
 <?php
-$t03_customer_edit->ShowPageFooter();
+$t07_satuan_edit->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -1194,5 +1175,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$t03_customer_edit->Page_Terminate();
+$t07_satuan_edit->Page_Terminate();
 ?>

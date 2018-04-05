@@ -311,6 +311,14 @@ class cdefault {
 			$this->Page_Terminate("t02_vendorlist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't03_customer'))
 			$this->Page_Terminate("t03_customerlist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't04_maingroup'))
+			$this->Page_Terminate("t04_maingrouplist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't05_subgroup'))
+			$this->Page_Terminate("t05_subgrouplist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't06_article'))
+			$this->Page_Terminate("t06_articlelist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't07_satuan'))
+			$this->Page_Terminate("t07_satuanlist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't96_employees'))
 			$this->Page_Terminate("t96_employeeslist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't97_userlevels'))

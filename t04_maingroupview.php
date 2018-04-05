@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg14.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql14.php") ?>
 <?php include_once "phpfn14.php" ?>
-<?php include_once "t97_userlevelsinfo.php" ?>
+<?php include_once "t04_maingroupinfo.php" ?>
 <?php include_once "t96_employeesinfo.php" ?>
 <?php include_once "userfn14.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t97_userlevels_view = NULL; // Initialize page object first
+$t04_maingroup_view = NULL; // Initialize page object first
 
-class ct97_userlevels_view extends ct97_userlevels {
+class ct04_maingroup_view extends ct04_maingroup {
 
 	// Page ID
 	var $PageID = 'view';
@@ -25,10 +25,10 @@ class ct97_userlevels_view extends ct97_userlevels {
 	var $ProjectID = '{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}';
 
 	// Table name
-	var $TableName = 't97_userlevels';
+	var $TableName = 't04_maingroup';
 
 	// Page object name
-	var $PageObjName = 't97_userlevels_view';
+	var $PageObjName = 't04_maingroup_view';
 
 	// Page headings
 	var $Heading = '';
@@ -288,15 +288,15 @@ class ct97_userlevels_view extends ct97_userlevels {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t97_userlevels)
-		if (!isset($GLOBALS["t97_userlevels"]) || get_class($GLOBALS["t97_userlevels"]) == "ct97_userlevels") {
-			$GLOBALS["t97_userlevels"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t97_userlevels"];
+		// Table object (t04_maingroup)
+		if (!isset($GLOBALS["t04_maingroup"]) || get_class($GLOBALS["t04_maingroup"]) == "ct04_maingroup") {
+			$GLOBALS["t04_maingroup"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t04_maingroup"];
 		}
 		$KeyUrl = "";
-		if (@$_GET["userlevelid"] <> "") {
-			$this->RecKey["userlevelid"] = $_GET["userlevelid"];
-			$KeyUrl .= "&amp;userlevelid=" . urlencode($this->RecKey["userlevelid"]);
+		if (@$_GET["id"] <> "") {
+			$this->RecKey["id"] = $_GET["id"];
+			$KeyUrl .= "&amp;id=" . urlencode($this->RecKey["id"]);
 		}
 		$this->ExportPrintUrl = $this->PageUrl() . "export=print" . $KeyUrl;
 		$this->ExportHtmlUrl = $this->PageUrl() . "export=html" . $KeyUrl;
@@ -315,7 +315,7 @@ class ct97_userlevels_view extends ct97_userlevels {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't97_userlevels', TRUE);
+			define("EW_TABLE_NAME", 't04_maingroup', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"]))
@@ -366,9 +366,13 @@ class ct97_userlevels_view extends ct97_userlevels {
 		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
 		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
 		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
-		if (!$Security->CanAdmin()) {
+		if (!$Security->CanView()) {
 			$Security->SaveLastUrl();
-			$this->Page_Terminate(ew_GetUrl("login.php"));
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			if ($Security->CanList())
+				$this->Page_Terminate(ew_GetUrl("t04_maingrouplist.php"));
+			else
+				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
 		if ($Security->IsLoggedIn()) {
 			$Security->UserID_Loading();
@@ -399,9 +403,9 @@ class ct97_userlevels_view extends ct97_userlevels {
 			$this->setExportReturnUrl(ew_CurrentUrl());
 		}
 		$gsExportFile = $this->TableVar; // Get export file, used in header
-		if (@$_GET["userlevelid"] <> "") {
+		if (@$_GET["id"] <> "") {
 			if ($gsExportFile <> "") $gsExportFile .= "_";
-			$gsExportFile .= $_GET["userlevelid"];
+			$gsExportFile .= $_GET["id"];
 		}
 
 		// Get custom export parameters
@@ -427,8 +431,8 @@ class ct97_userlevels_view extends ct97_userlevels {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->userlevelid->SetVisibility();
-		$this->userlevelname->SetVisibility();
+		$this->Kode->SetVisibility();
+		$this->Nama->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -460,13 +464,13 @@ class ct97_userlevels_view extends ct97_userlevels {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t97_userlevels;
+		global $EW_EXPORT, $t04_maingroup;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t97_userlevels);
+				$doc = new $class($t04_maingroup);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -492,7 +496,7 @@ class ct97_userlevels_view extends ct97_userlevels {
 				$pageName = ew_GetPageName($url);
 				if ($pageName != $this->GetListUrl()) { // Not List page
 					$row["caption"] = $this->GetModalCaption($pageName);
-					if ($pageName == "t97_userlevelsview.php")
+					if ($pageName == "t04_maingroupview.php")
 						$row["view"] = "1";
 				} else { // List page should not be shown as modal => error
 					$row["error"] = $this->getFailureMessage();
@@ -538,12 +542,12 @@ class ct97_userlevels_view extends ct97_userlevels {
 		$sReturnUrl = "";
 		$bMatchRecord = FALSE;
 		if ($this->IsPageRequest()) { // Validate request
-			if (@$_GET["userlevelid"] <> "") {
-				$this->userlevelid->setQueryStringValue($_GET["userlevelid"]);
-				$this->RecKey["userlevelid"] = $this->userlevelid->QueryStringValue;
-			} elseif (@$_POST["userlevelid"] <> "") {
-				$this->userlevelid->setFormValue($_POST["userlevelid"]);
-				$this->RecKey["userlevelid"] = $this->userlevelid->FormValue;
+			if (@$_GET["id"] <> "") {
+				$this->id->setQueryStringValue($_GET["id"]);
+				$this->RecKey["id"] = $this->id->QueryStringValue;
+			} elseif (@$_POST["id"] <> "") {
+				$this->id->setFormValue($_POST["id"]);
+				$this->RecKey["id"] = $this->id->FormValue;
 			} else {
 				$bLoadCurrentRecord = TRUE;
 			}
@@ -558,7 +562,7 @@ class ct97_userlevels_view extends ct97_userlevels {
 					if ($this->TotalRecs <= 0) { // No record found
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$this->Page_Terminate("t97_userlevelslist.php"); // Return to list page
+						$this->Page_Terminate("t04_maingrouplist.php"); // Return to list page
 					} elseif ($bLoadCurrentRecord) { // Load current record position
 						$this->SetupStartRec(); // Set up start record position
 
@@ -569,7 +573,7 @@ class ct97_userlevels_view extends ct97_userlevels {
 						}
 					} else { // Match key values
 						while (!$this->Recordset->EOF) {
-							if (strval($this->userlevelid->CurrentValue) == strval($this->Recordset->fields('userlevelid'))) {
+							if (strval($this->id->CurrentValue) == strval($this->Recordset->fields('id'))) {
 								$this->setStartRecordNumber($this->StartRec); // Save record position
 								$bMatchRecord = TRUE;
 								break;
@@ -582,7 +586,7 @@ class ct97_userlevels_view extends ct97_userlevels {
 					if (!$bMatchRecord) {
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$sReturnUrl = "t97_userlevelslist.php"; // No matching record, return to list
+						$sReturnUrl = "t04_maingrouplist.php"; // No matching record, return to list
 					} else {
 						$this->LoadRowValues($this->Recordset); // Load row values
 					}
@@ -595,7 +599,7 @@ class ct97_userlevels_view extends ct97_userlevels {
 				exit();
 			}
 		} else {
-			$sReturnUrl = "t97_userlevelslist.php"; // Not page request, return to list
+			$sReturnUrl = "t04_maingrouplist.php"; // Not page request, return to list
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
@@ -758,16 +762,17 @@ class ct97_userlevels_view extends ct97_userlevels {
 		if (!$rs || $rs->EOF)
 			return;
 		if ($this->AuditTrailOnView) $this->WriteAuditTrailOnView($row);
-		$this->userlevelid->setDbValue($row['userlevelid']);
-		$this->userlevelid->CurrentValue = intval($this->userlevelid->CurrentValue);
-		$this->userlevelname->setDbValue($row['userlevelname']);
+		$this->id->setDbValue($row['id']);
+		$this->Kode->setDbValue($row['Kode']);
+		$this->Nama->setDbValue($row['Nama']);
 	}
 
 	// Return a row with default values
 	function NewRow() {
 		$row = array();
-		$row['userlevelid'] = NULL;
-		$row['userlevelname'] = NULL;
+		$row['id'] = NULL;
+		$row['Kode'] = NULL;
+		$row['Nama'] = NULL;
 		return $row;
 	}
 
@@ -776,8 +781,9 @@ class ct97_userlevels_view extends ct97_userlevels {
 		if (!$rs || !is_array($rs) && $rs->EOF)
 			return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->userlevelid->DbValue = $row['userlevelid'];
-		$this->userlevelname->DbValue = $row['userlevelname'];
+		$this->id->DbValue = $row['id'];
+		$this->Kode->DbValue = $row['Kode'];
+		$this->Nama->DbValue = $row['Nama'];
 	}
 
 	// Render row values based on field settings
@@ -796,29 +802,33 @@ class ct97_userlevels_view extends ct97_userlevels {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// userlevelid
-		// userlevelname
+		// id
+		// Kode
+		// Nama
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// userlevelid
-		$this->userlevelid->ViewValue = $this->userlevelid->CurrentValue;
-		$this->userlevelid->ViewCustomAttributes = "";
+		// id
+		$this->id->ViewValue = $this->id->CurrentValue;
+		$this->id->ViewCustomAttributes = "";
 
-		// userlevelname
-		$this->userlevelname->ViewValue = $this->userlevelname->CurrentValue;
-		if ($Security->GetUserLevelName($this->userlevelid->CurrentValue) <> "") $this->userlevelname->ViewValue = $Security->GetUserLevelName($this->userlevelid->CurrentValue);
-		$this->userlevelname->ViewCustomAttributes = "";
+		// Kode
+		$this->Kode->ViewValue = $this->Kode->CurrentValue;
+		$this->Kode->ViewCustomAttributes = "";
 
-			// userlevelid
-			$this->userlevelid->LinkCustomAttributes = "";
-			$this->userlevelid->HrefValue = "";
-			$this->userlevelid->TooltipValue = "";
+		// Nama
+		$this->Nama->ViewValue = $this->Nama->CurrentValue;
+		$this->Nama->ViewCustomAttributes = "";
 
-			// userlevelname
-			$this->userlevelname->LinkCustomAttributes = "";
-			$this->userlevelname->HrefValue = "";
-			$this->userlevelname->TooltipValue = "";
+			// Kode
+			$this->Kode->LinkCustomAttributes = "";
+			$this->Kode->HrefValue = "";
+			$this->Kode->TooltipValue = "";
+
+			// Nama
+			$this->Nama->LinkCustomAttributes = "";
+			$this->Nama->HrefValue = "";
+			$this->Nama->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -868,7 +878,7 @@ class ct97_userlevels_view extends ct97_userlevels {
 		// Export to Email
 		$item = &$this->ExportOptions->Add("email");
 		$url = "";
-		$item->Body = "<button id=\"emf_t97_userlevels\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_t97_userlevels',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ft97_userlevelsview,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
+		$item->Body = "<button id=\"emf_t04_maingroup\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_t04_maingroup',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ft04_maingroupview,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
 		$item->Visible = TRUE;
 
 		// Drop down button for export
@@ -1069,7 +1079,7 @@ class ct97_userlevels_view extends ct97_userlevels {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t97_userlevelslist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t04_maingrouplist.php"), "", $this->TableVar, TRUE);
 		$PageId = "view";
 		$Breadcrumb->Add("view", $PageId, $url);
 	}
@@ -1181,30 +1191,30 @@ class ct97_userlevels_view extends ct97_userlevels {
 <?php
 
 // Create page object
-if (!isset($t97_userlevels_view)) $t97_userlevels_view = new ct97_userlevels_view();
+if (!isset($t04_maingroup_view)) $t04_maingroup_view = new ct04_maingroup_view();
 
 // Page init
-$t97_userlevels_view->Page_Init();
+$t04_maingroup_view->Page_Init();
 
 // Page main
-$t97_userlevels_view->Page_Main();
+$t04_maingroup_view->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t97_userlevels_view->Page_Render();
+$t04_maingroup_view->Page_Render();
 ?>
 <?php include_once "header.php" ?>
-<?php if ($t97_userlevels->Export == "") { ?>
+<?php if ($t04_maingroup->Export == "") { ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "view";
-var CurrentForm = ft97_userlevelsview = new ew_Form("ft97_userlevelsview", "view");
+var CurrentForm = ft04_maingroupview = new ew_Form("ft04_maingroupview", "view");
 
 // Form_CustomValidate event
-ft97_userlevelsview.Form_CustomValidate = 
+ft04_maingroupview.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid.
@@ -1212,7 +1222,7 @@ ft97_userlevelsview.Form_CustomValidate =
  }
 
 // Use JavaScript validation or not
-ft97_userlevelsview.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
+ft04_maingroupview.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
 
 // Dynamic selection lists
 // Form object for search
@@ -1223,154 +1233,154 @@ ft97_userlevelsview.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE
 // Write your client script here, no need to add script tags.
 </script>
 <?php } ?>
-<?php if ($t97_userlevels->Export == "") { ?>
+<?php if ($t04_maingroup->Export == "") { ?>
 <div class="ewToolbar">
-<?php $t97_userlevels_view->ExportOptions->Render("body") ?>
+<?php $t04_maingroup_view->ExportOptions->Render("body") ?>
 <?php
-	foreach ($t97_userlevels_view->OtherOptions as &$option)
+	foreach ($t04_maingroup_view->OtherOptions as &$option)
 		$option->Render("body");
 ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<?php $t97_userlevels_view->ShowPageHeader(); ?>
+<?php $t04_maingroup_view->ShowPageHeader(); ?>
 <?php
-$t97_userlevels_view->ShowMessage();
+$t04_maingroup_view->ShowMessage();
 ?>
-<?php if (!$t97_userlevels_view->IsModal) { ?>
-<?php if ($t97_userlevels->Export == "") { ?>
+<?php if (!$t04_maingroup_view->IsModal) { ?>
+<?php if ($t04_maingroup->Export == "") { ?>
 <form name="ewPagerForm" class="form-inline ewForm ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
-<?php if (!isset($t97_userlevels_view->Pager)) $t97_userlevels_view->Pager = new cPrevNextPager($t97_userlevels_view->StartRec, $t97_userlevels_view->DisplayRecs, $t97_userlevels_view->TotalRecs, $t97_userlevels_view->AutoHidePager) ?>
-<?php if ($t97_userlevels_view->Pager->RecordCount > 0 && $t97_userlevels_view->Pager->Visible) { ?>
+<?php if (!isset($t04_maingroup_view->Pager)) $t04_maingroup_view->Pager = new cPrevNextPager($t04_maingroup_view->StartRec, $t04_maingroup_view->DisplayRecs, $t04_maingroup_view->TotalRecs, $t04_maingroup_view->AutoHidePager) ?>
+<?php if ($t04_maingroup_view->Pager->RecordCount > 0 && $t04_maingroup_view->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t97_userlevels_view->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t97_userlevels_view->PageUrl() ?>start=<?php echo $t97_userlevels_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t04_maingroup_view->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t04_maingroup_view->PageUrl() ?>start=<?php echo $t04_maingroup_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t97_userlevels_view->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t97_userlevels_view->PageUrl() ?>start=<?php echo $t97_userlevels_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t04_maingroup_view->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t04_maingroup_view->PageUrl() ?>start=<?php echo $t04_maingroup_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t97_userlevels_view->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t04_maingroup_view->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t97_userlevels_view->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t97_userlevels_view->PageUrl() ?>start=<?php echo $t97_userlevels_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t04_maingroup_view->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t04_maingroup_view->PageUrl() ?>start=<?php echo $t04_maingroup_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t97_userlevels_view->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t97_userlevels_view->PageUrl() ?>start=<?php echo $t97_userlevels_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t04_maingroup_view->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t04_maingroup_view->PageUrl() ?>start=<?php echo $t04_maingroup_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t97_userlevels_view->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t04_maingroup_view->Pager->PageCount ?></span>
 </div>
 <?php } ?>
 <div class="clearfix"></div>
 </form>
 <?php } ?>
 <?php } ?>
-<form name="ft97_userlevelsview" id="ft97_userlevelsview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t97_userlevels_view->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t97_userlevels_view->Token ?>">
+<form name="ft04_maingroupview" id="ft04_maingroupview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t04_maingroup_view->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t04_maingroup_view->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t97_userlevels">
-<input type="hidden" name="modal" value="<?php echo intval($t97_userlevels_view->IsModal) ?>">
+<input type="hidden" name="t" value="t04_maingroup">
+<input type="hidden" name="modal" value="<?php echo intval($t04_maingroup_view->IsModal) ?>">
 <table class="table table-striped table-bordered table-hover table-condensed ewViewTable">
-<?php if ($t97_userlevels->userlevelid->Visible) { // userlevelid ?>
-	<tr id="r_userlevelid">
-		<td class="col-sm-2"><span id="elh_t97_userlevels_userlevelid"><?php echo $t97_userlevels->userlevelid->FldCaption() ?></span></td>
-		<td data-name="userlevelid"<?php echo $t97_userlevels->userlevelid->CellAttributes() ?>>
-<span id="el_t97_userlevels_userlevelid">
-<span<?php echo $t97_userlevels->userlevelid->ViewAttributes() ?>>
-<?php echo $t97_userlevels->userlevelid->ViewValue ?></span>
+<?php if ($t04_maingroup->Kode->Visible) { // Kode ?>
+	<tr id="r_Kode">
+		<td class="col-sm-2"><span id="elh_t04_maingroup_Kode"><?php echo $t04_maingroup->Kode->FldCaption() ?></span></td>
+		<td data-name="Kode"<?php echo $t04_maingroup->Kode->CellAttributes() ?>>
+<span id="el_t04_maingroup_Kode">
+<span<?php echo $t04_maingroup->Kode->ViewAttributes() ?>>
+<?php echo $t04_maingroup->Kode->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($t97_userlevels->userlevelname->Visible) { // userlevelname ?>
-	<tr id="r_userlevelname">
-		<td class="col-sm-2"><span id="elh_t97_userlevels_userlevelname"><?php echo $t97_userlevels->userlevelname->FldCaption() ?></span></td>
-		<td data-name="userlevelname"<?php echo $t97_userlevels->userlevelname->CellAttributes() ?>>
-<span id="el_t97_userlevels_userlevelname">
-<span<?php echo $t97_userlevels->userlevelname->ViewAttributes() ?>>
-<?php echo $t97_userlevels->userlevelname->ViewValue ?></span>
+<?php if ($t04_maingroup->Nama->Visible) { // Nama ?>
+	<tr id="r_Nama">
+		<td class="col-sm-2"><span id="elh_t04_maingroup_Nama"><?php echo $t04_maingroup->Nama->FldCaption() ?></span></td>
+		<td data-name="Nama"<?php echo $t04_maingroup->Nama->CellAttributes() ?>>
+<span id="el_t04_maingroup_Nama">
+<span<?php echo $t04_maingroup->Nama->ViewAttributes() ?>>
+<?php echo $t04_maingroup->Nama->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
 </table>
-<?php if (!$t97_userlevels_view->IsModal) { ?>
-<?php if ($t97_userlevels->Export == "") { ?>
-<?php if (!isset($t97_userlevels_view->Pager)) $t97_userlevels_view->Pager = new cPrevNextPager($t97_userlevels_view->StartRec, $t97_userlevels_view->DisplayRecs, $t97_userlevels_view->TotalRecs, $t97_userlevels_view->AutoHidePager) ?>
-<?php if ($t97_userlevels_view->Pager->RecordCount > 0 && $t97_userlevels_view->Pager->Visible) { ?>
+<?php if (!$t04_maingroup_view->IsModal) { ?>
+<?php if ($t04_maingroup->Export == "") { ?>
+<?php if (!isset($t04_maingroup_view->Pager)) $t04_maingroup_view->Pager = new cPrevNextPager($t04_maingroup_view->StartRec, $t04_maingroup_view->DisplayRecs, $t04_maingroup_view->TotalRecs, $t04_maingroup_view->AutoHidePager) ?>
+<?php if ($t04_maingroup_view->Pager->RecordCount > 0 && $t04_maingroup_view->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t97_userlevels_view->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t97_userlevels_view->PageUrl() ?>start=<?php echo $t97_userlevels_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t04_maingroup_view->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t04_maingroup_view->PageUrl() ?>start=<?php echo $t04_maingroup_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t97_userlevels_view->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t97_userlevels_view->PageUrl() ?>start=<?php echo $t97_userlevels_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t04_maingroup_view->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t04_maingroup_view->PageUrl() ?>start=<?php echo $t04_maingroup_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t97_userlevels_view->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t04_maingroup_view->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t97_userlevels_view->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t97_userlevels_view->PageUrl() ?>start=<?php echo $t97_userlevels_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t04_maingroup_view->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t04_maingroup_view->PageUrl() ?>start=<?php echo $t04_maingroup_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t97_userlevels_view->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t97_userlevels_view->PageUrl() ?>start=<?php echo $t97_userlevels_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t04_maingroup_view->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t04_maingroup_view->PageUrl() ?>start=<?php echo $t04_maingroup_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t97_userlevels_view->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t04_maingroup_view->Pager->PageCount ?></span>
 </div>
 <?php } ?>
 <div class="clearfix"></div>
 <?php } ?>
 <?php } ?>
 </form>
-<?php if ($t97_userlevels->Export == "") { ?>
+<?php if ($t04_maingroup->Export == "") { ?>
 <script type="text/javascript">
-ft97_userlevelsview.Init();
+ft04_maingroupview.Init();
 </script>
 <?php } ?>
 <?php
-$t97_userlevels_view->ShowPageFooter();
+$t04_maingroup_view->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
-<?php if ($t97_userlevels->Export == "") { ?>
+<?php if ($t04_maingroup->Export == "") { ?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
@@ -1380,5 +1390,5 @@ if (EW_DEBUG_ENABLED)
 <?php } ?>
 <?php include_once "footer.php" ?>
 <?php
-$t97_userlevels_view->Page_Terminate();
+$t04_maingroup_view->Page_Terminate();
 ?>

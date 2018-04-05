@@ -710,6 +710,17 @@ class ct02_vendor_add extends ct02_vendor {
 	// Add record
 	function AddRow($rsold = NULL) {
 		global $Language, $Security;
+		if ($this->Nama->CurrentValue <> "") { // Check field with unique index
+			$sFilter = "(Nama = '" . ew_AdjustSql($this->Nama->CurrentValue, $this->DBID) . "')";
+			$rsChk = $this->LoadRs($sFilter);
+			if ($rsChk && !$rsChk->EOF) {
+				$sIdxErrMsg = str_replace("%f", $this->Nama->FldCaption(), $Language->Phrase("DupIndex"));
+				$sIdxErrMsg = str_replace("%v", $this->Nama->CurrentValue, $sIdxErrMsg);
+				$this->setFailureMessage($sIdxErrMsg);
+				$rsChk->Close();
+				return FALSE;
+			}
+		}
 		$conn = &$this->Connection();
 
 		// Load db values from rsold

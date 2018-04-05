@@ -105,6 +105,12 @@ class ct97_userlevels_list extends ct97_userlevels {
 	var $GridEditUrl;
 	var $MultiDeleteUrl;
 	var $MultiUpdateUrl;
+	var $AuditTrailOnAdd = TRUE;
+	var $AuditTrailOnEdit = TRUE;
+	var $AuditTrailOnDelete = TRUE;
+	var $AuditTrailOnView = FALSE;
+	var $AuditTrailOnViewData = FALSE;
+	var $AuditTrailOnSearch = FALSE;
 
 	// Message
 	function getMessage() {
@@ -802,10 +808,6 @@ class ct97_userlevels_list extends ct97_userlevels {
 		// Initialize
 		$sFilterList = "";
 		$sSavedFilterList = "";
-
-		// Load server side filters
-		if (EW_SEARCH_FILTER_OPTION == "Server" && isset($UserProfile))
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ft97_userlevelslistsrch");
 		$sFilterList = ew_Concat($sFilterList, $this->userlevelid->AdvancedSearch->ToJson(), ","); // Field userlevelid
 		$sFilterList = ew_Concat($sFilterList, $this->userlevelname->AdvancedSearch->ToJson(), ","); // Field userlevelname
 		if ($this->BasicSearch->Keyword <> "") {
@@ -2129,6 +2131,13 @@ var CurrentSearchForm = ft97_userlevelslistsrch = new ew_Form("ft97_userlevelsli
 			$t97_userlevels_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
 			$t97_userlevels_list->setWarningMessage($Language->Phrase("NoRecord"));
+	}
+
+	// Audit trail on search
+	if ($t97_userlevels_list->AuditTrailOnSearch && $t97_userlevels_list->Command == "search" && !$t97_userlevels_list->RestoreSearch) {
+		$searchparm = ew_ServerVar("QUERY_STRING");
+		$searchsql = $t97_userlevels_list->getSessionWhere();
+		$t97_userlevels_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
 	}
 $t97_userlevels_list->RenderOtherOptions();
 ?>

@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg14.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql14.php") ?>
 <?php include_once "phpfn14.php" ?>
-<?php include_once "t98_userlevelpermissionsinfo.php" ?>
+<?php include_once "t07_satuaninfo.php" ?>
 <?php include_once "t96_employeesinfo.php" ?>
 <?php include_once "userfn14.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t98_userlevelpermissions_add = NULL; // Initialize page object first
+$t07_satuan_add = NULL; // Initialize page object first
 
-class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
+class ct07_satuan_add extends ct07_satuan {
 
 	// Page ID
 	var $PageID = 'add';
@@ -25,10 +25,10 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 	var $ProjectID = '{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}';
 
 	// Table name
-	var $TableName = 't98_userlevelpermissions';
+	var $TableName = 't07_satuan';
 
 	// Page object name
-	var $PageObjName = 't98_userlevelpermissions_add';
+	var $PageObjName = 't07_satuan_add';
 
 	// Page headings
 	var $Heading = '';
@@ -256,10 +256,10 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t98_userlevelpermissions)
-		if (!isset($GLOBALS["t98_userlevelpermissions"]) || get_class($GLOBALS["t98_userlevelpermissions"]) == "ct98_userlevelpermissions") {
-			$GLOBALS["t98_userlevelpermissions"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t98_userlevelpermissions"];
+		// Table object (t07_satuan)
+		if (!isset($GLOBALS["t07_satuan"]) || get_class($GLOBALS["t07_satuan"]) == "ct07_satuan") {
+			$GLOBALS["t07_satuan"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t07_satuan"];
 		}
 
 		// Table object (t96_employees)
@@ -271,7 +271,7 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't98_userlevelpermissions', TRUE);
+			define("EW_TABLE_NAME", 't07_satuan', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"]))
@@ -309,9 +309,13 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
 		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
 		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
-		if (!$Security->CanAdmin()) {
+		if (!$Security->CanAdd()) {
 			$Security->SaveLastUrl();
-			$this->Page_Terminate(ew_GetUrl("login.php"));
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			if ($Security->CanList())
+				$this->Page_Terminate(ew_GetUrl("t07_satuanlist.php"));
+			else
+				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
 		if ($Security->IsLoggedIn()) {
 			$Security->UserID_Loading();
@@ -327,9 +331,7 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->userlevelid->SetVisibility();
-		$this->_tablename->SetVisibility();
-		$this->permission->SetVisibility();
+		$this->Nama->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -375,13 +377,13 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t98_userlevelpermissions;
+		global $EW_EXPORT, $t07_satuan;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t98_userlevelpermissions);
+				$doc = new $class($t07_satuan);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -407,7 +409,7 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 				$pageName = ew_GetPageName($url);
 				if ($pageName != $this->GetListUrl()) { // Not List page
 					$row["caption"] = $this->GetModalCaption($pageName);
-					if ($pageName == "t98_userlevelpermissionsview.php")
+					if ($pageName == "t07_satuanview.php")
 						$row["view"] = "1";
 				} else { // List page should not be shown as modal => error
 					$row["error"] = $this->getFailureMessage();
@@ -452,18 +454,11 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 
 			// Load key values from QueryString
 			$this->CopyRecord = TRUE;
-			if (@$_GET["userlevelid"] != "") {
-				$this->userlevelid->setQueryStringValue($_GET["userlevelid"]);
-				$this->setKey("userlevelid", $this->userlevelid->CurrentValue); // Set up key
+			if (@$_GET["id"] != "") {
+				$this->id->setQueryStringValue($_GET["id"]);
+				$this->setKey("id", $this->id->CurrentValue); // Set up key
 			} else {
-				$this->setKey("userlevelid", ""); // Clear key
-				$this->CopyRecord = FALSE;
-			}
-			if (@$_GET["_tablename"] != "") {
-				$this->_tablename->setQueryStringValue($_GET["_tablename"]);
-				$this->setKey("_tablename", $this->_tablename->CurrentValue); // Set up key
-			} else {
-				$this->setKey("_tablename", ""); // Clear key
+				$this->setKey("id", ""); // Clear key
 				$this->CopyRecord = FALSE;
 			}
 			if ($this->CopyRecord) {
@@ -498,7 +493,7 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 			case "C": // Copy an existing record
 				if (!$loaded) { // Record not loaded
 					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
-					$this->Page_Terminate("t98_userlevelpermissionslist.php"); // No matching record, return to list
+					$this->Page_Terminate("t07_satuanlist.php"); // No matching record, return to list
 				}
 				break;
 			case "A": // Add new record
@@ -507,9 +502,9 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 					if ($this->getSuccessMessage() == "")
 						$this->setSuccessMessage($Language->Phrase("AddSuccess")); // Set up success message
 					$sReturnUrl = $this->getReturnUrl();
-					if (ew_GetPageName($sReturnUrl) == "t98_userlevelpermissionslist.php")
+					if (ew_GetPageName($sReturnUrl) == "t07_satuanlist.php")
 						$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to List page with correct master key if necessary
-					elseif (ew_GetPageName($sReturnUrl) == "t98_userlevelpermissionsview.php")
+					elseif (ew_GetPageName($sReturnUrl) == "t07_satuanview.php")
 						$sReturnUrl = $this->GetViewUrl(); // View page, return to View page with keyurl directly
 					$this->Page_Terminate($sReturnUrl); // Clean up and return
 				} else {
@@ -538,12 +533,10 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 
 	// Load default values
 	function LoadDefaultValues() {
-		$this->userlevelid->CurrentValue = NULL;
-		$this->userlevelid->OldValue = $this->userlevelid->CurrentValue;
-		$this->_tablename->CurrentValue = NULL;
-		$this->_tablename->OldValue = $this->_tablename->CurrentValue;
-		$this->permission->CurrentValue = NULL;
-		$this->permission->OldValue = $this->permission->CurrentValue;
+		$this->id->CurrentValue = NULL;
+		$this->id->OldValue = $this->id->CurrentValue;
+		$this->Nama->CurrentValue = NULL;
+		$this->Nama->OldValue = $this->Nama->CurrentValue;
 	}
 
 	// Load form values
@@ -551,23 +544,15 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 
 		// Load from form
 		global $objForm;
-		if (!$this->userlevelid->FldIsDetailKey) {
-			$this->userlevelid->setFormValue($objForm->GetValue("x_userlevelid"));
-		}
-		if (!$this->_tablename->FldIsDetailKey) {
-			$this->_tablename->setFormValue($objForm->GetValue("x__tablename"));
-		}
-		if (!$this->permission->FldIsDetailKey) {
-			$this->permission->setFormValue($objForm->GetValue("x_permission"));
+		if (!$this->Nama->FldIsDetailKey) {
+			$this->Nama->setFormValue($objForm->GetValue("x_Nama"));
 		}
 	}
 
 	// Restore form values
 	function RestoreFormValues() {
 		global $objForm;
-		$this->userlevelid->CurrentValue = $this->userlevelid->FormValue;
-		$this->_tablename->CurrentValue = $this->_tablename->FormValue;
-		$this->permission->CurrentValue = $this->permission->FormValue;
+		$this->Nama->CurrentValue = $this->Nama->FormValue;
 	}
 
 	// Load row based on key values
@@ -603,18 +588,16 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 		$this->Row_Selected($row);
 		if (!$rs || $rs->EOF)
 			return;
-		$this->userlevelid->setDbValue($row['userlevelid']);
-		$this->_tablename->setDbValue($row['tablename']);
-		$this->permission->setDbValue($row['permission']);
+		$this->id->setDbValue($row['id']);
+		$this->Nama->setDbValue($row['Nama']);
 	}
 
 	// Return a row with default values
 	function NewRow() {
 		$this->LoadDefaultValues();
 		$row = array();
-		$row['userlevelid'] = $this->userlevelid->CurrentValue;
-		$row['tablename'] = $this->_tablename->CurrentValue;
-		$row['permission'] = $this->permission->CurrentValue;
+		$row['id'] = $this->id->CurrentValue;
+		$row['Nama'] = $this->Nama->CurrentValue;
 		return $row;
 	}
 
@@ -623,9 +606,8 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 		if (!$rs || !is_array($rs) && $rs->EOF)
 			return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->userlevelid->DbValue = $row['userlevelid'];
-		$this->_tablename->DbValue = $row['tablename'];
-		$this->permission->DbValue = $row['permission'];
+		$this->id->DbValue = $row['id'];
+		$this->Nama->DbValue = $row['Nama'];
 	}
 
 	// Load old record
@@ -633,12 +615,8 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 
 		// Load key values from Session
 		$bValidKey = TRUE;
-		if (strval($this->getKey("userlevelid")) <> "")
-			$this->userlevelid->CurrentValue = $this->getKey("userlevelid"); // userlevelid
-		else
-			$bValidKey = FALSE;
-		if (strval($this->getKey("_tablename")) <> "")
-			$this->_tablename->CurrentValue = $this->getKey("_tablename"); // tablename
+		if (strval($this->getKey("id")) <> "")
+			$this->id->CurrentValue = $this->getKey("id"); // id
 		else
 			$bValidKey = FALSE;
 
@@ -664,71 +642,36 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// userlevelid
-		// tablename
-		// permission
+		// id
+		// Nama
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// userlevelid
-		$this->userlevelid->ViewValue = $this->userlevelid->CurrentValue;
-		$this->userlevelid->ViewCustomAttributes = "";
+		// id
+		$this->id->ViewValue = $this->id->CurrentValue;
+		$this->id->ViewCustomAttributes = "";
 
-		// tablename
-		$this->_tablename->ViewValue = $this->_tablename->CurrentValue;
-		$this->_tablename->ViewCustomAttributes = "";
+		// Nama
+		$this->Nama->ViewValue = $this->Nama->CurrentValue;
+		$this->Nama->ViewCustomAttributes = "";
 
-		// permission
-		$this->permission->ViewValue = $this->permission->CurrentValue;
-		$this->permission->ViewCustomAttributes = "";
-
-			// userlevelid
-			$this->userlevelid->LinkCustomAttributes = "";
-			$this->userlevelid->HrefValue = "";
-			$this->userlevelid->TooltipValue = "";
-
-			// tablename
-			$this->_tablename->LinkCustomAttributes = "";
-			$this->_tablename->HrefValue = "";
-			$this->_tablename->TooltipValue = "";
-
-			// permission
-			$this->permission->LinkCustomAttributes = "";
-			$this->permission->HrefValue = "";
-			$this->permission->TooltipValue = "";
+			// Nama
+			$this->Nama->LinkCustomAttributes = "";
+			$this->Nama->HrefValue = "";
+			$this->Nama->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
-			// userlevelid
-			$this->userlevelid->EditAttrs["class"] = "form-control";
-			$this->userlevelid->EditCustomAttributes = "";
-			$this->userlevelid->EditValue = ew_HtmlEncode($this->userlevelid->CurrentValue);
-			$this->userlevelid->PlaceHolder = ew_RemoveHtml($this->userlevelid->FldCaption());
-
-			// tablename
-			$this->_tablename->EditAttrs["class"] = "form-control";
-			$this->_tablename->EditCustomAttributes = "";
-			$this->_tablename->EditValue = ew_HtmlEncode($this->_tablename->CurrentValue);
-			$this->_tablename->PlaceHolder = ew_RemoveHtml($this->_tablename->FldCaption());
-
-			// permission
-			$this->permission->EditAttrs["class"] = "form-control";
-			$this->permission->EditCustomAttributes = "";
-			$this->permission->EditValue = ew_HtmlEncode($this->permission->CurrentValue);
-			$this->permission->PlaceHolder = ew_RemoveHtml($this->permission->FldCaption());
+			// Nama
+			$this->Nama->EditAttrs["class"] = "form-control";
+			$this->Nama->EditCustomAttributes = "";
+			$this->Nama->EditValue = ew_HtmlEncode($this->Nama->CurrentValue);
+			$this->Nama->PlaceHolder = ew_RemoveHtml($this->Nama->FldCaption());
 
 			// Add refer script
-			// userlevelid
+			// Nama
 
-			$this->userlevelid->LinkCustomAttributes = "";
-			$this->userlevelid->HrefValue = "";
-
-			// tablename
-			$this->_tablename->LinkCustomAttributes = "";
-			$this->_tablename->HrefValue = "";
-
-			// permission
-			$this->permission->LinkCustomAttributes = "";
-			$this->permission->HrefValue = "";
+			$this->Nama->LinkCustomAttributes = "";
+			$this->Nama->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD || $this->RowType == EW_ROWTYPE_EDIT || $this->RowType == EW_ROWTYPE_SEARCH) // Add/Edit/Search row
 			$this->SetupFieldTitles();
@@ -748,20 +691,8 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
-		if (!$this->userlevelid->FldIsDetailKey && !is_null($this->userlevelid->FormValue) && $this->userlevelid->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->userlevelid->FldCaption(), $this->userlevelid->ReqErrMsg));
-		}
-		if (!ew_CheckInteger($this->userlevelid->FormValue)) {
-			ew_AddMessage($gsFormError, $this->userlevelid->FldErrMsg());
-		}
-		if (!$this->_tablename->FldIsDetailKey && !is_null($this->_tablename->FormValue) && $this->_tablename->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->_tablename->FldCaption(), $this->_tablename->ReqErrMsg));
-		}
-		if (!$this->permission->FldIsDetailKey && !is_null($this->permission->FormValue) && $this->permission->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->permission->FldCaption(), $this->permission->ReqErrMsg));
-		}
-		if (!ew_CheckInteger($this->permission->FormValue)) {
-			ew_AddMessage($gsFormError, $this->permission->FldErrMsg());
+		if (!$this->Nama->FldIsDetailKey && !is_null($this->Nama->FormValue) && $this->Nama->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->Nama->FldCaption(), $this->Nama->ReqErrMsg));
 		}
 
 		// Return validate result
@@ -787,42 +718,12 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 		}
 		$rsnew = array();
 
-		// userlevelid
-		$this->userlevelid->SetDbValueDef($rsnew, $this->userlevelid->CurrentValue, 0, FALSE);
-
-		// tablename
-		$this->_tablename->SetDbValueDef($rsnew, $this->_tablename->CurrentValue, "", FALSE);
-
-		// permission
-		$this->permission->SetDbValueDef($rsnew, $this->permission->CurrentValue, 0, FALSE);
+		// Nama
+		$this->Nama->SetDbValueDef($rsnew, $this->Nama->CurrentValue, "", FALSE);
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
 		$bInsertRow = $this->Row_Inserting($rs, $rsnew);
-
-		// Check if key value entered
-		if ($bInsertRow && $this->ValidateKey && strval($rsnew['userlevelid']) == "") {
-			$this->setFailureMessage($Language->Phrase("InvalidKeyValue"));
-			$bInsertRow = FALSE;
-		}
-
-		// Check if key value entered
-		if ($bInsertRow && $this->ValidateKey && strval($rsnew['tablename']) == "") {
-			$this->setFailureMessage($Language->Phrase("InvalidKeyValue"));
-			$bInsertRow = FALSE;
-		}
-
-		// Check for duplicate key
-		if ($bInsertRow && $this->ValidateKey) {
-			$sFilter = $this->KeyFilter();
-			$rsChk = $this->LoadRs($sFilter);
-			if ($rsChk && !$rsChk->EOF) {
-				$sKeyErrMsg = str_replace("%f", $sFilter, $Language->Phrase("DupKey"));
-				$this->setFailureMessage($sKeyErrMsg);
-				$rsChk->Close();
-				$bInsertRow = FALSE;
-			}
-		}
 		if ($bInsertRow) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			$AddRow = $this->Insert($rsnew);
@@ -855,7 +756,7 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t98_userlevelpermissionslist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t07_satuanlist.php"), "", $this->TableVar, TRUE);
 		$PageId = ($this->CurrentAction == "C") ? "Copy" : "Add";
 		$Breadcrumb->Add("add", $PageId, $url);
 	}
@@ -948,29 +849,29 @@ class ct98_userlevelpermissions_add extends ct98_userlevelpermissions {
 <?php
 
 // Create page object
-if (!isset($t98_userlevelpermissions_add)) $t98_userlevelpermissions_add = new ct98_userlevelpermissions_add();
+if (!isset($t07_satuan_add)) $t07_satuan_add = new ct07_satuan_add();
 
 // Page init
-$t98_userlevelpermissions_add->Page_Init();
+$t07_satuan_add->Page_Init();
 
 // Page main
-$t98_userlevelpermissions_add->Page_Main();
+$t07_satuan_add->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t98_userlevelpermissions_add->Page_Render();
+$t07_satuan_add->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "add";
-var CurrentForm = ft98_userlevelpermissionsadd = new ew_Form("ft98_userlevelpermissionsadd", "add");
+var CurrentForm = ft07_satuanadd = new ew_Form("ft07_satuanadd", "add");
 
 // Validate form
-ft98_userlevelpermissionsadd.Validate = function() {
+ft07_satuanadd.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -984,21 +885,9 @@ ft98_userlevelpermissionsadd.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
-			elm = this.GetElements("x" + infix + "_userlevelid");
+			elm = this.GetElements("x" + infix + "_Nama");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t98_userlevelpermissions->userlevelid->FldCaption(), $t98_userlevelpermissions->userlevelid->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_userlevelid");
-			if (elm && !ew_CheckInteger(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t98_userlevelpermissions->userlevelid->FldErrMsg()) ?>");
-			elm = this.GetElements("x" + infix + "__tablename");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t98_userlevelpermissions->_tablename->FldCaption(), $t98_userlevelpermissions->_tablename->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_permission");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t98_userlevelpermissions->permission->FldCaption(), $t98_userlevelpermissions->permission->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_permission");
-			if (elm && !ew_CheckInteger(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t98_userlevelpermissions->permission->FldErrMsg()) ?>");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t07_satuan->Nama->FldCaption(), $t07_satuan->Nama->ReqErrMsg)) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -1017,7 +906,7 @@ ft98_userlevelpermissionsadd.Validate = function() {
 }
 
 // Form_CustomValidate event
-ft98_userlevelpermissionsadd.Form_CustomValidate = 
+ft07_satuanadd.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid.
@@ -1025,7 +914,7 @@ ft98_userlevelpermissionsadd.Form_CustomValidate =
  }
 
 // Use JavaScript validation or not
-ft98_userlevelpermissionsadd.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
+ft07_satuanadd.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
 
 // Dynamic selection lists
 // Form object for search
@@ -1035,63 +924,43 @@ ft98_userlevelpermissionsadd.ValidateRequired = <?php echo json_encode(EW_CLIENT
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php $t98_userlevelpermissions_add->ShowPageHeader(); ?>
+<?php $t07_satuan_add->ShowPageHeader(); ?>
 <?php
-$t98_userlevelpermissions_add->ShowMessage();
+$t07_satuan_add->ShowMessage();
 ?>
-<form name="ft98_userlevelpermissionsadd" id="ft98_userlevelpermissionsadd" class="<?php echo $t98_userlevelpermissions_add->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t98_userlevelpermissions_add->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t98_userlevelpermissions_add->Token ?>">
+<form name="ft07_satuanadd" id="ft07_satuanadd" class="<?php echo $t07_satuan_add->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t07_satuan_add->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t07_satuan_add->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t98_userlevelpermissions">
+<input type="hidden" name="t" value="t07_satuan">
 <input type="hidden" name="a_add" id="a_add" value="A">
-<input type="hidden" name="modal" value="<?php echo intval($t98_userlevelpermissions_add->IsModal) ?>">
+<input type="hidden" name="modal" value="<?php echo intval($t07_satuan_add->IsModal) ?>">
 <div class="ewAddDiv"><!-- page* -->
-<?php if ($t98_userlevelpermissions->userlevelid->Visible) { // userlevelid ?>
-	<div id="r_userlevelid" class="form-group">
-		<label id="elh_t98_userlevelpermissions_userlevelid" for="x_userlevelid" class="<?php echo $t98_userlevelpermissions_add->LeftColumnClass ?>"><?php echo $t98_userlevelpermissions->userlevelid->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="<?php echo $t98_userlevelpermissions_add->RightColumnClass ?>"><div<?php echo $t98_userlevelpermissions->userlevelid->CellAttributes() ?>>
-<span id="el_t98_userlevelpermissions_userlevelid">
-<input type="text" data-table="t98_userlevelpermissions" data-field="x_userlevelid" name="x_userlevelid" id="x_userlevelid" size="30" placeholder="<?php echo ew_HtmlEncode($t98_userlevelpermissions->userlevelid->getPlaceHolder()) ?>" value="<?php echo $t98_userlevelpermissions->userlevelid->EditValue ?>"<?php echo $t98_userlevelpermissions->userlevelid->EditAttributes() ?>>
+<?php if ($t07_satuan->Nama->Visible) { // Nama ?>
+	<div id="r_Nama" class="form-group">
+		<label id="elh_t07_satuan_Nama" for="x_Nama" class="<?php echo $t07_satuan_add->LeftColumnClass ?>"><?php echo $t07_satuan->Nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="<?php echo $t07_satuan_add->RightColumnClass ?>"><div<?php echo $t07_satuan->Nama->CellAttributes() ?>>
+<span id="el_t07_satuan_Nama">
+<input type="text" data-table="t07_satuan" data-field="x_Nama" name="x_Nama" id="x_Nama" size="30" maxlength="25" placeholder="<?php echo ew_HtmlEncode($t07_satuan->Nama->getPlaceHolder()) ?>" value="<?php echo $t07_satuan->Nama->EditValue ?>"<?php echo $t07_satuan->Nama->EditAttributes() ?>>
 </span>
-<?php echo $t98_userlevelpermissions->userlevelid->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
-<?php if ($t98_userlevelpermissions->_tablename->Visible) { // tablename ?>
-	<div id="r__tablename" class="form-group">
-		<label id="elh_t98_userlevelpermissions__tablename" for="x__tablename" class="<?php echo $t98_userlevelpermissions_add->LeftColumnClass ?>"><?php echo $t98_userlevelpermissions->_tablename->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="<?php echo $t98_userlevelpermissions_add->RightColumnClass ?>"><div<?php echo $t98_userlevelpermissions->_tablename->CellAttributes() ?>>
-<span id="el_t98_userlevelpermissions__tablename">
-<input type="text" data-table="t98_userlevelpermissions" data-field="x__tablename" name="x__tablename" id="x__tablename" size="30" maxlength="255" placeholder="<?php echo ew_HtmlEncode($t98_userlevelpermissions->_tablename->getPlaceHolder()) ?>" value="<?php echo $t98_userlevelpermissions->_tablename->EditValue ?>"<?php echo $t98_userlevelpermissions->_tablename->EditAttributes() ?>>
-</span>
-<?php echo $t98_userlevelpermissions->_tablename->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
-<?php if ($t98_userlevelpermissions->permission->Visible) { // permission ?>
-	<div id="r_permission" class="form-group">
-		<label id="elh_t98_userlevelpermissions_permission" for="x_permission" class="<?php echo $t98_userlevelpermissions_add->LeftColumnClass ?>"><?php echo $t98_userlevelpermissions->permission->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="<?php echo $t98_userlevelpermissions_add->RightColumnClass ?>"><div<?php echo $t98_userlevelpermissions->permission->CellAttributes() ?>>
-<span id="el_t98_userlevelpermissions_permission">
-<input type="text" data-table="t98_userlevelpermissions" data-field="x_permission" name="x_permission" id="x_permission" size="30" placeholder="<?php echo ew_HtmlEncode($t98_userlevelpermissions->permission->getPlaceHolder()) ?>" value="<?php echo $t98_userlevelpermissions->permission->EditValue ?>"<?php echo $t98_userlevelpermissions->permission->EditAttributes() ?>>
-</span>
-<?php echo $t98_userlevelpermissions->permission->CustomMsg ?></div></div>
+<?php echo $t07_satuan->Nama->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div><!-- /page* -->
-<?php if (!$t98_userlevelpermissions_add->IsModal) { ?>
+<?php if (!$t07_satuan_add->IsModal) { ?>
 <div class="form-group"><!-- buttons .form-group -->
-	<div class="<?php echo $t98_userlevelpermissions_add->OffsetColumnClass ?>"><!-- buttons offset -->
+	<div class="<?php echo $t07_satuan_add->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("AddBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t98_userlevelpermissions_add->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t07_satuan_add->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
 	</div><!-- /buttons offset -->
 </div><!-- /buttons .form-group -->
 <?php } ?>
 </form>
 <script type="text/javascript">
-ft98_userlevelpermissionsadd.Init();
+ft07_satuanadd.Init();
 </script>
 <?php
-$t98_userlevelpermissions_add->ShowPageFooter();
+$t07_satuan_add->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -1103,5 +972,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$t98_userlevelpermissions_add->Page_Terminate();
+$t07_satuan_add->Page_Terminate();
 ?>

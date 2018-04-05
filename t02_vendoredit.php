@@ -813,6 +813,25 @@ class ct02_vendor_edit extends ct02_vendor {
 		$sFilter = $this->KeyFilter();
 		$sFilter = $this->ApplyUserIDFilters($sFilter);
 		$conn = &$this->Connection();
+		if ($this->Nama->CurrentValue <> "") { // Check field with unique index
+			$sFilterChk = "(`Nama` = '" . ew_AdjustSql($this->Nama->CurrentValue, $this->DBID) . "')";
+			$sFilterChk .= " AND NOT (" . $sFilter . ")";
+			$this->CurrentFilter = $sFilterChk;
+			$sSqlChk = $this->SQL();
+			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+			$rsChk = $conn->Execute($sSqlChk);
+			$conn->raiseErrorFn = '';
+			if ($rsChk === FALSE) {
+				return FALSE;
+			} elseif (!$rsChk->EOF) {
+				$sIdxErrMsg = str_replace("%f", $this->Nama->FldCaption(), $Language->Phrase("DupIndex"));
+				$sIdxErrMsg = str_replace("%v", $this->Nama->CurrentValue, $sIdxErrMsg);
+				$this->setFailureMessage($sIdxErrMsg);
+				$rsChk->Close();
+				return FALSE;
+			}
+			$rsChk->Close();
+		}
 		$this->CurrentFilter = $sFilter;
 		$sSql = $this->SQL();
 		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];

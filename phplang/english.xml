@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/4/4" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/4/5" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -616,8 +616,8 @@
     <!-- v2017 -->
   </global>
   <project>
-    <phrase id="bodytitle" value="STOK" />
-    <phrase id="footertext" value="&amp;copy;2018. All rights reserved." />
+    <phrase id="bodytitle" value="STOK Apps." />
+    <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
     <menu id="1">
       <phrase id="menutext" value="Home" />
     </menu>
@@ -625,13 +625,28 @@
       <phrase id="menutext" value="Setup" />
     </menu>
     <menu id="7">
-      <phrase id="menutext" value="Perusahaan" />
+      <phrase id="menutext" value="Company" />
     </menu>
     <menu id="8">
       <phrase id="menutext" value="Vendor" />
     </menu>
     <menu id="9">
       <phrase id="menutext" value="Customer" />
+    </menu>
+    <menu id="17">
+      <phrase id="menutext" value="Stock Article" />
+    </menu>
+    <menu id="10">
+      <phrase id="menutext" value="Main Group" />
+    </menu>
+    <menu id="11">
+      <phrase id="menutext" value="Sub Group" />
+    </menu>
+    <menu id="12">
+      <phrase id="menutext" value="Article" />
+    </menu>
+    <menu id="18">
+      <phrase id="menutext" value="Satuan" />
     </menu>
     <menu id="2">
       <phrase id="menutext" value="User" />
@@ -649,7 +664,7 @@
       <phrase id="tblcaption" value="Home" />
     </table>
     <table id="t01_company">
-      <phrase id="tblcaption" value="Perusahaan" />
+      <phrase id="tblcaption" value="Company" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
@@ -668,6 +683,63 @@
     </table>
     <table id="t03_customer">
       <phrase id="tblcaption" value="Customer" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+    </table>
+    <table id="t04_maingroup">
+      <phrase id="tblcaption" value="Main Group" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="kode">
+        <phrase id="fldcaption" value="Kode" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+    </table>
+    <table id="t05_subgroup">
+      <phrase id="tblcaption" value="Sub Group" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="maingroupid">
+        <phrase id="fldcaption" value="Main Group" />
+      </field>
+      <field id="kode">
+        <phrase id="fldcaption" value="Kode" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+    </table>
+    <table id="t06_article">
+      <phrase id="tblcaption" value="Article" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="maingroupid">
+        <phrase id="fldcaption" value="Main Group" />
+      </field>
+      <field id="subgroupid">
+        <phrase id="fldcaption" value="Sub Group" />
+      </field>
+      <field id="kode">
+        <phrase id="fldcaption" value="Kode" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+      <field id="satuanid">
+        <phrase id="fldcaption" value="Satuan" />
+      </field>
+    </table>
+    <table id="t07_satuan">
+      <phrase id="tblcaption" value="Satuan" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>

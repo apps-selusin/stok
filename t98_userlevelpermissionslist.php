@@ -105,6 +105,12 @@ class ct98_userlevelpermissions_list extends ct98_userlevelpermissions {
 	var $GridEditUrl;
 	var $MultiDeleteUrl;
 	var $MultiUpdateUrl;
+	var $AuditTrailOnAdd = TRUE;
+	var $AuditTrailOnEdit = TRUE;
+	var $AuditTrailOnDelete = TRUE;
+	var $AuditTrailOnView = FALSE;
+	var $AuditTrailOnViewData = FALSE;
+	var $AuditTrailOnSearch = FALSE;
 
 	// Message
 	function getMessage() {
@@ -804,10 +810,6 @@ class ct98_userlevelpermissions_list extends ct98_userlevelpermissions {
 		// Initialize
 		$sFilterList = "";
 		$sSavedFilterList = "";
-
-		// Load server side filters
-		if (EW_SEARCH_FILTER_OPTION == "Server" && isset($UserProfile))
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ft98_userlevelpermissionslistsrch");
 		$sFilterList = ew_Concat($sFilterList, $this->userlevelid->AdvancedSearch->ToJson(), ","); // Field userlevelid
 		$sFilterList = ew_Concat($sFilterList, $this->_tablename->AdvancedSearch->ToJson(), ","); // Field tablename
 		$sFilterList = ew_Concat($sFilterList, $this->permission->AdvancedSearch->ToJson(), ","); // Field permission
@@ -2130,6 +2132,13 @@ var CurrentSearchForm = ft98_userlevelpermissionslistsrch = new ew_Form("ft98_us
 			$t98_userlevelpermissions_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
 			$t98_userlevelpermissions_list->setWarningMessage($Language->Phrase("NoRecord"));
+	}
+
+	// Audit trail on search
+	if ($t98_userlevelpermissions_list->AuditTrailOnSearch && $t98_userlevelpermissions_list->Command == "search" && !$t98_userlevelpermissions_list->RestoreSearch) {
+		$searchparm = ew_ServerVar("QUERY_STRING");
+		$searchsql = $t98_userlevelpermissions_list->getSessionWhere();
+		$t98_userlevelpermissions_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
 	}
 $t98_userlevelpermissions_list->RenderOtherOptions();
 ?>

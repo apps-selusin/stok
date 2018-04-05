@@ -1,20 +1,22 @@
 <?php
 
 // Global variable for table object
-$t97_userlevels = NULL;
+$t05_subgroup = NULL;
 
 //
-// Table class for t97_userlevels
+// Table class for t05_subgroup
 //
-class ct97_userlevels extends cTable {
+class ct05_subgroup extends cTable {
 	var $AuditTrailOnAdd = TRUE;
 	var $AuditTrailOnEdit = TRUE;
 	var $AuditTrailOnDelete = TRUE;
 	var $AuditTrailOnView = FALSE;
 	var $AuditTrailOnViewData = FALSE;
 	var $AuditTrailOnSearch = FALSE;
-	var $userlevelid;
-	var $userlevelname;
+	var $id;
+	var $MainGroupID;
+	var $Kode;
+	var $Nama;
 
 	//
 	// Table class constructor
@@ -24,12 +26,12 @@ class ct97_userlevels extends cTable {
 
 		// Language object
 		if (!isset($Language)) $Language = new cLanguage();
-		$this->TableVar = 't97_userlevels';
-		$this->TableName = 't97_userlevels';
+		$this->TableVar = 't05_subgroup';
+		$this->TableName = 't05_subgroup';
 		$this->TableType = 'TABLE';
 
 		// Update Table
-		$this->UpdateTable = "`t97_userlevels`";
+		$this->UpdateTable = "`t05_subgroup`";
 		$this->DBID = 'DB';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -48,16 +50,29 @@ class ct97_userlevels extends cTable {
 		$this->UserIDAllowSecurity = 0; // User ID Allow
 		$this->BasicSearch = new cBasicSearch($this->TableVar);
 
-		// userlevelid
-		$this->userlevelid = new cField('t97_userlevels', 't97_userlevels', 'x_userlevelid', 'userlevelid', '`userlevelid`', '`userlevelid`', 3, -1, FALSE, '`userlevelid`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->userlevelid->Sortable = TRUE; // Allow sort
-		$this->userlevelid->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['userlevelid'] = &$this->userlevelid;
+		// id
+		$this->id = new cField('t05_subgroup', 't05_subgroup', 'x_id', 'id', '`id`', '`id`', 3, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
+		$this->id->Sortable = TRUE; // Allow sort
+		$this->id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['id'] = &$this->id;
 
-		// userlevelname
-		$this->userlevelname = new cField('t97_userlevels', 't97_userlevels', 'x_userlevelname', 'userlevelname', '`userlevelname`', '`userlevelname`', 200, -1, FALSE, '`userlevelname`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->userlevelname->Sortable = TRUE; // Allow sort
-		$this->fields['userlevelname'] = &$this->userlevelname;
+		// MainGroupID
+		$this->MainGroupID = new cField('t05_subgroup', 't05_subgroup', 'x_MainGroupID', 'MainGroupID', '`MainGroupID`', '`MainGroupID`', 3, -1, FALSE, '`EV__MainGroupID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'SELECT');
+		$this->MainGroupID->Sortable = TRUE; // Allow sort
+		$this->MainGroupID->UsePleaseSelect = TRUE; // Use PleaseSelect by default
+		$this->MainGroupID->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
+		$this->MainGroupID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['MainGroupID'] = &$this->MainGroupID;
+
+		// Kode
+		$this->Kode = new cField('t05_subgroup', 't05_subgroup', 'x_Kode', 'Kode', '`Kode`', '`Kode`', 200, -1, FALSE, '`Kode`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Kode->Sortable = TRUE; // Allow sort
+		$this->fields['Kode'] = &$this->Kode;
+
+		// Nama
+		$this->Nama = new cField('t05_subgroup', 't05_subgroup', 'x_Nama', 'Nama', '`Nama`', '`Nama`', 200, -1, FALSE, '`Nama`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Nama->Sortable = TRUE; // Allow sort
+		$this->fields['Nama'] = &$this->Nama;
 	}
 
 	// Field Visibility
@@ -103,16 +118,38 @@ class ct97_userlevels extends cTable {
 			} else {
 				$this->setSessionOrderBy($sSortField . " " . $sThisSort); // Save to Session
 			}
+			$sSortFieldList = ($ofld->FldVirtualExpression <> "") ? $ofld->FldVirtualExpression : $sSortField;
+			if ($ctrl) {
+				$sOrderByList = $this->getSessionOrderByList();
+				if (strpos($sOrderByList, $sSortFieldList . " " . $sLastSort) !== FALSE) {
+					$sOrderByList = str_replace($sSortFieldList . " " . $sLastSort, $sSortFieldList . " " . $sThisSort, $sOrderByList);
+				} else {
+					if ($sOrderByList <> "") $sOrderByList .= ", ";
+					$sOrderByList .= $sSortFieldList . " " . $sThisSort;
+				}
+				$this->setSessionOrderByList($sOrderByList); // Save to Session
+			} else {
+				$this->setSessionOrderByList($sSortFieldList . " " . $sThisSort); // Save to Session
+			}
 		} else {
 			if (!$ctrl) $ofld->setSort("");
 		}
+	}
+
+	// Session ORDER BY for List page
+	function getSessionOrderByList() {
+		return @$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST];
+	}
+
+	function setSessionOrderByList($v) {
+		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST] = $v;
 	}
 
 	// Table level SQL
 	var $_SqlFrom = "";
 
 	function getSqlFrom() { // From
-		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t97_userlevels`";
+		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t05_subgroup`";
 	}
 
 	function SqlFrom() { // For backward compatibility
@@ -134,6 +171,23 @@ class ct97_userlevels extends cTable {
 
 	function setSqlSelect($v) {
 		$this->_SqlSelect = $v;
+	}
+	var $_SqlSelectList = "";
+
+	function getSqlSelectList() { // Select for List page
+		$select = "";
+		$select = "SELECT * FROM (" .
+			"SELECT *, (SELECT CONCAT(COALESCE(`Kode`, ''),'" . ew_ValueSeparator(1, $this->MainGroupID) . "',COALESCE(`Nama`,'')) FROM `t04_maingroup` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t05_subgroup`.`MainGroupID` LIMIT 1) AS `EV__MainGroupID` FROM `t05_subgroup`" .
+			") `EW_TMP_TABLE`";
+		return ($this->_SqlSelectList <> "") ? $this->_SqlSelectList : $select;
+	}
+
+	function SqlSelectList() { // For backward compatibility
+		return $this->getSqlSelectList();
+	}
+
+	function setSqlSelectList($v) {
+		$this->_SqlSelectList = $v;
 	}
 	var $_SqlWhere = "";
 
@@ -180,7 +234,7 @@ class ct97_userlevels extends cTable {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() { // Order By
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : EW_USER_LEVEL_ID_FIELD;
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`Kode` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -246,16 +300,38 @@ class ct97_userlevels extends cTable {
 		ew_AddFilter($sFilter, $this->CurrentFilter);
 		$sFilter = $this->ApplyUserIDFilters($sFilter);
 		$this->Recordset_Selecting($sFilter);
-		$sSelect = $this->getSqlSelect();
-		$sSort = $this->UseSessionForListSQL ? $this->getSessionOrderBy() : "";
+		if ($this->UseVirtualFields()) {
+			$sSelect = $this->getSqlSelectList();
+			$sSort = $this->UseSessionForListSQL ? $this->getSessionOrderByList() : "";
+		} else {
+			$sSelect = $this->getSqlSelect();
+			$sSort = $this->UseSessionForListSQL ? $this->getSessionOrderBy() : "";
+		}
 		return ew_BuildSelectSql($sSelect, $this->getSqlWhere(), $this->getSqlGroupBy(),
 			$this->getSqlHaving(), $this->getSqlOrderBy(), $sFilter, $sSort);
 	}
 
 	// Get ORDER BY clause
 	function GetOrderBy() {
-		$sSort = $this->getSessionOrderBy();
+		$sSort = ($this->UseVirtualFields()) ? $this->getSessionOrderByList() : $this->getSessionOrderBy();
 		return ew_BuildSelectSql("", "", "", "", $this->getSqlOrderBy(), "", $sSort);
+	}
+
+	// Check if virtual fields is used in SQL
+	function UseVirtualFields() {
+		$sWhere = $this->UseSessionForListSQL ? $this->getSessionWhere() : $this->CurrentFilter;
+		$sOrderBy = $this->UseSessionForListSQL ? $this->getSessionOrderByList() : "";
+		if ($sWhere <> "")
+			$sWhere = " " . str_replace(array("(",")"), array("",""), $sWhere) . " ";
+		if ($sOrderBy <> "")
+			$sOrderBy = " " . str_replace(array("(",")"), array("",""), $sOrderBy) . " ";
+		if ($this->MainGroupID->AdvancedSearch->SearchValue <> "" ||
+			$this->MainGroupID->AdvancedSearch->SearchValue2 <> "" ||
+			strpos($sWhere, " " . $this->MainGroupID->FldVirtualExpression . " ") !== FALSE)
+			return TRUE;
+		if (strpos($sOrderBy, " " . $this->MainGroupID->FldVirtualExpression . " ") !== FALSE)
+			return TRUE;
+		return FALSE;
 	}
 
 	// Try to get record count
@@ -306,7 +382,10 @@ class ct97_userlevels extends cTable {
 		$select = $this->TableType == 'CUSTOMVIEW' ? $this->getSqlSelect() : "SELECT * FROM " . $this->getSqlFrom();
 		$groupBy = $this->TableType == 'CUSTOMVIEW' ? $this->getSqlGroupBy() : "";
 		$having = $this->TableType == 'CUSTOMVIEW' ? $this->getSqlHaving() : "";
-		$sql = ew_BuildSelectSql($select, $this->getSqlWhere(), $groupBy, $having, "", $filter, "");
+		if ($this->UseVirtualFields())
+			$sql = ew_BuildSelectSql($this->getSqlSelectList(), $this->getSqlWhere(), $groupBy, $having, "", $filter, "");
+		else
+			$sql = ew_BuildSelectSql($select, $this->getSqlWhere(), $groupBy, $having, "", $filter, "");
 		$cnt = $this->TryGetRecordCount($sql);
 		if ($cnt == -1) {
 			$conn = &$this->Connection();
@@ -338,6 +417,10 @@ class ct97_userlevels extends cTable {
 		$conn = &$this->Connection();
 		$bInsert = $conn->Execute($this->InsertSQL($rs));
 		if ($bInsert) {
+
+			// Get insert id if necessary
+			$this->id->setDbValue($conn->Insert_ID());
+			$rs['id'] = $this->id->DbValue;
 			if ($this->AuditTrailOnAdd)
 				$this->WriteAuditTrailOnAdd($rs);
 		}
@@ -368,7 +451,7 @@ class ct97_userlevels extends cTable {
 		$bUpdate = $conn->Execute($this->UpdateSQL($rs, $where, $curfilter));
 		if ($bUpdate && $this->AuditTrailOnEdit) {
 			$rsaudit = $rs;
-			$fldname = 'userlevelid';
+			$fldname = 'id';
 			if (!array_key_exists($fldname, $rsaudit)) $rsaudit[$fldname] = $rsold[$fldname];
 			$this->WriteAuditTrailOnEdit($rsold, $rsaudit);
 		}
@@ -381,8 +464,8 @@ class ct97_userlevels extends cTable {
 		if (is_array($where))
 			$where = $this->ArrayToFilter($where);
 		if ($rs) {
-			if (array_key_exists('userlevelid', $rs))
-				ew_AddFilter($where, ew_QuotedName('userlevelid', $this->DBID) . '=' . ew_QuotedValue($rs['userlevelid'], $this->userlevelid->FldDataType, $this->DBID));
+			if (array_key_exists('id', $rs))
+				ew_AddFilter($where, ew_QuotedName('id', $this->DBID) . '=' . ew_QuotedValue($rs['id'], $this->id->FldDataType, $this->DBID));
 		}
 		$filter = ($curfilter) ? $this->CurrentFilter : "";
 		ew_AddFilter($filter, $where);
@@ -406,18 +489,18 @@ class ct97_userlevels extends cTable {
 
 	// Key filter WHERE clause
 	function SqlKeyFilter() {
-		return "`userlevelid` = @userlevelid@";
+		return "`id` = @id@";
 	}
 
 	// Key filter
 	function KeyFilter() {
 		$sKeyFilter = $this->SqlKeyFilter();
-		if (!is_numeric($this->userlevelid->CurrentValue))
+		if (!is_numeric($this->id->CurrentValue))
 			return "0=1"; // Invalid key
-		if (is_null($this->userlevelid->CurrentValue))
+		if (is_null($this->id->CurrentValue))
 			return "0=1"; // Invalid key
 		else
-			$sKeyFilter = str_replace("@userlevelid@", ew_AdjustSql($this->userlevelid->CurrentValue, $this->DBID), $sKeyFilter); // Replace key value
+			$sKeyFilter = str_replace("@id@", ew_AdjustSql($this->id->CurrentValue, $this->DBID), $sKeyFilter); // Replace key value
 		return $sKeyFilter;
 	}
 
@@ -431,7 +514,7 @@ class ct97_userlevels extends cTable {
 		if (@$_SESSION[$name] <> "") {
 			return $_SESSION[$name];
 		} else {
-			return "t97_userlevelslist.php";
+			return "t05_subgrouplist.php";
 		}
 	}
 
@@ -442,11 +525,11 @@ class ct97_userlevels extends cTable {
 	// Get modal caption
 	function GetModalCaption($pageName) {
 		global $Language;
-		if ($pageName == "t97_userlevelsview.php")
+		if ($pageName == "t05_subgroupview.php")
 			return $Language->Phrase("View");
-		elseif ($pageName == "t97_userlevelsedit.php")
+		elseif ($pageName == "t05_subgroupedit.php")
 			return $Language->Phrase("Edit");
-		elseif ($pageName == "t97_userlevelsadd.php")
+		elseif ($pageName == "t05_subgroupadd.php")
 			return $Language->Phrase("Add");
 		else
 			return "";
@@ -454,30 +537,30 @@ class ct97_userlevels extends cTable {
 
 	// List URL
 	function GetListUrl() {
-		return "t97_userlevelslist.php";
+		return "t05_subgrouplist.php";
 	}
 
 	// View URL
 	function GetViewUrl($parm = "") {
 		if ($parm <> "")
-			$url = $this->KeyUrl("t97_userlevelsview.php", $this->UrlParm($parm));
+			$url = $this->KeyUrl("t05_subgroupview.php", $this->UrlParm($parm));
 		else
-			$url = $this->KeyUrl("t97_userlevelsview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+			$url = $this->KeyUrl("t05_subgroupview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
 		return $this->AddMasterUrl($url);
 	}
 
 	// Add URL
 	function GetAddUrl($parm = "") {
 		if ($parm <> "")
-			$url = "t97_userlevelsadd.php?" . $this->UrlParm($parm);
+			$url = "t05_subgroupadd.php?" . $this->UrlParm($parm);
 		else
-			$url = "t97_userlevelsadd.php";
+			$url = "t05_subgroupadd.php";
 		return $this->AddMasterUrl($url);
 	}
 
 	// Edit URL
 	function GetEditUrl($parm = "") {
-		$url = $this->KeyUrl("t97_userlevelsedit.php", $this->UrlParm($parm));
+		$url = $this->KeyUrl("t05_subgroupedit.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -489,7 +572,7 @@ class ct97_userlevels extends cTable {
 
 	// Copy URL
 	function GetCopyUrl($parm = "") {
-		$url = $this->KeyUrl("t97_userlevelsadd.php", $this->UrlParm($parm));
+		$url = $this->KeyUrl("t05_subgroupadd.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -501,7 +584,7 @@ class ct97_userlevels extends cTable {
 
 	// Delete URL
 	function GetDeleteUrl() {
-		return $this->KeyUrl("t97_userlevelsdelete.php", $this->UrlParm());
+		return $this->KeyUrl("t05_subgroupdelete.php", $this->UrlParm());
 	}
 
 	// Add master url
@@ -511,7 +594,7 @@ class ct97_userlevels extends cTable {
 
 	function KeyToJson() {
 		$json = "";
-		$json .= "userlevelid:" . ew_VarToJson($this->userlevelid->CurrentValue, "number", "'");
+		$json .= "id:" . ew_VarToJson($this->id->CurrentValue, "number", "'");
 		return "{" . $json . "}";
 	}
 
@@ -519,8 +602,8 @@ class ct97_userlevels extends cTable {
 	function KeyUrl($url, $parm = "") {
 		$sUrl = $url . "?";
 		if ($parm <> "") $sUrl .= $parm . "&";
-		if (!is_null($this->userlevelid->CurrentValue)) {
-			$sUrl .= "userlevelid=" . urlencode($this->userlevelid->CurrentValue);
+		if (!is_null($this->id->CurrentValue)) {
+			$sUrl .= "id=" . urlencode($this->id->CurrentValue);
 		} else {
 			return "javascript:ew_Alert(ewLanguage.Phrase('InvalidRecord'));";
 		}
@@ -553,10 +636,10 @@ class ct97_userlevels extends cTable {
 			$cnt = count($arKeys);
 		} elseif (!empty($_GET) || !empty($_POST)) {
 			$isPost = ew_IsPost();
-			if ($isPost && isset($_POST["userlevelid"]))
-				$arKeys[] = $_POST["userlevelid"];
-			elseif (isset($_GET["userlevelid"]))
-				$arKeys[] = $_GET["userlevelid"];
+			if ($isPost && isset($_POST["id"]))
+				$arKeys[] = $_POST["id"];
+			elseif (isset($_GET["id"]))
+				$arKeys[] = $_GET["id"];
 			else
 				$arKeys = NULL; // Do not setup
 
@@ -581,7 +664,7 @@ class ct97_userlevels extends cTable {
 		$sKeyFilter = "";
 		foreach ($arKeys as $key) {
 			if ($sKeyFilter <> "") $sKeyFilter .= " OR ";
-			$this->userlevelid->CurrentValue = $key;
+			$this->id->CurrentValue = $key;
 			$sKeyFilter .= "(" . $this->KeyFilter() . ")";
 		}
 		return $sKeyFilter;
@@ -602,8 +685,10 @@ class ct97_userlevels extends cTable {
 
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
-		$this->userlevelid->setDbValue($rs->fields('userlevelid'));
-		$this->userlevelname->setDbValue($rs->fields('userlevelname'));
+		$this->id->setDbValue($rs->fields('id'));
+		$this->MainGroupID->setDbValue($rs->fields('MainGroupID'));
+		$this->Kode->setDbValue($rs->fields('Kode'));
+		$this->Nama->setDbValue($rs->fields('Nama'));
 	}
 
 	// Render list row values
@@ -614,27 +699,70 @@ class ct97_userlevels extends cTable {
 		$this->Row_Rendering();
 
 	// Common render codes
-		// userlevelid
-		// userlevelname
-		// userlevelid
+		// id
+		// MainGroupID
+		// Kode
+		// Nama
+		// id
 
-		$this->userlevelid->ViewValue = $this->userlevelid->CurrentValue;
-		$this->userlevelid->ViewCustomAttributes = "";
+		$this->id->ViewValue = $this->id->CurrentValue;
+		$this->id->ViewCustomAttributes = "";
 
-		// userlevelname
-		$this->userlevelname->ViewValue = $this->userlevelname->CurrentValue;
-		if ($Security->GetUserLevelName($this->userlevelid->CurrentValue) <> "") $this->userlevelname->ViewValue = $Security->GetUserLevelName($this->userlevelid->CurrentValue);
-		$this->userlevelname->ViewCustomAttributes = "";
+		// MainGroupID
+		if ($this->MainGroupID->VirtualValue <> "") {
+			$this->MainGroupID->ViewValue = $this->MainGroupID->VirtualValue;
+		} else {
+		if (strval($this->MainGroupID->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->MainGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t04_maingroup`";
+		$sWhereWrk = "";
+		$this->MainGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->MainGroupID, $sWhereWrk); // Call Lookup Selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$arwrk[2] = $rswrk->fields('Disp2Fld');
+				$this->MainGroupID->ViewValue = $this->MainGroupID->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->MainGroupID->ViewValue = $this->MainGroupID->CurrentValue;
+			}
+		} else {
+			$this->MainGroupID->ViewValue = NULL;
+		}
+		}
+		$this->MainGroupID->ViewCustomAttributes = "";
 
-		// userlevelid
-		$this->userlevelid->LinkCustomAttributes = "";
-		$this->userlevelid->HrefValue = "";
-		$this->userlevelid->TooltipValue = "";
+		// Kode
+		$this->Kode->ViewValue = $this->Kode->CurrentValue;
+		$this->Kode->ViewCustomAttributes = "";
 
-		// userlevelname
-		$this->userlevelname->LinkCustomAttributes = "";
-		$this->userlevelname->HrefValue = "";
-		$this->userlevelname->TooltipValue = "";
+		// Nama
+		$this->Nama->ViewValue = $this->Nama->CurrentValue;
+		$this->Nama->ViewCustomAttributes = "";
+
+		// id
+		$this->id->LinkCustomAttributes = "";
+		$this->id->HrefValue = "";
+		$this->id->TooltipValue = "";
+
+		// MainGroupID
+		$this->MainGroupID->LinkCustomAttributes = "";
+		$this->MainGroupID->HrefValue = "";
+		$this->MainGroupID->TooltipValue = "";
+
+		// Kode
+		$this->Kode->LinkCustomAttributes = "";
+		$this->Kode->HrefValue = "";
+		$this->Kode->TooltipValue = "";
+
+		// Nama
+		$this->Nama->LinkCustomAttributes = "";
+		$this->Nama->HrefValue = "";
+		$this->Nama->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -650,18 +778,27 @@ class ct97_userlevels extends cTable {
 		// Call Row Rendering event
 		$this->Row_Rendering();
 
-		// userlevelid
-		$this->userlevelid->EditAttrs["class"] = "form-control";
-		$this->userlevelid->EditCustomAttributes = "";
-		$this->userlevelid->EditValue = $this->userlevelid->CurrentValue;
-		$this->userlevelid->ViewCustomAttributes = "";
+		// id
+		$this->id->EditAttrs["class"] = "form-control";
+		$this->id->EditCustomAttributes = "";
+		$this->id->EditValue = $this->id->CurrentValue;
+		$this->id->ViewCustomAttributes = "";
 
-		// userlevelname
-		$this->userlevelname->EditAttrs["class"] = "form-control";
-		$this->userlevelname->EditCustomAttributes = "";
-		$this->userlevelname->EditValue = $this->userlevelname->CurrentValue;
-		if (in_array($this->userlevelid->CurrentValue, array(-2,-1,0))) $this->userlevelname->ReadOnly = TRUE;
-		$this->userlevelname->PlaceHolder = ew_RemoveHtml($this->userlevelname->FldCaption());
+		// MainGroupID
+		$this->MainGroupID->EditAttrs["class"] = "form-control";
+		$this->MainGroupID->EditCustomAttributes = "";
+
+		// Kode
+		$this->Kode->EditAttrs["class"] = "form-control";
+		$this->Kode->EditCustomAttributes = "";
+		$this->Kode->EditValue = $this->Kode->CurrentValue;
+		$this->Kode->PlaceHolder = ew_RemoveHtml($this->Kode->FldCaption());
+
+		// Nama
+		$this->Nama->EditAttrs["class"] = "form-control";
+		$this->Nama->EditCustomAttributes = "";
+		$this->Nama->EditValue = $this->Nama->CurrentValue;
+		$this->Nama->PlaceHolder = ew_RemoveHtml($this->Nama->FldCaption());
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -690,11 +827,14 @@ class ct97_userlevels extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
-					if ($this->userlevelid->Exportable) $Doc->ExportCaption($this->userlevelid);
-					if ($this->userlevelname->Exportable) $Doc->ExportCaption($this->userlevelname);
+					if ($this->MainGroupID->Exportable) $Doc->ExportCaption($this->MainGroupID);
+					if ($this->Kode->Exportable) $Doc->ExportCaption($this->Kode);
+					if ($this->Nama->Exportable) $Doc->ExportCaption($this->Nama);
 				} else {
-					if ($this->userlevelid->Exportable) $Doc->ExportCaption($this->userlevelid);
-					if ($this->userlevelname->Exportable) $Doc->ExportCaption($this->userlevelname);
+					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
+					if ($this->MainGroupID->Exportable) $Doc->ExportCaption($this->MainGroupID);
+					if ($this->Kode->Exportable) $Doc->ExportCaption($this->Kode);
+					if ($this->Nama->Exportable) $Doc->ExportCaption($this->Nama);
 				}
 				$Doc->EndExportRow();
 			}
@@ -726,11 +866,14 @@ class ct97_userlevels extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
-						if ($this->userlevelid->Exportable) $Doc->ExportField($this->userlevelid);
-						if ($this->userlevelname->Exportable) $Doc->ExportField($this->userlevelname);
+						if ($this->MainGroupID->Exportable) $Doc->ExportField($this->MainGroupID);
+						if ($this->Kode->Exportable) $Doc->ExportField($this->Kode);
+						if ($this->Nama->Exportable) $Doc->ExportField($this->Nama);
 					} else {
-						if ($this->userlevelid->Exportable) $Doc->ExportField($this->userlevelid);
-						if ($this->userlevelname->Exportable) $Doc->ExportField($this->userlevelname);
+						if ($this->id->Exportable) $Doc->ExportField($this->id);
+						if ($this->MainGroupID->Exportable) $Doc->ExportField($this->MainGroupID);
+						if ($this->Kode->Exportable) $Doc->ExportField($this->Kode);
+						if ($this->Nama->Exportable) $Doc->ExportField($this->Nama);
 					}
 					$Doc->EndExportRow($RowCnt);
 				}
@@ -774,7 +917,7 @@ class ct97_userlevels extends cTable {
 
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
-		$table = 't97_userlevels';
+		$table = 't05_subgroup';
 		$usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
@@ -783,12 +926,12 @@ class ct97_userlevels extends cTable {
 	function WriteAuditTrailOnAdd(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnAdd) return;
-		$table = 't97_userlevels';
+		$table = 't05_subgroup';
 
 		// Get key value
 		$key = "";
 		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rs['userlevelid'];
+		$key .= $rs['id'];
 
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
@@ -817,12 +960,12 @@ class ct97_userlevels extends cTable {
 	function WriteAuditTrailOnEdit(&$rsold, &$rsnew) {
 		global $Language;
 		if (!$this->AuditTrailOnEdit) return;
-		$table = 't97_userlevels';
+		$table = 't05_subgroup';
 
 		// Get key value
 		$key = "";
 		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rsold['userlevelid'];
+		$key .= $rsold['id'];
 
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
@@ -864,13 +1007,13 @@ class ct97_userlevels extends cTable {
 	function WriteAuditTrailOnDelete(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnDelete) return;
-		$table = 't97_userlevels';
+		$table = 't05_subgroup';
 
 		// Get key value
 		$key = "";
 		if ($key <> "")
 			$key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rs['userlevelid'];
+		$key .= $rs['id'];
 
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();

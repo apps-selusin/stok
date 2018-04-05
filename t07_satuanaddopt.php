@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg14.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql14.php") ?>
 <?php include_once "phpfn14.php" ?>
-<?php include_once "t97_userlevelsinfo.php" ?>
+<?php include_once "t07_satuaninfo.php" ?>
 <?php include_once "t96_employeesinfo.php" ?>
 <?php include_once "userfn14.php" ?>
 <?php
@@ -14,21 +14,21 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t97_userlevels_delete = NULL; // Initialize page object first
+$t07_satuan_addopt = NULL; // Initialize page object first
 
-class ct97_userlevels_delete extends ct97_userlevels {
+class ct07_satuan_addopt extends ct07_satuan {
 
 	// Page ID
-	var $PageID = 'delete';
+	var $PageID = 'addopt';
 
 	// Project ID
 	var $ProjectID = '{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}';
 
 	// Table name
-	var $TableName = 't97_userlevels';
+	var $TableName = 't07_satuan';
 
 	// Page object name
-	var $PageObjName = 't97_userlevels_delete';
+	var $PageObjName = 't07_satuan_addopt';
 
 	// Page headings
 	var $Heading = '';
@@ -256,10 +256,10 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t97_userlevels)
-		if (!isset($GLOBALS["t97_userlevels"]) || get_class($GLOBALS["t97_userlevels"]) == "ct97_userlevels") {
-			$GLOBALS["t97_userlevels"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t97_userlevels"];
+		// Table object (t07_satuan)
+		if (!isset($GLOBALS["t07_satuan"]) || get_class($GLOBALS["t07_satuan"]) == "ct07_satuan") {
+			$GLOBALS["t07_satuan"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t07_satuan"];
 		}
 
 		// Table object (t96_employees)
@@ -267,11 +267,11 @@ class ct97_userlevels_delete extends ct97_userlevels {
 
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
-			define("EW_PAGE_ID", 'delete', TRUE);
+			define("EW_PAGE_ID", 'addopt', TRUE);
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't97_userlevels', TRUE);
+			define("EW_TABLE_NAME", 't07_satuan', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"]))
@@ -306,9 +306,13 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
 		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
 		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
-		if (!$Security->CanAdmin()) {
+		if (!$Security->CanAdd()) {
 			$Security->SaveLastUrl();
-			$this->Page_Terminate(ew_GetUrl("login.php"));
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			if ($Security->CanList())
+				$this->Page_Terminate(ew_GetUrl("t07_satuanlist.php"));
+			else
+				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
 		if ($Security->IsLoggedIn()) {
 			$Security->UserID_Loading();
@@ -320,10 +324,11 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		// 
 		// Security = null;
 		// 
+		// Create form object
 
+		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->userlevelid->SetVisibility();
-		$this->userlevelname->SetVisibility();
+		$this->Nama->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -336,6 +341,20 @@ class ct97_userlevels_delete extends ct97_userlevels {
 			echo $Language->Phrase("InvalidPostRequest");
 			$this->Page_Terminate();
 			exit();
+		}
+
+		// Process auto fill
+		if (@$_POST["ajax"] == "autofill") {
+			$results = $this->GetAutoFill(@$_POST["name"], @$_POST["q"]);
+			if ($results) {
+
+				// Clean output buffer
+				if (!EW_DEBUG_ENABLED && ob_get_length())
+					ob_end_clean();
+				echo $results;
+				$this->Page_Terminate();
+				exit();
+			}
 		}
 
 		// Create Token
@@ -355,13 +374,13 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t97_userlevels;
+		global $EW_EXPORT, $t07_satuan;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t97_userlevels);
+				$doc = new $class($t07_satuan);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -385,89 +404,89 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		}
 		exit();
 	}
-	var $DbMasterFilter = "";
-	var $DbDetailFilter = "";
-	var $StartRec;
-	var $TotalRecs = 0;
-	var $RecCnt;
-	var $RecKeys = array();
-	var $Recordset;
-	var $StartRowCnt = 1;
-	var $RowCnt = 0;
 
 	//
 	// Page main
 	//
 	function Page_Main() {
-		global $Language;
+		global $objForm, $Language, $gsFormError;
+		set_error_handler("ew_ErrorHandler");
 
 		// Set up Breadcrumb
-		$this->SetupBreadcrumb();
+		//$this->SetupBreadcrumb(); // Not used
 
-		// Load key parameters
-		$this->RecKeys = $this->GetRecordKeys(); // Load record keys
-		$sFilter = $this->GetKeyFilter();
-		if ($sFilter == "")
-			$this->Page_Terminate("t97_userlevelslist.php"); // Prevent SQL injection, return to list
+		$this->LoadRowValues(); // Load default values
 
-		// Set up filter (SQL WHHERE clause) and get return SQL
-		// SQL constructor in t97_userlevels class, t97_userlevelsinfo.php
+		// Process form if post back
+		if ($objForm->GetValue("a_addopt") <> "") {
+			$this->CurrentAction = $objForm->GetValue("a_addopt"); // Get form action
+			$this->LoadFormValues(); // Load form values
 
-		$this->CurrentFilter = $sFilter;
-
-		// Get action
-		if (@$_POST["a_delete"] <> "") {
-			$this->CurrentAction = $_POST["a_delete"];
-		} elseif (@$_GET["a_delete"] == "1") {
-			$this->CurrentAction = "D"; // Delete record directly
-		} else {
-			$this->CurrentAction = "I"; // Display record
-		}
-		if ($this->CurrentAction == "D") {
-			$this->SendEmail = TRUE; // Send email on delete success
-			if ($this->DeleteRows()) { // Delete rows
-				if ($this->getSuccessMessage() == "")
-					$this->setSuccessMessage($Language->Phrase("DeleteSuccess")); // Set up success message
-				$this->Page_Terminate($this->getReturnUrl()); // Return to caller
-			} else { // Delete failed
-				$this->CurrentAction = "I"; // Display record
+			// Validate form
+			if (!$this->ValidateForm()) {
+				$this->CurrentAction = "I"; // Form error, reset action
+				$this->setFailureMessage($gsFormError);
 			}
+		} else { // Not post back
+			$this->CurrentAction = "I"; // Display blank record
 		}
-		if ($this->CurrentAction == "I") { // Load records for display
-			if ($this->Recordset = $this->LoadRecordset())
-				$this->TotalRecs = $this->Recordset->RecordCount(); // Get record count
-			if ($this->TotalRecs <= 0) { // No record found, exit
-				if ($this->Recordset)
-					$this->Recordset->Close();
-				$this->Page_Terminate("t97_userlevelslist.php"); // Return to list
-			}
+
+		// Perform action based on action code
+		switch ($this->CurrentAction) {
+			case "I": // Blank record, no action required
+				break;
+			case "A": // Add new record
+				$this->SendEmail = TRUE; // Send email on add success
+				if ($this->AddRow()) { // Add successful
+					$row = array();
+					$row["x_id"] = $this->id->DbValue;
+					$row["x_Nama"] = ew_ConvertToUtf8($this->Nama->DbValue);
+					if (!EW_DEBUG_ENABLED && ob_get_length())
+						ob_end_clean();
+					ew_Header(FALSE, "utf-8", TRUE);
+					echo ew_ArrayToJson(array($row));
+				} else {
+					$this->ShowMessage();
+				}
+				$this->Page_Terminate();
+				exit();
+		}
+
+		// Render row
+		$this->RowType = EW_ROWTYPE_ADD; // Render add type
+		$this->ResetAttrs();
+		$this->RenderRow();
+	}
+
+	// Get upload files
+	function GetUploadFiles() {
+		global $objForm, $Language;
+
+		// Get upload data
+	}
+
+	// Load default values
+	function LoadDefaultValues() {
+		$this->id->CurrentValue = NULL;
+		$this->id->OldValue = $this->id->CurrentValue;
+		$this->Nama->CurrentValue = NULL;
+		$this->Nama->OldValue = $this->Nama->CurrentValue;
+	}
+
+	// Load form values
+	function LoadFormValues() {
+
+		// Load from form
+		global $objForm;
+		if (!$this->Nama->FldIsDetailKey) {
+			$this->Nama->setFormValue(ew_ConvertFromUtf8($objForm->GetValue("x_Nama")));
 		}
 	}
 
-	// Load recordset
-	function LoadRecordset($offset = -1, $rowcnt = -1) {
-
-		// Load List page SQL
-		$sSql = $this->ListSQL();
-		$conn = &$this->Connection();
-
-		// Load recordset
-		$dbtype = ew_GetConnectionType($this->DBID);
-		if ($this->UseSelectLimit) {
-			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
-			} else {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
-			}
-			$conn->raiseErrorFn = '';
-		} else {
-			$rs = ew_LoadRecordset($sSql, $conn);
-		}
-
-		// Call Recordset Selected event
-		$this->Recordset_Selected($rs);
-		return $rs;
+	// Restore form values
+	function RestoreFormValues() {
+		global $objForm;
+		$this->Nama->CurrentValue = ew_ConvertToUtf8($this->Nama->FormValue);
 	}
 
 	// Load row based on key values
@@ -503,16 +522,16 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		$this->Row_Selected($row);
 		if (!$rs || $rs->EOF)
 			return;
-		$this->userlevelid->setDbValue($row['userlevelid']);
-		$this->userlevelid->CurrentValue = intval($this->userlevelid->CurrentValue);
-		$this->userlevelname->setDbValue($row['userlevelname']);
+		$this->id->setDbValue($row['id']);
+		$this->Nama->setDbValue($row['Nama']);
 	}
 
 	// Return a row with default values
 	function NewRow() {
+		$this->LoadDefaultValues();
 		$row = array();
-		$row['userlevelid'] = NULL;
-		$row['userlevelname'] = NULL;
+		$row['id'] = $this->id->CurrentValue;
+		$row['Nama'] = $this->Nama->CurrentValue;
 		return $row;
 	}
 
@@ -521,8 +540,8 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		if (!$rs || !is_array($rs) && $rs->EOF)
 			return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->userlevelid->DbValue = $row['userlevelid'];
-		$this->userlevelname->DbValue = $row['userlevelname'];
+		$this->id->DbValue = $row['id'];
+		$this->Nama->DbValue = $row['Nama'];
 	}
 
 	// Render row values based on field settings
@@ -535,96 +554,95 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// userlevelid
-		// userlevelname
+		// id
+		// Nama
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// userlevelid
-		$this->userlevelid->ViewValue = $this->userlevelid->CurrentValue;
-		$this->userlevelid->ViewCustomAttributes = "";
+		// id
+		$this->id->ViewValue = $this->id->CurrentValue;
+		$this->id->ViewCustomAttributes = "";
 
-		// userlevelname
-		$this->userlevelname->ViewValue = $this->userlevelname->CurrentValue;
-		if ($Security->GetUserLevelName($this->userlevelid->CurrentValue) <> "") $this->userlevelname->ViewValue = $Security->GetUserLevelName($this->userlevelid->CurrentValue);
-		$this->userlevelname->ViewCustomAttributes = "";
+		// Nama
+		$this->Nama->ViewValue = $this->Nama->CurrentValue;
+		$this->Nama->ViewCustomAttributes = "";
 
-			// userlevelid
-			$this->userlevelid->LinkCustomAttributes = "";
-			$this->userlevelid->HrefValue = "";
-			$this->userlevelid->TooltipValue = "";
+			// Nama
+			$this->Nama->LinkCustomAttributes = "";
+			$this->Nama->HrefValue = "";
+			$this->Nama->TooltipValue = "";
+		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
-			// userlevelname
-			$this->userlevelname->LinkCustomAttributes = "";
-			$this->userlevelname->HrefValue = "";
-			$this->userlevelname->TooltipValue = "";
+			// Nama
+			$this->Nama->EditAttrs["class"] = "form-control";
+			$this->Nama->EditCustomAttributes = "";
+			$this->Nama->EditValue = ew_HtmlEncode($this->Nama->CurrentValue);
+			$this->Nama->PlaceHolder = ew_RemoveHtml($this->Nama->FldCaption());
+
+			// Add refer script
+			// Nama
+
+			$this->Nama->LinkCustomAttributes = "";
+			$this->Nama->HrefValue = "";
 		}
+		if ($this->RowType == EW_ROWTYPE_ADD || $this->RowType == EW_ROWTYPE_EDIT || $this->RowType == EW_ROWTYPE_SEARCH) // Add/Edit/Search row
+			$this->SetupFieldTitles();
 
 		// Call Row Rendered event
 		if ($this->RowType <> EW_ROWTYPE_AGGREGATEINIT)
 			$this->Row_Rendered();
 	}
 
-	//
-	// Delete records based on current filter
-	//
-	function DeleteRows() {
+	// Validate form
+	function ValidateForm() {
+		global $Language, $gsFormError;
+
+		// Initialize form error message
+		$gsFormError = "";
+
+		// Check if validation required
+		if (!EW_SERVER_VALIDATE)
+			return ($gsFormError == "");
+		if (!$this->Nama->FldIsDetailKey && !is_null($this->Nama->FormValue) && $this->Nama->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->Nama->FldCaption(), $this->Nama->ReqErrMsg));
+		}
+
+		// Return validate result
+		$ValidateForm = ($gsFormError == "");
+
+		// Call Form_CustomValidate event
+		$sFormCustomError = "";
+		$ValidateForm = $ValidateForm && $this->Form_CustomValidate($sFormCustomError);
+		if ($sFormCustomError <> "") {
+			ew_AddMessage($gsFormError, $sFormCustomError);
+		}
+		return $ValidateForm;
+	}
+
+	// Add record
+	function AddRow($rsold = NULL) {
 		global $Language, $Security;
-		if (!$Security->CanDelete()) {
-			$this->setFailureMessage($Language->Phrase("NoDeletePermission")); // No delete permission
-			return FALSE;
-		}
-		$DeleteRows = TRUE;
-		$sSql = $this->SQL();
 		$conn = &$this->Connection();
-		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-		$rs = $conn->Execute($sSql);
-		$conn->raiseErrorFn = '';
-		if ($rs === FALSE) {
-			return FALSE;
-		} elseif ($rs->EOF) {
-			$this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
-			$rs->Close();
-			return FALSE;
+
+		// Load db values from rsold
+		$this->LoadDbValues($rsold);
+		if ($rsold) {
 		}
-		$rows = ($rs) ? $rs->GetRows() : array();
-		$conn->BeginTrans();
-		if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteBegin")); // Batch delete begin
+		$rsnew = array();
 
-		// Clone old rows
-		$rsold = $rows;
-		if ($rs)
-			$rs->Close();
+		// Nama
+		$this->Nama->SetDbValueDef($rsnew, $this->Nama->CurrentValue, "", FALSE);
 
-		// Call row deleting event
-		if ($DeleteRows) {
-			foreach ($rsold as $row) {
-				$DeleteRows = $this->Row_Deleting($row);
-				if (!$DeleteRows) break;
+		// Call Row Inserting event
+		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
+		$bInsertRow = $this->Row_Inserting($rs, $rsnew);
+		if ($bInsertRow) {
+			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+			$AddRow = $this->Insert($rsnew);
+			$conn->raiseErrorFn = '';
+			if ($AddRow) {
 			}
-		}
-		if ($DeleteRows) {
-			$sKey = "";
-			foreach ($rsold as $row) {
-				$sThisKey = "";
-				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-				$sThisKey .= $row['userlevelid'];
-				$x_userlevelid = $row['userlevelid']; // Get User Level id
-				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-				$DeleteRows = $this->Delete($row); // Delete
-				$conn->raiseErrorFn = '';
-				if ($DeleteRows === FALSE)
-					break;
-				if ($sKey <> "") $sKey .= ", ";
-				$sKey .= $sThisKey;
-				if (!is_null($x_userlevelid)) {
-					$conn->Execute("DELETE FROM " . EW_USER_LEVEL_PRIV_TABLE . " WHERE " . EW_USER_LEVEL_PRIV_USER_LEVEL_ID_FIELD . " = " . $x_userlevelid); // Delete user rights as well
-				}
-			}
-		}
-		if (!$DeleteRows) {
-
-			// Set up error message
+		} else {
 			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
 
 				// Use the message, do nothing
@@ -632,24 +650,17 @@ class ct97_userlevels_delete extends ct97_userlevels {
 				$this->setFailureMessage($this->CancelMessage);
 				$this->CancelMessage = "";
 			} else {
-				$this->setFailureMessage($Language->Phrase("DeleteCancelled"));
+				$this->setFailureMessage($Language->Phrase("InsertCancelled"));
 			}
+			$AddRow = FALSE;
 		}
-		if ($DeleteRows) {
-			$conn->CommitTrans(); // Commit the changes
-			if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteSuccess")); // Batch delete success
-		} else {
-			$conn->RollbackTrans(); // Rollback changes
-			if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteRollback")); // Batch delete rollback
-		}
+		if ($AddRow) {
 
-		// Call Row Deleted event
-		if ($DeleteRows) {
-			foreach ($rsold as $row) {
-				$this->Row_Deleted($row);
-			}
+			// Call Row Inserted event
+			$rs = ($rsold == NULL) ? NULL : $rsold->fields;
+			$this->Row_Inserted($rs, $rsnew);
 		}
-		return $DeleteRows;
+		return $AddRow;
 	}
 
 	// Set up Breadcrumb
@@ -657,9 +668,9 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t97_userlevelslist.php"), "", $this->TableVar, TRUE);
-		$PageId = "delete";
-		$Breadcrumb->Add("delete", $PageId, $url);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t07_satuanlist.php"), "", $this->TableVar, TRUE);
+		$PageId = "addopt";
+		$Breadcrumb->Add("addopt", $PageId, $url);
 	}
 
 	// Setup lookup filters of a field
@@ -737,35 +748,68 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		//$footer = "your footer";
 
 	}
+
+	// Custom validate event
+	// Form Custom Validate event
+	function Form_CustomValidate(&$CustomError) {
+
+		// Return error message in CustomError
+		return TRUE;
+	}
 }
 ?>
 <?php ew_Header(FALSE) ?>
 <?php
 
 // Create page object
-if (!isset($t97_userlevels_delete)) $t97_userlevels_delete = new ct97_userlevels_delete();
+if (!isset($t07_satuan_addopt)) $t07_satuan_addopt = new ct07_satuan_addopt();
 
 // Page init
-$t97_userlevels_delete->Page_Init();
+$t07_satuan_addopt->Page_Init();
 
 // Page main
-$t97_userlevels_delete->Page_Main();
+$t07_satuan_addopt->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t97_userlevels_delete->Page_Render();
+$t07_satuan_addopt->Page_Render();
 ?>
-<?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
-var CurrentPageID = EW_PAGE_ID = "delete";
-var CurrentForm = ft97_userlevelsdelete = new ew_Form("ft97_userlevelsdelete", "delete");
+var CurrentPageID = EW_PAGE_ID = "addopt";
+var CurrentForm = ft07_satuanaddopt = new ew_Form("ft07_satuanaddopt", "addopt");
+
+// Validate form
+ft07_satuanaddopt.Validate = function() {
+	if (!this.ValidateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
+	if ($fobj.find("#a_confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.FormKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = $fobj.find("#a_list").val() == "gridinsert";
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+			elm = this.GetElements("x" + infix + "_Nama");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t07_satuan->Nama->FldCaption(), $t07_satuan->Nama->ReqErrMsg)) ?>");
+
+			// Fire Form_CustomValidate event
+			if (!this.Form_CustomValidate(fobj))
+				return false;
+	}
+	return true;
+}
 
 // Form_CustomValidate event
-ft97_userlevelsdelete.Form_CustomValidate = 
+ft07_satuanaddopt.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid.
@@ -773,7 +817,7 @@ ft97_userlevelsdelete.Form_CustomValidate =
  }
 
 // Use JavaScript validation or not
-ft97_userlevelsdelete.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
+ft07_satuanaddopt.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
 
 // Dynamic selection lists
 // Form object for search
@@ -783,98 +827,33 @@ ft97_userlevelsdelete.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDA
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php $t97_userlevels_delete->ShowPageHeader(); ?>
 <?php
-$t97_userlevels_delete->ShowMessage();
+$t07_satuan_addopt->ShowMessage();
 ?>
-<form name="ft97_userlevelsdelete" id="ft97_userlevelsdelete" class="form-inline ewForm ewDeleteForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t97_userlevels_delete->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t97_userlevels_delete->Token ?>">
+<form name="ft07_satuanaddopt" id="ft07_satuanaddopt" class="ewForm form-horizontal" action="t07_satuanaddopt.php" method="post">
+<?php if ($t07_satuan_addopt->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t07_satuan_addopt->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t97_userlevels">
-<input type="hidden" name="a_delete" id="a_delete" value="D">
-<?php foreach ($t97_userlevels_delete->RecKeys as $key) { ?>
-<?php $keyvalue = is_array($key) ? implode($EW_COMPOSITE_KEY_SEPARATOR, $key) : $key; ?>
-<input type="hidden" name="key_m[]" value="<?php echo ew_HtmlEncode($keyvalue) ?>">
-<?php } ?>
-<div class="box ewBox ewGrid">
-<div class="<?php if (ew_IsResponsiveLayout()) { ?>table-responsive <?php } ?>ewGridMiddlePanel">
-<table class="table ewTable">
-	<thead>
-	<tr class="ewTableHeader">
-<?php if ($t97_userlevels->userlevelid->Visible) { // userlevelid ?>
-		<th class="<?php echo $t97_userlevels->userlevelid->HeaderCellClass() ?>"><span id="elh_t97_userlevels_userlevelid" class="t97_userlevels_userlevelid"><?php echo $t97_userlevels->userlevelid->FldCaption() ?></span></th>
-<?php } ?>
-<?php if ($t97_userlevels->userlevelname->Visible) { // userlevelname ?>
-		<th class="<?php echo $t97_userlevels->userlevelname->HeaderCellClass() ?>"><span id="elh_t97_userlevels_userlevelname" class="t97_userlevels_userlevelname"><?php echo $t97_userlevels->userlevelname->FldCaption() ?></span></th>
-<?php } ?>
-	</tr>
-	</thead>
-	<tbody>
-<?php
-$t97_userlevels_delete->RecCnt = 0;
-$i = 0;
-while (!$t97_userlevels_delete->Recordset->EOF) {
-	$t97_userlevels_delete->RecCnt++;
-	$t97_userlevels_delete->RowCnt++;
-
-	// Set row properties
-	$t97_userlevels->ResetAttrs();
-	$t97_userlevels->RowType = EW_ROWTYPE_VIEW; // View
-
-	// Get the field contents
-	$t97_userlevels_delete->LoadRowValues($t97_userlevels_delete->Recordset);
-
-	// Render row
-	$t97_userlevels_delete->RenderRow();
-?>
-	<tr<?php echo $t97_userlevels->RowAttributes() ?>>
-<?php if ($t97_userlevels->userlevelid->Visible) { // userlevelid ?>
-		<td<?php echo $t97_userlevels->userlevelid->CellAttributes() ?>>
-<span id="el<?php echo $t97_userlevels_delete->RowCnt ?>_t97_userlevels_userlevelid" class="t97_userlevels_userlevelid">
-<span<?php echo $t97_userlevels->userlevelid->ViewAttributes() ?>>
-<?php echo $t97_userlevels->userlevelid->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($t97_userlevels->userlevelname->Visible) { // userlevelname ?>
-		<td<?php echo $t97_userlevels->userlevelname->CellAttributes() ?>>
-<span id="el<?php echo $t97_userlevels_delete->RowCnt ?>_t97_userlevels_userlevelname" class="t97_userlevels_userlevelname">
-<span<?php echo $t97_userlevels->userlevelname->ViewAttributes() ?>>
-<?php echo $t97_userlevels->userlevelname->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-	</tr>
-<?php
-	$t97_userlevels_delete->Recordset->MoveNext();
-}
-$t97_userlevels_delete->Recordset->Close();
-?>
-</tbody>
-</table>
+<input type="hidden" name="t" value="t07_satuan">
+<input type="hidden" name="a_addopt" id="a_addopt" value="A">
+<?php if ($t07_satuan->Nama->Visible) { // Nama ?>
+	<div class="form-group">
+		<label class="col-sm-2 control-label ewLabel" for="x_Nama"><?php echo $t07_satuan->Nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="col-sm-10">
+<input type="text" data-table="t07_satuan" data-field="x_Nama" name="x_Nama" id="x_Nama" size="30" maxlength="25" placeholder="<?php echo ew_HtmlEncode($t07_satuan->Nama->getPlaceHolder()) ?>" value="<?php echo $t07_satuan->Nama->EditValue ?>"<?php echo $t07_satuan->Nama->EditAttributes() ?>>
 </div>
-</div>
-<div>
-<button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("DeleteBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t97_userlevels_delete->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
-</div>
+	</div>
+<?php } ?>
 </form>
 <script type="text/javascript">
-ft97_userlevelsdelete.Init();
+ft07_satuanaddopt.Init();
 </script>
-<?php
-$t97_userlevels_delete->ShowPageFooter();
-if (EW_DEBUG_ENABLED)
-	echo ew_DebugMsg();
-?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
 // document.write("page loaded");
 
 </script>
-<?php include_once "footer.php" ?>
 <?php
-$t97_userlevels_delete->Page_Terminate();
+$t07_satuan_addopt->Page_Terminate();
 ?>

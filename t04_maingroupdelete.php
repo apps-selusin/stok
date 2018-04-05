@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg14.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql14.php") ?>
 <?php include_once "phpfn14.php" ?>
-<?php include_once "t97_userlevelsinfo.php" ?>
+<?php include_once "t04_maingroupinfo.php" ?>
 <?php include_once "t96_employeesinfo.php" ?>
 <?php include_once "userfn14.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t97_userlevels_delete = NULL; // Initialize page object first
+$t04_maingroup_delete = NULL; // Initialize page object first
 
-class ct97_userlevels_delete extends ct97_userlevels {
+class ct04_maingroup_delete extends ct04_maingroup {
 
 	// Page ID
 	var $PageID = 'delete';
@@ -25,10 +25,10 @@ class ct97_userlevels_delete extends ct97_userlevels {
 	var $ProjectID = '{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}';
 
 	// Table name
-	var $TableName = 't97_userlevels';
+	var $TableName = 't04_maingroup';
 
 	// Page object name
-	var $PageObjName = 't97_userlevels_delete';
+	var $PageObjName = 't04_maingroup_delete';
 
 	// Page headings
 	var $Heading = '';
@@ -256,10 +256,10 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t97_userlevels)
-		if (!isset($GLOBALS["t97_userlevels"]) || get_class($GLOBALS["t97_userlevels"]) == "ct97_userlevels") {
-			$GLOBALS["t97_userlevels"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t97_userlevels"];
+		// Table object (t04_maingroup)
+		if (!isset($GLOBALS["t04_maingroup"]) || get_class($GLOBALS["t04_maingroup"]) == "ct04_maingroup") {
+			$GLOBALS["t04_maingroup"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t04_maingroup"];
 		}
 
 		// Table object (t96_employees)
@@ -271,7 +271,7 @@ class ct97_userlevels_delete extends ct97_userlevels {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't97_userlevels', TRUE);
+			define("EW_TABLE_NAME", 't04_maingroup', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"]))
@@ -306,9 +306,13 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
 		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
 		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
-		if (!$Security->CanAdmin()) {
+		if (!$Security->CanDelete()) {
 			$Security->SaveLastUrl();
-			$this->Page_Terminate(ew_GetUrl("login.php"));
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			if ($Security->CanList())
+				$this->Page_Terminate(ew_GetUrl("t04_maingrouplist.php"));
+			else
+				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
 		if ($Security->IsLoggedIn()) {
 			$Security->UserID_Loading();
@@ -322,8 +326,8 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		// 
 
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->userlevelid->SetVisibility();
-		$this->userlevelname->SetVisibility();
+		$this->Kode->SetVisibility();
+		$this->Nama->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -355,13 +359,13 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t97_userlevels;
+		global $EW_EXPORT, $t04_maingroup;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t97_userlevels);
+				$doc = new $class($t04_maingroup);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -408,10 +412,10 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		$this->RecKeys = $this->GetRecordKeys(); // Load record keys
 		$sFilter = $this->GetKeyFilter();
 		if ($sFilter == "")
-			$this->Page_Terminate("t97_userlevelslist.php"); // Prevent SQL injection, return to list
+			$this->Page_Terminate("t04_maingrouplist.php"); // Prevent SQL injection, return to list
 
 		// Set up filter (SQL WHHERE clause) and get return SQL
-		// SQL constructor in t97_userlevels class, t97_userlevelsinfo.php
+		// SQL constructor in t04_maingroup class, t04_maingroupinfo.php
 
 		$this->CurrentFilter = $sFilter;
 
@@ -439,7 +443,7 @@ class ct97_userlevels_delete extends ct97_userlevels {
 			if ($this->TotalRecs <= 0) { // No record found, exit
 				if ($this->Recordset)
 					$this->Recordset->Close();
-				$this->Page_Terminate("t97_userlevelslist.php"); // Return to list
+				$this->Page_Terminate("t04_maingrouplist.php"); // Return to list
 			}
 		}
 	}
@@ -503,16 +507,17 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		$this->Row_Selected($row);
 		if (!$rs || $rs->EOF)
 			return;
-		$this->userlevelid->setDbValue($row['userlevelid']);
-		$this->userlevelid->CurrentValue = intval($this->userlevelid->CurrentValue);
-		$this->userlevelname->setDbValue($row['userlevelname']);
+		$this->id->setDbValue($row['id']);
+		$this->Kode->setDbValue($row['Kode']);
+		$this->Nama->setDbValue($row['Nama']);
 	}
 
 	// Return a row with default values
 	function NewRow() {
 		$row = array();
-		$row['userlevelid'] = NULL;
-		$row['userlevelname'] = NULL;
+		$row['id'] = NULL;
+		$row['Kode'] = NULL;
+		$row['Nama'] = NULL;
 		return $row;
 	}
 
@@ -521,8 +526,9 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		if (!$rs || !is_array($rs) && $rs->EOF)
 			return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->userlevelid->DbValue = $row['userlevelid'];
-		$this->userlevelname->DbValue = $row['userlevelname'];
+		$this->id->DbValue = $row['id'];
+		$this->Kode->DbValue = $row['Kode'];
+		$this->Nama->DbValue = $row['Nama'];
 	}
 
 	// Render row values based on field settings
@@ -535,29 +541,33 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// userlevelid
-		// userlevelname
+		// id
+		// Kode
+		// Nama
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// userlevelid
-		$this->userlevelid->ViewValue = $this->userlevelid->CurrentValue;
-		$this->userlevelid->ViewCustomAttributes = "";
+		// id
+		$this->id->ViewValue = $this->id->CurrentValue;
+		$this->id->ViewCustomAttributes = "";
 
-		// userlevelname
-		$this->userlevelname->ViewValue = $this->userlevelname->CurrentValue;
-		if ($Security->GetUserLevelName($this->userlevelid->CurrentValue) <> "") $this->userlevelname->ViewValue = $Security->GetUserLevelName($this->userlevelid->CurrentValue);
-		$this->userlevelname->ViewCustomAttributes = "";
+		// Kode
+		$this->Kode->ViewValue = $this->Kode->CurrentValue;
+		$this->Kode->ViewCustomAttributes = "";
 
-			// userlevelid
-			$this->userlevelid->LinkCustomAttributes = "";
-			$this->userlevelid->HrefValue = "";
-			$this->userlevelid->TooltipValue = "";
+		// Nama
+		$this->Nama->ViewValue = $this->Nama->CurrentValue;
+		$this->Nama->ViewCustomAttributes = "";
 
-			// userlevelname
-			$this->userlevelname->LinkCustomAttributes = "";
-			$this->userlevelname->HrefValue = "";
-			$this->userlevelname->TooltipValue = "";
+			// Kode
+			$this->Kode->LinkCustomAttributes = "";
+			$this->Kode->HrefValue = "";
+			$this->Kode->TooltipValue = "";
+
+			// Nama
+			$this->Nama->LinkCustomAttributes = "";
+			$this->Nama->HrefValue = "";
+			$this->Nama->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -608,8 +618,7 @@ class ct97_userlevels_delete extends ct97_userlevels {
 			foreach ($rsold as $row) {
 				$sThisKey = "";
 				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-				$sThisKey .= $row['userlevelid'];
-				$x_userlevelid = $row['userlevelid']; // Get User Level id
+				$sThisKey .= $row['id'];
 				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 				$DeleteRows = $this->Delete($row); // Delete
 				$conn->raiseErrorFn = '';
@@ -617,9 +626,6 @@ class ct97_userlevels_delete extends ct97_userlevels {
 					break;
 				if ($sKey <> "") $sKey .= ", ";
 				$sKey .= $sThisKey;
-				if (!is_null($x_userlevelid)) {
-					$conn->Execute("DELETE FROM " . EW_USER_LEVEL_PRIV_TABLE . " WHERE " . EW_USER_LEVEL_PRIV_USER_LEVEL_ID_FIELD . " = " . $x_userlevelid); // Delete user rights as well
-				}
 			}
 		}
 		if (!$DeleteRows) {
@@ -657,7 +663,7 @@ class ct97_userlevels_delete extends ct97_userlevels {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t97_userlevelslist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t04_maingrouplist.php"), "", $this->TableVar, TRUE);
 		$PageId = "delete";
 		$Breadcrumb->Add("delete", $PageId, $url);
 	}
@@ -743,29 +749,29 @@ class ct97_userlevels_delete extends ct97_userlevels {
 <?php
 
 // Create page object
-if (!isset($t97_userlevels_delete)) $t97_userlevels_delete = new ct97_userlevels_delete();
+if (!isset($t04_maingroup_delete)) $t04_maingroup_delete = new ct04_maingroup_delete();
 
 // Page init
-$t97_userlevels_delete->Page_Init();
+$t04_maingroup_delete->Page_Init();
 
 // Page main
-$t97_userlevels_delete->Page_Main();
+$t04_maingroup_delete->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t97_userlevels_delete->Page_Render();
+$t04_maingroup_delete->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "delete";
-var CurrentForm = ft97_userlevelsdelete = new ew_Form("ft97_userlevelsdelete", "delete");
+var CurrentForm = ft04_maingroupdelete = new ew_Form("ft04_maingroupdelete", "delete");
 
 // Form_CustomValidate event
-ft97_userlevelsdelete.Form_CustomValidate = 
+ft04_maingroupdelete.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid.
@@ -773,7 +779,7 @@ ft97_userlevelsdelete.Form_CustomValidate =
  }
 
 // Use JavaScript validation or not
-ft97_userlevelsdelete.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
+ft04_maingroupdelete.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
 
 // Dynamic selection lists
 // Form object for search
@@ -783,17 +789,17 @@ ft97_userlevelsdelete.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDA
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php $t97_userlevels_delete->ShowPageHeader(); ?>
+<?php $t04_maingroup_delete->ShowPageHeader(); ?>
 <?php
-$t97_userlevels_delete->ShowMessage();
+$t04_maingroup_delete->ShowMessage();
 ?>
-<form name="ft97_userlevelsdelete" id="ft97_userlevelsdelete" class="form-inline ewForm ewDeleteForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t97_userlevels_delete->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t97_userlevels_delete->Token ?>">
+<form name="ft04_maingroupdelete" id="ft04_maingroupdelete" class="form-inline ewForm ewDeleteForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t04_maingroup_delete->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t04_maingroup_delete->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t97_userlevels">
+<input type="hidden" name="t" value="t04_maingroup">
 <input type="hidden" name="a_delete" id="a_delete" value="D">
-<?php foreach ($t97_userlevels_delete->RecKeys as $key) { ?>
+<?php foreach ($t04_maingroup_delete->RecKeys as $key) { ?>
 <?php $keyvalue = is_array($key) ? implode($EW_COMPOSITE_KEY_SEPARATOR, $key) : $key; ?>
 <input type="hidden" name="key_m[]" value="<?php echo ew_HtmlEncode($keyvalue) ?>">
 <?php } ?>
@@ -802,54 +808,54 @@ $t97_userlevels_delete->ShowMessage();
 <table class="table ewTable">
 	<thead>
 	<tr class="ewTableHeader">
-<?php if ($t97_userlevels->userlevelid->Visible) { // userlevelid ?>
-		<th class="<?php echo $t97_userlevels->userlevelid->HeaderCellClass() ?>"><span id="elh_t97_userlevels_userlevelid" class="t97_userlevels_userlevelid"><?php echo $t97_userlevels->userlevelid->FldCaption() ?></span></th>
+<?php if ($t04_maingroup->Kode->Visible) { // Kode ?>
+		<th class="<?php echo $t04_maingroup->Kode->HeaderCellClass() ?>"><span id="elh_t04_maingroup_Kode" class="t04_maingroup_Kode"><?php echo $t04_maingroup->Kode->FldCaption() ?></span></th>
 <?php } ?>
-<?php if ($t97_userlevels->userlevelname->Visible) { // userlevelname ?>
-		<th class="<?php echo $t97_userlevels->userlevelname->HeaderCellClass() ?>"><span id="elh_t97_userlevels_userlevelname" class="t97_userlevels_userlevelname"><?php echo $t97_userlevels->userlevelname->FldCaption() ?></span></th>
+<?php if ($t04_maingroup->Nama->Visible) { // Nama ?>
+		<th class="<?php echo $t04_maingroup->Nama->HeaderCellClass() ?>"><span id="elh_t04_maingroup_Nama" class="t04_maingroup_Nama"><?php echo $t04_maingroup->Nama->FldCaption() ?></span></th>
 <?php } ?>
 	</tr>
 	</thead>
 	<tbody>
 <?php
-$t97_userlevels_delete->RecCnt = 0;
+$t04_maingroup_delete->RecCnt = 0;
 $i = 0;
-while (!$t97_userlevels_delete->Recordset->EOF) {
-	$t97_userlevels_delete->RecCnt++;
-	$t97_userlevels_delete->RowCnt++;
+while (!$t04_maingroup_delete->Recordset->EOF) {
+	$t04_maingroup_delete->RecCnt++;
+	$t04_maingroup_delete->RowCnt++;
 
 	// Set row properties
-	$t97_userlevels->ResetAttrs();
-	$t97_userlevels->RowType = EW_ROWTYPE_VIEW; // View
+	$t04_maingroup->ResetAttrs();
+	$t04_maingroup->RowType = EW_ROWTYPE_VIEW; // View
 
 	// Get the field contents
-	$t97_userlevels_delete->LoadRowValues($t97_userlevels_delete->Recordset);
+	$t04_maingroup_delete->LoadRowValues($t04_maingroup_delete->Recordset);
 
 	// Render row
-	$t97_userlevels_delete->RenderRow();
+	$t04_maingroup_delete->RenderRow();
 ?>
-	<tr<?php echo $t97_userlevels->RowAttributes() ?>>
-<?php if ($t97_userlevels->userlevelid->Visible) { // userlevelid ?>
-		<td<?php echo $t97_userlevels->userlevelid->CellAttributes() ?>>
-<span id="el<?php echo $t97_userlevels_delete->RowCnt ?>_t97_userlevels_userlevelid" class="t97_userlevels_userlevelid">
-<span<?php echo $t97_userlevels->userlevelid->ViewAttributes() ?>>
-<?php echo $t97_userlevels->userlevelid->ListViewValue() ?></span>
+	<tr<?php echo $t04_maingroup->RowAttributes() ?>>
+<?php if ($t04_maingroup->Kode->Visible) { // Kode ?>
+		<td<?php echo $t04_maingroup->Kode->CellAttributes() ?>>
+<span id="el<?php echo $t04_maingroup_delete->RowCnt ?>_t04_maingroup_Kode" class="t04_maingroup_Kode">
+<span<?php echo $t04_maingroup->Kode->ViewAttributes() ?>>
+<?php echo $t04_maingroup->Kode->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($t97_userlevels->userlevelname->Visible) { // userlevelname ?>
-		<td<?php echo $t97_userlevels->userlevelname->CellAttributes() ?>>
-<span id="el<?php echo $t97_userlevels_delete->RowCnt ?>_t97_userlevels_userlevelname" class="t97_userlevels_userlevelname">
-<span<?php echo $t97_userlevels->userlevelname->ViewAttributes() ?>>
-<?php echo $t97_userlevels->userlevelname->ListViewValue() ?></span>
+<?php if ($t04_maingroup->Nama->Visible) { // Nama ?>
+		<td<?php echo $t04_maingroup->Nama->CellAttributes() ?>>
+<span id="el<?php echo $t04_maingroup_delete->RowCnt ?>_t04_maingroup_Nama" class="t04_maingroup_Nama">
+<span<?php echo $t04_maingroup->Nama->ViewAttributes() ?>>
+<?php echo $t04_maingroup->Nama->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
 	</tr>
 <?php
-	$t97_userlevels_delete->Recordset->MoveNext();
+	$t04_maingroup_delete->Recordset->MoveNext();
 }
-$t97_userlevels_delete->Recordset->Close();
+$t04_maingroup_delete->Recordset->Close();
 ?>
 </tbody>
 </table>
@@ -857,14 +863,14 @@ $t97_userlevels_delete->Recordset->Close();
 </div>
 <div>
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("DeleteBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t97_userlevels_delete->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t04_maingroup_delete->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
 </div>
 </form>
 <script type="text/javascript">
-ft97_userlevelsdelete.Init();
+ft04_maingroupdelete.Init();
 </script>
 <?php
-$t97_userlevels_delete->ShowPageFooter();
+$t04_maingroup_delete->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -876,5 +882,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$t97_userlevels_delete->Page_Terminate();
+$t04_maingroup_delete->Page_Terminate();
 ?>
