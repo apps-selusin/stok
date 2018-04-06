@@ -126,16 +126,14 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt14.js");
 
 // Write your global startup script here
 // document.write("page loaded");
-function xf_article_kode_onkeyup(RowIndex) {
+function f_article_maingroupid_onchange(event) {
 	var elm_name = $(event.target).val();
+	alert(elm_name);
+}
 
-	//debet_new = parseInt(elm_name);
-	//if(isNaN(debet_old)) debet_old = 0;
-	//if(isNaN(debet_new)) debet_new = 0;
-	//debet_total = debet_total - debet_old + debet_new;
-	//alert('debet : '+debet_total);
-
-	alert(event.keyCode);
+function f_article_subgroupid_onchange(event) {
+	var elm_name = $(event.target).val();
+	alert(elm_name);
 }
 
 function f_article_kode_onkeyup(RowIndex, event) {
@@ -150,7 +148,7 @@ function f_article_kode_onkeyup(RowIndex, event) {
 		//alert(MainGroupID.value);
 		//alert(elm_name);
 
-		alert(RowIndex);
+		alert(RowIndex + " - " + elm_name);
 	}
 }
 

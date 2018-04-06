@@ -1305,6 +1305,8 @@ class ct06_article extends cTable {
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
 
+		$this->MainGroupID->EditAttrs["onchange"] = "f_article_maingroupid_onchange(event);";
+		$this->SubGroupID->EditAttrs["onchange"] = "f_article_subgroupid_onchange(event);";
 		$this->Kode->EditAttrs["onkeyup"] = "f_article_kode_onkeyup(".$this->RowIndex.", event);"; //exit;
 	}
 

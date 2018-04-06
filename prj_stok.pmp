@@ -331,14 +331,14 @@
   <CustomScript ScriptType="Client" ScriptCodeType="Global" ScriptName="Startup Script" ScriptCtrlID="" ScriptL1Key="" ScriptL2Key=""><![CDATA[// Write your global startup script here
 // document.write("page loaded");
 
-function xf_article_kode_onkeyup(RowIndex) {
+function f_article_maingroupid_onchange(event) {
 	var elm_name = $(event.target).val();
-	//debet_new = parseInt(elm_name);
-	//if(isNaN(debet_old)) debet_old = 0;
-	//if(isNaN(debet_new)) debet_new = 0;
-	//debet_total = debet_total - debet_old + debet_new;
-	//alert('debet : '+debet_total);
-	alert(event.keyCode);
+	alert(elm_name);
+}
+
+function f_article_subgroupid_onchange(event) {
+	var elm_name = $(event.target).val();
+	alert(elm_name);
 }
 
 function f_article_kode_onkeyup(RowIndex, event) {
@@ -349,7 +349,7 @@ function f_article_kode_onkeyup(RowIndex, event) {
 	if (event.keyCode == 113) {
 		//alert(MainGroupID.value);
 		//alert(elm_name);
-		alert(RowIndex);
+		alert(RowIndex + " - " + elm_name);
 	}
 }
 
@@ -366,6 +366,8 @@ function kredit_onchange(event) {
 function Row_Rendered() {
 	// To view properties of field class, use:
 	//var_dump($this-><FieldName>);
+	$this->MainGroupID->EditAttrs["onchange"] = "f_article_maingroupid_onchange(event);";
+	$this->SubGroupID->EditAttrs["onchange"] = "f_article_subgroupid_onchange(event);";
 	$this->Kode->EditAttrs["onkeyup"] = "f_article_kode_onkeyup(".$this->RowIndex.", event);"; //exit;
 }
 ]]></CustomScript>
