@@ -331,14 +331,15 @@
   <CustomScript ScriptType="Client" ScriptCodeType="Global" ScriptName="Startup Script" ScriptCtrlID="" ScriptL1Key="" ScriptL2Key=""><![CDATA[// Write your global startup script here
 // document.write("page loaded");
 
-function f_article_maingroupid_onchange(event) {
+/*function f_article_maingroupid_onchange(event) {
 	var elm_name = $(event.target).val();
 	alert(elm_name);
-}
+}*/
 
 function f_article_subgroupid_onchange(event) {
-	var elm_name = $(event.target).val();
-	alert(elm_name);
+	var nilai = $(event.target).val();
+	//alert(elm_name);
+	article_subgroupid = nilai;
 }
 
 function f_article_kode_onkeyup(RowIndex, event) {
@@ -352,21 +353,12 @@ function f_article_kode_onkeyup(RowIndex, event) {
 		alert(RowIndex + " - " + elm_name);
 	}
 }
-
-function kredit_onchange(event) {
-	var elm_name = $(event.target).val();
-	kredit_new = parseInt(elm_name);
-	if(isNaN(kredit_old)) kredit_old = 0;
-	if(isNaN(kredit_new)) kredit_new = 0;
-	kredit_total = kredit_total - kredit_old + kredit_new;
-	alert('kredit : '+kredit_total);
-}
 ]]></CustomScript>
   <CustomScript ScriptType="Server" ScriptCodeType="Table" ScriptName="Row_Rendered" ScriptCtrlID="" ScriptL1Key="t06_article" ScriptL2Key=""><![CDATA[// Row Rendered event
 function Row_Rendered() {
 	// To view properties of field class, use:
 	//var_dump($this-><FieldName>);
-	$this->MainGroupID->EditAttrs["onchange"] = "f_article_maingroupid_onchange(event);";
+	//$this->MainGroupID->EditAttrs["onchange"] = "f_article_maingroupid_onchange(event);";
 	$this->SubGroupID->EditAttrs["onchange"] = "f_article_subgroupid_onchange(event);";
 	$this->Kode->EditAttrs["onkeyup"] = "f_article_kode_onkeyup(".$this->RowIndex.", event);"; //exit;
 }
@@ -374,6 +366,14 @@ function Row_Rendered() {
   <CustomScript ScriptType="Template" ScriptCodeType="Table" ScriptName="Content" ScriptCtrlID="custom" ScriptL1Key="cf01_home.php" ScriptL2Key=""><![CDATA[<div>
 	<a href="t06_articlelist.php">Article</a>
 </div>
+]]></CustomScript>
+  <CustomScript ScriptType="Client" ScriptCodeType="Global" ScriptName="Global Code" ScriptCtrlID="" ScriptL1Key="" ScriptL2Key=""><![CDATA[var article_subgroupid;
+]]></CustomScript>
+  <CustomScript ScriptType="Server" ScriptCodeType="Global" ScriptName="Global Code" ScriptCtrlID="" ScriptL1Key="" ScriptL2Key=""><![CDATA[function f_GetNextArticleCode() {
+	$nextCode = "";
+	$lastCode = "";
+	$rs = ew_ExecuteScalar("select Kode from t06_article where SubGroupID = ".""."");
+}
 ]]></CustomScript>
   <Menu MenuID="1" MenuText="Home" MenuParentID="-1" MenuGroup="0" MenuSource="" MenuExtUrl="" MenuAnonymous="0" MenuSecurity="" MenuUrl="cf01_home.php" MenuCustomUrl="0" MenuLevel="0" MenuShow="1" MenuDisplayOrder="100" MenuIconClass="" />
   <Menu MenuID="6" MenuText="Setup" MenuParentID="-1" MenuGroup="0" MenuSource="" MenuExtUrl="" MenuAnonymous="8" MenuSecurity="" MenuUrl="" MenuCustomUrl="1" MenuLevel="0" MenuShow="1" MenuDisplayOrder="200" MenuIconClass="" />

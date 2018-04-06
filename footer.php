@@ -126,10 +126,11 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt14.js");
 
 // Write your global startup script here
 // document.write("page loaded");
-function f_article_maingroupid_onchange(event) {
+
+/*function f_article_maingroupid_onchange(event) {
 	var elm_name = $(event.target).val();
 	alert(elm_name);
-}
+}*/
 
 function f_article_subgroupid_onchange(event) {
 	var elm_name = $(event.target).val();
@@ -150,15 +151,6 @@ function f_article_kode_onkeyup(RowIndex, event) {
 
 		alert(RowIndex + " - " + elm_name);
 	}
-}
-
-function kredit_onchange(event) {
-	var elm_name = $(event.target).val();
-	kredit_new = parseInt(elm_name);
-	if(isNaN(kredit_old)) kredit_old = 0;
-	if(isNaN(kredit_new)) kredit_new = 0;
-	kredit_total = kredit_total - kredit_old + kredit_new;
-	alert('kredit : '+kredit_total);
 }
 </script>
 <?php } ?>
