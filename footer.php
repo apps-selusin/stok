@@ -138,15 +138,29 @@ function xf_article_kode_onkeyup(RowIndex) {
 	alert(event.keyCode);
 }
 
-function f_article_kode_onkeyup(RowIndex) {
+function f_article_kode_onkeyup(RowIndex, event) {
 	var form = this.form;
+	var elm_name = $(event.target).val();
 
 	//var MainGroupID = form.elements["lu_x" + RowIndex + "_MainGroupID"];
-	alert(event.keyCode);
+	//alert(event.keyCode);
+
 	if (event.keyCode == 113) {
 
 		//alert(MainGroupID.value);
+		//alert(elm_name);
+
+		alert(RowIndex);
 	}
+}
+
+function kredit_onchange(event) {
+	var elm_name = $(event.target).val();
+	kredit_new = parseInt(elm_name);
+	if(isNaN(kredit_old)) kredit_old = 0;
+	if(isNaN(kredit_new)) kredit_new = 0;
+	kredit_total = kredit_total - kredit_old + kredit_new;
+	alert('kredit : '+kredit_total);
 }
 </script>
 <?php } ?>

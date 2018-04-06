@@ -1305,7 +1305,7 @@ class ct06_article extends cTable {
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
 
-		$this->Kode->EditAttrs["onkeyup"] = "f_article_kode_onkeyup(".$this->RowIndex.");"; //exit;
+		$this->Kode->EditAttrs["onkeyup"] = "f_article_kode_onkeyup(".$this->RowIndex.", event);"; //exit;
 	}
 
 	// User ID Filtering event
