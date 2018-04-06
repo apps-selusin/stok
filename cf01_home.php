@@ -344,7 +344,10 @@ $cf01_home_php->Page_Main();
 Page_Rendering();
 ?>
 <?php include_once "header.php" ?>
-<!-- %%Custom page content begin%% --><!-- %%Custom page content end%% --><?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
+<div>
+	<a href="t06_articlelist.php">Article</a>
+</div>
+<?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
 <?php include_once "footer.php" ?>
 <?php
 $cf01_home_php->Page_Terminate();

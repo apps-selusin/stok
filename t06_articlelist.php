@@ -1294,6 +1294,10 @@ class ct06_article_list extends ct06_article {
 		// Initialize
 		$sFilterList = "";
 		$sSavedFilterList = "";
+
+		// Load server side filters
+		if (EW_SEARCH_FILTER_OPTION == "Server" && isset($UserProfile))
+			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ft06_articlelistsrch");
 		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJson(), ","); // Field id
 		$sFilterList = ew_Concat($sFilterList, $this->MainGroupID->AdvancedSearch->ToJson(), ","); // Field MainGroupID
 		$sFilterList = ew_Concat($sFilterList, $this->SubGroupID->AdvancedSearch->ToJson(), ","); // Field SubGroupID

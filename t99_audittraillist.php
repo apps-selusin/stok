@@ -816,6 +816,10 @@ class ct99_audittrail_list extends ct99_audittrail {
 		// Initialize
 		$sFilterList = "";
 		$sSavedFilterList = "";
+
+		// Load server side filters
+		if (EW_SEARCH_FILTER_OPTION == "Server" && isset($UserProfile))
+			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ft99_audittraillistsrch");
 		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJson(), ","); // Field id
 		$sFilterList = ew_Concat($sFilterList, $this->datetime->AdvancedSearch->ToJson(), ","); // Field datetime
 		$sFilterList = ew_Concat($sFilterList, $this->script->AdvancedSearch->ToJson(), ","); // Field script

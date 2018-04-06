@@ -1383,17 +1383,7 @@ if (EW_DEBUG_ENABLED)
 
 // Write your table-specific startup script here
 // document.write("page loaded");
-function kode_() {
-	var elm_name = $(event.target).val();
 
-	//debet_new = parseInt(elm_name);
-	//if(isNaN(debet_old)) debet_old = 0;
-	//if(isNaN(debet_new)) debet_new = 0;
-	//debet_total = debet_total - debet_old + debet_new;
-	//alert('debet : '+debet_total);
-
-	alert(event.keyCode);
-}
 </script>
 <?php include_once "footer.php" ?>
 <?php

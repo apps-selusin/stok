@@ -126,7 +126,28 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt14.js");
 
 // Write your global startup script here
 // document.write("page loaded");
+function xf_article_kode_onkeyup(RowIndex) {
+	var elm_name = $(event.target).val();
 
+	//debet_new = parseInt(elm_name);
+	//if(isNaN(debet_old)) debet_old = 0;
+	//if(isNaN(debet_new)) debet_new = 0;
+	//debet_total = debet_total - debet_old + debet_new;
+	//alert('debet : '+debet_total);
+
+	alert(event.keyCode);
+}
+
+function f_article_kode_onkeyup(RowIndex) {
+	var form = this.form;
+
+	//var MainGroupID = form.elements["lu_x" + RowIndex + "_MainGroupID"];
+	alert(event.keyCode);
+	if (event.keyCode == 113) {
+
+		//alert(MainGroupID.value);
+	}
+}
 </script>
 <?php } ?>
 </body>

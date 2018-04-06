@@ -1285,6 +1285,10 @@ class ct04_maingroup_list extends ct04_maingroup {
 		// Initialize
 		$sFilterList = "";
 		$sSavedFilterList = "";
+
+		// Load server side filters
+		if (EW_SEARCH_FILTER_OPTION == "Server" && isset($UserProfile))
+			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ft04_maingrouplistsrch");
 		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJson(), ","); // Field id
 		$sFilterList = ew_Concat($sFilterList, $this->Kode->AdvancedSearch->ToJson(), ","); // Field Kode
 		$sFilterList = ew_Concat($sFilterList, $this->Nama->AdvancedSearch->ToJson(), ","); // Field Nama
