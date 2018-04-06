@@ -133,8 +133,10 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt14.js");
 }*/
 
 function f_article_subgroupid_onchange(event) {
-	var elm_name = $(event.target).val();
-	alert(elm_name);
+	var nilai = $(event.target).val();
+
+	//alert(elm_name);
+	article_subgroupid = nilai;
 }
 
 function f_article_kode_onkeyup(RowIndex, event) {
