@@ -1395,8 +1395,10 @@ function f_BuatAjax() {
 $("#x_MainGroupID").change(
 
 	function () {
+		article_SubGroupID = "";
 		if (this.value != "") {
-			alert(this.value);
+
+			//alert(this.value);
 		}
 	}
 );

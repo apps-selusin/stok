@@ -126,11 +126,13 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt14.js");
 
 // Write your global startup script here
 // document.write("page loaded");
+function f_article_maingroupid_onchange(RowIndex) {
 
-/*function f_article_maingroupid_onchange(event) {
-	var elm_name = $(event.target).val();
-	alert(elm_name);
-}*/
+	//var elm_name = $(event.target).val();
+	//alert(elm_name);
+
+	alert(RowIndex);
+}
 /*function f_article_subgroupid_onchange(event) {
 	var nilai = $(event.target).val();
 
