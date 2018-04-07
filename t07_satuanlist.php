@@ -1282,10 +1282,6 @@ class ct07_satuan_list extends ct07_satuan {
 		// Initialize
 		$sFilterList = "";
 		$sSavedFilterList = "";
-
-		// Load server side filters
-		if (EW_SEARCH_FILTER_OPTION == "Server" && isset($UserProfile))
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ft07_satuanlistsrch");
 		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJson(), ","); // Field id
 		$sFilterList = ew_Concat($sFilterList, $this->Nama->AdvancedSearch->ToJson(), ","); // Field Nama
 		if ($this->BasicSearch->Keyword <> "") {

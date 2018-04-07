@@ -131,15 +131,13 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt14.js");
 	var elm_name = $(event.target).val();
 	alert(elm_name);
 }*/
-
-function f_article_subgroupid_onchange(event) {
+/*function f_article_subgroupid_onchange(event) {
 	var nilai = $(event.target).val();
 
 	//alert(elm_name);
 	article_subgroupid = nilai;
-}
-
-function f_article_kode_onkeyup(RowIndex, event) {
+}*/
+/*function f_article_kode_onkeyup(RowIndex, event) {
 	var form = this.form;
 	var elm_name = $(event.target).val();
 
@@ -153,7 +151,7 @@ function f_article_kode_onkeyup(RowIndex, event) {
 
 		alert(RowIndex + " - " + elm_name);
 	}
-}
+}*/
 </script>
 <?php } ?>
 </body>
