@@ -13,3 +13,17 @@
 8:04 AM 4/7/2018
 523 204 273 acer one 10
 
+
+12:10 AM 4/10/2018
+cerita dulu :
+- untuk pengiriman parameter baris data :: sudah ketemu cara;
+  - misal ADD :: maka yang dikirim 'x'
+  - untuk inline ADD :: maka yang dikirim '0'
+  - untuk grid ADD :: maka yang dikirim sesuai rowindex '1' hingga 'n'
+
+- berikutnya :: 
+  - yang diambil adalah nilai dari perubahan isian sub-group
+  - lalu pindah ke article -> tekan F2 
+    - maka, check nilai di sub-group untuk mendapatkan nilai sub group
+      yang akan dicari di tabel article
+
