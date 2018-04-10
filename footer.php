@@ -126,12 +126,12 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt14.js");
 
 // Write your global startup script here
 // document.write("page loaded");
-function f_article_maingroupid_onchange(RowIndex) {
+function f_Article_MainGroupID_onChange(event, RowIndex) {
 
 	//var elm_name = $(event.target).val();
 	//alert(elm_name);
+	//alert(RowIndex);
 
-	alert(RowIndex);
 }
 /*function f_article_subgroupid_onchange(event) {
 	var nilai = $(event.target).val();
@@ -154,6 +154,17 @@ function f_article_maingroupid_onchange(RowIndex) {
 		alert(RowIndex + " - " + elm_name);
 	}
 }*/
+
+function f_Article_SubGroupID_onChange(event, RowIndex) {
+	var elm_name = $(event.target).val();
+
+	//alert(elm_name);
+	//alert(RowIndex);
+
+	if (elm_name != "") {
+		alert(elm_name);
+	}
+}
 </script>
 <?php } ?>
 </body>

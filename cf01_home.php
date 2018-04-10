@@ -345,6 +345,11 @@ Page_Rendering();
 ?>
 <?php include_once "header.php" ?>
 <div>
+7:56 AM 4/10/2018<br/>
+- check dengan komposisi kode terbaru yang hanya onchange nya ada di subgroup saja<br/>
+- agar nanti F2 di article benar benar membaca nilai subgroup yang ada di barisnya<br/>
+</div>
+<div>
 	<a href="t06_articlelist.php">Article</a>
 </div>
 <?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>

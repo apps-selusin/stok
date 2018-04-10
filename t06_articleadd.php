@@ -1392,16 +1392,15 @@ function f_BuatAjax() {
 	}
 	return null;
 }
-$("#x_MainGroupID").change(
+/*$("#x_SubGroupID").change(
 
 	function () {
 		article_SubGroupID = "";
 		if (this.value != "") {
-
-			//alert(this.value);
+			alert(this.value);
 		}
 	}
-);
+);*/
 </script>
 <?php include_once "footer.php" ?>
 <?php

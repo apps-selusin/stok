@@ -27,3 +27,8 @@ cerita dulu :
     - maka, check nilai di sub-group untuk mendapatkan nilai sub group
       yang akan dicari di tabel article
 
+
+7:56 AM 4/10/2018
+- check dengan komposisi kode terbaru yang hanya onchange nya ada di subgroup saja
+- agar nanti F2 di article benar benar membaca nilai subgroup yang ada di barisnya
+
