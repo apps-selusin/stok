@@ -1383,24 +1383,7 @@ if (EW_DEBUG_ENABLED)
 
 // Write your table-specific startup script here
 // document.write("page loaded");
-function f_BuatAjax() {
-	if (window.XMLHttpRequest) {
-		return new XMLHttpRequest();
-	}
-	if (window.ActiveXObject) {
-		return new ActiveXObject("Microsoft.XMLHTTP");
-	}
-	return null;
-}
-/*$("#x_SubGroupID").change(
 
-	function () {
-		article_SubGroupID = "";
-		if (this.value != "") {
-			alert(this.value);
-		}
-	}
-);*/
 </script>
 <?php include_once "footer.php" ?>
 <?php

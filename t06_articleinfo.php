@@ -1306,20 +1306,15 @@ class ct06_article extends cTable {
 		//var_dump($this-><FieldName>);
 
 		$RowIndex = "x";
-		if (CurrentPageID() != "add") {
+		if (CurrentPageID() != "add" and CurrentPageID() != "edit") {
 			$RowIndex = $this->RowIndex;
-
-			//$this->MainGroupID->EditAttrs["onchange"] = "f_article_maingroupid_onchange(".$this->RowIndex.");";
 		}
 
-		//$this->MainGroupID->EditAttrs["onchange"] = "f_article_maingroupid_onchange(".$this->RowIndex.");";
+		// MainGroupID
+		$this->MainGroupID->EditAttrs["onchange"] = "f_Article_MainGroupID_onChange(event, '".$RowIndex."');";
+
+		// SubGroupID
 		$this->SubGroupID->EditAttrs["onchange"] = "f_Article_SubGroupID_onChange(event, '".$RowIndex."');";
-
-		//$this->MainGroupID->EditAttrs["onchange"] = "f_Article_MainGroupID_onChange(event, '".$RowIndex."');";
-		//$this->MainGroupID->EditAttrs["onchange"] = "f_article_maingroupid_onchange(".CurrentPage()->RowCnt.");";
-		//$this->SubGroupID->EditAttrs["onchange"] = "f_article_subgroupid_onchange(event);";
-		//$this->Kode->EditAttrs["onkeyup"] = "f_article_kode_onkeyup(".$this->RowIndex.", event);"; //exit;
-
 	}
 
 	// User ID Filtering event

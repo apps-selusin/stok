@@ -18,9 +18,4 @@ function Page_Unloaded() {
 
 	//echo "Page Unloaded";
 }
-/*function f_GetNextArticleCode() {
-	$nextCode = "";
-	$lastCode = "";
-	$rs = ew_ExecuteScalar("select Kode from t06_article where SubGroupID = ".""."");
-}*/
 ?>

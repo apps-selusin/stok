@@ -126,44 +126,84 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt14.js");
 
 // Write your global startup script here
 // document.write("page loaded");
+
+var ArticleCode;
+var AjaxArticleCode;
+var p_RowIndex;
+
 function f_Article_MainGroupID_onChange(event, RowIndex) {
-
-	//var elm_name = $(event.target).val();
-	//alert(elm_name);
-	//alert(RowIndex);
-
-}
-/*function f_article_subgroupid_onchange(event) {
-	var nilai = $(event.target).val();
-
-	//alert(elm_name);
-	article_subgroupid = nilai;
-}*/
-/*function f_article_kode_onkeyup(RowIndex, event) {
-	var form = this.form;
-	var elm_name = $(event.target).val();
-
-	//var MainGroupID = form.elements["lu_x" + RowIndex + "_MainGroupID"];
-	//alert(event.keyCode);
-
-	if (event.keyCode == 113) {
-
-		//alert(MainGroupID.value);
-		//alert(elm_name);
-
-		alert(RowIndex + " - " + elm_name);
+	if (RowIndex == "x") {
+		$("#x_SubGroupID").val("");
+		$("#x_Kode").val("");
 	}
-}*/
+	else {
+		$("#x"+RowIndex+"_SubGroupID").val("");
+		$("#x"+RowIndex+"_Kode").val("");
+	}
+}
 
 function f_Article_SubGroupID_onChange(event, RowIndex) {
-	var elm_name = $(event.target).val();
-
-	//alert(elm_name);
-	//alert(RowIndex);
-
-	if (elm_name != "") {
-		alert(elm_name);
+	p_RowIndex = RowIndex;
+	if (RowIndex == "x") {
+		var article_SubGroupID = $("#x_SubGroupID").val();
 	}
+	else {
+		var article_SubGroupID = $("#x"+RowIndex+"_SubGroupID").val();
+	}
+	f_GetNextArticleCode(article_SubGroupID);
+	/*if (RowIndex == "x") {
+		$("#x_Kode").val(ArticleCode); 
+	}
+	else {
+		$("#x"+RowIndex+"_Kode").val(ArticleCode);
+	}*/
+}
+
+function stateChangedArticleCode() {
+	var data;
+	if (AjaxArticleCode.readyState == 4) {
+		data = AjaxArticleCode.responseText;
+		if(data.length > 0) {
+
+			//ArticleCode = data;
+			if (p_RowIndex == "x") {
+				$("#x_Kode").val(ArticleCode); 
+			}
+			else {
+				$("#x"+p_RowIndex+"_Kode").val(ArticleCode);
+			}
+		}
+		else {
+
+			//ArticleCode = "";
+			if (p_RowIndex == "x") {
+				$("#x_Kode").val(""); 
+			}
+			else {
+				$("#x"+p_RowIndex+"_Kode").val("");
+			}
+		}
+	}
+}
+
+function f_GetNextArticleCode(SubGroupID) {
+	AjaxArticleCode = f_BuatAjax();
+	var url = "getartcode.php";
+	url = url + "?q=" + SubGroupID;
+	url = url + "&sid=" + Math.random();
+	AjaxArticleCode.onreadystatechange = stateChangedArticleCode;
+	AjaxArticleCode.open("GET", url, true);
+	AjaxArticleCode.send(null);
+}
+
+function f_BuatAjax() {
+	if (window.XMLHttpRequest) {
+		return new XMLHttpRequest();
+	}
+	if (window.ActiveXObject) {
+		return new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	return null;
 }
 </script>
 <?php } ?>
