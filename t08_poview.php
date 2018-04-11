@@ -431,13 +431,14 @@ class ct08_po_view extends ct08_po {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->NoPO->SetVisibility();
 		$this->TglPO->SetVisibility();
+		$this->NoPO->SetVisibility();
 		$this->VendorID->SetVisibility();
 		$this->ArticleID->SetVisibility();
 		$this->Harga->SetVisibility();
 		$this->Qty->SetVisibility();
 		$this->SatuanID->SetVisibility();
+		$this->SubTotal->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -625,15 +626,6 @@ class ct08_po_view extends ct08_po {
 		$options = &$this->OtherOptions;
 		$option = &$options["action"];
 
-		// Add
-		$item = &$option->Add("add");
-		$addcaption = ew_HtmlTitle($Language->Phrase("ViewPageAddLink"));
-		if ($this->IsModal) // Modal
-			$item->Body = "<a class=\"ewAction ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"javascript:void(0);\" onclick=\"ew_ModalDialogShow({lnk:this,url:'" . ew_HtmlEncode($this->AddUrl) . "'});\">" . $Language->Phrase("ViewPageAddLink") . "</a>";
-		else
-			$item->Body = "<a class=\"ewAction ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("ViewPageAddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
-
 		// Edit
 		$item = &$option->Add("edit");
 		$editcaption = ew_HtmlTitle($Language->Phrase("ViewPageEditLink"));
@@ -759,8 +751,8 @@ class ct08_po_view extends ct08_po {
 			return;
 		if ($this->AuditTrailOnView) $this->WriteAuditTrailOnView($row);
 		$this->id->setDbValue($row['id']);
-		$this->NoPO->setDbValue($row['NoPO']);
 		$this->TglPO->setDbValue($row['TglPO']);
+		$this->NoPO->setDbValue($row['NoPO']);
 		$this->VendorID->setDbValue($row['VendorID']);
 		$this->ArticleID->setDbValue($row['ArticleID']);
 		if (array_key_exists('EV__ArticleID', $rs->fields)) {
@@ -776,19 +768,21 @@ class ct08_po_view extends ct08_po {
 		} else {
 			$this->SatuanID->VirtualValue = ""; // Clear value
 		}
+		$this->SubTotal->setDbValue($row['SubTotal']);
 	}
 
 	// Return a row with default values
 	function NewRow() {
 		$row = array();
 		$row['id'] = NULL;
-		$row['NoPO'] = NULL;
 		$row['TglPO'] = NULL;
+		$row['NoPO'] = NULL;
 		$row['VendorID'] = NULL;
 		$row['ArticleID'] = NULL;
 		$row['Harga'] = NULL;
 		$row['Qty'] = NULL;
 		$row['SatuanID'] = NULL;
+		$row['SubTotal'] = NULL;
 		return $row;
 	}
 
@@ -798,13 +792,14 @@ class ct08_po_view extends ct08_po {
 			return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
-		$this->NoPO->DbValue = $row['NoPO'];
 		$this->TglPO->DbValue = $row['TglPO'];
+		$this->NoPO->DbValue = $row['NoPO'];
 		$this->VendorID->DbValue = $row['VendorID'];
 		$this->ArticleID->DbValue = $row['ArticleID'];
 		$this->Harga->DbValue = $row['Harga'];
 		$this->Qty->DbValue = $row['Qty'];
 		$this->SatuanID->DbValue = $row['SatuanID'];
+		$this->SubTotal->DbValue = $row['SubTotal'];
 	}
 
 	// Render row values based on field settings
@@ -823,18 +818,23 @@ class ct08_po_view extends ct08_po {
 		if ($this->Harga->FormValue == $this->Harga->CurrentValue && is_numeric(ew_StrToFloat($this->Harga->CurrentValue)))
 			$this->Harga->CurrentValue = ew_StrToFloat($this->Harga->CurrentValue);
 
+		// Convert decimal values if posted back
+		if ($this->SubTotal->FormValue == $this->SubTotal->CurrentValue && is_numeric(ew_StrToFloat($this->SubTotal->CurrentValue)))
+			$this->SubTotal->CurrentValue = ew_StrToFloat($this->SubTotal->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
 		// id
-		// NoPO
 		// TglPO
+		// NoPO
 		// VendorID
 		// ArticleID
 		// Harga
 		// Qty
 		// SatuanID
+		// SubTotal
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -842,14 +842,14 @@ class ct08_po_view extends ct08_po {
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// NoPO
-		$this->NoPO->ViewValue = $this->NoPO->CurrentValue;
-		$this->NoPO->ViewCustomAttributes = "";
-
 		// TglPO
 		$this->TglPO->ViewValue = $this->TglPO->CurrentValue;
 		$this->TglPO->ViewValue = ew_FormatDateTime($this->TglPO->ViewValue, 7);
 		$this->TglPO->ViewCustomAttributes = "";
+
+		// NoPO
+		$this->NoPO->ViewValue = $this->NoPO->CurrentValue;
+		$this->NoPO->ViewCustomAttributes = "";
 
 		// VendorID
 		if (strval($this->VendorID->CurrentValue) <> "") {
@@ -942,15 +942,21 @@ class ct08_po_view extends ct08_po {
 		}
 		$this->SatuanID->ViewCustomAttributes = "";
 
-			// NoPO
-			$this->NoPO->LinkCustomAttributes = "";
-			$this->NoPO->HrefValue = "";
-			$this->NoPO->TooltipValue = "";
+		// SubTotal
+		$this->SubTotal->ViewValue = $this->SubTotal->CurrentValue;
+		$this->SubTotal->ViewValue = ew_FormatNumber($this->SubTotal->ViewValue, 2, -2, -2, -2);
+		$this->SubTotal->CellCssStyle .= "text-align: right;";
+		$this->SubTotal->ViewCustomAttributes = "";
 
 			// TglPO
 			$this->TglPO->LinkCustomAttributes = "";
 			$this->TglPO->HrefValue = "";
 			$this->TglPO->TooltipValue = "";
+
+			// NoPO
+			$this->NoPO->LinkCustomAttributes = "";
+			$this->NoPO->HrefValue = "";
+			$this->NoPO->TooltipValue = "";
 
 			// VendorID
 			$this->VendorID->LinkCustomAttributes = "";
@@ -976,6 +982,11 @@ class ct08_po_view extends ct08_po {
 			$this->SatuanID->LinkCustomAttributes = "";
 			$this->SatuanID->HrefValue = "";
 			$this->SatuanID->TooltipValue = "";
+
+			// SubTotal
+			$this->SubTotal->LinkCustomAttributes = "";
+			$this->SubTotal->HrefValue = "";
+			$this->SubTotal->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1455,17 +1466,6 @@ $t08_po_view->ShowMessage();
 <input type="hidden" name="t" value="t08_po">
 <input type="hidden" name="modal" value="<?php echo intval($t08_po_view->IsModal) ?>">
 <table class="table table-striped table-bordered table-hover table-condensed ewViewTable">
-<?php if ($t08_po->NoPO->Visible) { // NoPO ?>
-	<tr id="r_NoPO">
-		<td class="col-sm-2"><span id="elh_t08_po_NoPO"><?php echo $t08_po->NoPO->FldCaption() ?></span></td>
-		<td data-name="NoPO"<?php echo $t08_po->NoPO->CellAttributes() ?>>
-<span id="el_t08_po_NoPO">
-<span<?php echo $t08_po->NoPO->ViewAttributes() ?>>
-<?php echo $t08_po->NoPO->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
 <?php if ($t08_po->TglPO->Visible) { // TglPO ?>
 	<tr id="r_TglPO">
 		<td class="col-sm-2"><span id="elh_t08_po_TglPO"><?php echo $t08_po->TglPO->FldCaption() ?></span></td>
@@ -1473,6 +1473,17 @@ $t08_po_view->ShowMessage();
 <span id="el_t08_po_TglPO">
 <span<?php echo $t08_po->TglPO->ViewAttributes() ?>>
 <?php echo $t08_po->TglPO->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t08_po->NoPO->Visible) { // NoPO ?>
+	<tr id="r_NoPO">
+		<td class="col-sm-2"><span id="elh_t08_po_NoPO"><?php echo $t08_po->NoPO->FldCaption() ?></span></td>
+		<td data-name="NoPO"<?php echo $t08_po->NoPO->CellAttributes() ?>>
+<span id="el_t08_po_NoPO">
+<span<?php echo $t08_po->NoPO->ViewAttributes() ?>>
+<?php echo $t08_po->NoPO->ViewValue ?></span>
 </span>
 </td>
 	</tr>
@@ -1528,6 +1539,17 @@ $t08_po_view->ShowMessage();
 <span id="el_t08_po_SatuanID">
 <span<?php echo $t08_po->SatuanID->ViewAttributes() ?>>
 <?php echo $t08_po->SatuanID->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t08_po->SubTotal->Visible) { // SubTotal ?>
+	<tr id="r_SubTotal">
+		<td class="col-sm-2"><span id="elh_t08_po_SubTotal"><?php echo $t08_po->SubTotal->FldCaption() ?></span></td>
+		<td data-name="SubTotal"<?php echo $t08_po->SubTotal->CellAttributes() ?>>
+<span id="el_t08_po_SubTotal">
+<span<?php echo $t08_po->SubTotal->ViewAttributes() ?>>
+<?php echo $t08_po->SubTotal->ViewValue ?></span>
 </span>
 </td>
 	</tr>

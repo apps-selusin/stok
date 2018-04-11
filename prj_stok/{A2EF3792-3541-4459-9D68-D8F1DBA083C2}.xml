@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<configuration date="2018/04/12" author="e.World Technology Ltd.">
+  <project id="{A2EF3792-3541-4459-9D68-D8F1DBA083C2}" file="C:\xampp\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="11.0" datetime="2018/04/12 00:57:51" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
+    <table id="t01_company" name="t01_company" caption="t 01 company" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t02_vendor" name="t02_vendor" caption="t 02 vendor" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t03_customer" name="t03_customer" caption="t 03 customer" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t04_maingroup" name="t04_maingroup" caption="t 04 maingroup" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t05_subgroup" name="t05_subgroup" caption="t 05 subgroup" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t06_article" name="t06_article" caption="t 06 article" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t07_satuan" name="t07_satuan" caption="t 07 satuan" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t08_po" name="t08_po" caption="Pembelian" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t96_employees" name="t96_employees" caption="t 96 employees" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t97_userlevels" name="t97_userlevels" caption="t 97 userlevels" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t98_userlevelpermissions" name="t98_userlevelpermissions" caption="t 98 userlevelpermissions" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t99_audittrail" name="t99_audittrail" caption="t 99 audittrail" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+  </project>
+</configuration>

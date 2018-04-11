@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/4/11" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/4/12" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -624,6 +624,12 @@
     <menu id="19">
       <phrase id="menutext" value="Pembelian" />
     </menu>
+    <menu id="10013">
+      <phrase id="menutext" value="Laporan" />
+    </menu>
+    <menu id="10008">
+      <phrase id="menutext" value="Pembelian" />
+    </menu>
     <menu id="6">
       <phrase id="menutext" value="Setup" />
     </menu>
@@ -662,6 +668,39 @@
     </menu>
     <menu id="5">
       <phrase id="menutext" value="Activity Log" />
+    </menu>
+    <menu id="10001">
+      <phrase id="menutext" value="t 01 company" />
+    </menu>
+    <menu id="10002">
+      <phrase id="menutext" value="t 02 vendor" />
+    </menu>
+    <menu id="10003">
+      <phrase id="menutext" value="t 03 customer" />
+    </menu>
+    <menu id="10004">
+      <phrase id="menutext" value="t 04 maingroup" />
+    </menu>
+    <menu id="10005">
+      <phrase id="menutext" value="t 05 subgroup" />
+    </menu>
+    <menu id="10006">
+      <phrase id="menutext" value="t 06 article" />
+    </menu>
+    <menu id="10007">
+      <phrase id="menutext" value="t 07 satuan" />
+    </menu>
+    <menu id="10009">
+      <phrase id="menutext" value="t 96 employees" />
+    </menu>
+    <menu id="10010">
+      <phrase id="menutext" value="t 97 userlevels" />
+    </menu>
+    <menu id="10011">
+      <phrase id="menutext" value="t 98 userlevelpermissions" />
+    </menu>
+    <menu id="10012">
+      <phrase id="menutext" value="t 99 audittrail" />
     </menu>
     <table id="cf01_home_php">
       <phrase id="tblcaption" value="Home" />
@@ -758,11 +797,11 @@
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
-      <field id="nopo">
-        <phrase id="fldcaption" value="No PO" />
-      </field>
       <field id="tglpo">
         <phrase id="fldcaption" value="Tgl PO" />
+      </field>
+      <field id="nopo">
+        <phrase id="fldcaption" value="No PO" />
       </field>
       <field id="vendorid">
         <phrase id="fldcaption" value="Vendor" />
@@ -778,6 +817,9 @@
       </field>
       <field id="satuanid">
         <phrase id="fldcaption" value="Satuan" />
+      </field>
+      <field id="subtotal">
+        <phrase id="fldcaption" value="Sub Total" />
       </field>
     </table>
     <table id="t96_employees">

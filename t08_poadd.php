@@ -1492,7 +1492,6 @@ if (EW_DEBUG_ENABLED)
 // document.write("page loaded");
 
 $("#x_TglPO").val("<?php echo date('d-m-Y');?>");
-$("#x0_TglPO").val("<?php echo date('d-m-Y');?>");
 </script>
 <?php include_once "footer.php" ?>
 <?php

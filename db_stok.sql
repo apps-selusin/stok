@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 11, 2018 at 11:16 AM
+-- Generation Time: Apr 11, 2018 at 06:43 PM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -187,14 +187,24 @@ INSERT INTO `t07_satuan` (`id`, `Nama`) VALUES
 
 CREATE TABLE IF NOT EXISTS `t08_po` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `NoPO` varchar(14) NOT NULL,
   `TglPO` date NOT NULL,
+  `NoPO` varchar(14) NOT NULL,
   `VendorID` int(11) NOT NULL,
   `ArticleID` int(11) NOT NULL,
   `Harga` float(15,2) NOT NULL DEFAULT '0.00',
-  `Qty` int(11) NOT NULL DEFAULT '0',
+  `Qty` float(15,2) NOT NULL DEFAULT '0.00',
+  `SubTotal` float(15,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+
+--
+-- Dumping data for table `t08_po`
+--
+
+INSERT INTO `t08_po` (`id`, `TglPO`, `NoPO`, `VendorID`, `ArticleID`, `Harga`, `Qty`, `SubTotal`) VALUES
+(1, '2018-04-11', 'PO201804110001', 2, 1, 50000.00, 3.00, 150000.00),
+(2, '2018-04-11', 'PO201804110002', 1, 1, 75000.00, 3.00, 225000.00),
+(3, '2018-04-11', 'PO201804110003', 2, 1, 60000.00, 4.00, 240000.00);
 
 -- --------------------------------------------------------
 
@@ -314,7 +324,7 @@ CREATE TABLE IF NOT EXISTS `t99_audittrail` (
   `oldvalue` longtext CHARACTER SET latin1,
   `newvalue` longtext CHARACTER SET latin1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=121 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=158 ;
 
 --
 -- Dumping data for table `t99_audittrail`
@@ -438,7 +448,44 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (117, '2018-04-10 10:15:18', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
 (118, '2018-04-10 10:42:35', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
 (119, '2018-04-11 10:26:06', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
-(120, '2018-04-11 11:58:09', '/stok/t06_articleedit.php', '1', 'U', 't06_article', 'Harga', '1', '0.00', '100000');
+(120, '2018-04-11 11:58:09', '/stok/t06_articleedit.php', '1', 'U', 't06_article', 'Harga', '1', '0.00', '100000'),
+(121, '2018-04-11 16:59:33', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(122, '2018-04-11 17:22:09', '/stok/t08_polist.php', '1', 'A', 't08_po', 'NoPO', '1', '', 'PO201804110001'),
+(123, '2018-04-11 17:22:09', '/stok/t08_polist.php', '1', 'A', 't08_po', 'TglPO', '1', '', '2018-04-11'),
+(124, '2018-04-11 17:22:09', '/stok/t08_polist.php', '1', 'A', 't08_po', 'VendorID', '1', '', '1'),
+(125, '2018-04-11 17:22:09', '/stok/t08_polist.php', '1', 'A', 't08_po', 'ArticleID', '1', '', '1'),
+(126, '2018-04-11 17:22:09', '/stok/t08_polist.php', '1', 'A', 't08_po', 'Harga', '1', '', '100000.00'),
+(127, '2018-04-11 17:22:09', '/stok/t08_polist.php', '1', 'A', 't08_po', 'Qty', '1', '', '1'),
+(128, '2018-04-11 17:22:09', '/stok/t08_polist.php', '1', 'A', 't08_po', 'SatuanID', '1', '', '1'),
+(129, '2018-04-11 17:22:09', '/stok/t08_polist.php', '1', 'A', 't08_po', 'id', '1', '', '1'),
+(130, '2018-04-11 17:40:50', '/stok/t08_polist.php', '1', 'A', 't08_po', 'NoPO', '2', '', 'PO201804110002'),
+(131, '2018-04-11 17:40:50', '/stok/t08_polist.php', '1', 'A', 't08_po', 'TglPO', '2', '', '2018-04-11'),
+(132, '2018-04-11 17:40:50', '/stok/t08_polist.php', '1', 'A', 't08_po', 'VendorID', '2', '', '1'),
+(133, '2018-04-11 17:40:50', '/stok/t08_polist.php', '1', 'A', 't08_po', 'ArticleID', '2', '', '1'),
+(134, '2018-04-11 17:40:50', '/stok/t08_polist.php', '1', 'A', 't08_po', 'Harga', '2', '', '100000.00'),
+(135, '2018-04-11 17:40:50', '/stok/t08_polist.php', '1', 'A', 't08_po', 'Qty', '2', '', '2'),
+(136, '2018-04-11 17:40:50', '/stok/t08_polist.php', '1', 'A', 't08_po', 'SatuanID', '2', '', '1'),
+(137, '2018-04-11 17:40:50', '/stok/t08_polist.php', '1', 'A', 't08_po', 'id', '2', '', '2'),
+(138, '2018-04-11 17:44:16', '/stok/t08_polist.php', '1', 'A', 't08_po', 'TglPO', '3', '', '2018-04-11'),
+(139, '2018-04-11 17:44:16', '/stok/t08_polist.php', '1', 'A', 't08_po', 'NoPO', '3', '', 'PO201804110003'),
+(140, '2018-04-11 17:44:16', '/stok/t08_polist.php', '1', 'A', 't08_po', 'VendorID', '3', '', '2'),
+(141, '2018-04-11 17:44:16', '/stok/t08_polist.php', '1', 'A', 't08_po', 'ArticleID', '3', '', '1'),
+(142, '2018-04-11 17:44:16', '/stok/t08_polist.php', '1', 'A', 't08_po', 'Harga', '3', '', '100000.00'),
+(143, '2018-04-11 17:44:16', '/stok/t08_polist.php', '1', 'A', 't08_po', 'Qty', '3', '', '3'),
+(144, '2018-04-11 17:44:16', '/stok/t08_polist.php', '1', 'A', 't08_po', 'SatuanID', '3', '', '1'),
+(145, '2018-04-11 17:44:16', '/stok/t08_polist.php', '1', 'A', 't08_po', 'id', '3', '', '3'),
+(146, '2018-04-11 19:19:26', '/stok/t08_polist.php', '1', 'U', 't08_po', 'Harga', '1', '100000.00', '50000'),
+(147, '2018-04-11 19:19:26', '/stok/t08_polist.php', '1', 'U', 't08_po', 'Qty', '1', '1', '2'),
+(148, '2018-04-11 19:19:26', '/stok/t08_polist.php', '1', 'U', 't08_po', 'SubTotal', '1', '0.00', '100000'),
+(149, '2018-04-11 19:19:42', '/stok/t08_polist.php', '1', 'U', 't08_po', 'Harga', '2', '100000.00', '75000'),
+(150, '2018-04-11 19:19:42', '/stok/t08_polist.php', '1', 'U', 't08_po', 'Qty', '2', '2', '3'),
+(151, '2018-04-11 19:19:42', '/stok/t08_polist.php', '1', 'U', 't08_po', 'SubTotal', '2', '0.00', '225000'),
+(152, '2018-04-11 19:19:58', '/stok/t08_poedit.php', '1', 'U', 't08_po', 'Harga', '3', '100000.00', '60000'),
+(153, '2018-04-11 19:19:58', '/stok/t08_poedit.php', '1', 'U', 't08_po', 'Qty', '3', '3', '4'),
+(154, '2018-04-11 19:19:58', '/stok/t08_poedit.php', '1', 'U', 't08_po', 'SubTotal', '3', '0.00', '240000'),
+(155, '2018-04-11 19:26:17', '/stok/t08_polist.php', '1', 'U', 't08_po', 'VendorID', '1', '1', '2'),
+(156, '2018-04-11 19:26:17', '/stok/t08_polist.php', '1', 'U', 't08_po', 'Qty', '1', '2', '3'),
+(157, '2018-04-11 19:26:17', '/stok/t08_polist.php', '1', 'U', 't08_po', 'SubTotal', '1', '100000.00', '150000');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

@@ -331,13 +331,14 @@ class ct08_po_edit extends ct08_po {
 
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->NoPO->SetVisibility();
 		$this->TglPO->SetVisibility();
+		$this->NoPO->SetVisibility();
 		$this->VendorID->SetVisibility();
 		$this->ArticleID->SetVisibility();
 		$this->Harga->SetVisibility();
 		$this->Qty->SetVisibility();
 		$this->SatuanID->SetVisibility();
+		$this->SubTotal->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -622,12 +623,12 @@ class ct08_po_edit extends ct08_po {
 
 		// Load from form
 		global $objForm;
-		if (!$this->NoPO->FldIsDetailKey) {
-			$this->NoPO->setFormValue($objForm->GetValue("x_NoPO"));
-		}
 		if (!$this->TglPO->FldIsDetailKey) {
 			$this->TglPO->setFormValue($objForm->GetValue("x_TglPO"));
 			$this->TglPO->CurrentValue = ew_UnFormatDateTime($this->TglPO->CurrentValue, 7);
+		}
+		if (!$this->NoPO->FldIsDetailKey) {
+			$this->NoPO->setFormValue($objForm->GetValue("x_NoPO"));
 		}
 		if (!$this->VendorID->FldIsDetailKey) {
 			$this->VendorID->setFormValue($objForm->GetValue("x_VendorID"));
@@ -644,6 +645,9 @@ class ct08_po_edit extends ct08_po {
 		if (!$this->SatuanID->FldIsDetailKey) {
 			$this->SatuanID->setFormValue($objForm->GetValue("x_SatuanID"));
 		}
+		if (!$this->SubTotal->FldIsDetailKey) {
+			$this->SubTotal->setFormValue($objForm->GetValue("x_SubTotal"));
+		}
 		if (!$this->id->FldIsDetailKey)
 			$this->id->setFormValue($objForm->GetValue("x_id"));
 	}
@@ -652,14 +656,15 @@ class ct08_po_edit extends ct08_po {
 	function RestoreFormValues() {
 		global $objForm;
 		$this->id->CurrentValue = $this->id->FormValue;
-		$this->NoPO->CurrentValue = $this->NoPO->FormValue;
 		$this->TglPO->CurrentValue = $this->TglPO->FormValue;
 		$this->TglPO->CurrentValue = ew_UnFormatDateTime($this->TglPO->CurrentValue, 7);
+		$this->NoPO->CurrentValue = $this->NoPO->FormValue;
 		$this->VendorID->CurrentValue = $this->VendorID->FormValue;
 		$this->ArticleID->CurrentValue = $this->ArticleID->FormValue;
 		$this->Harga->CurrentValue = $this->Harga->FormValue;
 		$this->Qty->CurrentValue = $this->Qty->FormValue;
 		$this->SatuanID->CurrentValue = $this->SatuanID->FormValue;
+		$this->SubTotal->CurrentValue = $this->SubTotal->FormValue;
 	}
 
 	// Load recordset
@@ -722,8 +727,8 @@ class ct08_po_edit extends ct08_po {
 		if (!$rs || $rs->EOF)
 			return;
 		$this->id->setDbValue($row['id']);
-		$this->NoPO->setDbValue($row['NoPO']);
 		$this->TglPO->setDbValue($row['TglPO']);
+		$this->NoPO->setDbValue($row['NoPO']);
 		$this->VendorID->setDbValue($row['VendorID']);
 		$this->ArticleID->setDbValue($row['ArticleID']);
 		if (array_key_exists('EV__ArticleID', $rs->fields)) {
@@ -739,19 +744,21 @@ class ct08_po_edit extends ct08_po {
 		} else {
 			$this->SatuanID->VirtualValue = ""; // Clear value
 		}
+		$this->SubTotal->setDbValue($row['SubTotal']);
 	}
 
 	// Return a row with default values
 	function NewRow() {
 		$row = array();
 		$row['id'] = NULL;
-		$row['NoPO'] = NULL;
 		$row['TglPO'] = NULL;
+		$row['NoPO'] = NULL;
 		$row['VendorID'] = NULL;
 		$row['ArticleID'] = NULL;
 		$row['Harga'] = NULL;
 		$row['Qty'] = NULL;
 		$row['SatuanID'] = NULL;
+		$row['SubTotal'] = NULL;
 		return $row;
 	}
 
@@ -761,13 +768,14 @@ class ct08_po_edit extends ct08_po {
 			return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
-		$this->NoPO->DbValue = $row['NoPO'];
 		$this->TglPO->DbValue = $row['TglPO'];
+		$this->NoPO->DbValue = $row['NoPO'];
 		$this->VendorID->DbValue = $row['VendorID'];
 		$this->ArticleID->DbValue = $row['ArticleID'];
 		$this->Harga->DbValue = $row['Harga'];
 		$this->Qty->DbValue = $row['Qty'];
 		$this->SatuanID->DbValue = $row['SatuanID'];
+		$this->SubTotal->DbValue = $row['SubTotal'];
 	}
 
 	// Load old record
@@ -802,18 +810,23 @@ class ct08_po_edit extends ct08_po {
 		if ($this->Harga->FormValue == $this->Harga->CurrentValue && is_numeric(ew_StrToFloat($this->Harga->CurrentValue)))
 			$this->Harga->CurrentValue = ew_StrToFloat($this->Harga->CurrentValue);
 
+		// Convert decimal values if posted back
+		if ($this->SubTotal->FormValue == $this->SubTotal->CurrentValue && is_numeric(ew_StrToFloat($this->SubTotal->CurrentValue)))
+			$this->SubTotal->CurrentValue = ew_StrToFloat($this->SubTotal->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
 		// id
-		// NoPO
 		// TglPO
+		// NoPO
 		// VendorID
 		// ArticleID
 		// Harga
 		// Qty
 		// SatuanID
+		// SubTotal
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -821,14 +834,14 @@ class ct08_po_edit extends ct08_po {
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// NoPO
-		$this->NoPO->ViewValue = $this->NoPO->CurrentValue;
-		$this->NoPO->ViewCustomAttributes = "";
-
 		// TglPO
 		$this->TglPO->ViewValue = $this->TglPO->CurrentValue;
 		$this->TglPO->ViewValue = ew_FormatDateTime($this->TglPO->ViewValue, 7);
 		$this->TglPO->ViewCustomAttributes = "";
+
+		// NoPO
+		$this->NoPO->ViewValue = $this->NoPO->CurrentValue;
+		$this->NoPO->ViewCustomAttributes = "";
 
 		// VendorID
 		if (strval($this->VendorID->CurrentValue) <> "") {
@@ -921,15 +934,21 @@ class ct08_po_edit extends ct08_po {
 		}
 		$this->SatuanID->ViewCustomAttributes = "";
 
-			// NoPO
-			$this->NoPO->LinkCustomAttributes = "";
-			$this->NoPO->HrefValue = "";
-			$this->NoPO->TooltipValue = "";
+		// SubTotal
+		$this->SubTotal->ViewValue = $this->SubTotal->CurrentValue;
+		$this->SubTotal->ViewValue = ew_FormatNumber($this->SubTotal->ViewValue, 2, -2, -2, -2);
+		$this->SubTotal->CellCssStyle .= "text-align: right;";
+		$this->SubTotal->ViewCustomAttributes = "";
 
 			// TglPO
 			$this->TglPO->LinkCustomAttributes = "";
 			$this->TglPO->HrefValue = "";
 			$this->TglPO->TooltipValue = "";
+
+			// NoPO
+			$this->NoPO->LinkCustomAttributes = "";
+			$this->NoPO->HrefValue = "";
+			$this->NoPO->TooltipValue = "";
 
 			// VendorID
 			$this->VendorID->LinkCustomAttributes = "";
@@ -955,19 +974,24 @@ class ct08_po_edit extends ct08_po {
 			$this->SatuanID->LinkCustomAttributes = "";
 			$this->SatuanID->HrefValue = "";
 			$this->SatuanID->TooltipValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
-			// NoPO
-			$this->NoPO->EditAttrs["class"] = "form-control";
-			$this->NoPO->EditCustomAttributes = "";
-			$this->NoPO->EditValue = ew_HtmlEncode($this->NoPO->CurrentValue);
-			$this->NoPO->PlaceHolder = ew_RemoveHtml($this->NoPO->FldCaption());
+			// SubTotal
+			$this->SubTotal->LinkCustomAttributes = "";
+			$this->SubTotal->HrefValue = "";
+			$this->SubTotal->TooltipValue = "";
+		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
 			// TglPO
 			$this->TglPO->EditAttrs["class"] = "form-control";
 			$this->TglPO->EditCustomAttributes = "";
 			$this->TglPO->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->TglPO->CurrentValue, 7));
 			$this->TglPO->PlaceHolder = ew_RemoveHtml($this->TglPO->FldCaption());
+
+			// NoPO
+			$this->NoPO->EditAttrs["class"] = "form-control";
+			$this->NoPO->EditCustomAttributes = "";
+			$this->NoPO->EditValue = ew_HtmlEncode($this->NoPO->CurrentValue);
+			$this->NoPO->PlaceHolder = ew_RemoveHtml($this->NoPO->FldCaption());
 
 			// VendorID
 			$this->VendorID->EditCustomAttributes = "";
@@ -1059,15 +1083,22 @@ class ct08_po_edit extends ct08_po {
 			}
 			$this->SatuanID->PlaceHolder = ew_RemoveHtml($this->SatuanID->FldCaption());
 
+			// SubTotal
+			$this->SubTotal->EditAttrs["class"] = "form-control";
+			$this->SubTotal->EditCustomAttributes = "";
+			$this->SubTotal->EditValue = ew_HtmlEncode($this->SubTotal->CurrentValue);
+			$this->SubTotal->PlaceHolder = ew_RemoveHtml($this->SubTotal->FldCaption());
+			if (strval($this->SubTotal->EditValue) <> "" && is_numeric($this->SubTotal->EditValue)) $this->SubTotal->EditValue = ew_FormatNumber($this->SubTotal->EditValue, -2, -2, -2, -2);
+
 			// Edit refer script
-			// NoPO
-
-			$this->NoPO->LinkCustomAttributes = "";
-			$this->NoPO->HrefValue = "";
-
 			// TglPO
+
 			$this->TglPO->LinkCustomAttributes = "";
 			$this->TglPO->HrefValue = "";
+
+			// NoPO
+			$this->NoPO->LinkCustomAttributes = "";
+			$this->NoPO->HrefValue = "";
 
 			// VendorID
 			$this->VendorID->LinkCustomAttributes = "";
@@ -1088,6 +1119,10 @@ class ct08_po_edit extends ct08_po {
 			// SatuanID
 			$this->SatuanID->LinkCustomAttributes = "";
 			$this->SatuanID->HrefValue = "";
+
+			// SubTotal
+			$this->SubTotal->LinkCustomAttributes = "";
+			$this->SubTotal->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD || $this->RowType == EW_ROWTYPE_EDIT || $this->RowType == EW_ROWTYPE_SEARCH) // Add/Edit/Search row
 			$this->SetupFieldTitles();
@@ -1107,14 +1142,14 @@ class ct08_po_edit extends ct08_po {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
-		if (!$this->NoPO->FldIsDetailKey && !is_null($this->NoPO->FormValue) && $this->NoPO->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->NoPO->FldCaption(), $this->NoPO->ReqErrMsg));
-		}
 		if (!$this->TglPO->FldIsDetailKey && !is_null($this->TglPO->FormValue) && $this->TglPO->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->TglPO->FldCaption(), $this->TglPO->ReqErrMsg));
 		}
 		if (!ew_CheckEuroDate($this->TglPO->FormValue)) {
 			ew_AddMessage($gsFormError, $this->TglPO->FldErrMsg());
+		}
+		if (!$this->NoPO->FldIsDetailKey && !is_null($this->NoPO->FormValue) && $this->NoPO->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->NoPO->FldCaption(), $this->NoPO->ReqErrMsg));
 		}
 		if (!$this->VendorID->FldIsDetailKey && !is_null($this->VendorID->FormValue) && $this->VendorID->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->VendorID->FldCaption(), $this->VendorID->ReqErrMsg));
@@ -1127,6 +1162,9 @@ class ct08_po_edit extends ct08_po {
 		}
 		if (!ew_CheckInteger($this->Qty->FormValue)) {
 			ew_AddMessage($gsFormError, $this->Qty->FldErrMsg());
+		}
+		if (!ew_CheckNumber($this->SubTotal->FormValue)) {
+			ew_AddMessage($gsFormError, $this->SubTotal->FldErrMsg());
 		}
 
 		// Return validate result
@@ -1164,11 +1202,11 @@ class ct08_po_edit extends ct08_po {
 			$this->LoadDbValues($rsold);
 			$rsnew = array();
 
-			// NoPO
-			$this->NoPO->SetDbValueDef($rsnew, $this->NoPO->CurrentValue, "", $this->NoPO->ReadOnly);
-
 			// TglPO
 			$this->TglPO->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->TglPO->CurrentValue, 7), ew_CurrentDate(), $this->TglPO->ReadOnly);
+
+			// NoPO
+			$this->NoPO->SetDbValueDef($rsnew, $this->NoPO->CurrentValue, "", $this->NoPO->ReadOnly);
 
 			// VendorID
 			$this->VendorID->SetDbValueDef($rsnew, $this->VendorID->CurrentValue, 0, $this->VendorID->ReadOnly);
@@ -1183,7 +1221,10 @@ class ct08_po_edit extends ct08_po {
 			$this->Qty->SetDbValueDef($rsnew, $this->Qty->CurrentValue, 0, $this->Qty->ReadOnly);
 
 			// SatuanID
-			$this->SatuanID->SetDbValueDef($rsnew, $this->SatuanID->CurrentValue, 0, $this->SatuanID->ReadOnly);
+			$this->SatuanID->SetDbValueDef($rsnew, $this->SatuanID->CurrentValue, NULL, $this->SatuanID->ReadOnly);
+
+			// SubTotal
+			$this->SubTotal->SetDbValueDef($rsnew, $this->SubTotal->CurrentValue, 0, $this->SubTotal->ReadOnly);
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -1399,15 +1440,15 @@ ft08_poedit.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
-			elm = this.GetElements("x" + infix + "_NoPO");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t08_po->NoPO->FldCaption(), $t08_po->NoPO->ReqErrMsg)) ?>");
 			elm = this.GetElements("x" + infix + "_TglPO");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t08_po->TglPO->FldCaption(), $t08_po->TglPO->ReqErrMsg)) ?>");
 			elm = this.GetElements("x" + infix + "_TglPO");
 			if (elm && !ew_CheckEuroDate(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t08_po->TglPO->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_NoPO");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t08_po->NoPO->FldCaption(), $t08_po->NoPO->ReqErrMsg)) ?>");
 			elm = this.GetElements("x" + infix + "_VendorID");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t08_po->VendorID->FldCaption(), $t08_po->VendorID->ReqErrMsg)) ?>");
@@ -1420,6 +1461,9 @@ ft08_poedit.Validate = function() {
 			elm = this.GetElements("x" + infix + "_Qty");
 			if (elm && !ew_CheckInteger(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t08_po->Qty->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_SubTotal");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t08_po->SubTotal->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -1520,16 +1564,6 @@ $t08_po_edit->ShowMessage();
 <input type="hidden" name="a_edit" id="a_edit" value="U">
 <input type="hidden" name="modal" value="<?php echo intval($t08_po_edit->IsModal) ?>">
 <div class="ewEditDiv"><!-- page* -->
-<?php if ($t08_po->NoPO->Visible) { // NoPO ?>
-	<div id="r_NoPO" class="form-group">
-		<label id="elh_t08_po_NoPO" for="x_NoPO" class="<?php echo $t08_po_edit->LeftColumnClass ?>"><?php echo $t08_po->NoPO->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="<?php echo $t08_po_edit->RightColumnClass ?>"><div<?php echo $t08_po->NoPO->CellAttributes() ?>>
-<span id="el_t08_po_NoPO">
-<input type="text" data-table="t08_po" data-field="x_NoPO" name="x_NoPO" id="x_NoPO" size="15" maxlength="14" placeholder="<?php echo ew_HtmlEncode($t08_po->NoPO->getPlaceHolder()) ?>" value="<?php echo $t08_po->NoPO->EditValue ?>"<?php echo $t08_po->NoPO->EditAttributes() ?>>
-</span>
-<?php echo $t08_po->NoPO->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
 <?php if ($t08_po->TglPO->Visible) { // TglPO ?>
 	<div id="r_TglPO" class="form-group">
 		<label id="elh_t08_po_TglPO" for="x_TglPO" class="<?php echo $t08_po_edit->LeftColumnClass ?>"><?php echo $t08_po->TglPO->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
@@ -1543,6 +1577,16 @@ ew_CreateDateTimePicker("ft08_poedit", "x_TglPO", {"ignoreReadonly":true,"useCur
 <?php } ?>
 </span>
 <?php echo $t08_po->TglPO->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t08_po->NoPO->Visible) { // NoPO ?>
+	<div id="r_NoPO" class="form-group">
+		<label id="elh_t08_po_NoPO" for="x_NoPO" class="<?php echo $t08_po_edit->LeftColumnClass ?>"><?php echo $t08_po->NoPO->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="<?php echo $t08_po_edit->RightColumnClass ?>"><div<?php echo $t08_po->NoPO->CellAttributes() ?>>
+<span id="el_t08_po_NoPO">
+<input type="text" data-table="t08_po" data-field="x_NoPO" name="x_NoPO" id="x_NoPO" size="15" maxlength="14" placeholder="<?php echo ew_HtmlEncode($t08_po->NoPO->getPlaceHolder()) ?>" value="<?php echo $t08_po->NoPO->EditValue ?>"<?php echo $t08_po->NoPO->EditAttributes() ?>>
+</span>
+<?php echo $t08_po->NoPO->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 <?php if ($t08_po->VendorID->Visible) { // VendorID ?>
@@ -1606,7 +1650,7 @@ if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchang
 $t08_po->SatuanID->EditAttrs["onchange"] = "";
 ?>
 <span id="as_x_SatuanID" style="white-space: nowrap; z-index: 8920">
-	<input type="text" name="sv_x_SatuanID" id="sv_x_SatuanID" value="<?php echo $t08_po->SatuanID->EditValue ?>" size="5" placeholder="<?php echo ew_HtmlEncode($t08_po->SatuanID->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t08_po->SatuanID->getPlaceHolder()) ?>"<?php echo $t08_po->SatuanID->EditAttributes() ?>>
+	<input type="text" name="sv_x_SatuanID" id="sv_x_SatuanID" value="<?php echo $t08_po->SatuanID->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($t08_po->SatuanID->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t08_po->SatuanID->getPlaceHolder()) ?>"<?php echo $t08_po->SatuanID->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t08_po" data-field="x_SatuanID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t08_po->SatuanID->DisplayValueSeparatorAttribute() ?>" name="x_SatuanID" id="x_SatuanID" value="<?php echo ew_HtmlEncode($t08_po->SatuanID->CurrentValue) ?>"<?php echo $wrkonchange ?>>
 <script type="text/javascript">
@@ -1615,6 +1659,16 @@ ft08_poedit.CreateAutoSuggest({"id":"x_SatuanID","forceSelect":true});
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t08_po->SatuanID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_SatuanID',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t08_po->SatuanID->ReadOnly || $t08_po->SatuanID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
 </span>
 <?php echo $t08_po->SatuanID->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t08_po->SubTotal->Visible) { // SubTotal ?>
+	<div id="r_SubTotal" class="form-group">
+		<label id="elh_t08_po_SubTotal" for="x_SubTotal" class="<?php echo $t08_po_edit->LeftColumnClass ?>"><?php echo $t08_po->SubTotal->FldCaption() ?></label>
+		<div class="<?php echo $t08_po_edit->RightColumnClass ?>"><div<?php echo $t08_po->SubTotal->CellAttributes() ?>>
+<span id="el_t08_po_SubTotal">
+<input type="text" data-table="t08_po" data-field="x_SubTotal" name="x_SubTotal" id="x_SubTotal" size="10" placeholder="<?php echo ew_HtmlEncode($t08_po->SubTotal->getPlaceHolder()) ?>" value="<?php echo $t08_po->SubTotal->EditValue ?>"<?php echo $t08_po->SubTotal->EditAttributes() ?>>
+</span>
+<?php echo $t08_po->SubTotal->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div><!-- /page* -->

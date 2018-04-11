@@ -14,13 +14,14 @@ class ct08_po extends cTable {
 	var $AuditTrailOnViewData = FALSE;
 	var $AuditTrailOnSearch = FALSE;
 	var $id;
-	var $NoPO;
 	var $TglPO;
+	var $NoPO;
 	var $VendorID;
 	var $ArticleID;
 	var $Harga;
 	var $Qty;
 	var $SatuanID;
+	var $SubTotal;
 
 	//
 	// Table class constructor
@@ -60,16 +61,16 @@ class ct08_po extends cTable {
 		$this->id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['id'] = &$this->id;
 
-		// NoPO
-		$this->NoPO = new cField('t08_po', 't08_po', 'x_NoPO', 'NoPO', '`NoPO`', '`NoPO`', 200, -1, FALSE, '`NoPO`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->NoPO->Sortable = TRUE; // Allow sort
-		$this->fields['NoPO'] = &$this->NoPO;
-
 		// TglPO
 		$this->TglPO = new cField('t08_po', 't08_po', 'x_TglPO', 'TglPO', '`TglPO`', ew_CastDateFieldForLike('`TglPO`', 7, "DB"), 133, 7, FALSE, '`TglPO`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->TglPO->Sortable = TRUE; // Allow sort
 		$this->TglPO->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
 		$this->fields['TglPO'] = &$this->TglPO;
+
+		// NoPO
+		$this->NoPO = new cField('t08_po', 't08_po', 'x_NoPO', 'NoPO', '`NoPO`', '`NoPO`', 200, -1, FALSE, '`NoPO`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->NoPO->Sortable = TRUE; // Allow sort
+		$this->fields['NoPO'] = &$this->NoPO;
 
 		// VendorID
 		$this->VendorID = new cField('t08_po', 't08_po', 'x_VendorID', 'VendorID', '`VendorID`', '`VendorID`', 3, -1, FALSE, '`VendorID`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'SELECT');
@@ -94,17 +95,23 @@ class ct08_po extends cTable {
 		$this->fields['Harga'] = &$this->Harga;
 
 		// Qty
-		$this->Qty = new cField('t08_po', 't08_po', 'x_Qty', 'Qty', '`Qty`', '`Qty`', 3, -1, FALSE, '`Qty`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Qty = new cField('t08_po', 't08_po', 'x_Qty', 'Qty', '`Qty`', '`Qty`', 4, -1, FALSE, '`Qty`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->Qty->Sortable = TRUE; // Allow sort
-		$this->Qty->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->Qty->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
 		$this->fields['Qty'] = &$this->Qty;
 
 		// SatuanID
-		$this->SatuanID = new cField('t08_po', 't08_po', 'x_SatuanID', 'SatuanID', '0', '0', 20, -1, FALSE, '`EV__SatuanID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'TEXT');
+		$this->SatuanID = new cField('t08_po', 't08_po', 'x_SatuanID', 'SatuanID', '(SELECT satuanid  FROM t06_article a where articleid = a.id)', '(SELECT satuanid  FROM t06_article a where articleid = a.id)', 3, -1, FALSE, '`EV__SatuanID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'TEXT');
 		$this->SatuanID->FldIsCustom = TRUE; // Custom field
 		$this->SatuanID->Sortable = TRUE; // Allow sort
 		$this->SatuanID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['SatuanID'] = &$this->SatuanID;
+
+		// SubTotal
+		$this->SubTotal = new cField('t08_po', 't08_po', 'x_SubTotal', 'SubTotal', '`SubTotal`', '`SubTotal`', 4, -1, FALSE, '`SubTotal`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->SubTotal->Sortable = TRUE; // Allow sort
+		$this->SubTotal->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['SubTotal'] = &$this->SubTotal;
 	}
 
 	// Field Visibility
@@ -194,7 +201,7 @@ class ct08_po extends cTable {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() { // Select
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, 0 AS `SatuanID` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (SELECT satuanid  FROM t06_article a where articleid = a.id) AS `SatuanID` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -209,7 +216,7 @@ class ct08_po extends cTable {
 	function getSqlSelectList() { // Select for List page
 		$select = "";
 		$select = "SELECT * FROM (" .
-			"SELECT *, 0 AS `SatuanID`, (SELECT CONCAT(COALESCE(`Kode`, ''),'" . ew_ValueSeparator(1, $this->ArticleID) . "',COALESCE(`Nama`,'')) FROM `t06_article` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t08_po`.`ArticleID` LIMIT 1) AS `EV__ArticleID`, (SELECT `Nama` FROM `t07_satuan` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t08_po`.`SatuanID` LIMIT 1) AS `EV__SatuanID` FROM `t08_po`" .
+			"SELECT *, (SELECT satuanid  FROM t06_article a where articleid = a.id) AS `SatuanID`, (SELECT CONCAT(COALESCE(`Kode`, ''),'" . ew_ValueSeparator(1, $this->ArticleID) . "',COALESCE(`Nama`,'')) FROM `t06_article` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t08_po`.`ArticleID` LIMIT 1) AS `EV__ArticleID`, (SELECT `Nama` FROM `t07_satuan` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t08_po`.`SatuanID` LIMIT 1) AS `EV__SatuanID` FROM `t08_po`" .
 			") `EW_TMP_TABLE`";
 		return ($this->_SqlSelectList <> "") ? $this->_SqlSelectList : $select;
 	}
@@ -266,7 +273,7 @@ class ct08_po extends cTable {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() { // Order By
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`TglPO` ASC,`NoPO` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -724,13 +731,14 @@ class ct08_po extends cTable {
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
 		$this->id->setDbValue($rs->fields('id'));
-		$this->NoPO->setDbValue($rs->fields('NoPO'));
 		$this->TglPO->setDbValue($rs->fields('TglPO'));
+		$this->NoPO->setDbValue($rs->fields('NoPO'));
 		$this->VendorID->setDbValue($rs->fields('VendorID'));
 		$this->ArticleID->setDbValue($rs->fields('ArticleID'));
 		$this->Harga->setDbValue($rs->fields('Harga'));
 		$this->Qty->setDbValue($rs->fields('Qty'));
 		$this->SatuanID->setDbValue($rs->fields('SatuanID'));
+		$this->SubTotal->setDbValue($rs->fields('SubTotal'));
 	}
 
 	// Render list row values
@@ -742,26 +750,27 @@ class ct08_po extends cTable {
 
 	// Common render codes
 		// id
-		// NoPO
 		// TglPO
+		// NoPO
 		// VendorID
 		// ArticleID
 		// Harga
 		// Qty
 		// SatuanID
+		// SubTotal
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// NoPO
-		$this->NoPO->ViewValue = $this->NoPO->CurrentValue;
-		$this->NoPO->ViewCustomAttributes = "";
-
 		// TglPO
 		$this->TglPO->ViewValue = $this->TglPO->CurrentValue;
 		$this->TglPO->ViewValue = ew_FormatDateTime($this->TglPO->ViewValue, 7);
 		$this->TglPO->ViewCustomAttributes = "";
+
+		// NoPO
+		$this->NoPO->ViewValue = $this->NoPO->CurrentValue;
+		$this->NoPO->ViewCustomAttributes = "";
 
 		// VendorID
 		if (strval($this->VendorID->CurrentValue) <> "") {
@@ -854,20 +863,26 @@ class ct08_po extends cTable {
 		}
 		$this->SatuanID->ViewCustomAttributes = "";
 
+		// SubTotal
+		$this->SubTotal->ViewValue = $this->SubTotal->CurrentValue;
+		$this->SubTotal->ViewValue = ew_FormatNumber($this->SubTotal->ViewValue, 2, -2, -2, -2);
+		$this->SubTotal->CellCssStyle .= "text-align: right;";
+		$this->SubTotal->ViewCustomAttributes = "";
+
 		// id
 		$this->id->LinkCustomAttributes = "";
 		$this->id->HrefValue = "";
 		$this->id->TooltipValue = "";
 
-		// NoPO
-		$this->NoPO->LinkCustomAttributes = "";
-		$this->NoPO->HrefValue = "";
-		$this->NoPO->TooltipValue = "";
-
 		// TglPO
 		$this->TglPO->LinkCustomAttributes = "";
 		$this->TglPO->HrefValue = "";
 		$this->TglPO->TooltipValue = "";
+
+		// NoPO
+		$this->NoPO->LinkCustomAttributes = "";
+		$this->NoPO->HrefValue = "";
+		$this->NoPO->TooltipValue = "";
 
 		// VendorID
 		$this->VendorID->LinkCustomAttributes = "";
@@ -894,6 +909,11 @@ class ct08_po extends cTable {
 		$this->SatuanID->HrefValue = "";
 		$this->SatuanID->TooltipValue = "";
 
+		// SubTotal
+		$this->SubTotal->LinkCustomAttributes = "";
+		$this->SubTotal->HrefValue = "";
+		$this->SubTotal->TooltipValue = "";
+
 		// Call Row Rendered event
 		$this->Row_Rendered();
 
@@ -914,17 +934,17 @@ class ct08_po extends cTable {
 		$this->id->EditValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// NoPO
-		$this->NoPO->EditAttrs["class"] = "form-control";
-		$this->NoPO->EditCustomAttributes = "";
-		$this->NoPO->EditValue = $this->NoPO->CurrentValue;
-		$this->NoPO->PlaceHolder = ew_RemoveHtml($this->NoPO->FldCaption());
-
 		// TglPO
 		$this->TglPO->EditAttrs["class"] = "form-control";
 		$this->TglPO->EditCustomAttributes = "";
 		$this->TglPO->EditValue = ew_FormatDateTime($this->TglPO->CurrentValue, 7);
 		$this->TglPO->PlaceHolder = ew_RemoveHtml($this->TglPO->FldCaption());
+
+		// NoPO
+		$this->NoPO->EditAttrs["class"] = "form-control";
+		$this->NoPO->EditCustomAttributes = "";
+		$this->NoPO->EditValue = $this->NoPO->CurrentValue;
+		$this->NoPO->PlaceHolder = ew_RemoveHtml($this->NoPO->FldCaption());
 
 		// VendorID
 		$this->VendorID->EditAttrs["class"] = "form-control";
@@ -946,12 +966,20 @@ class ct08_po extends cTable {
 		$this->Qty->EditCustomAttributes = "";
 		$this->Qty->EditValue = $this->Qty->CurrentValue;
 		$this->Qty->PlaceHolder = ew_RemoveHtml($this->Qty->FldCaption());
+		if (strval($this->Qty->EditValue) <> "" && is_numeric($this->Qty->EditValue)) $this->Qty->EditValue = ew_FormatNumber($this->Qty->EditValue, -2, -2, -2, -2);
 
 		// SatuanID
 		$this->SatuanID->EditAttrs["class"] = "form-control";
 		$this->SatuanID->EditCustomAttributes = "";
 		$this->SatuanID->EditValue = $this->SatuanID->CurrentValue;
 		$this->SatuanID->PlaceHolder = ew_RemoveHtml($this->SatuanID->FldCaption());
+
+		// SubTotal
+		$this->SubTotal->EditAttrs["class"] = "form-control";
+		$this->SubTotal->EditCustomAttributes = "";
+		$this->SubTotal->EditValue = $this->SubTotal->CurrentValue;
+		$this->SubTotal->PlaceHolder = ew_RemoveHtml($this->SubTotal->FldCaption());
+		if (strval($this->SubTotal->EditValue) <> "" && is_numeric($this->SubTotal->EditValue)) $this->SubTotal->EditValue = ew_FormatNumber($this->SubTotal->EditValue, -2, -2, -2, -2);
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -980,22 +1008,24 @@ class ct08_po extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
-					if ($this->NoPO->Exportable) $Doc->ExportCaption($this->NoPO);
 					if ($this->TglPO->Exportable) $Doc->ExportCaption($this->TglPO);
+					if ($this->NoPO->Exportable) $Doc->ExportCaption($this->NoPO);
 					if ($this->VendorID->Exportable) $Doc->ExportCaption($this->VendorID);
 					if ($this->ArticleID->Exportable) $Doc->ExportCaption($this->ArticleID);
 					if ($this->Harga->Exportable) $Doc->ExportCaption($this->Harga);
 					if ($this->Qty->Exportable) $Doc->ExportCaption($this->Qty);
 					if ($this->SatuanID->Exportable) $Doc->ExportCaption($this->SatuanID);
+					if ($this->SubTotal->Exportable) $Doc->ExportCaption($this->SubTotal);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
-					if ($this->NoPO->Exportable) $Doc->ExportCaption($this->NoPO);
 					if ($this->TglPO->Exportable) $Doc->ExportCaption($this->TglPO);
+					if ($this->NoPO->Exportable) $Doc->ExportCaption($this->NoPO);
 					if ($this->VendorID->Exportable) $Doc->ExportCaption($this->VendorID);
 					if ($this->ArticleID->Exportable) $Doc->ExportCaption($this->ArticleID);
 					if ($this->Harga->Exportable) $Doc->ExportCaption($this->Harga);
 					if ($this->Qty->Exportable) $Doc->ExportCaption($this->Qty);
 					if ($this->SatuanID->Exportable) $Doc->ExportCaption($this->SatuanID);
+					if ($this->SubTotal->Exportable) $Doc->ExportCaption($this->SubTotal);
 				}
 				$Doc->EndExportRow();
 			}
@@ -1027,22 +1057,24 @@ class ct08_po extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
-						if ($this->NoPO->Exportable) $Doc->ExportField($this->NoPO);
 						if ($this->TglPO->Exportable) $Doc->ExportField($this->TglPO);
+						if ($this->NoPO->Exportable) $Doc->ExportField($this->NoPO);
 						if ($this->VendorID->Exportable) $Doc->ExportField($this->VendorID);
 						if ($this->ArticleID->Exportable) $Doc->ExportField($this->ArticleID);
 						if ($this->Harga->Exportable) $Doc->ExportField($this->Harga);
 						if ($this->Qty->Exportable) $Doc->ExportField($this->Qty);
 						if ($this->SatuanID->Exportable) $Doc->ExportField($this->SatuanID);
+						if ($this->SubTotal->Exportable) $Doc->ExportField($this->SubTotal);
 					} else {
 						if ($this->id->Exportable) $Doc->ExportField($this->id);
-						if ($this->NoPO->Exportable) $Doc->ExportField($this->NoPO);
 						if ($this->TglPO->Exportable) $Doc->ExportField($this->TglPO);
+						if ($this->NoPO->Exportable) $Doc->ExportField($this->NoPO);
 						if ($this->VendorID->Exportable) $Doc->ExportField($this->VendorID);
 						if ($this->ArticleID->Exportable) $Doc->ExportField($this->ArticleID);
 						if ($this->Harga->Exportable) $Doc->ExportField($this->Harga);
 						if ($this->Qty->Exportable) $Doc->ExportField($this->Qty);
 						if ($this->SatuanID->Exportable) $Doc->ExportField($this->SatuanID);
+						if ($this->SubTotal->Exportable) $Doc->ExportField($this->SubTotal);
 					}
 					$Doc->EndExportRow($RowCnt);
 				}
@@ -1315,7 +1347,6 @@ class ct08_po extends cTable {
 		// Enter your code here
 		// To reject grid insert, set return value to FALSE
 
-		$rsnew["NoPO"] = f_GetNextNoPO(); // mengantisipasi lebih satu user menginput data saat bersamaan
 		return TRUE;
 	}
 
