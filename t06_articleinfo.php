@@ -1304,6 +1304,7 @@ class ct06_article extends cTable {
 
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
+		// assign variable RowIndex
 
 		$RowIndex = "x";
 		if (CurrentPageID() != "add" and CurrentPageID() != "edit") {
@@ -1315,6 +1316,9 @@ class ct06_article extends cTable {
 
 		// SubGroupID
 		$this->SubGroupID->EditAttrs["onchange"] = "f_Article_SubGroupID_onChange(event, '".$RowIndex."');";
+
+		// Kode set readonly
+		$this->Kode->ReadOnly = true;
 	}
 
 	// User ID Filtering event

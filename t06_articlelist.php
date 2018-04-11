@@ -404,11 +404,8 @@ class ct06_article_list extends ct06_article {
 		// 
 		// Security = null;
 		// 
-		// Create form object
-
-		$objForm = new cFormObj();
-
 		// Get export parameters
+
 		$custom = "";
 		if (@$_GET["export"] <> "") {
 			$this->Export = $_GET["export"];
@@ -628,71 +625,6 @@ class ct06_article_list extends ct06_article {
 			if ($this->Export == "")
 				$this->SetupBreadcrumb();
 
-			// Check QueryString parameters
-			if (@$_GET["a"] <> "") {
-				$this->CurrentAction = $_GET["a"];
-
-				// Clear inline mode
-				if ($this->CurrentAction == "cancel")
-					$this->ClearInlineMode();
-
-				// Switch to grid edit mode
-				if ($this->CurrentAction == "gridedit")
-					$this->GridEditMode();
-
-				// Switch to inline edit mode
-				if ($this->CurrentAction == "edit")
-					$this->InlineEditMode();
-
-				// Switch to inline add mode
-				if ($this->CurrentAction == "add" || $this->CurrentAction == "copy")
-					$this->InlineAddMode();
-
-				// Switch to grid add mode
-				if ($this->CurrentAction == "gridadd")
-					$this->GridAddMode();
-			} else {
-				if (@$_POST["a_list"] <> "") {
-					$this->CurrentAction = $_POST["a_list"]; // Get action
-
-					// Grid Update
-					if (($this->CurrentAction == "gridupdate" || $this->CurrentAction == "gridoverwrite") && @$_SESSION[EW_SESSION_INLINE_MODE] == "gridedit") {
-						if ($this->ValidateGridForm()) {
-							$bGridUpdate = $this->GridUpdate();
-						} else {
-							$bGridUpdate = FALSE;
-							$this->setFailureMessage($gsFormError);
-						}
-						if (!$bGridUpdate) {
-							$this->EventCancelled = TRUE;
-							$this->CurrentAction = "gridedit"; // Stay in Grid Edit mode
-						}
-					}
-
-					// Inline Update
-					if (($this->CurrentAction == "update" || $this->CurrentAction == "overwrite") && @$_SESSION[EW_SESSION_INLINE_MODE] == "edit")
-						$this->InlineUpdate();
-
-					// Insert Inline
-					if ($this->CurrentAction == "insert" && @$_SESSION[EW_SESSION_INLINE_MODE] == "add")
-						$this->InlineInsert();
-
-					// Grid Insert
-					if ($this->CurrentAction == "gridinsert" && @$_SESSION[EW_SESSION_INLINE_MODE] == "gridadd") {
-						if ($this->ValidateGridForm()) {
-							$bGridInsert = $this->GridInsert();
-						} else {
-							$bGridInsert = FALSE;
-							$this->setFailureMessage($gsFormError);
-						}
-						if (!$bGridInsert) {
-							$this->EventCancelled = TRUE;
-							$this->CurrentAction = "gridadd"; // Stay in Grid Add mode
-						}
-					}
-				}
-			}
-
 			// Hide list options
 			if ($this->Export <> "") {
 				$this->ListOptions->HideAllOptions(array("sequence"));
@@ -714,14 +646,6 @@ class ct06_article_list extends ct06_article {
 			if ($this->Export <> "") {
 				foreach ($this->OtherOptions as &$option)
 					$option->HideAllOptions();
-			}
-
-			// Show grid delete link for grid add / grid edit
-			if ($this->AllowAddDeleteRow) {
-				if ($this->CurrentAction == "gridadd" || $this->CurrentAction == "gridedit") {
-					$item = $this->ListOptions->GetItem("griddelete");
-					if ($item) $item->Visible = TRUE;
-				}
 			}
 
 			// Get default search criteria
@@ -843,234 +767,6 @@ class ct06_article_list extends ct06_article {
 		}
 	}
 
-	// Exit inline mode
-	function ClearInlineMode() {
-		$this->setKey("id", ""); // Clear inline edit key
-		$this->LastAction = $this->CurrentAction; // Save last action
-		$this->CurrentAction = ""; // Clear action
-		$_SESSION[EW_SESSION_INLINE_MODE] = ""; // Clear inline mode
-	}
-
-	// Switch to Grid Add mode
-	function GridAddMode() {
-		$_SESSION[EW_SESSION_INLINE_MODE] = "gridadd"; // Enabled grid add
-	}
-
-	// Switch to Grid Edit mode
-	function GridEditMode() {
-		$_SESSION[EW_SESSION_INLINE_MODE] = "gridedit"; // Enable grid edit
-	}
-
-	// Switch to Inline Edit mode
-	function InlineEditMode() {
-		global $Security, $Language;
-		if (!$Security->CanEdit())
-			$this->Page_Terminate("login.php"); // Go to login page
-		$bInlineEdit = TRUE;
-		if (isset($_GET["id"])) {
-			$this->id->setQueryStringValue($_GET["id"]);
-		} else {
-			$bInlineEdit = FALSE;
-		}
-		if ($bInlineEdit) {
-			if ($this->LoadRow()) {
-				$this->setKey("id", $this->id->CurrentValue); // Set up inline edit key
-				$_SESSION[EW_SESSION_INLINE_MODE] = "edit"; // Enable inline edit
-			}
-		}
-	}
-
-	// Perform update to Inline Edit record
-	function InlineUpdate() {
-		global $Language, $objForm, $gsFormError;
-		$objForm->Index = 1;
-		$this->LoadFormValues(); // Get form values
-
-		// Validate form
-		$bInlineUpdate = TRUE;
-		if (!$this->ValidateForm()) {
-			$bInlineUpdate = FALSE; // Form error, reset action
-			$this->setFailureMessage($gsFormError);
-		} else {
-			$bInlineUpdate = FALSE;
-			$rowkey = strval($objForm->GetValue($this->FormKeyName));
-			if ($this->SetupKeyValues($rowkey)) { // Set up key values
-				if ($this->CheckInlineEditKey()) { // Check key
-					$this->SendEmail = TRUE; // Send email on update success
-					$bInlineUpdate = $this->EditRow(); // Update record
-				} else {
-					$bInlineUpdate = FALSE;
-				}
-			}
-		}
-		if ($bInlineUpdate) { // Update success
-			if ($this->getSuccessMessage() == "")
-				$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Set up success message
-			$this->ClearInlineMode(); // Clear inline edit mode
-		} else {
-			if ($this->getFailureMessage() == "")
-				$this->setFailureMessage($Language->Phrase("UpdateFailed")); // Set update failed message
-			$this->EventCancelled = TRUE; // Cancel event
-			$this->CurrentAction = "edit"; // Stay in edit mode
-		}
-	}
-
-	// Check Inline Edit key
-	function CheckInlineEditKey() {
-
-		//CheckInlineEditKey = True
-		if (strval($this->getKey("id")) <> strval($this->id->CurrentValue))
-			return FALSE;
-		return TRUE;
-	}
-
-	// Switch to Inline Add mode
-	function InlineAddMode() {
-		global $Security, $Language;
-		if (!$Security->CanAdd())
-			$this->Page_Terminate("login.php"); // Return to login page
-		if ($this->CurrentAction == "copy") {
-			if (@$_GET["id"] <> "") {
-				$this->id->setQueryStringValue($_GET["id"]);
-				$this->setKey("id", $this->id->CurrentValue); // Set up key
-			} else {
-				$this->setKey("id", ""); // Clear key
-				$this->CurrentAction = "add";
-			}
-		}
-		$_SESSION[EW_SESSION_INLINE_MODE] = "add"; // Enable inline add
-	}
-
-	// Perform update to Inline Add/Copy record
-	function InlineInsert() {
-		global $Language, $objForm, $gsFormError;
-		$this->LoadOldRecord(); // Load old record
-		$objForm->Index = 0;
-		$this->LoadFormValues(); // Get form values
-
-		// Validate form
-		if (!$this->ValidateForm()) {
-			$this->setFailureMessage($gsFormError); // Set validation error message
-			$this->EventCancelled = TRUE; // Set event cancelled
-			$this->CurrentAction = "add"; // Stay in add mode
-			return;
-		}
-		$this->SendEmail = TRUE; // Send email on add success
-		if ($this->AddRow($this->OldRecordset)) { // Add record
-			if ($this->getSuccessMessage() == "")
-				$this->setSuccessMessage($Language->Phrase("AddSuccess")); // Set up add success message
-			$this->ClearInlineMode(); // Clear inline add mode
-		} else { // Add failed
-			$this->EventCancelled = TRUE; // Set event cancelled
-			$this->CurrentAction = "add"; // Stay in add mode
-		}
-	}
-
-	// Perform update to grid
-	function GridUpdate() {
-		global $Language, $objForm, $gsFormError;
-		$bGridUpdate = TRUE;
-
-		// Get old recordset
-		$this->CurrentFilter = $this->BuildKeyFilter();
-		if ($this->CurrentFilter == "")
-			$this->CurrentFilter = "0=1";
-		$sSql = $this->SQL();
-		$conn = &$this->Connection();
-		if ($rs = $conn->Execute($sSql)) {
-			$rsold = $rs->GetRows();
-			$rs->Close();
-		}
-
-		// Call Grid Updating event
-		if (!$this->Grid_Updating($rsold)) {
-			if ($this->getFailureMessage() == "")
-				$this->setFailureMessage($Language->Phrase("GridEditCancelled")); // Set grid edit cancelled message
-			return FALSE;
-		}
-
-		// Begin transaction
-		$conn->BeginTrans();
-		if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateBegin")); // Batch update begin
-		$sKey = "";
-
-		// Update row index and get row key
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-
-		// Update all rows based on key
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-			$objForm->Index = $rowindex;
-			$rowkey = strval($objForm->GetValue($this->FormKeyName));
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-
-			// Load all values and keys
-			if ($rowaction <> "insertdelete") { // Skip insert then deleted rows
-				$this->LoadFormValues(); // Get form values
-				if ($rowaction == "" || $rowaction == "edit" || $rowaction == "delete") {
-					$bGridUpdate = $this->SetupKeyValues($rowkey); // Set up key values
-				} else {
-					$bGridUpdate = TRUE;
-				}
-
-				// Skip empty row
-				if ($rowaction == "insert" && $this->EmptyRow()) {
-
-					// No action required
-				// Validate form and insert/update/delete record
-
-				} elseif ($bGridUpdate) {
-					if ($rowaction == "delete") {
-						$this->CurrentFilter = $this->KeyFilter();
-						$bGridUpdate = $this->DeleteRows(); // Delete this row
-					} else if (!$this->ValidateForm()) {
-						$bGridUpdate = FALSE; // Form error, reset action
-						$this->setFailureMessage($gsFormError);
-					} else {
-						if ($rowaction == "insert") {
-							$bGridUpdate = $this->AddRow(); // Insert this row
-						} else {
-							if ($rowkey <> "") {
-								$this->SendEmail = FALSE; // Do not send email on update success
-								$bGridUpdate = $this->EditRow(); // Update this row
-							}
-						} // End update
-					}
-				}
-				if ($bGridUpdate) {
-					if ($sKey <> "") $sKey .= ", ";
-					$sKey .= $rowkey;
-				} else {
-					break;
-				}
-			}
-		}
-		if ($bGridUpdate) {
-			$conn->CommitTrans(); // Commit transaction
-
-			// Get new recordset
-			if ($rs = $conn->Execute($sSql)) {
-				$rsnew = $rs->GetRows();
-				$rs->Close();
-			}
-
-			// Call Grid_Updated event
-			$this->Grid_Updated($rsold, $rsnew);
-			if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateSuccess")); // Batch update success
-			if ($this->getSuccessMessage() == "")
-				$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Set up update success message
-			$this->ClearInlineMode(); // Clear inline edit mode
-		} else {
-			$conn->RollbackTrans(); // Rollback transaction
-			if ($this->AuditTrailOnEdit) $this->WriteAuditTrailDummy($Language->Phrase("BatchUpdateRollback")); // Batch update rollback
-			if ($this->getFailureMessage() == "")
-				$this->setFailureMessage($Language->Phrase("UpdateFailed")); // Set update failed message
-		}
-		return $bGridUpdate;
-	}
-
 	// Build filter for all keys
 	function BuildKeyFilter() {
 		global $objForm;
@@ -1107,184 +803,6 @@ class ct06_article_list extends ct06_article {
 				return FALSE;
 		}
 		return TRUE;
-	}
-
-	// Perform Grid Add
-	function GridInsert() {
-		global $Language, $objForm, $gsFormError;
-		$rowindex = 1;
-		$bGridInsert = FALSE;
-		$conn = &$this->Connection();
-
-		// Call Grid Inserting event
-		if (!$this->Grid_Inserting()) {
-			if ($this->getFailureMessage() == "") {
-				$this->setFailureMessage($Language->Phrase("GridAddCancelled")); // Set grid add cancelled message
-			}
-			return FALSE;
-		}
-
-		// Begin transaction
-		$conn->BeginTrans();
-
-		// Init key filter
-		$sWrkFilter = "";
-		$addcnt = 0;
-		if ($this->AuditTrailOnAdd) $this->WriteAuditTrailDummy($Language->Phrase("BatchInsertBegin")); // Batch insert begin
-		$sKey = "";
-
-		// Get row count
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-
-		// Insert all rows
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-
-			// Load current row values
-			$objForm->Index = $rowindex;
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-			if ($rowaction <> "" && $rowaction <> "insert")
-				continue; // Skip
-			$this->LoadFormValues(); // Get form values
-			if (!$this->EmptyRow()) {
-				$addcnt++;
-				$this->SendEmail = FALSE; // Do not send email on insert success
-
-				// Validate form
-				if (!$this->ValidateForm()) {
-					$bGridInsert = FALSE; // Form error, reset action
-					$this->setFailureMessage($gsFormError);
-				} else {
-					$bGridInsert = $this->AddRow($this->OldRecordset); // Insert this row
-				}
-				if ($bGridInsert) {
-					if ($sKey <> "") $sKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-					$sKey .= $this->id->CurrentValue;
-
-					// Add filter for this record
-					$sFilter = $this->KeyFilter();
-					if ($sWrkFilter <> "") $sWrkFilter .= " OR ";
-					$sWrkFilter .= $sFilter;
-				} else {
-					break;
-				}
-			}
-		}
-		if ($addcnt == 0) { // No record inserted
-			$this->setFailureMessage($Language->Phrase("NoAddRecord"));
-			$bGridInsert = FALSE;
-		}
-		if ($bGridInsert) {
-			$conn->CommitTrans(); // Commit transaction
-
-			// Get new recordset
-			$this->CurrentFilter = $sWrkFilter;
-			$sSql = $this->SQL();
-			if ($rs = $conn->Execute($sSql)) {
-				$rsnew = $rs->GetRows();
-				$rs->Close();
-			}
-
-			// Call Grid_Inserted event
-			$this->Grid_Inserted($rsnew);
-			if ($this->AuditTrailOnAdd) $this->WriteAuditTrailDummy($Language->Phrase("BatchInsertSuccess")); // Batch insert success
-			if ($this->getSuccessMessage() == "")
-				$this->setSuccessMessage($Language->Phrase("InsertSuccess")); // Set up insert success message
-			$this->ClearInlineMode(); // Clear grid add mode
-		} else {
-			$conn->RollbackTrans(); // Rollback transaction
-			if ($this->AuditTrailOnAdd) $this->WriteAuditTrailDummy($Language->Phrase("BatchInsertRollback")); // Batch insert rollback
-			if ($this->getFailureMessage() == "") {
-				$this->setFailureMessage($Language->Phrase("InsertFailed")); // Set insert failed message
-			}
-		}
-		return $bGridInsert;
-	}
-
-	// Check if empty row
-	function EmptyRow() {
-		global $objForm;
-		if ($objForm->HasValue("x_MainGroupID") && $objForm->HasValue("o_MainGroupID") && $this->MainGroupID->CurrentValue <> $this->MainGroupID->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_SubGroupID") && $objForm->HasValue("o_SubGroupID") && $this->SubGroupID->CurrentValue <> $this->SubGroupID->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_Kode") && $objForm->HasValue("o_Kode") && $this->Kode->CurrentValue <> $this->Kode->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_Nama") && $objForm->HasValue("o_Nama") && $this->Nama->CurrentValue <> $this->Nama->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_SatuanID") && $objForm->HasValue("o_SatuanID") && $this->SatuanID->CurrentValue <> $this->SatuanID->OldValue)
-			return FALSE;
-		return TRUE;
-	}
-
-	// Validate grid form
-	function ValidateGridForm() {
-		global $objForm;
-
-		// Get row count
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-
-		// Validate all records
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-
-			// Load current row values
-			$objForm->Index = $rowindex;
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-			if ($rowaction <> "delete" && $rowaction <> "insertdelete") {
-				$this->LoadFormValues(); // Get form values
-				if ($rowaction == "insert" && $this->EmptyRow()) {
-
-					// Ignore
-				} else if (!$this->ValidateForm()) {
-					return FALSE;
-				}
-			}
-		}
-		return TRUE;
-	}
-
-	// Get all form values of the grid
-	function GetGridFormValues() {
-		global $objForm;
-
-		// Get row count
-		$objForm->Index = -1;
-		$rowcnt = strval($objForm->GetValue($this->FormKeyCountName));
-		if ($rowcnt == "" || !is_numeric($rowcnt))
-			$rowcnt = 0;
-		$rows = array();
-
-		// Loop through all records
-		for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
-
-			// Load current row values
-			$objForm->Index = $rowindex;
-			$rowaction = strval($objForm->GetValue($this->FormActionName));
-			if ($rowaction <> "delete" && $rowaction <> "insertdelete") {
-				$this->LoadFormValues(); // Get form values
-				if ($rowaction == "insert" && $this->EmptyRow()) {
-
-					// Ignore
-				} else {
-					$rows[] = $this->GetFieldValues("FormValue"); // Return row as array
-				}
-			}
-		}
-		return $rows; // Return as array of array
-	}
-
-	// Restore form values for current row
-	function RestoreCurrentRowFormValues($idx) {
-		global $objForm;
-
-		// Get row based on current index
-		$objForm->Index = $idx;
-		$this->LoadFormValues(); // Load form values
 	}
 
 	// Get list of filters
@@ -1606,14 +1124,6 @@ class ct06_article_list extends ct06_article {
 	function SetupListOptions() {
 		global $Security, $Language;
 
-		// "griddelete"
-		if ($this->AllowAddDeleteRow) {
-			$item = &$this->ListOptions->Add("griddelete");
-			$item->CssClass = "text-nowrap";
-			$item->OnLeft = TRUE;
-			$item->Visible = FALSE; // Default hidden
-		}
-
 		// Add group option item
 		$item = &$this->ListOptions->Add($this->ListOptions->GroupOptionName);
 		$item->Body = "";
@@ -1630,12 +1140,6 @@ class ct06_article_list extends ct06_article {
 		$item = &$this->ListOptions->Add("edit");
 		$item->CssClass = "text-nowrap";
 		$item->Visible = $Security->CanEdit();
-		$item->OnLeft = TRUE;
-
-		// "copy"
-		$item = &$this->ListOptions->Add("copy");
-		$item->CssClass = "text-nowrap";
-		$item->Visible = $Security->CanAdd();
 		$item->OnLeft = TRUE;
 
 		// List actions
@@ -1687,66 +1191,9 @@ class ct06_article_list extends ct06_article {
 		// Call ListOptions_Rendering event
 		$this->ListOptions_Rendering();
 
-		// Set up row action and key
-		if (is_numeric($this->RowIndex) && $this->CurrentMode <> "view") {
-			$objForm->Index = $this->RowIndex;
-			$ActionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
-			$OldKeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormOldKeyName);
-			$KeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormKeyName);
-			$BlankRowName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormBlankRowName);
-			if ($this->RowAction <> "")
-				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $ActionName . "\" id=\"" . $ActionName . "\" value=\"" . $this->RowAction . "\">";
-			if ($this->RowAction == "delete") {
-				$rowkey = $objForm->GetValue($this->FormKeyName);
-				$this->SetupKeyValues($rowkey);
-			}
-			if ($this->RowAction == "insert" && $this->CurrentAction == "F" && $this->EmptyRow())
-				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $BlankRowName . "\" id=\"" . $BlankRowName . "\" value=\"1\">";
-		}
-
-		// "delete"
-		if ($this->AllowAddDeleteRow) {
-			if ($this->CurrentAction == "gridadd" || $this->CurrentAction == "gridedit") {
-				$option = &$this->ListOptions;
-				$option->UseButtonGroup = TRUE; // Use button group for grid delete button
-				$option->UseImageAndText = TRUE; // Use image and text for grid delete button
-				$oListOpt = &$option->Items["griddelete"];
-				if (!$Security->CanDelete() && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
-					$oListOpt->Body = "&nbsp;";
-				} else {
-					$oListOpt->Body = "<a class=\"ewGridLink ewGridDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteLink")) . "\" onclick=\"return ew_DeleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->Phrase("DeleteLink") . "</a>";
-				}
-			}
-		}
-
 		// "sequence"
 		$oListOpt = &$this->ListOptions->Items["sequence"];
 		$oListOpt->Body = ew_FormatSeqNo($this->RecCnt);
-
-		// "copy"
-		$oListOpt = &$this->ListOptions->Items["copy"];
-		if (($this->CurrentAction == "add" || $this->CurrentAction == "copy") && $this->RowType == EW_ROWTYPE_ADD) { // Inline Add/Copy
-			$this->ListOptions->CustomItem = "copy"; // Show copy column only
-			$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
-			$oListOpt->Body = "<div" . (($oListOpt->OnLeft) ? " style=\"text-align: right\"" : "") . ">" .
-				"<a class=\"ewGridLink ewInlineInsert\" title=\"" . ew_HtmlTitle($Language->Phrase("InsertLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InsertLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("InsertLink") . "</a>&nbsp;" .
-				"<a class=\"ewGridLink ewInlineCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("CancelLink") . "</a>" .
-				"<input type=\"hidden\" name=\"a_list\" id=\"a_list\" value=\"insert\"></div>";
-			return;
-		}
-
-		// "edit"
-		$oListOpt = &$this->ListOptions->Items["edit"];
-		if ($this->CurrentAction == "edit" && $this->RowType == EW_ROWTYPE_EDIT) { // Inline-Edit
-			$this->ListOptions->CustomItem = "edit"; // Show edit column only
-			$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
-				$oListOpt->Body = "<div" . (($oListOpt->OnLeft) ? " style=\"text-align: right\"" : "") . ">" .
-					"<a class=\"ewGridLink ewInlineUpdate\" title=\"" . ew_HtmlTitle($Language->Phrase("UpdateLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("UpdateLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . ew_UrlAddHash($this->PageName(), "r" . $this->RowCnt . "_" . $this->TableVar) . "');\">" . $Language->Phrase("UpdateLink") . "</a>&nbsp;" .
-					"<a class=\"ewGridLink ewInlineCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("CancelLink") . "</a>" .
-					"<input type=\"hidden\" name=\"a_list\" id=\"a_list\" value=\"update\"></div>";
-			$oListOpt->Body .= "<input type=\"hidden\" name=\"k" . $this->RowIndex . "_key\" id=\"k" . $this->RowIndex . "_key\" value=\"" . ew_HtmlEncode($this->id->CurrentValue) . "\">";
-			return;
-		}
 
 		// "view"
 		$oListOpt = &$this->ListOptions->Items["view"];
@@ -1762,17 +1209,6 @@ class ct06_article_list extends ct06_article {
 		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
 		if ($Security->CanEdit()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
-			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" href=\"" . ew_HtmlEncode(ew_UrlAddHash($this->InlineEditUrl, "r" . $this->RowCnt . "_" . $this->TableVar)) . "\">" . $Language->Phrase("InlineEditLink") . "</a>";
-		} else {
-			$oListOpt->Body = "";
-		}
-
-		// "copy"
-		$oListOpt = &$this->ListOptions->Items["copy"];
-		$copycaption = ew_HtmlTitle($Language->Phrase("CopyLink"));
-		if ($Security->CanAdd()) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
-			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineCopy\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineCopyLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineCopyUrl) . "\">" . $Language->Phrase("InlineCopyLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
 		}
@@ -1809,9 +1245,6 @@ class ct06_article_list extends ct06_article {
 		// "checkbox"
 		$oListOpt = &$this->ListOptions->Items["checkbox"];
 		$oListOpt->Body = "<input type=\"checkbox\" name=\"key_m[]\" class=\"ewMultiSelect\" value=\"" . ew_HtmlEncode($this->id->CurrentValue) . "\" onclick=\"ew_ClickMultiCheckbox(event);\">";
-		if ($this->CurrentAction == "gridedit" && is_numeric($this->RowIndex)) {
-			$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $KeyName . "\" id=\"" . $KeyName . "\" value=\"" . $this->id->CurrentValue . "\">";
-		}
 		$this->RenderListOptionsExt();
 
 		// Call ListOptions_Rendered event
@@ -1829,20 +1262,6 @@ class ct06_article_list extends ct06_article {
 		$addcaption = ew_HtmlTitle($Language->Phrase("AddLink"));
 		$item->Body = "<a class=\"ewAddEdit ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
 		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
-
-		// Inline Add
-		$item = &$option->Add("inlineadd");
-		$item->Body = "<a class=\"ewAddEdit ewInlineAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineAddUrl) . "\">" .$Language->Phrase("InlineAddLink") . "</a>";
-		$item->Visible = ($this->InlineAddUrl <> "" && $Security->CanAdd());
-		$item = &$option->Add("gridadd");
-		$item->Body = "<a class=\"ewAddEdit ewGridAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridAddLink")) . "\" href=\"" . ew_HtmlEncode($this->GridAddUrl) . "\">" . $Language->Phrase("GridAddLink") . "</a>";
-		$item->Visible = ($this->GridAddUrl <> "" && $Security->CanAdd());
-
-		// Add grid edit
-		$option = $options["addedit"];
-		$item = &$option->Add("gridedit");
-		$item->Body = "<a class=\"ewAddEdit ewGridEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GridEditUrl) . "\">" . $Language->Phrase("GridEditLink") . "</a>";
-		$item->Visible = ($this->GridEditUrl <> "" && $Security->CanEdit());
 		$option = $options["action"];
 
 		// Add multi delete
@@ -1885,7 +1304,6 @@ class ct06_article_list extends ct06_article {
 	function RenderOtherOptions() {
 		global $Language, $Security;
 		$options = &$this->OtherOptions;
-		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "gridedit") { // Not grid add/edit mode
 			$option = &$options["action"];
 
 			// Set up list action buttons
@@ -1907,56 +1325,6 @@ class ct06_article_list extends ct06_article {
 				$option = &$options["action"];
 				$option->HideAllOptions();
 			}
-		} else { // Grid add/edit mode
-
-			// Hide all options first
-			foreach ($options as &$option)
-				$option->HideAllOptions();
-			if ($this->CurrentAction == "gridadd") {
-				if ($this->AllowAddDeleteRow) {
-
-					// Add add blank row
-					$option = &$options["addedit"];
-					$option->UseDropDownButton = FALSE;
-					$option->UseImageAndText = TRUE;
-					$item = &$option->Add("addblankrow");
-					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
-					$item->Visible = $Security->CanAdd();
-				}
-				$option = &$options["action"];
-				$option->UseDropDownButton = FALSE;
-				$option->UseImageAndText = TRUE;
-
-				// Add grid insert
-				$item = &$option->Add("gridinsert");
-				$item->Body = "<a class=\"ewAction ewGridInsert\" title=\"" . ew_HtmlTitle($Language->Phrase("GridInsertLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridInsertLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("GridInsertLink") . "</a>";
-
-				// Add grid cancel
-				$item = &$option->Add("gridcancel");
-				$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
-				$item->Body = "<a class=\"ewAction ewGridCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("GridCancelLink") . "</a>";
-			}
-			if ($this->CurrentAction == "gridedit") {
-				if ($this->AllowAddDeleteRow) {
-
-					// Add add blank row
-					$option = &$options["addedit"];
-					$option->UseDropDownButton = FALSE;
-					$option->UseImageAndText = TRUE;
-					$item = &$option->Add("addblankrow");
-					$item->Body = "<a class=\"ewAddEdit ewAddBlankRow\" title=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("AddBlankRow")) . "\" href=\"javascript:void(0);\" onclick=\"ew_AddGridRow(this);\">" . $Language->Phrase("AddBlankRow") . "</a>";
-					$item->Visible = $Security->CanAdd();
-				}
-				$option = &$options["action"];
-				$option->UseDropDownButton = FALSE;
-				$option->UseImageAndText = TRUE;
-					$item = &$option->Add("gridsave");
-					$item->Body = "<a class=\"ewAction ewGridSave\" title=\"" . ew_HtmlTitle($Language->Phrase("GridSaveLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridSaveLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("GridSaveLink") . "</a>";
-					$item = &$option->Add("gridcancel");
-					$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
-					$item->Body = "<a class=\"ewAction ewGridCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("GridCancelLink") . "</a>";
-			}
-		}
 	}
 
 	// Process list action
@@ -2121,68 +1489,11 @@ class ct06_article_list extends ct06_article {
 		}
 	}
 
-	// Load default values
-	function LoadDefaultValues() {
-		$this->id->CurrentValue = NULL;
-		$this->id->OldValue = $this->id->CurrentValue;
-		$this->MainGroupID->CurrentValue = NULL;
-		$this->MainGroupID->OldValue = $this->MainGroupID->CurrentValue;
-		$this->SubGroupID->CurrentValue = NULL;
-		$this->SubGroupID->OldValue = $this->SubGroupID->CurrentValue;
-		$this->Kode->CurrentValue = NULL;
-		$this->Kode->OldValue = $this->Kode->CurrentValue;
-		$this->Nama->CurrentValue = NULL;
-		$this->Nama->OldValue = $this->Nama->CurrentValue;
-		$this->SatuanID->CurrentValue = NULL;
-		$this->SatuanID->OldValue = $this->SatuanID->CurrentValue;
-	}
-
 	// Load basic search values
 	function LoadBasicSearchValues() {
 		$this->BasicSearch->Keyword = @$_GET[EW_TABLE_BASIC_SEARCH];
 		if ($this->BasicSearch->Keyword <> "" && $this->Command == "") $this->Command = "search";
 		$this->BasicSearch->Type = @$_GET[EW_TABLE_BASIC_SEARCH_TYPE];
-	}
-
-	// Load form values
-	function LoadFormValues() {
-
-		// Load from form
-		global $objForm;
-		if (!$this->MainGroupID->FldIsDetailKey) {
-			$this->MainGroupID->setFormValue($objForm->GetValue("x_MainGroupID"));
-		}
-		$this->MainGroupID->setOldValue($objForm->GetValue("o_MainGroupID"));
-		if (!$this->SubGroupID->FldIsDetailKey) {
-			$this->SubGroupID->setFormValue($objForm->GetValue("x_SubGroupID"));
-		}
-		$this->SubGroupID->setOldValue($objForm->GetValue("o_SubGroupID"));
-		if (!$this->Kode->FldIsDetailKey) {
-			$this->Kode->setFormValue($objForm->GetValue("x_Kode"));
-		}
-		$this->Kode->setOldValue($objForm->GetValue("o_Kode"));
-		if (!$this->Nama->FldIsDetailKey) {
-			$this->Nama->setFormValue($objForm->GetValue("x_Nama"));
-		}
-		$this->Nama->setOldValue($objForm->GetValue("o_Nama"));
-		if (!$this->SatuanID->FldIsDetailKey) {
-			$this->SatuanID->setFormValue($objForm->GetValue("x_SatuanID"));
-		}
-		$this->SatuanID->setOldValue($objForm->GetValue("o_SatuanID"));
-		if (!$this->id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
-			$this->id->setFormValue($objForm->GetValue("x_id"));
-	}
-
-	// Restore form values
-	function RestoreFormValues() {
-		global $objForm;
-		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
-			$this->id->CurrentValue = $this->id->FormValue;
-		$this->MainGroupID->CurrentValue = $this->MainGroupID->FormValue;
-		$this->SubGroupID->CurrentValue = $this->SubGroupID->FormValue;
-		$this->Kode->CurrentValue = $this->Kode->FormValue;
-		$this->Nama->CurrentValue = $this->Nama->FormValue;
-		$this->SatuanID->CurrentValue = $this->SatuanID->FormValue;
 	}
 
 	// Load recordset
@@ -2269,14 +1580,13 @@ class ct06_article_list extends ct06_article {
 
 	// Return a row with default values
 	function NewRow() {
-		$this->LoadDefaultValues();
 		$row = array();
-		$row['id'] = $this->id->CurrentValue;
-		$row['MainGroupID'] = $this->MainGroupID->CurrentValue;
-		$row['SubGroupID'] = $this->SubGroupID->CurrentValue;
-		$row['Kode'] = $this->Kode->CurrentValue;
-		$row['Nama'] = $this->Nama->CurrentValue;
-		$row['SatuanID'] = $this->SatuanID->CurrentValue;
+		$row['id'] = NULL;
+		$row['MainGroupID'] = NULL;
+		$row['SubGroupID'] = NULL;
+		$row['Kode'] = NULL;
+		$row['Nama'] = NULL;
+		$row['SatuanID'] = NULL;
 		return $row;
 	}
 
@@ -2459,537 +1769,11 @@ class ct06_article_list extends ct06_article {
 			$this->SatuanID->LinkCustomAttributes = "";
 			$this->SatuanID->HrefValue = "";
 			$this->SatuanID->TooltipValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
-
-			// MainGroupID
-			$this->MainGroupID->EditCustomAttributes = "";
-			if (trim(strval($this->MainGroupID->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->MainGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t04_maingroup`";
-			$sWhereWrk = "";
-			$this->MainGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->MainGroupID, $sWhereWrk); // Call Lookup Selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$arwrk[2] = ew_HtmlEncode($rswrk->fields('Disp2Fld'));
-				$this->MainGroupID->ViewValue = $this->MainGroupID->DisplayValue($arwrk);
-			} else {
-				$this->MainGroupID->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->MainGroupID->EditValue = $arwrk;
-
-			// SubGroupID
-			$this->SubGroupID->EditCustomAttributes = "";
-			if (trim(strval($this->SubGroupID->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->SubGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, `MainGroupID` AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t05_subgroup`";
-			$sWhereWrk = "";
-			$this->SubGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->SubGroupID, $sWhereWrk); // Call Lookup Selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$arwrk[2] = ew_HtmlEncode($rswrk->fields('Disp2Fld'));
-				$this->SubGroupID->ViewValue = $this->SubGroupID->DisplayValue($arwrk);
-			} else {
-				$this->SubGroupID->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->SubGroupID->EditValue = $arwrk;
-
-			// Kode
-			$this->Kode->EditAttrs["class"] = "form-control";
-			$this->Kode->EditCustomAttributes = "";
-			$this->Kode->EditValue = ew_HtmlEncode($this->Kode->CurrentValue);
-			$this->Kode->PlaceHolder = ew_RemoveHtml($this->Kode->FldCaption());
-
-			// Nama
-			$this->Nama->EditAttrs["class"] = "form-control";
-			$this->Nama->EditCustomAttributes = "";
-			$this->Nama->EditValue = ew_HtmlEncode($this->Nama->CurrentValue);
-			$this->Nama->PlaceHolder = ew_RemoveHtml($this->Nama->FldCaption());
-
-			// SatuanID
-			$this->SatuanID->EditCustomAttributes = "";
-			if (trim(strval($this->SatuanID->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->SatuanID->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t07_satuan`";
-			$sWhereWrk = "";
-			$this->SatuanID->LookupFilters = array("dx1" => '`Nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->SatuanID, $sWhereWrk); // Call Lookup Selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$this->SatuanID->ViewValue = $this->SatuanID->DisplayValue($arwrk);
-			} else {
-				$this->SatuanID->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->SatuanID->EditValue = $arwrk;
-
-			// Add refer script
-			// MainGroupID
-
-			$this->MainGroupID->LinkCustomAttributes = "";
-			$this->MainGroupID->HrefValue = "";
-
-			// SubGroupID
-			$this->SubGroupID->LinkCustomAttributes = "";
-			$this->SubGroupID->HrefValue = "";
-
-			// Kode
-			$this->Kode->LinkCustomAttributes = "";
-			$this->Kode->HrefValue = "";
-
-			// Nama
-			$this->Nama->LinkCustomAttributes = "";
-			$this->Nama->HrefValue = "";
-
-			// SatuanID
-			$this->SatuanID->LinkCustomAttributes = "";
-			$this->SatuanID->HrefValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
-
-			// MainGroupID
-			$this->MainGroupID->EditCustomAttributes = "";
-			if (trim(strval($this->MainGroupID->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->MainGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t04_maingroup`";
-			$sWhereWrk = "";
-			$this->MainGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->MainGroupID, $sWhereWrk); // Call Lookup Selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$arwrk[2] = ew_HtmlEncode($rswrk->fields('Disp2Fld'));
-				$this->MainGroupID->ViewValue = $this->MainGroupID->DisplayValue($arwrk);
-			} else {
-				$this->MainGroupID->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->MainGroupID->EditValue = $arwrk;
-
-			// SubGroupID
-			$this->SubGroupID->EditCustomAttributes = "";
-			if (trim(strval($this->SubGroupID->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->SubGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, `MainGroupID` AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t05_subgroup`";
-			$sWhereWrk = "";
-			$this->SubGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->SubGroupID, $sWhereWrk); // Call Lookup Selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$arwrk[2] = ew_HtmlEncode($rswrk->fields('Disp2Fld'));
-				$this->SubGroupID->ViewValue = $this->SubGroupID->DisplayValue($arwrk);
-			} else {
-				$this->SubGroupID->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->SubGroupID->EditValue = $arwrk;
-
-			// Kode
-			$this->Kode->EditAttrs["class"] = "form-control";
-			$this->Kode->EditCustomAttributes = "";
-			$this->Kode->EditValue = ew_HtmlEncode($this->Kode->CurrentValue);
-			$this->Kode->PlaceHolder = ew_RemoveHtml($this->Kode->FldCaption());
-
-			// Nama
-			$this->Nama->EditAttrs["class"] = "form-control";
-			$this->Nama->EditCustomAttributes = "";
-			$this->Nama->EditValue = ew_HtmlEncode($this->Nama->CurrentValue);
-			$this->Nama->PlaceHolder = ew_RemoveHtml($this->Nama->FldCaption());
-
-			// SatuanID
-			$this->SatuanID->EditCustomAttributes = "";
-			if (trim(strval($this->SatuanID->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->SatuanID->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t07_satuan`";
-			$sWhereWrk = "";
-			$this->SatuanID->LookupFilters = array("dx1" => '`Nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->SatuanID, $sWhereWrk); // Call Lookup Selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$this->SatuanID->ViewValue = $this->SatuanID->DisplayValue($arwrk);
-			} else {
-				$this->SatuanID->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->SatuanID->EditValue = $arwrk;
-
-			// Edit refer script
-			// MainGroupID
-
-			$this->MainGroupID->LinkCustomAttributes = "";
-			$this->MainGroupID->HrefValue = "";
-
-			// SubGroupID
-			$this->SubGroupID->LinkCustomAttributes = "";
-			$this->SubGroupID->HrefValue = "";
-
-			// Kode
-			$this->Kode->LinkCustomAttributes = "";
-			$this->Kode->HrefValue = "";
-
-			// Nama
-			$this->Nama->LinkCustomAttributes = "";
-			$this->Nama->HrefValue = "";
-
-			// SatuanID
-			$this->SatuanID->LinkCustomAttributes = "";
-			$this->SatuanID->HrefValue = "";
 		}
-		if ($this->RowType == EW_ROWTYPE_ADD || $this->RowType == EW_ROWTYPE_EDIT || $this->RowType == EW_ROWTYPE_SEARCH) // Add/Edit/Search row
-			$this->SetupFieldTitles();
 
 		// Call Row Rendered event
 		if ($this->RowType <> EW_ROWTYPE_AGGREGATEINIT)
 			$this->Row_Rendered();
-	}
-
-	// Validate form
-	function ValidateForm() {
-		global $Language, $gsFormError;
-
-		// Initialize form error message
-		$gsFormError = "";
-
-		// Check if validation required
-		if (!EW_SERVER_VALIDATE)
-			return ($gsFormError == "");
-		if (!$this->SubGroupID->FldIsDetailKey && !is_null($this->SubGroupID->FormValue) && $this->SubGroupID->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->SubGroupID->FldCaption(), $this->SubGroupID->ReqErrMsg));
-		}
-		if (!$this->Kode->FldIsDetailKey && !is_null($this->Kode->FormValue) && $this->Kode->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->Kode->FldCaption(), $this->Kode->ReqErrMsg));
-		}
-		if (!$this->Nama->FldIsDetailKey && !is_null($this->Nama->FormValue) && $this->Nama->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->Nama->FldCaption(), $this->Nama->ReqErrMsg));
-		}
-		if (!$this->SatuanID->FldIsDetailKey && !is_null($this->SatuanID->FormValue) && $this->SatuanID->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->SatuanID->FldCaption(), $this->SatuanID->ReqErrMsg));
-		}
-
-		// Return validate result
-		$ValidateForm = ($gsFormError == "");
-
-		// Call Form_CustomValidate event
-		$sFormCustomError = "";
-		$ValidateForm = $ValidateForm && $this->Form_CustomValidate($sFormCustomError);
-		if ($sFormCustomError <> "") {
-			ew_AddMessage($gsFormError, $sFormCustomError);
-		}
-		return $ValidateForm;
-	}
-
-	//
-	// Delete records based on current filter
-	//
-	function DeleteRows() {
-		global $Language, $Security;
-		if (!$Security->CanDelete()) {
-			$this->setFailureMessage($Language->Phrase("NoDeletePermission")); // No delete permission
-			return FALSE;
-		}
-		$DeleteRows = TRUE;
-		$sSql = $this->SQL();
-		$conn = &$this->Connection();
-		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-		$rs = $conn->Execute($sSql);
-		$conn->raiseErrorFn = '';
-		if ($rs === FALSE) {
-			return FALSE;
-		} elseif ($rs->EOF) {
-			$this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
-			$rs->Close();
-			return FALSE;
-		}
-		$rows = ($rs) ? $rs->GetRows() : array();
-		if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteBegin")); // Batch delete begin
-
-		// Clone old rows
-		$rsold = $rows;
-		if ($rs)
-			$rs->Close();
-
-		// Call row deleting event
-		if ($DeleteRows) {
-			foreach ($rsold as $row) {
-				$DeleteRows = $this->Row_Deleting($row);
-				if (!$DeleteRows) break;
-			}
-		}
-		if ($DeleteRows) {
-			$sKey = "";
-			foreach ($rsold as $row) {
-				$sThisKey = "";
-				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-				$sThisKey .= $row['id'];
-				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-				$DeleteRows = $this->Delete($row); // Delete
-				$conn->raiseErrorFn = '';
-				if ($DeleteRows === FALSE)
-					break;
-				if ($sKey <> "") $sKey .= ", ";
-				$sKey .= $sThisKey;
-			}
-		}
-		if (!$DeleteRows) {
-
-			// Set up error message
-			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
-
-				// Use the message, do nothing
-			} elseif ($this->CancelMessage <> "") {
-				$this->setFailureMessage($this->CancelMessage);
-				$this->CancelMessage = "";
-			} else {
-				$this->setFailureMessage($Language->Phrase("DeleteCancelled"));
-			}
-		}
-		if ($DeleteRows) {
-			if ($this->AuditTrailOnDelete) $this->WriteAuditTrailDummy($Language->Phrase("BatchDeleteSuccess")); // Batch delete success
-		} else {
-		}
-
-		// Call Row Deleted event
-		if ($DeleteRows) {
-			foreach ($rsold as $row) {
-				$this->Row_Deleted($row);
-			}
-		}
-		return $DeleteRows;
-	}
-
-	// Update record based on key values
-	function EditRow() {
-		global $Security, $Language;
-		$sFilter = $this->KeyFilter();
-		$sFilter = $this->ApplyUserIDFilters($sFilter);
-		$conn = &$this->Connection();
-		if ($this->Kode->CurrentValue <> "") { // Check field with unique index
-			$sFilterChk = "(`Kode` = '" . ew_AdjustSql($this->Kode->CurrentValue, $this->DBID) . "')";
-			$sFilterChk .= " AND NOT (" . $sFilter . ")";
-			$this->CurrentFilter = $sFilterChk;
-			$sSqlChk = $this->SQL();
-			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-			$rsChk = $conn->Execute($sSqlChk);
-			$conn->raiseErrorFn = '';
-			if ($rsChk === FALSE) {
-				return FALSE;
-			} elseif (!$rsChk->EOF) {
-				$sIdxErrMsg = str_replace("%f", $this->Kode->FldCaption(), $Language->Phrase("DupIndex"));
-				$sIdxErrMsg = str_replace("%v", $this->Kode->CurrentValue, $sIdxErrMsg);
-				$this->setFailureMessage($sIdxErrMsg);
-				$rsChk->Close();
-				return FALSE;
-			}
-			$rsChk->Close();
-		}
-		if ($this->Nama->CurrentValue <> "") { // Check field with unique index
-			$sFilterChk = "(`Nama` = '" . ew_AdjustSql($this->Nama->CurrentValue, $this->DBID) . "')";
-			$sFilterChk .= " AND NOT (" . $sFilter . ")";
-			$this->CurrentFilter = $sFilterChk;
-			$sSqlChk = $this->SQL();
-			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-			$rsChk = $conn->Execute($sSqlChk);
-			$conn->raiseErrorFn = '';
-			if ($rsChk === FALSE) {
-				return FALSE;
-			} elseif (!$rsChk->EOF) {
-				$sIdxErrMsg = str_replace("%f", $this->Nama->FldCaption(), $Language->Phrase("DupIndex"));
-				$sIdxErrMsg = str_replace("%v", $this->Nama->CurrentValue, $sIdxErrMsg);
-				$this->setFailureMessage($sIdxErrMsg);
-				$rsChk->Close();
-				return FALSE;
-			}
-			$rsChk->Close();
-		}
-		$this->CurrentFilter = $sFilter;
-		$sSql = $this->SQL();
-		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-		$rs = $conn->Execute($sSql);
-		$conn->raiseErrorFn = '';
-		if ($rs === FALSE)
-			return FALSE;
-		if ($rs->EOF) {
-			$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-			$EditRow = FALSE; // Update Failed
-		} else {
-
-			// Save old values
-			$rsold = &$rs->fields;
-			$this->LoadDbValues($rsold);
-			$rsnew = array();
-
-			// MainGroupID
-			$this->MainGroupID->SetDbValueDef($rsnew, $this->MainGroupID->CurrentValue, NULL, $this->MainGroupID->ReadOnly);
-
-			// SubGroupID
-			$this->SubGroupID->SetDbValueDef($rsnew, $this->SubGroupID->CurrentValue, 0, $this->SubGroupID->ReadOnly);
-
-			// Kode
-			$this->Kode->SetDbValueDef($rsnew, $this->Kode->CurrentValue, "", $this->Kode->ReadOnly);
-
-			// Nama
-			$this->Nama->SetDbValueDef($rsnew, $this->Nama->CurrentValue, "", $this->Nama->ReadOnly);
-
-			// SatuanID
-			$this->SatuanID->SetDbValueDef($rsnew, $this->SatuanID->CurrentValue, 0, $this->SatuanID->ReadOnly);
-
-			// Call Row Updating event
-			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
-			if ($bUpdateRow) {
-				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-				if (count($rsnew) > 0)
-					$EditRow = $this->Update($rsnew, "", $rsold);
-				else
-					$EditRow = TRUE; // No field to update
-				$conn->raiseErrorFn = '';
-				if ($EditRow) {
-				}
-			} else {
-				if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
-
-					// Use the message, do nothing
-				} elseif ($this->CancelMessage <> "") {
-					$this->setFailureMessage($this->CancelMessage);
-					$this->CancelMessage = "";
-				} else {
-					$this->setFailureMessage($Language->Phrase("UpdateCancelled"));
-				}
-				$EditRow = FALSE;
-			}
-		}
-
-		// Call Row_Updated event
-		if ($EditRow)
-			$this->Row_Updated($rsold, $rsnew);
-		$rs->Close();
-		return $EditRow;
-	}
-
-	// Add record
-	function AddRow($rsold = NULL) {
-		global $Language, $Security;
-		if ($this->Kode->CurrentValue <> "") { // Check field with unique index
-			$sFilter = "(Kode = '" . ew_AdjustSql($this->Kode->CurrentValue, $this->DBID) . "')";
-			$rsChk = $this->LoadRs($sFilter);
-			if ($rsChk && !$rsChk->EOF) {
-				$sIdxErrMsg = str_replace("%f", $this->Kode->FldCaption(), $Language->Phrase("DupIndex"));
-				$sIdxErrMsg = str_replace("%v", $this->Kode->CurrentValue, $sIdxErrMsg);
-				$this->setFailureMessage($sIdxErrMsg);
-				$rsChk->Close();
-				return FALSE;
-			}
-		}
-		if ($this->Nama->CurrentValue <> "") { // Check field with unique index
-			$sFilter = "(Nama = '" . ew_AdjustSql($this->Nama->CurrentValue, $this->DBID) . "')";
-			$rsChk = $this->LoadRs($sFilter);
-			if ($rsChk && !$rsChk->EOF) {
-				$sIdxErrMsg = str_replace("%f", $this->Nama->FldCaption(), $Language->Phrase("DupIndex"));
-				$sIdxErrMsg = str_replace("%v", $this->Nama->CurrentValue, $sIdxErrMsg);
-				$this->setFailureMessage($sIdxErrMsg);
-				$rsChk->Close();
-				return FALSE;
-			}
-		}
-		$conn = &$this->Connection();
-
-		// Load db values from rsold
-		$this->LoadDbValues($rsold);
-		if ($rsold) {
-		}
-		$rsnew = array();
-
-		// MainGroupID
-		$this->MainGroupID->SetDbValueDef($rsnew, $this->MainGroupID->CurrentValue, NULL, FALSE);
-
-		// SubGroupID
-		$this->SubGroupID->SetDbValueDef($rsnew, $this->SubGroupID->CurrentValue, 0, FALSE);
-
-		// Kode
-		$this->Kode->SetDbValueDef($rsnew, $this->Kode->CurrentValue, "", FALSE);
-
-		// Nama
-		$this->Nama->SetDbValueDef($rsnew, $this->Nama->CurrentValue, "", FALSE);
-
-		// SatuanID
-		$this->SatuanID->SetDbValueDef($rsnew, $this->SatuanID->CurrentValue, 0, FALSE);
-
-		// Call Row Inserting event
-		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
-		$bInsertRow = $this->Row_Inserting($rs, $rsnew);
-		if ($bInsertRow) {
-			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
-			$AddRow = $this->Insert($rsnew);
-			$conn->raiseErrorFn = '';
-			if ($AddRow) {
-			}
-		} else {
-			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
-
-				// Use the message, do nothing
-			} elseif ($this->CancelMessage <> "") {
-				$this->setFailureMessage($this->CancelMessage);
-				$this->CancelMessage = "";
-			} else {
-				$this->setFailureMessage($Language->Phrase("InsertCancelled"));
-			}
-			$AddRow = FALSE;
-		}
-		if ($AddRow) {
-
-			// Call Row Inserted event
-			$rs = ($rsold == NULL) ? NULL : $rsold->fields;
-			$this->Row_Inserted($rs, $rsnew);
-		}
-		return $AddRow;
 	}
 
 	// Set up export options
@@ -3271,42 +2055,6 @@ class ct06_article_list extends ct06_article {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
-		case "x_MainGroupID":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `id` AS `LinkFld`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t04_maingroup`";
-			$sWhereWrk = "{filter}";
-			$fld->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` IN ({filter_value})', "t0" => "3", "fn0" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->MainGroupID, $sWhereWrk); // Call Lookup Selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
-		case "x_SubGroupID":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `id` AS `LinkFld`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t05_subgroup`";
-			$sWhereWrk = "{filter}";
-			$fld->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` IN ({filter_value})', "t0" => "3", "fn0" => "", "f1" => '`MainGroupID` IN ({filter_value})', "t1" => "3", "fn1" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->SubGroupID, $sWhereWrk); // Call Lookup Selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
-		case "x_SatuanID":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `id` AS `LinkFld`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_satuan`";
-			$sWhereWrk = "{filter}";
-			$fld->LookupFilters = array("dx1" => '`Nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` IN ({filter_value})', "t0" => "3", "fn0" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->SatuanID, $sWhereWrk); // Call Lookup Selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
 		}
 	}
 
@@ -3474,60 +2222,6 @@ var CurrentPageID = EW_PAGE_ID = "list";
 var CurrentForm = ft06_articlelist = new ew_Form("ft06_articlelist", "list");
 ft06_articlelist.FormKeyCountName = '<?php echo $t06_article_list->FormKeyCountName ?>';
 
-// Validate form
-ft06_articlelist.Validate = function() {
-	if (!this.ValidateRequired)
-		return true; // Ignore validation
-	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
-	if ($fobj.find("#a_confirm").val() == "F")
-		return true;
-	var elm, felm, uelm, addcnt = 0;
-	var $k = $fobj.find("#" + this.FormKeyCountName); // Get key_count
-	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
-	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
-	var gridinsert = $fobj.find("#a_list").val() == "gridinsert";
-	for (var i = startcnt; i <= rowcnt; i++) {
-		var infix = ($k[0]) ? String(i) : "";
-		$fobj.data("rowindex", infix);
-		var checkrow = (gridinsert) ? !this.EmptyRow(infix) : true;
-		if (checkrow) {
-			addcnt++;
-			elm = this.GetElements("x" + infix + "_SubGroupID");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_article->SubGroupID->FldCaption(), $t06_article->SubGroupID->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_Kode");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_article->Kode->FldCaption(), $t06_article->Kode->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_Nama");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_article->Nama->FldCaption(), $t06_article->Nama->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_SatuanID");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_article->SatuanID->FldCaption(), $t06_article->SatuanID->ReqErrMsg)) ?>");
-
-			// Fire Form_CustomValidate event
-			if (!this.Form_CustomValidate(fobj))
-				return false;
-		} // End Grid Add checking
-	}
-	if (gridinsert && addcnt == 0) { // No row added
-		ew_Alert(ewLanguage.Phrase("NoAddRecord"));
-		return false;
-	}
-	return true;
-}
-
-// Check empty row
-ft06_articlelist.EmptyRow = function(infix) {
-	var fobj = this.Form;
-	if (ew_ValueChanged(fobj, infix, "MainGroupID", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "SubGroupID", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "Kode", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "Nama", false)) return false;
-	if (ew_ValueChanged(fobj, infix, "SatuanID", false)) return false;
-	return true;
-}
-
 // Form_CustomValidate event
 ft06_articlelist.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
@@ -3542,7 +2236,7 @@ ft06_articlelist.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?
 // Dynamic selection lists
 ft06_articlelist.Lists["x_MainGroupID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kode","x_Nama","",""],"ParentFields":[],"ChildFields":["x_SubGroupID"],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t04_maingroup"};
 ft06_articlelist.Lists["x_MainGroupID"].Data = "<?php echo $t06_article_list->MainGroupID->LookupFilterQuery(FALSE, "list") ?>";
-ft06_articlelist.Lists["x_SubGroupID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kode","x_Nama","",""],"ParentFields":["x_MainGroupID"],"ChildFields":[],"FilterFields":["x_MainGroupID"],"Options":[],"Template":"","LinkTable":"t05_subgroup"};
+ft06_articlelist.Lists["x_SubGroupID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kode","x_Nama","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t05_subgroup"};
 ft06_articlelist.Lists["x_SubGroupID"].Data = "<?php echo $t06_article_list->SubGroupID->LookupFilterQuery(FALSE, "list") ?>";
 ft06_articlelist.Lists["x_SatuanID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_satuan"};
 ft06_articlelist.Lists["x_SatuanID"].Data = "<?php echo $t06_article_list->SatuanID->LookupFilterQuery(FALSE, "list") ?>";
@@ -3570,13 +2264,6 @@ var CurrentSearchForm = ft06_articlelistsrch = new ew_Form("ft06_articlelistsrch
 </div>
 <?php } ?>
 <?php
-if ($t06_article->CurrentAction == "gridadd") {
-	$t06_article->CurrentFilter = "0=1";
-	$t06_article_list->StartRec = 1;
-	$t06_article_list->DisplayRecs = $t06_article->GridAddRowCount;
-	$t06_article_list->TotalRecs = $t06_article_list->DisplayRecs;
-	$t06_article_list->StopRec = $t06_article_list->DisplayRecs;
-} else {
 	$bSelectLimit = $t06_article_list->UseSelectLimit;
 	if ($bSelectLimit) {
 		if ($t06_article_list->TotalRecs <= 0)
@@ -3609,7 +2296,6 @@ if ($t06_article->CurrentAction == "gridadd") {
 		$searchsql = $t06_article_list->getSessionWhere();
 		$t06_article_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
 	}
-}
 $t06_article_list->RenderOtherOptions();
 ?>
 <?php if ($Security->CanSearch()) { ?>
@@ -3726,7 +2412,7 @@ $t06_article_list->ShowMessage();
 <?php } ?>
 <input type="hidden" name="t" value="t06_article">
 <div id="gmp_t06_article" class="<?php if (ew_IsResponsiveLayout()) { ?>table-responsive <?php } ?>ewGridMiddlePanel">
-<?php if ($t06_article_list->TotalRecs > 0 || $t06_article->CurrentAction == "add" || $t06_article->CurrentAction == "copy" || $t06_article->CurrentAction == "gridedit") { ?>
+<?php if ($t06_article_list->TotalRecs > 0 || $t06_article->CurrentAction == "gridedit") { ?>
 <table id="tbl_t06_articlelist" class="table ewTable">
 <thead>
 	<tr class="ewTableHeader">
@@ -3795,103 +2481,6 @@ $t06_article_list->ListOptions->Render("header", "right");
 </thead>
 <tbody>
 <?php
-	if ($t06_article->CurrentAction == "add" || $t06_article->CurrentAction == "copy") {
-		$t06_article_list->RowIndex = 0;
-		$t06_article_list->KeyCount = $t06_article_list->RowIndex;
-		if ($t06_article->CurrentAction == "copy" && !$t06_article_list->LoadRow())
-			$t06_article->CurrentAction = "add";
-		if ($t06_article->CurrentAction == "add")
-			$t06_article_list->LoadRowValues();
-		if ($t06_article->EventCancelled) // Insert failed
-			$t06_article_list->RestoreFormValues(); // Restore form values
-
-		// Set row properties
-		$t06_article->ResetAttrs();
-		$t06_article->RowAttrs = array_merge($t06_article->RowAttrs, array('data-rowindex'=>0, 'id'=>'r0_t06_article', 'data-rowtype'=>EW_ROWTYPE_ADD));
-		$t06_article->RowType = EW_ROWTYPE_ADD;
-
-		// Render row
-		$t06_article_list->RenderRow();
-
-		// Render list options
-		$t06_article_list->RenderListOptions();
-		$t06_article_list->StartRowCnt = 0;
-?>
-	<tr<?php echo $t06_article->RowAttributes() ?>>
-<?php
-
-// Render list options (body, left)
-$t06_article_list->ListOptions->Render("body", "left", $t06_article_list->RowCnt);
-?>
-	<?php if ($t06_article->MainGroupID->Visible) { // MainGroupID ?>
-		<td data-name="MainGroupID">
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_MainGroupID" class="form-group t06_article_MainGroupID">
-<?php $t06_article->MainGroupID->EditAttrs["onchange"] = "ew_UpdateOpt.call(this); " . @$t06_article->MainGroupID->EditAttrs["onchange"]; ?>
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t06_article_list->RowIndex ?>_MainGroupID"><?php echo (strval($t06_article->MainGroupID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->MainGroupID->ViewValue); ?></span>
-</span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->MainGroupID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_MainGroupID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->MainGroupID->ReadOnly || $t06_article->MainGroupID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_MainGroupID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->MainGroupID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t06_article_list->RowIndex ?>_MainGroupID" id="x<?php echo $t06_article_list->RowIndex ?>_MainGroupID" value="<?php echo $t06_article->MainGroupID->CurrentValue ?>"<?php echo $t06_article->MainGroupID->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_MainGroupID" name="o<?php echo $t06_article_list->RowIndex ?>_MainGroupID" id="o<?php echo $t06_article_list->RowIndex ?>_MainGroupID" value="<?php echo ew_HtmlEncode($t06_article->MainGroupID->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t06_article->SubGroupID->Visible) { // SubGroupID ?>
-		<td data-name="SubGroupID">
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_SubGroupID" class="form-group t06_article_SubGroupID">
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t06_article_list->RowIndex ?>_SubGroupID"><?php echo (strval($t06_article->SubGroupID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->SubGroupID->ViewValue); ?></span>
-</span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->SubGroupID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_SubGroupID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->SubGroupID->ReadOnly || $t06_article->SubGroupID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_SubGroupID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->SubGroupID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t06_article_list->RowIndex ?>_SubGroupID" id="x<?php echo $t06_article_list->RowIndex ?>_SubGroupID" value="<?php echo $t06_article->SubGroupID->CurrentValue ?>"<?php echo $t06_article->SubGroupID->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_SubGroupID" name="o<?php echo $t06_article_list->RowIndex ?>_SubGroupID" id="o<?php echo $t06_article_list->RowIndex ?>_SubGroupID" value="<?php echo ew_HtmlEncode($t06_article->SubGroupID->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t06_article->Kode->Visible) { // Kode ?>
-		<td data-name="Kode">
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Kode" class="form-group t06_article_Kode">
-<input type="text" data-table="t06_article" data-field="x_Kode" name="x<?php echo $t06_article_list->RowIndex ?>_Kode" id="x<?php echo $t06_article_list->RowIndex ?>_Kode" size="30" maxlength="7" placeholder="<?php echo ew_HtmlEncode($t06_article->Kode->getPlaceHolder()) ?>" value="<?php echo $t06_article->Kode->EditValue ?>"<?php echo $t06_article->Kode->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_Kode" name="o<?php echo $t06_article_list->RowIndex ?>_Kode" id="o<?php echo $t06_article_list->RowIndex ?>_Kode" value="<?php echo ew_HtmlEncode($t06_article->Kode->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t06_article->Nama->Visible) { // Nama ?>
-		<td data-name="Nama">
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Nama" class="form-group t06_article_Nama">
-<input type="text" data-table="t06_article" data-field="x_Nama" name="x<?php echo $t06_article_list->RowIndex ?>_Nama" id="x<?php echo $t06_article_list->RowIndex ?>_Nama" size="30" maxlength="75" placeholder="<?php echo ew_HtmlEncode($t06_article->Nama->getPlaceHolder()) ?>" value="<?php echo $t06_article->Nama->EditValue ?>"<?php echo $t06_article->Nama->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_Nama" name="o<?php echo $t06_article_list->RowIndex ?>_Nama" id="o<?php echo $t06_article_list->RowIndex ?>_Nama" value="<?php echo ew_HtmlEncode($t06_article->Nama->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t06_article->SatuanID->Visible) { // SatuanID ?>
-		<td data-name="SatuanID">
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_SatuanID" class="form-group t06_article_SatuanID">
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t06_article_list->RowIndex ?>_SatuanID"><?php echo (strval($t06_article->SatuanID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->SatuanID->ViewValue); ?></span>
-</span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->SatuanID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_SatuanID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->SatuanID->ReadOnly || $t06_article->SatuanID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_SatuanID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->SatuanID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t06_article_list->RowIndex ?>_SatuanID" id="x<?php echo $t06_article_list->RowIndex ?>_SatuanID" value="<?php echo $t06_article->SatuanID->CurrentValue ?>"<?php echo $t06_article->SatuanID->EditAttributes() ?>>
-<?php if (AllowAdd(CurrentProjectID() . "t07_satuan") && !$t06_article->SatuanID->ReadOnly) { ?>
-<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t06_article->SatuanID->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_SatuanID',url:'t07_satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t06_article_list->RowIndex ?>_SatuanID"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t06_article->SatuanID->FldCaption() ?></span></button>
-<?php } ?>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_SatuanID" name="o<?php echo $t06_article_list->RowIndex ?>_SatuanID" id="o<?php echo $t06_article_list->RowIndex ?>_SatuanID" value="<?php echo ew_HtmlEncode($t06_article->SatuanID->OldValue) ?>">
-</td>
-	<?php } ?>
-<?php
-
-// Render list options (body, right)
-$t06_article_list->ListOptions->Render("body", "right", $t06_article_list->RowCnt);
-?>
-<script type="text/javascript">
-ft06_articlelist.UpdateOpts(<?php echo $t06_article_list->RowIndex ?>);
-</script>
-	</tr>
-<?php
-}
-?>
-<?php
 if ($t06_article->ExportAll && $t06_article->Export <> "") {
 	$t06_article_list->StopRec = $t06_article_list->TotalRecs;
 } else {
@@ -3901,15 +2490,6 @@ if ($t06_article->ExportAll && $t06_article->Export <> "") {
 		$t06_article_list->StopRec = $t06_article_list->StartRec + $t06_article_list->DisplayRecs - 1;
 	else
 		$t06_article_list->StopRec = $t06_article_list->TotalRecs;
-}
-
-// Restore number of post back records
-if ($objForm) {
-	$objForm->Index = -1;
-	if ($objForm->HasValue($t06_article_list->FormKeyCountName) && ($t06_article->CurrentAction == "gridadd" || $t06_article->CurrentAction == "gridedit" || $t06_article->CurrentAction == "F")) {
-		$t06_article_list->KeyCount = $objForm->GetValue($t06_article_list->FormKeyCountName);
-		$t06_article_list->StopRec = $t06_article_list->StartRec + $t06_article_list->KeyCount - 1;
-	}
 }
 $t06_article_list->RecCnt = $t06_article_list->StartRec - 1;
 if ($t06_article_list->Recordset && !$t06_article_list->Recordset->EOF) {
@@ -3925,27 +2505,10 @@ if ($t06_article_list->Recordset && !$t06_article_list->Recordset->EOF) {
 $t06_article->RowType = EW_ROWTYPE_AGGREGATEINIT;
 $t06_article->ResetAttrs();
 $t06_article_list->RenderRow();
-$t06_article_list->EditRowCnt = 0;
-if ($t06_article->CurrentAction == "edit")
-	$t06_article_list->RowIndex = 1;
-if ($t06_article->CurrentAction == "gridadd")
-	$t06_article_list->RowIndex = 0;
-if ($t06_article->CurrentAction == "gridedit")
-	$t06_article_list->RowIndex = 0;
 while ($t06_article_list->RecCnt < $t06_article_list->StopRec) {
 	$t06_article_list->RecCnt++;
 	if (intval($t06_article_list->RecCnt) >= intval($t06_article_list->StartRec)) {
 		$t06_article_list->RowCnt++;
-		if ($t06_article->CurrentAction == "gridadd" || $t06_article->CurrentAction == "gridedit" || $t06_article->CurrentAction == "F") {
-			$t06_article_list->RowIndex++;
-			$objForm->Index = $t06_article_list->RowIndex;
-			if ($objForm->HasValue($t06_article_list->FormActionName))
-				$t06_article_list->RowAction = strval($objForm->GetValue($t06_article_list->FormActionName));
-			elseif ($t06_article->CurrentAction == "gridadd")
-				$t06_article_list->RowAction = "insert";
-			else
-				$t06_article_list->RowAction = "";
-		}
 
 		// Set up key count
 		$t06_article_list->KeyCount = $t06_article_list->RowIndex;
@@ -3954,37 +2517,10 @@ while ($t06_article_list->RecCnt < $t06_article_list->StopRec) {
 		$t06_article->ResetAttrs();
 		$t06_article->CssClass = "";
 		if ($t06_article->CurrentAction == "gridadd") {
-			$t06_article_list->LoadRowValues(); // Load default values
 		} else {
 			$t06_article_list->LoadRowValues($t06_article_list->Recordset); // Load row values
 		}
 		$t06_article->RowType = EW_ROWTYPE_VIEW; // Render view
-		if ($t06_article->CurrentAction == "gridadd") // Grid add
-			$t06_article->RowType = EW_ROWTYPE_ADD; // Render add
-		if ($t06_article->CurrentAction == "gridadd" && $t06_article->EventCancelled && !$objForm->HasValue("k_blankrow")) // Insert failed
-			$t06_article_list->RestoreCurrentRowFormValues($t06_article_list->RowIndex); // Restore form values
-		if ($t06_article->CurrentAction == "edit") {
-			if ($t06_article_list->CheckInlineEditKey() && $t06_article_list->EditRowCnt == 0) { // Inline edit
-				$t06_article->RowType = EW_ROWTYPE_EDIT; // Render edit
-			}
-		}
-		if ($t06_article->CurrentAction == "gridedit") { // Grid edit
-			if ($t06_article->EventCancelled) {
-				$t06_article_list->RestoreCurrentRowFormValues($t06_article_list->RowIndex); // Restore form values
-			}
-			if ($t06_article_list->RowAction == "insert")
-				$t06_article->RowType = EW_ROWTYPE_ADD; // Render add
-			else
-				$t06_article->RowType = EW_ROWTYPE_EDIT; // Render edit
-		}
-		if ($t06_article->CurrentAction == "edit" && $t06_article->RowType == EW_ROWTYPE_EDIT && $t06_article->EventCancelled) { // Update failed
-			$objForm->Index = 1;
-			$t06_article_list->RestoreFormValues(); // Restore form values
-		}
-		if ($t06_article->CurrentAction == "gridedit" && ($t06_article->RowType == EW_ROWTYPE_EDIT || $t06_article->RowType == EW_ROWTYPE_ADD) && $t06_article->EventCancelled) // Update failed
-			$t06_article_list->RestoreCurrentRowFormValues($t06_article_list->RowIndex); // Restore form values
-		if ($t06_article->RowType == EW_ROWTYPE_EDIT) // Edit row
-			$t06_article_list->EditRowCnt++;
 
 		// Set up row id / data-rowindex
 		$t06_article->RowAttrs = array_merge($t06_article->RowAttrs, array('data-rowindex'=>$t06_article_list->RowCnt, 'id'=>'r' . $t06_article_list->RowCnt . '_t06_article', 'data-rowtype'=>$t06_article->RowType));
@@ -3994,9 +2530,6 @@ while ($t06_article_list->RecCnt < $t06_article_list->StopRec) {
 
 		// Render list options
 		$t06_article_list->RenderListOptions();
-
-		// Skip delete row / empty row for confirm page
-		if ($t06_article_list->RowAction <> "delete" && $t06_article_list->RowAction <> "insertdelete" && !($t06_article_list->RowAction == "insert" && $t06_article->CurrentAction == "F" && $t06_article_list->EmptyRow())) {
 ?>
 	<tr<?php echo $t06_article->RowAttributes() ?>>
 <?php
@@ -4006,146 +2539,42 @@ $t06_article_list->ListOptions->Render("body", "left", $t06_article_list->RowCnt
 ?>
 	<?php if ($t06_article->MainGroupID->Visible) { // MainGroupID ?>
 		<td data-name="MainGroupID"<?php echo $t06_article->MainGroupID->CellAttributes() ?>>
-<?php if ($t06_article->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_MainGroupID" class="form-group t06_article_MainGroupID">
-<?php $t06_article->MainGroupID->EditAttrs["onchange"] = "ew_UpdateOpt.call(this); " . @$t06_article->MainGroupID->EditAttrs["onchange"]; ?>
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t06_article_list->RowIndex ?>_MainGroupID"><?php echo (strval($t06_article->MainGroupID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->MainGroupID->ViewValue); ?></span>
-</span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->MainGroupID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_MainGroupID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->MainGroupID->ReadOnly || $t06_article->MainGroupID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_MainGroupID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->MainGroupID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t06_article_list->RowIndex ?>_MainGroupID" id="x<?php echo $t06_article_list->RowIndex ?>_MainGroupID" value="<?php echo $t06_article->MainGroupID->CurrentValue ?>"<?php echo $t06_article->MainGroupID->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_MainGroupID" name="o<?php echo $t06_article_list->RowIndex ?>_MainGroupID" id="o<?php echo $t06_article_list->RowIndex ?>_MainGroupID" value="<?php echo ew_HtmlEncode($t06_article->MainGroupID->OldValue) ?>">
-<?php } ?>
-<?php if ($t06_article->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_MainGroupID" class="form-group t06_article_MainGroupID">
-<?php $t06_article->MainGroupID->EditAttrs["onchange"] = "ew_UpdateOpt.call(this); " . @$t06_article->MainGroupID->EditAttrs["onchange"]; ?>
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t06_article_list->RowIndex ?>_MainGroupID"><?php echo (strval($t06_article->MainGroupID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->MainGroupID->ViewValue); ?></span>
-</span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->MainGroupID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_MainGroupID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->MainGroupID->ReadOnly || $t06_article->MainGroupID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_MainGroupID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->MainGroupID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t06_article_list->RowIndex ?>_MainGroupID" id="x<?php echo $t06_article_list->RowIndex ?>_MainGroupID" value="<?php echo $t06_article->MainGroupID->CurrentValue ?>"<?php echo $t06_article->MainGroupID->EditAttributes() ?>>
-</span>
-<?php } ?>
-<?php if ($t06_article->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_MainGroupID" class="t06_article_MainGroupID">
 <span<?php echo $t06_article->MainGroupID->ViewAttributes() ?>>
 <?php echo $t06_article->MainGroupID->ListViewValue() ?></span>
 </span>
-<?php } ?>
 </td>
 	<?php } ?>
-<?php if ($t06_article->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<input type="hidden" data-table="t06_article" data-field="x_id" name="x<?php echo $t06_article_list->RowIndex ?>_id" id="x<?php echo $t06_article_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t06_article->id->CurrentValue) ?>">
-<input type="hidden" data-table="t06_article" data-field="x_id" name="o<?php echo $t06_article_list->RowIndex ?>_id" id="o<?php echo $t06_article_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t06_article->id->OldValue) ?>">
-<?php } ?>
-<?php if ($t06_article->RowType == EW_ROWTYPE_EDIT || $t06_article->CurrentMode == "edit") { ?>
-<input type="hidden" data-table="t06_article" data-field="x_id" name="x<?php echo $t06_article_list->RowIndex ?>_id" id="x<?php echo $t06_article_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t06_article->id->CurrentValue) ?>">
-<?php } ?>
 	<?php if ($t06_article->SubGroupID->Visible) { // SubGroupID ?>
 		<td data-name="SubGroupID"<?php echo $t06_article->SubGroupID->CellAttributes() ?>>
-<?php if ($t06_article->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_SubGroupID" class="form-group t06_article_SubGroupID">
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t06_article_list->RowIndex ?>_SubGroupID"><?php echo (strval($t06_article->SubGroupID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->SubGroupID->ViewValue); ?></span>
-</span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->SubGroupID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_SubGroupID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->SubGroupID->ReadOnly || $t06_article->SubGroupID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_SubGroupID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->SubGroupID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t06_article_list->RowIndex ?>_SubGroupID" id="x<?php echo $t06_article_list->RowIndex ?>_SubGroupID" value="<?php echo $t06_article->SubGroupID->CurrentValue ?>"<?php echo $t06_article->SubGroupID->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_SubGroupID" name="o<?php echo $t06_article_list->RowIndex ?>_SubGroupID" id="o<?php echo $t06_article_list->RowIndex ?>_SubGroupID" value="<?php echo ew_HtmlEncode($t06_article->SubGroupID->OldValue) ?>">
-<?php } ?>
-<?php if ($t06_article->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_SubGroupID" class="form-group t06_article_SubGroupID">
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t06_article_list->RowIndex ?>_SubGroupID"><?php echo (strval($t06_article->SubGroupID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->SubGroupID->ViewValue); ?></span>
-</span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->SubGroupID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_SubGroupID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->SubGroupID->ReadOnly || $t06_article->SubGroupID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_SubGroupID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->SubGroupID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t06_article_list->RowIndex ?>_SubGroupID" id="x<?php echo $t06_article_list->RowIndex ?>_SubGroupID" value="<?php echo $t06_article->SubGroupID->CurrentValue ?>"<?php echo $t06_article->SubGroupID->EditAttributes() ?>>
-</span>
-<?php } ?>
-<?php if ($t06_article->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_SubGroupID" class="t06_article_SubGroupID">
 <span<?php echo $t06_article->SubGroupID->ViewAttributes() ?>>
 <?php echo $t06_article->SubGroupID->ListViewValue() ?></span>
 </span>
-<?php } ?>
 </td>
 	<?php } ?>
 	<?php if ($t06_article->Kode->Visible) { // Kode ?>
 		<td data-name="Kode"<?php echo $t06_article->Kode->CellAttributes() ?>>
-<?php if ($t06_article->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Kode" class="form-group t06_article_Kode">
-<input type="text" data-table="t06_article" data-field="x_Kode" name="x<?php echo $t06_article_list->RowIndex ?>_Kode" id="x<?php echo $t06_article_list->RowIndex ?>_Kode" size="30" maxlength="7" placeholder="<?php echo ew_HtmlEncode($t06_article->Kode->getPlaceHolder()) ?>" value="<?php echo $t06_article->Kode->EditValue ?>"<?php echo $t06_article->Kode->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_Kode" name="o<?php echo $t06_article_list->RowIndex ?>_Kode" id="o<?php echo $t06_article_list->RowIndex ?>_Kode" value="<?php echo ew_HtmlEncode($t06_article->Kode->OldValue) ?>">
-<?php } ?>
-<?php if ($t06_article->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Kode" class="form-group t06_article_Kode">
-<input type="text" data-table="t06_article" data-field="x_Kode" name="x<?php echo $t06_article_list->RowIndex ?>_Kode" id="x<?php echo $t06_article_list->RowIndex ?>_Kode" size="30" maxlength="7" placeholder="<?php echo ew_HtmlEncode($t06_article->Kode->getPlaceHolder()) ?>" value="<?php echo $t06_article->Kode->EditValue ?>"<?php echo $t06_article->Kode->EditAttributes() ?>>
-</span>
-<?php } ?>
-<?php if ($t06_article->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Kode" class="t06_article_Kode">
 <span<?php echo $t06_article->Kode->ViewAttributes() ?>>
 <?php echo $t06_article->Kode->ListViewValue() ?></span>
 </span>
-<?php } ?>
 </td>
 	<?php } ?>
 	<?php if ($t06_article->Nama->Visible) { // Nama ?>
 		<td data-name="Nama"<?php echo $t06_article->Nama->CellAttributes() ?>>
-<?php if ($t06_article->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Nama" class="form-group t06_article_Nama">
-<input type="text" data-table="t06_article" data-field="x_Nama" name="x<?php echo $t06_article_list->RowIndex ?>_Nama" id="x<?php echo $t06_article_list->RowIndex ?>_Nama" size="30" maxlength="75" placeholder="<?php echo ew_HtmlEncode($t06_article->Nama->getPlaceHolder()) ?>" value="<?php echo $t06_article->Nama->EditValue ?>"<?php echo $t06_article->Nama->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_Nama" name="o<?php echo $t06_article_list->RowIndex ?>_Nama" id="o<?php echo $t06_article_list->RowIndex ?>_Nama" value="<?php echo ew_HtmlEncode($t06_article->Nama->OldValue) ?>">
-<?php } ?>
-<?php if ($t06_article->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Nama" class="form-group t06_article_Nama">
-<input type="text" data-table="t06_article" data-field="x_Nama" name="x<?php echo $t06_article_list->RowIndex ?>_Nama" id="x<?php echo $t06_article_list->RowIndex ?>_Nama" size="30" maxlength="75" placeholder="<?php echo ew_HtmlEncode($t06_article->Nama->getPlaceHolder()) ?>" value="<?php echo $t06_article->Nama->EditValue ?>"<?php echo $t06_article->Nama->EditAttributes() ?>>
-</span>
-<?php } ?>
-<?php if ($t06_article->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Nama" class="t06_article_Nama">
 <span<?php echo $t06_article->Nama->ViewAttributes() ?>>
 <?php echo $t06_article->Nama->ListViewValue() ?></span>
 </span>
-<?php } ?>
 </td>
 	<?php } ?>
 	<?php if ($t06_article->SatuanID->Visible) { // SatuanID ?>
 		<td data-name="SatuanID"<?php echo $t06_article->SatuanID->CellAttributes() ?>>
-<?php if ($t06_article->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_SatuanID" class="form-group t06_article_SatuanID">
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t06_article_list->RowIndex ?>_SatuanID"><?php echo (strval($t06_article->SatuanID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->SatuanID->ViewValue); ?></span>
-</span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->SatuanID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_SatuanID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->SatuanID->ReadOnly || $t06_article->SatuanID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_SatuanID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->SatuanID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t06_article_list->RowIndex ?>_SatuanID" id="x<?php echo $t06_article_list->RowIndex ?>_SatuanID" value="<?php echo $t06_article->SatuanID->CurrentValue ?>"<?php echo $t06_article->SatuanID->EditAttributes() ?>>
-<?php if (AllowAdd(CurrentProjectID() . "t07_satuan") && !$t06_article->SatuanID->ReadOnly) { ?>
-<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t06_article->SatuanID->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_SatuanID',url:'t07_satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t06_article_list->RowIndex ?>_SatuanID"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t06_article->SatuanID->FldCaption() ?></span></button>
-<?php } ?>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_SatuanID" name="o<?php echo $t06_article_list->RowIndex ?>_SatuanID" id="o<?php echo $t06_article_list->RowIndex ?>_SatuanID" value="<?php echo ew_HtmlEncode($t06_article->SatuanID->OldValue) ?>">
-<?php } ?>
-<?php if ($t06_article->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_SatuanID" class="form-group t06_article_SatuanID">
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t06_article_list->RowIndex ?>_SatuanID"><?php echo (strval($t06_article->SatuanID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->SatuanID->ViewValue); ?></span>
-</span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->SatuanID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_SatuanID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->SatuanID->ReadOnly || $t06_article->SatuanID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_SatuanID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->SatuanID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t06_article_list->RowIndex ?>_SatuanID" id="x<?php echo $t06_article_list->RowIndex ?>_SatuanID" value="<?php echo $t06_article->SatuanID->CurrentValue ?>"<?php echo $t06_article->SatuanID->EditAttributes() ?>>
-<?php if (AllowAdd(CurrentProjectID() . "t07_satuan") && !$t06_article->SatuanID->ReadOnly) { ?>
-<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t06_article->SatuanID->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_SatuanID',url:'t07_satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t06_article_list->RowIndex ?>_SatuanID"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t06_article->SatuanID->FldCaption() ?></span></button>
-<?php } ?>
-</span>
-<?php } ?>
-<?php if ($t06_article->RowType == EW_ROWTYPE_VIEW) { // View record ?>
 <span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_SatuanID" class="t06_article_SatuanID">
 <span<?php echo $t06_article->SatuanID->ViewAttributes() ?>>
 <?php echo $t06_article->SatuanID->ListViewValue() ?></span>
 </span>
-<?php } ?>
 </td>
 	<?php } ?>
 <?php
@@ -4154,128 +2583,14 @@ $t06_article_list->ListOptions->Render("body", "left", $t06_article_list->RowCnt
 $t06_article_list->ListOptions->Render("body", "right", $t06_article_list->RowCnt);
 ?>
 	</tr>
-<?php if ($t06_article->RowType == EW_ROWTYPE_ADD || $t06_article->RowType == EW_ROWTYPE_EDIT) { ?>
-<script type="text/javascript">
-ft06_articlelist.UpdateOpts(<?php echo $t06_article_list->RowIndex ?>);
-</script>
-<?php } ?>
 <?php
 	}
-	} // End delete row checking
 	if ($t06_article->CurrentAction <> "gridadd")
-		if (!$t06_article_list->Recordset->EOF) $t06_article_list->Recordset->MoveNext();
-}
-?>
-<?php
-	if ($t06_article->CurrentAction == "gridadd" || $t06_article->CurrentAction == "gridedit") {
-		$t06_article_list->RowIndex = '$rowindex$';
-		$t06_article_list->LoadRowValues();
-
-		// Set row properties
-		$t06_article->ResetAttrs();
-		$t06_article->RowAttrs = array_merge($t06_article->RowAttrs, array('data-rowindex'=>$t06_article_list->RowIndex, 'id'=>'r0_t06_article', 'data-rowtype'=>EW_ROWTYPE_ADD));
-		ew_AppendClass($t06_article->RowAttrs["class"], "ewTemplate");
-		$t06_article->RowType = EW_ROWTYPE_ADD;
-
-		// Render row
-		$t06_article_list->RenderRow();
-
-		// Render list options
-		$t06_article_list->RenderListOptions();
-		$t06_article_list->StartRowCnt = 0;
-?>
-	<tr<?php echo $t06_article->RowAttributes() ?>>
-<?php
-
-// Render list options (body, left)
-$t06_article_list->ListOptions->Render("body", "left", $t06_article_list->RowIndex);
-?>
-	<?php if ($t06_article->MainGroupID->Visible) { // MainGroupID ?>
-		<td data-name="MainGroupID">
-<span id="el$rowindex$_t06_article_MainGroupID" class="form-group t06_article_MainGroupID">
-<?php $t06_article->MainGroupID->EditAttrs["onchange"] = "ew_UpdateOpt.call(this); " . @$t06_article->MainGroupID->EditAttrs["onchange"]; ?>
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t06_article_list->RowIndex ?>_MainGroupID"><?php echo (strval($t06_article->MainGroupID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->MainGroupID->ViewValue); ?></span>
-</span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->MainGroupID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_MainGroupID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->MainGroupID->ReadOnly || $t06_article->MainGroupID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_MainGroupID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->MainGroupID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t06_article_list->RowIndex ?>_MainGroupID" id="x<?php echo $t06_article_list->RowIndex ?>_MainGroupID" value="<?php echo $t06_article->MainGroupID->CurrentValue ?>"<?php echo $t06_article->MainGroupID->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_MainGroupID" name="o<?php echo $t06_article_list->RowIndex ?>_MainGroupID" id="o<?php echo $t06_article_list->RowIndex ?>_MainGroupID" value="<?php echo ew_HtmlEncode($t06_article->MainGroupID->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t06_article->SubGroupID->Visible) { // SubGroupID ?>
-		<td data-name="SubGroupID">
-<span id="el$rowindex$_t06_article_SubGroupID" class="form-group t06_article_SubGroupID">
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t06_article_list->RowIndex ?>_SubGroupID"><?php echo (strval($t06_article->SubGroupID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->SubGroupID->ViewValue); ?></span>
-</span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->SubGroupID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_SubGroupID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->SubGroupID->ReadOnly || $t06_article->SubGroupID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_SubGroupID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->SubGroupID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t06_article_list->RowIndex ?>_SubGroupID" id="x<?php echo $t06_article_list->RowIndex ?>_SubGroupID" value="<?php echo $t06_article->SubGroupID->CurrentValue ?>"<?php echo $t06_article->SubGroupID->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_SubGroupID" name="o<?php echo $t06_article_list->RowIndex ?>_SubGroupID" id="o<?php echo $t06_article_list->RowIndex ?>_SubGroupID" value="<?php echo ew_HtmlEncode($t06_article->SubGroupID->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t06_article->Kode->Visible) { // Kode ?>
-		<td data-name="Kode">
-<span id="el$rowindex$_t06_article_Kode" class="form-group t06_article_Kode">
-<input type="text" data-table="t06_article" data-field="x_Kode" name="x<?php echo $t06_article_list->RowIndex ?>_Kode" id="x<?php echo $t06_article_list->RowIndex ?>_Kode" size="30" maxlength="7" placeholder="<?php echo ew_HtmlEncode($t06_article->Kode->getPlaceHolder()) ?>" value="<?php echo $t06_article->Kode->EditValue ?>"<?php echo $t06_article->Kode->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_Kode" name="o<?php echo $t06_article_list->RowIndex ?>_Kode" id="o<?php echo $t06_article_list->RowIndex ?>_Kode" value="<?php echo ew_HtmlEncode($t06_article->Kode->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t06_article->Nama->Visible) { // Nama ?>
-		<td data-name="Nama">
-<span id="el$rowindex$_t06_article_Nama" class="form-group t06_article_Nama">
-<input type="text" data-table="t06_article" data-field="x_Nama" name="x<?php echo $t06_article_list->RowIndex ?>_Nama" id="x<?php echo $t06_article_list->RowIndex ?>_Nama" size="30" maxlength="75" placeholder="<?php echo ew_HtmlEncode($t06_article->Nama->getPlaceHolder()) ?>" value="<?php echo $t06_article->Nama->EditValue ?>"<?php echo $t06_article->Nama->EditAttributes() ?>>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_Nama" name="o<?php echo $t06_article_list->RowIndex ?>_Nama" id="o<?php echo $t06_article_list->RowIndex ?>_Nama" value="<?php echo ew_HtmlEncode($t06_article->Nama->OldValue) ?>">
-</td>
-	<?php } ?>
-	<?php if ($t06_article->SatuanID->Visible) { // SatuanID ?>
-		<td data-name="SatuanID">
-<span id="el$rowindex$_t06_article_SatuanID" class="form-group t06_article_SatuanID">
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t06_article_list->RowIndex ?>_SatuanID"><?php echo (strval($t06_article->SatuanID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->SatuanID->ViewValue); ?></span>
-</span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->SatuanID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_SatuanID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->SatuanID->ReadOnly || $t06_article->SatuanID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_SatuanID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->SatuanID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t06_article_list->RowIndex ?>_SatuanID" id="x<?php echo $t06_article_list->RowIndex ?>_SatuanID" value="<?php echo $t06_article->SatuanID->CurrentValue ?>"<?php echo $t06_article->SatuanID->EditAttributes() ?>>
-<?php if (AllowAdd(CurrentProjectID() . "t07_satuan") && !$t06_article->SatuanID->ReadOnly) { ?>
-<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t06_article->SatuanID->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x<?php echo $t06_article_list->RowIndex ?>_SatuanID',url:'t07_satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x<?php echo $t06_article_list->RowIndex ?>_SatuanID"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t06_article->SatuanID->FldCaption() ?></span></button>
-<?php } ?>
-</span>
-<input type="hidden" data-table="t06_article" data-field="x_SatuanID" name="o<?php echo $t06_article_list->RowIndex ?>_SatuanID" id="o<?php echo $t06_article_list->RowIndex ?>_SatuanID" value="<?php echo ew_HtmlEncode($t06_article->SatuanID->OldValue) ?>">
-</td>
-	<?php } ?>
-<?php
-
-// Render list options (body, right)
-$t06_article_list->ListOptions->Render("body", "right", $t06_article_list->RowIndex);
-?>
-<script type="text/javascript">
-ft06_articlelist.UpdateOpts(<?php echo $t06_article_list->RowIndex ?>);
-</script>
-	</tr>
-<?php
+		$t06_article_list->Recordset->MoveNext();
 }
 ?>
 </tbody>
 </table>
-<?php } ?>
-<?php if ($t06_article->CurrentAction == "add" || $t06_article->CurrentAction == "copy") { ?>
-<input type="hidden" name="<?php echo $t06_article_list->FormKeyCountName ?>" id="<?php echo $t06_article_list->FormKeyCountName ?>" value="<?php echo $t06_article_list->KeyCount ?>">
-<?php } ?>
-<?php if ($t06_article->CurrentAction == "gridadd") { ?>
-<input type="hidden" name="a_list" id="a_list" value="gridinsert">
-<input type="hidden" name="<?php echo $t06_article_list->FormKeyCountName ?>" id="<?php echo $t06_article_list->FormKeyCountName ?>" value="<?php echo $t06_article_list->KeyCount ?>">
-<?php echo $t06_article_list->MultiSelectKey ?>
-<?php } ?>
-<?php if ($t06_article->CurrentAction == "edit") { ?>
-<input type="hidden" name="<?php echo $t06_article_list->FormKeyCountName ?>" id="<?php echo $t06_article_list->FormKeyCountName ?>" value="<?php echo $t06_article_list->KeyCount ?>">
-<?php } ?>
-<?php if ($t06_article->CurrentAction == "gridedit") { ?>
-<input type="hidden" name="a_list" id="a_list" value="gridupdate">
-<input type="hidden" name="<?php echo $t06_article_list->FormKeyCountName ?>" id="<?php echo $t06_article_list->FormKeyCountName ?>" value="<?php echo $t06_article_list->KeyCount ?>">
-<?php echo $t06_article_list->MultiSelectKey ?>
 <?php } ?>
 <?php if ($t06_article->CurrentAction == "") { ?>
 <input type="hidden" name="a_list" id="a_list" value="">

@@ -150,13 +150,9 @@ function f_Article_SubGroupID_onChange(event, RowIndex) {
 	else {
 		var article_SubGroupID = $("#x"+RowIndex+"_SubGroupID").val();
 	}
-	f_GetNextArticleCode(article_SubGroupID);
-	/*if (RowIndex == "x") {
-		$("#x_Kode").val(ArticleCode); 
+	if (article_SubGroupID != "") {
+		f_GetNextArticleCode(article_SubGroupID);
 	}
-	else {
-		$("#x"+RowIndex+"_Kode").val(ArticleCode);
-	}*/
 }
 
 function stateChangedArticleCode() {
@@ -164,18 +160,14 @@ function stateChangedArticleCode() {
 	if (AjaxArticleCode.readyState == 4) {
 		data = AjaxArticleCode.responseText;
 		if(data.length > 0) {
-
-			//ArticleCode = data;
 			if (p_RowIndex == "x") {
-				$("#x_Kode").val(ArticleCode); 
+				$("#x_Kode").val(data); 
 			}
 			else {
-				$("#x"+p_RowIndex+"_Kode").val(ArticleCode);
+				$("#x"+p_RowIndex+"_Kode").val(data);
 			}
 		}
 		else {
-
-			//ArticleCode = "";
 			if (p_RowIndex == "x") {
 				$("#x_Kode").val(""); 
 			}
