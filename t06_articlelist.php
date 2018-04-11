@@ -460,6 +460,7 @@ class ct06_article_list extends ct06_article {
 		$this->Kode->SetVisibility();
 		$this->Nama->SetVisibility();
 		$this->SatuanID->SetVisibility();
+		$this->Harga->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -818,6 +819,7 @@ class ct06_article_list extends ct06_article {
 		$sFilterList = ew_Concat($sFilterList, $this->Kode->AdvancedSearch->ToJson(), ","); // Field Kode
 		$sFilterList = ew_Concat($sFilterList, $this->Nama->AdvancedSearch->ToJson(), ","); // Field Nama
 		$sFilterList = ew_Concat($sFilterList, $this->SatuanID->AdvancedSearch->ToJson(), ","); // Field SatuanID
+		$sFilterList = ew_Concat($sFilterList, $this->Harga->AdvancedSearch->ToJson(), ","); // Field Harga
 		if ($this->BasicSearch->Keyword <> "") {
 			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
 			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
@@ -909,6 +911,14 @@ class ct06_article_list extends ct06_article {
 		$this->SatuanID->AdvancedSearch->SearchValue2 = @$filter["y_SatuanID"];
 		$this->SatuanID->AdvancedSearch->SearchOperator2 = @$filter["w_SatuanID"];
 		$this->SatuanID->AdvancedSearch->Save();
+
+		// Field Harga
+		$this->Harga->AdvancedSearch->SearchValue = @$filter["x_Harga"];
+		$this->Harga->AdvancedSearch->SearchOperator = @$filter["z_Harga"];
+		$this->Harga->AdvancedSearch->SearchCondition = @$filter["v_Harga"];
+		$this->Harga->AdvancedSearch->SearchValue2 = @$filter["y_Harga"];
+		$this->Harga->AdvancedSearch->SearchOperator2 = @$filter["w_Harga"];
+		$this->Harga->AdvancedSearch->Save();
 		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
 		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
 	}
@@ -1073,6 +1083,7 @@ class ct06_article_list extends ct06_article {
 			$this->UpdateSort($this->Kode, $bCtrl); // Kode
 			$this->UpdateSort($this->Nama, $bCtrl); // Nama
 			$this->UpdateSort($this->SatuanID, $bCtrl); // SatuanID
+			$this->UpdateSort($this->Harga, $bCtrl); // Harga
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -1112,6 +1123,7 @@ class ct06_article_list extends ct06_article {
 				$this->Kode->setSort("");
 				$this->Nama->setSort("");
 				$this->SatuanID->setSort("");
+				$this->Harga->setSort("");
 			}
 
 			// Reset start position
@@ -1576,6 +1588,7 @@ class ct06_article_list extends ct06_article {
 		} else {
 			$this->SatuanID->VirtualValue = ""; // Clear value
 		}
+		$this->Harga->setDbValue($row['Harga']);
 	}
 
 	// Return a row with default values
@@ -1587,6 +1600,7 @@ class ct06_article_list extends ct06_article {
 		$row['Kode'] = NULL;
 		$row['Nama'] = NULL;
 		$row['SatuanID'] = NULL;
+		$row['Harga'] = NULL;
 		return $row;
 	}
 
@@ -1601,6 +1615,7 @@ class ct06_article_list extends ct06_article {
 		$this->Kode->DbValue = $row['Kode'];
 		$this->Nama->DbValue = $row['Nama'];
 		$this->SatuanID->DbValue = $row['SatuanID'];
+		$this->Harga->DbValue = $row['Harga'];
 	}
 
 	// Load old record
@@ -1637,6 +1652,10 @@ class ct06_article_list extends ct06_article {
 		$this->InlineCopyUrl = $this->GetInlineCopyUrl();
 		$this->DeleteUrl = $this->GetDeleteUrl();
 
+		// Convert decimal values if posted back
+		if ($this->Harga->FormValue == $this->Harga->CurrentValue && is_numeric(ew_StrToFloat($this->Harga->CurrentValue)))
+			$this->Harga->CurrentValue = ew_StrToFloat($this->Harga->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
@@ -1647,6 +1666,7 @@ class ct06_article_list extends ct06_article {
 		// Kode
 		// Nama
 		// SatuanID
+		// Harga
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1745,6 +1765,12 @@ class ct06_article_list extends ct06_article {
 		}
 		$this->SatuanID->ViewCustomAttributes = "";
 
+		// Harga
+		$this->Harga->ViewValue = $this->Harga->CurrentValue;
+		$this->Harga->ViewValue = ew_FormatNumber($this->Harga->ViewValue, 2, -2, -2, -2);
+		$this->Harga->CellCssStyle .= "text-align: right;";
+		$this->Harga->ViewCustomAttributes = "";
+
 			// MainGroupID
 			$this->MainGroupID->LinkCustomAttributes = "";
 			$this->MainGroupID->HrefValue = "";
@@ -1769,6 +1795,11 @@ class ct06_article_list extends ct06_article {
 			$this->SatuanID->LinkCustomAttributes = "";
 			$this->SatuanID->HrefValue = "";
 			$this->SatuanID->TooltipValue = "";
+
+			// Harga
+			$this->Harga->LinkCustomAttributes = "";
+			$this->Harga->HrefValue = "";
+			$this->Harga->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -2472,6 +2503,15 @@ $t06_article_list->ListOptions->Render("header", "left");
 		</div></div></th>
 	<?php } ?>
 <?php } ?>
+<?php if ($t06_article->Harga->Visible) { // Harga ?>
+	<?php if ($t06_article->SortUrl($t06_article->Harga) == "") { ?>
+		<th data-name="Harga" class="<?php echo $t06_article->Harga->HeaderCellClass() ?>"><div id="elh_t06_article_Harga" class="t06_article_Harga"><div class="ewTableHeaderCaption"><?php echo $t06_article->Harga->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="Harga" class="<?php echo $t06_article->Harga->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t06_article->SortUrl($t06_article->Harga) ?>',2);"><div id="elh_t06_article_Harga" class="t06_article_Harga">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t06_article->Harga->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t06_article->Harga->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t06_article->Harga->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		</div></div></th>
+	<?php } ?>
+<?php } ?>
 <?php
 
 // Render list options (header, right)
@@ -2574,6 +2614,14 @@ $t06_article_list->ListOptions->Render("body", "left", $t06_article_list->RowCnt
 <span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_SatuanID" class="t06_article_SatuanID">
 <span<?php echo $t06_article->SatuanID->ViewAttributes() ?>>
 <?php echo $t06_article->SatuanID->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($t06_article->Harga->Visible) { // Harga ?>
+		<td data-name="Harga"<?php echo $t06_article->Harga->CellAttributes() ?>>
+<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Harga" class="t06_article_Harga">
+<span<?php echo $t06_article->Harga->ViewAttributes() ?>>
+<?php echo $t06_article->Harga->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>

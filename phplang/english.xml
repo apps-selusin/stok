@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/4/10" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/4/11" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -621,6 +621,9 @@
     <menu id="1">
       <phrase id="menutext" value="Home" />
     </menu>
+    <menu id="19">
+      <phrase id="menutext" value="Pembelian" />
+    </menu>
     <menu id="6">
       <phrase id="menutext" value="Setup" />
     </menu>
@@ -737,6 +740,9 @@
       <field id="satuanid">
         <phrase id="fldcaption" value="Satuan" />
       </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="Harga" />
+      </field>
     </table>
     <table id="t07_satuan">
       <phrase id="tblcaption" value="Satuan" />
@@ -745,6 +751,33 @@
       </field>
       <field id="nama">
         <phrase id="fldcaption" value="Nama" />
+      </field>
+    </table>
+    <table id="t08_po">
+      <phrase id="tblcaption" value="Pembelian" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="nopo">
+        <phrase id="fldcaption" value="No PO" />
+      </field>
+      <field id="tglpo">
+        <phrase id="fldcaption" value="Tgl PO" />
+      </field>
+      <field id="vendorid">
+        <phrase id="fldcaption" value="Vendor" />
+      </field>
+      <field id="articleid">
+        <phrase id="fldcaption" value="Article" />
+      </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="Harga" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="Qty" />
+      </field>
+      <field id="satuanid">
+        <phrase id="fldcaption" value="Satuan" />
       </field>
     </table>
     <table id="t96_employees">

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 05, 2018 at 12:36 PM
+-- Generation Time: Apr 11, 2018 at 11:16 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -146,6 +146,7 @@ CREATE TABLE IF NOT EXISTS `t06_article` (
   `Kode` varchar(7) NOT NULL,
   `Nama` varchar(75) NOT NULL,
   `SatuanID` int(11) NOT NULL,
+  `Harga` float(15,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
@@ -153,8 +154,8 @@ CREATE TABLE IF NOT EXISTS `t06_article` (
 -- Dumping data for table `t06_article`
 --
 
-INSERT INTO `t06_article` (`id`, `SubGroupID`, `Kode`, `Nama`, `SatuanID`) VALUES
-(1, 1, '5501001', 'MEAT Has Luar Lokal', 1);
+INSERT INTO `t06_article` (`id`, `SubGroupID`, `Kode`, `Nama`, `SatuanID`, `Harga`) VALUES
+(1, 1, '5501001', 'MEAT Has Luar Lokal', 1, 100000.00);
 
 -- --------------------------------------------------------
 
@@ -177,6 +178,23 @@ INSERT INTO `t07_satuan` (`id`, `Nama`) VALUES
 (2, 'Set'),
 (3, 'Pcs'),
 (4, 'Unit');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `t08_po`
+--
+
+CREATE TABLE IF NOT EXISTS `t08_po` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `NoPO` varchar(14) NOT NULL,
+  `TglPO` date NOT NULL,
+  `VendorID` int(11) NOT NULL,
+  `ArticleID` int(11) NOT NULL,
+  `Harga` float(15,2) NOT NULL DEFAULT '0.00',
+  `Qty` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -296,7 +314,7 @@ CREATE TABLE IF NOT EXISTS `t99_audittrail` (
   `oldvalue` longtext CHARACTER SET latin1,
   `newvalue` longtext CHARACTER SET latin1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=115 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=121 ;
 
 --
 -- Dumping data for table `t99_audittrail`
@@ -414,7 +432,13 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (111, '2018-04-05 10:08:16', '/stok/t07_satuanlist.php', '1', '*** Batch insert successful ***', 't07_satuan', '', '', '', ''),
 (112, '2018-04-05 10:08:36', '/stok/t06_articlelist.php', '1', '*** Batch update begin ***', 't06_article', '', '', '', ''),
 (113, '2018-04-05 10:08:36', '/stok/t06_articlelist.php', '1', 'U', 't06_article', 'SatuanID', '1', '0', '1'),
-(114, '2018-04-05 10:08:36', '/stok/t06_articlelist.php', '1', '*** Batch update successful ***', 't06_article', '', '', '', '');
+(114, '2018-04-05 10:08:36', '/stok/t06_articlelist.php', '1', '*** Batch update successful ***', 't06_article', '', '', '', ''),
+(115, '2018-04-07 08:48:13', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(116, '2018-04-07 13:12:17', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(117, '2018-04-10 10:15:18', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(118, '2018-04-10 10:42:35', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(119, '2018-04-11 10:26:06', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(120, '2018-04-11 11:58:09', '/stok/t06_articleedit.php', '1', 'U', 't06_article', 'Harga', '1', '0.00', '100000');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

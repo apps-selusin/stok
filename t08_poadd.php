@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg14.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql14.php") ?>
 <?php include_once "phpfn14.php" ?>
-<?php include_once "t06_articleinfo.php" ?>
+<?php include_once "t08_poinfo.php" ?>
 <?php include_once "t96_employeesinfo.php" ?>
 <?php include_once "userfn14.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t06_article_add = NULL; // Initialize page object first
+$t08_po_add = NULL; // Initialize page object first
 
-class ct06_article_add extends ct06_article {
+class ct08_po_add extends ct08_po {
 
 	// Page ID
 	var $PageID = 'add';
@@ -25,10 +25,10 @@ class ct06_article_add extends ct06_article {
 	var $ProjectID = '{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}';
 
 	// Table name
-	var $TableName = 't06_article';
+	var $TableName = 't08_po';
 
 	// Page object name
-	var $PageObjName = 't06_article_add';
+	var $PageObjName = 't08_po_add';
 
 	// Page headings
 	var $Heading = '';
@@ -256,10 +256,10 @@ class ct06_article_add extends ct06_article {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t06_article)
-		if (!isset($GLOBALS["t06_article"]) || get_class($GLOBALS["t06_article"]) == "ct06_article") {
-			$GLOBALS["t06_article"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t06_article"];
+		// Table object (t08_po)
+		if (!isset($GLOBALS["t08_po"]) || get_class($GLOBALS["t08_po"]) == "ct08_po") {
+			$GLOBALS["t08_po"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t08_po"];
 		}
 
 		// Table object (t96_employees)
@@ -271,7 +271,7 @@ class ct06_article_add extends ct06_article {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't06_article', TRUE);
+			define("EW_TABLE_NAME", 't08_po', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"]))
@@ -313,7 +313,7 @@ class ct06_article_add extends ct06_article {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
 			if ($Security->CanList())
-				$this->Page_Terminate(ew_GetUrl("t06_articlelist.php"));
+				$this->Page_Terminate(ew_GetUrl("t08_polist.php"));
 			else
 				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
@@ -331,12 +331,13 @@ class ct06_article_add extends ct06_article {
 
 		$objForm = new cFormObj();
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->MainGroupID->SetVisibility();
-		$this->SubGroupID->SetVisibility();
-		$this->Kode->SetVisibility();
-		$this->Nama->SetVisibility();
-		$this->SatuanID->SetVisibility();
+		$this->NoPO->SetVisibility();
+		$this->TglPO->SetVisibility();
+		$this->VendorID->SetVisibility();
+		$this->ArticleID->SetVisibility();
 		$this->Harga->SetVisibility();
+		$this->Qty->SetVisibility();
+		$this->SatuanID->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -382,13 +383,13 @@ class ct06_article_add extends ct06_article {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t06_article;
+		global $EW_EXPORT, $t08_po;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t06_article);
+				$doc = new $class($t08_po);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -414,7 +415,7 @@ class ct06_article_add extends ct06_article {
 				$pageName = ew_GetPageName($url);
 				if ($pageName != $this->GetListUrl()) { // Not List page
 					$row["caption"] = $this->GetModalCaption($pageName);
-					if ($pageName == "t06_articleview.php")
+					if ($pageName == "t08_poview.php")
 						$row["view"] = "1";
 				} else { // List page should not be shown as modal => error
 					$row["error"] = $this->getFailureMessage();
@@ -498,7 +499,7 @@ class ct06_article_add extends ct06_article {
 			case "C": // Copy an existing record
 				if (!$loaded) { // Record not loaded
 					if ($this->getFailureMessage() == "") $this->setFailureMessage($Language->Phrase("NoRecord")); // No record found
-					$this->Page_Terminate("t06_articlelist.php"); // No matching record, return to list
+					$this->Page_Terminate("t08_polist.php"); // No matching record, return to list
 				}
 				break;
 			case "A": // Add new record
@@ -507,9 +508,9 @@ class ct06_article_add extends ct06_article {
 					if ($this->getSuccessMessage() == "")
 						$this->setSuccessMessage($Language->Phrase("AddSuccess")); // Set up success message
 					$sReturnUrl = $this->getReturnUrl();
-					if (ew_GetPageName($sReturnUrl) == "t06_articlelist.php")
+					if (ew_GetPageName($sReturnUrl) == "t08_polist.php")
 						$sReturnUrl = $this->AddMasterUrl($sReturnUrl); // List page, return to List page with correct master key if necessary
-					elseif (ew_GetPageName($sReturnUrl) == "t06_articleview.php")
+					elseif (ew_GetPageName($sReturnUrl) == "t08_poview.php")
 						$sReturnUrl = $this->GetViewUrl(); // View page, return to View page with keyurl directly
 					$this->Page_Terminate($sReturnUrl); // Clean up and return
 				} else {
@@ -540,17 +541,18 @@ class ct06_article_add extends ct06_article {
 	function LoadDefaultValues() {
 		$this->id->CurrentValue = NULL;
 		$this->id->OldValue = $this->id->CurrentValue;
-		$this->MainGroupID->CurrentValue = NULL;
-		$this->MainGroupID->OldValue = $this->MainGroupID->CurrentValue;
-		$this->SubGroupID->CurrentValue = NULL;
-		$this->SubGroupID->OldValue = $this->SubGroupID->CurrentValue;
-		$this->Kode->CurrentValue = NULL;
-		$this->Kode->OldValue = $this->Kode->CurrentValue;
-		$this->Nama->CurrentValue = NULL;
-		$this->Nama->OldValue = $this->Nama->CurrentValue;
+		$this->NoPO->CurrentValue = NULL;
+		$this->NoPO->OldValue = $this->NoPO->CurrentValue;
+		$this->TglPO->CurrentValue = NULL;
+		$this->TglPO->OldValue = $this->TglPO->CurrentValue;
+		$this->VendorID->CurrentValue = NULL;
+		$this->VendorID->OldValue = $this->VendorID->CurrentValue;
+		$this->ArticleID->CurrentValue = NULL;
+		$this->ArticleID->OldValue = $this->ArticleID->CurrentValue;
+		$this->Harga->CurrentValue = 0.00;
+		$this->Qty->CurrentValue = 0;
 		$this->SatuanID->CurrentValue = NULL;
 		$this->SatuanID->OldValue = $this->SatuanID->CurrentValue;
-		$this->Harga->CurrentValue = 0.00;
 	}
 
 	// Load form values
@@ -558,35 +560,41 @@ class ct06_article_add extends ct06_article {
 
 		// Load from form
 		global $objForm;
-		if (!$this->MainGroupID->FldIsDetailKey) {
-			$this->MainGroupID->setFormValue($objForm->GetValue("x_MainGroupID"));
+		if (!$this->NoPO->FldIsDetailKey) {
+			$this->NoPO->setFormValue($objForm->GetValue("x_NoPO"));
 		}
-		if (!$this->SubGroupID->FldIsDetailKey) {
-			$this->SubGroupID->setFormValue($objForm->GetValue("x_SubGroupID"));
+		if (!$this->TglPO->FldIsDetailKey) {
+			$this->TglPO->setFormValue($objForm->GetValue("x_TglPO"));
+			$this->TglPO->CurrentValue = ew_UnFormatDateTime($this->TglPO->CurrentValue, 7);
 		}
-		if (!$this->Kode->FldIsDetailKey) {
-			$this->Kode->setFormValue($objForm->GetValue("x_Kode"));
+		if (!$this->VendorID->FldIsDetailKey) {
+			$this->VendorID->setFormValue($objForm->GetValue("x_VendorID"));
 		}
-		if (!$this->Nama->FldIsDetailKey) {
-			$this->Nama->setFormValue($objForm->GetValue("x_Nama"));
-		}
-		if (!$this->SatuanID->FldIsDetailKey) {
-			$this->SatuanID->setFormValue($objForm->GetValue("x_SatuanID"));
+		if (!$this->ArticleID->FldIsDetailKey) {
+			$this->ArticleID->setFormValue($objForm->GetValue("x_ArticleID"));
 		}
 		if (!$this->Harga->FldIsDetailKey) {
 			$this->Harga->setFormValue($objForm->GetValue("x_Harga"));
+		}
+		if (!$this->Qty->FldIsDetailKey) {
+			$this->Qty->setFormValue($objForm->GetValue("x_Qty"));
+		}
+		if (!$this->SatuanID->FldIsDetailKey) {
+			$this->SatuanID->setFormValue($objForm->GetValue("x_SatuanID"));
 		}
 	}
 
 	// Restore form values
 	function RestoreFormValues() {
 		global $objForm;
-		$this->MainGroupID->CurrentValue = $this->MainGroupID->FormValue;
-		$this->SubGroupID->CurrentValue = $this->SubGroupID->FormValue;
-		$this->Kode->CurrentValue = $this->Kode->FormValue;
-		$this->Nama->CurrentValue = $this->Nama->FormValue;
-		$this->SatuanID->CurrentValue = $this->SatuanID->FormValue;
+		$this->NoPO->CurrentValue = $this->NoPO->FormValue;
+		$this->TglPO->CurrentValue = $this->TglPO->FormValue;
+		$this->TglPO->CurrentValue = ew_UnFormatDateTime($this->TglPO->CurrentValue, 7);
+		$this->VendorID->CurrentValue = $this->VendorID->FormValue;
+		$this->ArticleID->CurrentValue = $this->ArticleID->FormValue;
 		$this->Harga->CurrentValue = $this->Harga->FormValue;
+		$this->Qty->CurrentValue = $this->Qty->FormValue;
+		$this->SatuanID->CurrentValue = $this->SatuanID->FormValue;
 	}
 
 	// Load row based on key values
@@ -623,27 +631,23 @@ class ct06_article_add extends ct06_article {
 		if (!$rs || $rs->EOF)
 			return;
 		$this->id->setDbValue($row['id']);
-		$this->MainGroupID->setDbValue($row['MainGroupID']);
-		if (array_key_exists('EV__MainGroupID', $rs->fields)) {
-			$this->MainGroupID->VirtualValue = $rs->fields('EV__MainGroupID'); // Set up virtual field value
+		$this->NoPO->setDbValue($row['NoPO']);
+		$this->TglPO->setDbValue($row['TglPO']);
+		$this->VendorID->setDbValue($row['VendorID']);
+		$this->ArticleID->setDbValue($row['ArticleID']);
+		if (array_key_exists('EV__ArticleID', $rs->fields)) {
+			$this->ArticleID->VirtualValue = $rs->fields('EV__ArticleID'); // Set up virtual field value
 		} else {
-			$this->MainGroupID->VirtualValue = ""; // Clear value
+			$this->ArticleID->VirtualValue = ""; // Clear value
 		}
-		$this->SubGroupID->setDbValue($row['SubGroupID']);
-		if (array_key_exists('EV__SubGroupID', $rs->fields)) {
-			$this->SubGroupID->VirtualValue = $rs->fields('EV__SubGroupID'); // Set up virtual field value
-		} else {
-			$this->SubGroupID->VirtualValue = ""; // Clear value
-		}
-		$this->Kode->setDbValue($row['Kode']);
-		$this->Nama->setDbValue($row['Nama']);
+		$this->Harga->setDbValue($row['Harga']);
+		$this->Qty->setDbValue($row['Qty']);
 		$this->SatuanID->setDbValue($row['SatuanID']);
 		if (array_key_exists('EV__SatuanID', $rs->fields)) {
 			$this->SatuanID->VirtualValue = $rs->fields('EV__SatuanID'); // Set up virtual field value
 		} else {
 			$this->SatuanID->VirtualValue = ""; // Clear value
 		}
-		$this->Harga->setDbValue($row['Harga']);
 	}
 
 	// Return a row with default values
@@ -651,12 +655,13 @@ class ct06_article_add extends ct06_article {
 		$this->LoadDefaultValues();
 		$row = array();
 		$row['id'] = $this->id->CurrentValue;
-		$row['MainGroupID'] = $this->MainGroupID->CurrentValue;
-		$row['SubGroupID'] = $this->SubGroupID->CurrentValue;
-		$row['Kode'] = $this->Kode->CurrentValue;
-		$row['Nama'] = $this->Nama->CurrentValue;
-		$row['SatuanID'] = $this->SatuanID->CurrentValue;
+		$row['NoPO'] = $this->NoPO->CurrentValue;
+		$row['TglPO'] = $this->TglPO->CurrentValue;
+		$row['VendorID'] = $this->VendorID->CurrentValue;
+		$row['ArticleID'] = $this->ArticleID->CurrentValue;
 		$row['Harga'] = $this->Harga->CurrentValue;
+		$row['Qty'] = $this->Qty->CurrentValue;
+		$row['SatuanID'] = $this->SatuanID->CurrentValue;
 		return $row;
 	}
 
@@ -666,12 +671,13 @@ class ct06_article_add extends ct06_article {
 			return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
-		$this->MainGroupID->DbValue = $row['MainGroupID'];
-		$this->SubGroupID->DbValue = $row['SubGroupID'];
-		$this->Kode->DbValue = $row['Kode'];
-		$this->Nama->DbValue = $row['Nama'];
-		$this->SatuanID->DbValue = $row['SatuanID'];
+		$this->NoPO->DbValue = $row['NoPO'];
+		$this->TglPO->DbValue = $row['TglPO'];
+		$this->VendorID->DbValue = $row['VendorID'];
+		$this->ArticleID->DbValue = $row['ArticleID'];
 		$this->Harga->DbValue = $row['Harga'];
+		$this->Qty->DbValue = $row['Qty'];
+		$this->SatuanID->DbValue = $row['SatuanID'];
 	}
 
 	// Load old record
@@ -711,12 +717,13 @@ class ct06_article_add extends ct06_article {
 
 		// Common render codes for all row types
 		// id
-		// MainGroupID
-		// SubGroupID
-		// Kode
-		// Nama
-		// SatuanID
+		// NoPO
+		// TglPO
+		// VendorID
+		// ArticleID
 		// Harga
+		// Qty
+		// SatuanID
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -724,74 +731,83 @@ class ct06_article_add extends ct06_article {
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// MainGroupID
-		if ($this->MainGroupID->VirtualValue <> "") {
-			$this->MainGroupID->ViewValue = $this->MainGroupID->VirtualValue;
-		} else {
-		if (strval($this->MainGroupID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->MainGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t04_maingroup`";
+		// NoPO
+		$this->NoPO->ViewValue = $this->NoPO->CurrentValue;
+		$this->NoPO->ViewCustomAttributes = "";
+
+		// TglPO
+		$this->TglPO->ViewValue = $this->TglPO->CurrentValue;
+		$this->TglPO->ViewValue = ew_FormatDateTime($this->TglPO->ViewValue, 7);
+		$this->TglPO->ViewCustomAttributes = "";
+
+		// VendorID
+		if (strval($this->VendorID->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->VendorID->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t02_vendor`";
 		$sWhereWrk = "";
-		$this->MainGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
+		$this->VendorID->LookupFilters = array("dx1" => '`Nama`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->MainGroupID, $sWhereWrk); // Call Lookup Selecting
+		$this->Lookup_Selecting($this->VendorID, $sWhereWrk); // Call Lookup Selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->VendorID->ViewValue = $this->VendorID->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->VendorID->ViewValue = $this->VendorID->CurrentValue;
+			}
+		} else {
+			$this->VendorID->ViewValue = NULL;
+		}
+		$this->VendorID->ViewCustomAttributes = "";
+
+		// ArticleID
+		if ($this->ArticleID->VirtualValue <> "") {
+			$this->ArticleID->ViewValue = $this->ArticleID->VirtualValue;
+		} else {
+		if (strval($this->ArticleID->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->ArticleID->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t06_article`";
+		$sWhereWrk = "";
+		$this->ArticleID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 			$rswrk = Conn()->Execute($sSqlWrk);
 			if ($rswrk && !$rswrk->EOF) { // Lookup values found
 				$arwrk = array();
 				$arwrk[1] = $rswrk->fields('DispFld');
 				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$this->MainGroupID->ViewValue = $this->MainGroupID->DisplayValue($arwrk);
+				$this->ArticleID->ViewValue = $this->ArticleID->DisplayValue($arwrk);
 				$rswrk->Close();
 			} else {
-				$this->MainGroupID->ViewValue = $this->MainGroupID->CurrentValue;
+				$this->ArticleID->ViewValue = $this->ArticleID->CurrentValue;
 			}
 		} else {
-			$this->MainGroupID->ViewValue = NULL;
+			$this->ArticleID->ViewValue = NULL;
 		}
 		}
-		$this->MainGroupID->ViewCustomAttributes = "";
+		$this->ArticleID->ViewCustomAttributes = "";
 
-		// SubGroupID
-		if ($this->SubGroupID->VirtualValue <> "") {
-			$this->SubGroupID->ViewValue = $this->SubGroupID->VirtualValue;
-		} else {
-		if (strval($this->SubGroupID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->SubGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t05_subgroup`";
-		$sWhereWrk = "";
-		$this->SubGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->SubGroupID, $sWhereWrk); // Call Lookup Selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$this->SubGroupID->ViewValue = $this->SubGroupID->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->SubGroupID->ViewValue = $this->SubGroupID->CurrentValue;
-			}
-		} else {
-			$this->SubGroupID->ViewValue = NULL;
-		}
-		}
-		$this->SubGroupID->ViewCustomAttributes = "";
+		// Harga
+		$this->Harga->ViewValue = $this->Harga->CurrentValue;
+		$this->Harga->ViewValue = ew_FormatNumber($this->Harga->ViewValue, 2, -2, -2, -2);
+		$this->Harga->CellCssStyle .= "text-align: right;";
+		$this->Harga->ViewCustomAttributes = "";
 
-		// Kode
-		$this->Kode->ViewValue = $this->Kode->CurrentValue;
-		$this->Kode->ViewCustomAttributes = "";
-
-		// Nama
-		$this->Nama->ViewValue = $this->Nama->CurrentValue;
-		$this->Nama->ViewCustomAttributes = "";
+		// Qty
+		$this->Qty->ViewValue = $this->Qty->CurrentValue;
+		$this->Qty->ViewValue = ew_FormatNumber($this->Qty->ViewValue, 2, -2, -2, -2);
+		$this->Qty->CellCssStyle .= "text-align: right;";
+		$this->Qty->ViewCustomAttributes = "";
 
 		// SatuanID
 		if ($this->SatuanID->VirtualValue <> "") {
 			$this->SatuanID->ViewValue = $this->SatuanID->VirtualValue;
 		} else {
+			$this->SatuanID->ViewValue = $this->SatuanID->CurrentValue;
 		if (strval($this->SatuanID->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->SatuanID->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_satuan`";
@@ -815,131 +831,104 @@ class ct06_article_add extends ct06_article {
 		}
 		$this->SatuanID->ViewCustomAttributes = "";
 
-		// Harga
-		$this->Harga->ViewValue = $this->Harga->CurrentValue;
-		$this->Harga->ViewValue = ew_FormatNumber($this->Harga->ViewValue, 2, -2, -2, -2);
-		$this->Harga->CellCssStyle .= "text-align: right;";
-		$this->Harga->ViewCustomAttributes = "";
+			// NoPO
+			$this->NoPO->LinkCustomAttributes = "";
+			$this->NoPO->HrefValue = "";
+			$this->NoPO->TooltipValue = "";
 
-			// MainGroupID
-			$this->MainGroupID->LinkCustomAttributes = "";
-			$this->MainGroupID->HrefValue = "";
-			$this->MainGroupID->TooltipValue = "";
+			// TglPO
+			$this->TglPO->LinkCustomAttributes = "";
+			$this->TglPO->HrefValue = "";
+			$this->TglPO->TooltipValue = "";
 
-			// SubGroupID
-			$this->SubGroupID->LinkCustomAttributes = "";
-			$this->SubGroupID->HrefValue = "";
-			$this->SubGroupID->TooltipValue = "";
+			// VendorID
+			$this->VendorID->LinkCustomAttributes = "";
+			$this->VendorID->HrefValue = "";
+			$this->VendorID->TooltipValue = "";
 
-			// Kode
-			$this->Kode->LinkCustomAttributes = "";
-			$this->Kode->HrefValue = "";
-			$this->Kode->TooltipValue = "";
-
-			// Nama
-			$this->Nama->LinkCustomAttributes = "";
-			$this->Nama->HrefValue = "";
-			$this->Nama->TooltipValue = "";
-
-			// SatuanID
-			$this->SatuanID->LinkCustomAttributes = "";
-			$this->SatuanID->HrefValue = "";
-			$this->SatuanID->TooltipValue = "";
+			// ArticleID
+			$this->ArticleID->LinkCustomAttributes = "";
+			$this->ArticleID->HrefValue = "";
+			$this->ArticleID->TooltipValue = "";
 
 			// Harga
 			$this->Harga->LinkCustomAttributes = "";
 			$this->Harga->HrefValue = "";
 			$this->Harga->TooltipValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
-			// MainGroupID
-			$this->MainGroupID->EditCustomAttributes = "";
-			if (trim(strval($this->MainGroupID->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->MainGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t04_maingroup`";
-			$sWhereWrk = "";
-			$this->MainGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->MainGroupID, $sWhereWrk); // Call Lookup Selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$arwrk[2] = ew_HtmlEncode($rswrk->fields('Disp2Fld'));
-				$this->MainGroupID->ViewValue = $this->MainGroupID->DisplayValue($arwrk);
-			} else {
-				$this->MainGroupID->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->MainGroupID->EditValue = $arwrk;
-
-			// SubGroupID
-			$this->SubGroupID->EditCustomAttributes = "";
-			if (trim(strval($this->SubGroupID->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->SubGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, `MainGroupID` AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t05_subgroup`";
-			$sWhereWrk = "";
-			$this->SubGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->SubGroupID, $sWhereWrk); // Call Lookup Selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$arwrk[2] = ew_HtmlEncode($rswrk->fields('Disp2Fld'));
-				$this->SubGroupID->ViewValue = $this->SubGroupID->DisplayValue($arwrk);
-			} else {
-				$this->SubGroupID->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->SubGroupID->EditValue = $arwrk;
-
-			// Kode
-			$this->Kode->EditAttrs["class"] = "form-control";
-			$this->Kode->EditCustomAttributes = "";
-			$this->Kode->EditValue = ew_HtmlEncode($this->Kode->CurrentValue);
-			$this->Kode->PlaceHolder = ew_RemoveHtml($this->Kode->FldCaption());
-
-			// Nama
-			$this->Nama->EditAttrs["class"] = "form-control";
-			$this->Nama->EditCustomAttributes = "";
-			$this->Nama->EditValue = ew_HtmlEncode($this->Nama->CurrentValue);
-			$this->Nama->PlaceHolder = ew_RemoveHtml($this->Nama->FldCaption());
+			// Qty
+			$this->Qty->LinkCustomAttributes = "";
+			$this->Qty->HrefValue = "";
+			$this->Qty->TooltipValue = "";
 
 			// SatuanID
-			$this->SatuanID->EditCustomAttributes = "";
-			if (trim(strval($this->SatuanID->CurrentValue)) == "") {
+			$this->SatuanID->LinkCustomAttributes = "";
+			$this->SatuanID->HrefValue = "";
+			$this->SatuanID->TooltipValue = "";
+		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
+
+			// NoPO
+			$this->NoPO->EditAttrs["class"] = "form-control";
+			$this->NoPO->EditCustomAttributes = "";
+			$this->NoPO->EditValue = ew_HtmlEncode($this->NoPO->CurrentValue);
+			$this->NoPO->PlaceHolder = ew_RemoveHtml($this->NoPO->FldCaption());
+
+			// TglPO
+			$this->TglPO->EditAttrs["class"] = "form-control";
+			$this->TglPO->EditCustomAttributes = "";
+			$this->TglPO->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->TglPO->CurrentValue, 7));
+			$this->TglPO->PlaceHolder = ew_RemoveHtml($this->TglPO->FldCaption());
+
+			// VendorID
+			$this->VendorID->EditCustomAttributes = "";
+			if (trim(strval($this->VendorID->CurrentValue)) == "") {
 				$sFilterWrk = "0=1";
 			} else {
-				$sFilterWrk = "`id`" . ew_SearchString("=", $this->SatuanID->CurrentValue, EW_DATATYPE_NUMBER, "");
+				$sFilterWrk = "`id`" . ew_SearchString("=", $this->VendorID->CurrentValue, EW_DATATYPE_NUMBER, "");
 			}
-			$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t07_satuan`";
+			$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t02_vendor`";
 			$sWhereWrk = "";
-			$this->SatuanID->LookupFilters = array("dx1" => '`Nama`');
+			$this->VendorID->LookupFilters = array("dx1" => '`Nama`');
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->SatuanID, $sWhereWrk); // Call Lookup Selecting
+			$this->Lookup_Selecting($this->VendorID, $sWhereWrk); // Call Lookup Selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 			$rswrk = Conn()->Execute($sSqlWrk);
 			if ($rswrk && !$rswrk->EOF) { // Lookup values found
 				$arwrk = array();
 				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$this->SatuanID->ViewValue = $this->SatuanID->DisplayValue($arwrk);
+				$this->VendorID->ViewValue = $this->VendorID->DisplayValue($arwrk);
 			} else {
-				$this->SatuanID->ViewValue = $Language->Phrase("PleaseSelect");
+				$this->VendorID->ViewValue = $Language->Phrase("PleaseSelect");
 			}
 			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
 			if ($rswrk) $rswrk->Close();
-			$this->SatuanID->EditValue = $arwrk;
+			$this->VendorID->EditValue = $arwrk;
+
+			// ArticleID
+			$this->ArticleID->EditCustomAttributes = "";
+			if (trim(strval($this->ArticleID->CurrentValue)) == "") {
+				$sFilterWrk = "0=1";
+			} else {
+				$sFilterWrk = "`id`" . ew_SearchString("=", $this->ArticleID->CurrentValue, EW_DATATYPE_NUMBER, "");
+			}
+			$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t06_article`";
+			$sWhereWrk = "";
+			$this->ArticleID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
+				$arwrk[2] = ew_HtmlEncode($rswrk->fields('Disp2Fld'));
+				$this->ArticleID->ViewValue = $this->ArticleID->DisplayValue($arwrk);
+			} else {
+				$this->ArticleID->ViewValue = $Language->Phrase("PleaseSelect");
+			}
+			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
+			if ($rswrk) $rswrk->Close();
+			$this->ArticleID->EditValue = $arwrk;
 
 			// Harga
 			$this->Harga->EditAttrs["class"] = "form-control";
@@ -948,31 +937,67 @@ class ct06_article_add extends ct06_article {
 			$this->Harga->PlaceHolder = ew_RemoveHtml($this->Harga->FldCaption());
 			if (strval($this->Harga->EditValue) <> "" && is_numeric($this->Harga->EditValue)) $this->Harga->EditValue = ew_FormatNumber($this->Harga->EditValue, -2, -2, -2, -2);
 
-			// Add refer script
-			// MainGroupID
-
-			$this->MainGroupID->LinkCustomAttributes = "";
-			$this->MainGroupID->HrefValue = "";
-
-			// SubGroupID
-			$this->SubGroupID->LinkCustomAttributes = "";
-			$this->SubGroupID->HrefValue = "";
-
-			// Kode
-			$this->Kode->LinkCustomAttributes = "";
-			$this->Kode->HrefValue = "";
-
-			// Nama
-			$this->Nama->LinkCustomAttributes = "";
-			$this->Nama->HrefValue = "";
+			// Qty
+			$this->Qty->EditAttrs["class"] = "form-control";
+			$this->Qty->EditCustomAttributes = "";
+			$this->Qty->EditValue = ew_HtmlEncode($this->Qty->CurrentValue);
+			$this->Qty->PlaceHolder = ew_RemoveHtml($this->Qty->FldCaption());
 
 			// SatuanID
-			$this->SatuanID->LinkCustomAttributes = "";
-			$this->SatuanID->HrefValue = "";
+			$this->SatuanID->EditAttrs["class"] = "form-control";
+			$this->SatuanID->EditCustomAttributes = "";
+			$this->SatuanID->EditValue = ew_HtmlEncode($this->SatuanID->CurrentValue);
+			if (strval($this->SatuanID->CurrentValue) <> "") {
+				$sFilterWrk = "`id`" . ew_SearchString("=", $this->SatuanID->CurrentValue, EW_DATATYPE_NUMBER, "");
+			$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_satuan`";
+			$sWhereWrk = "";
+			$this->SatuanID->LookupFilters = array("dx1" => '`Nama`');
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->SatuanID, $sWhereWrk); // Call Lookup Selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = Conn()->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$arwrk = array();
+					$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
+					$this->SatuanID->EditValue = $this->SatuanID->DisplayValue($arwrk);
+					$rswrk->Close();
+				} else {
+					$this->SatuanID->EditValue = ew_HtmlEncode($this->SatuanID->CurrentValue);
+				}
+			} else {
+				$this->SatuanID->EditValue = NULL;
+			}
+			$this->SatuanID->PlaceHolder = ew_RemoveHtml($this->SatuanID->FldCaption());
+
+			// Add refer script
+			// NoPO
+
+			$this->NoPO->LinkCustomAttributes = "";
+			$this->NoPO->HrefValue = "";
+
+			// TglPO
+			$this->TglPO->LinkCustomAttributes = "";
+			$this->TglPO->HrefValue = "";
+
+			// VendorID
+			$this->VendorID->LinkCustomAttributes = "";
+			$this->VendorID->HrefValue = "";
+
+			// ArticleID
+			$this->ArticleID->LinkCustomAttributes = "";
+			$this->ArticleID->HrefValue = "";
 
 			// Harga
 			$this->Harga->LinkCustomAttributes = "";
 			$this->Harga->HrefValue = "";
+
+			// Qty
+			$this->Qty->LinkCustomAttributes = "";
+			$this->Qty->HrefValue = "";
+
+			// SatuanID
+			$this->SatuanID->LinkCustomAttributes = "";
+			$this->SatuanID->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD || $this->RowType == EW_ROWTYPE_EDIT || $this->RowType == EW_ROWTYPE_SEARCH) // Add/Edit/Search row
 			$this->SetupFieldTitles();
@@ -992,20 +1017,26 @@ class ct06_article_add extends ct06_article {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
-		if (!$this->SubGroupID->FldIsDetailKey && !is_null($this->SubGroupID->FormValue) && $this->SubGroupID->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->SubGroupID->FldCaption(), $this->SubGroupID->ReqErrMsg));
+		if (!$this->NoPO->FldIsDetailKey && !is_null($this->NoPO->FormValue) && $this->NoPO->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->NoPO->FldCaption(), $this->NoPO->ReqErrMsg));
 		}
-		if (!$this->Kode->FldIsDetailKey && !is_null($this->Kode->FormValue) && $this->Kode->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->Kode->FldCaption(), $this->Kode->ReqErrMsg));
+		if (!$this->TglPO->FldIsDetailKey && !is_null($this->TglPO->FormValue) && $this->TglPO->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->TglPO->FldCaption(), $this->TglPO->ReqErrMsg));
 		}
-		if (!$this->Nama->FldIsDetailKey && !is_null($this->Nama->FormValue) && $this->Nama->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->Nama->FldCaption(), $this->Nama->ReqErrMsg));
+		if (!ew_CheckEuroDate($this->TglPO->FormValue)) {
+			ew_AddMessage($gsFormError, $this->TglPO->FldErrMsg());
 		}
-		if (!$this->SatuanID->FldIsDetailKey && !is_null($this->SatuanID->FormValue) && $this->SatuanID->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->SatuanID->FldCaption(), $this->SatuanID->ReqErrMsg));
+		if (!$this->VendorID->FldIsDetailKey && !is_null($this->VendorID->FormValue) && $this->VendorID->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->VendorID->FldCaption(), $this->VendorID->ReqErrMsg));
+		}
+		if (!$this->ArticleID->FldIsDetailKey && !is_null($this->ArticleID->FormValue) && $this->ArticleID->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->ArticleID->FldCaption(), $this->ArticleID->ReqErrMsg));
 		}
 		if (!ew_CheckNumber($this->Harga->FormValue)) {
 			ew_AddMessage($gsFormError, $this->Harga->FldErrMsg());
+		}
+		if (!ew_CheckInteger($this->Qty->FormValue)) {
+			ew_AddMessage($gsFormError, $this->Qty->FldErrMsg());
 		}
 
 		// Return validate result
@@ -1023,28 +1054,6 @@ class ct06_article_add extends ct06_article {
 	// Add record
 	function AddRow($rsold = NULL) {
 		global $Language, $Security;
-		if ($this->Kode->CurrentValue <> "") { // Check field with unique index
-			$sFilter = "(Kode = '" . ew_AdjustSql($this->Kode->CurrentValue, $this->DBID) . "')";
-			$rsChk = $this->LoadRs($sFilter);
-			if ($rsChk && !$rsChk->EOF) {
-				$sIdxErrMsg = str_replace("%f", $this->Kode->FldCaption(), $Language->Phrase("DupIndex"));
-				$sIdxErrMsg = str_replace("%v", $this->Kode->CurrentValue, $sIdxErrMsg);
-				$this->setFailureMessage($sIdxErrMsg);
-				$rsChk->Close();
-				return FALSE;
-			}
-		}
-		if ($this->Nama->CurrentValue <> "") { // Check field with unique index
-			$sFilter = "(Nama = '" . ew_AdjustSql($this->Nama->CurrentValue, $this->DBID) . "')";
-			$rsChk = $this->LoadRs($sFilter);
-			if ($rsChk && !$rsChk->EOF) {
-				$sIdxErrMsg = str_replace("%f", $this->Nama->FldCaption(), $Language->Phrase("DupIndex"));
-				$sIdxErrMsg = str_replace("%v", $this->Nama->CurrentValue, $sIdxErrMsg);
-				$this->setFailureMessage($sIdxErrMsg);
-				$rsChk->Close();
-				return FALSE;
-			}
-		}
 		$conn = &$this->Connection();
 
 		// Load db values from rsold
@@ -1053,23 +1062,26 @@ class ct06_article_add extends ct06_article {
 		}
 		$rsnew = array();
 
-		// MainGroupID
-		$this->MainGroupID->SetDbValueDef($rsnew, $this->MainGroupID->CurrentValue, NULL, FALSE);
+		// NoPO
+		$this->NoPO->SetDbValueDef($rsnew, $this->NoPO->CurrentValue, "", FALSE);
 
-		// SubGroupID
-		$this->SubGroupID->SetDbValueDef($rsnew, $this->SubGroupID->CurrentValue, 0, FALSE);
+		// TglPO
+		$this->TglPO->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->TglPO->CurrentValue, 7), ew_CurrentDate(), FALSE);
 
-		// Kode
-		$this->Kode->SetDbValueDef($rsnew, $this->Kode->CurrentValue, "", FALSE);
+		// VendorID
+		$this->VendorID->SetDbValueDef($rsnew, $this->VendorID->CurrentValue, 0, FALSE);
 
-		// Nama
-		$this->Nama->SetDbValueDef($rsnew, $this->Nama->CurrentValue, "", FALSE);
-
-		// SatuanID
-		$this->SatuanID->SetDbValueDef($rsnew, $this->SatuanID->CurrentValue, 0, FALSE);
+		// ArticleID
+		$this->ArticleID->SetDbValueDef($rsnew, $this->ArticleID->CurrentValue, 0, FALSE);
 
 		// Harga
 		$this->Harga->SetDbValueDef($rsnew, $this->Harga->CurrentValue, 0, strval($this->Harga->CurrentValue) == "");
+
+		// Qty
+		$this->Qty->SetDbValueDef($rsnew, $this->Qty->CurrentValue, 0, strval($this->Qty->CurrentValue) == "");
+
+		// SatuanID
+		$this->SatuanID->SetDbValueDef($rsnew, $this->SatuanID->CurrentValue, 0, FALSE);
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -1106,7 +1118,7 @@ class ct06_article_add extends ct06_article {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t06_articlelist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t08_polist.php"), "", $this->TableVar, TRUE);
 		$PageId = ($this->CurrentAction == "C") ? "Copy" : "Add";
 		$Breadcrumb->Add("add", $PageId, $url);
 	}
@@ -1116,26 +1128,26 @@ class ct06_article_add extends ct06_article {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
-		case "x_MainGroupID":
+		case "x_VendorID":
 			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `id` AS `LinkFld`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t04_maingroup`";
+			$sSqlWrk = "SELECT `id` AS `LinkFld`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t02_vendor`";
 			$sWhereWrk = "{filter}";
-			$fld->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
+			$fld->LookupFilters = array("dx1" => '`Nama`');
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` IN ({filter_value})', "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->MainGroupID, $sWhereWrk); // Call Lookup Selecting
+			$this->Lookup_Selecting($this->VendorID, $sWhereWrk); // Call Lookup Selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 			if ($sSqlWrk <> "")
 				$fld->LookupFilters["s"] .= $sSqlWrk;
 			break;
-		case "x_SubGroupID":
+		case "x_ArticleID":
 			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `id` AS `LinkFld`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t05_subgroup`";
+			$sSqlWrk = "SELECT `id` AS `LinkFld`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t06_article`";
 			$sWhereWrk = "{filter}";
 			$fld->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` IN ({filter_value})', "t0" => "3", "fn0" => "", "f1" => '`MainGroupID` IN ({filter_value})', "t1" => "3", "fn1" => "");
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` IN ({filter_value})', "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->SubGroupID, $sWhereWrk); // Call Lookup Selecting
+			$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 			if ($sSqlWrk <> "")
 				$fld->LookupFilters["s"] .= $sSqlWrk;
@@ -1160,6 +1172,18 @@ class ct06_article_add extends ct06_article {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_SatuanID":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld` FROM `t07_satuan`";
+			$sWhereWrk = "`Nama` LIKE '{query_value}%'";
+			$fld->LookupFilters = array("dx1" => '`Nama`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->SatuanID, $sWhereWrk); // Call Lookup Selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 
@@ -1235,29 +1259,29 @@ class ct06_article_add extends ct06_article {
 <?php
 
 // Create page object
-if (!isset($t06_article_add)) $t06_article_add = new ct06_article_add();
+if (!isset($t08_po_add)) $t08_po_add = new ct08_po_add();
 
 // Page init
-$t06_article_add->Page_Init();
+$t08_po_add->Page_Init();
 
 // Page main
-$t06_article_add->Page_Main();
+$t08_po_add->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t06_article_add->Page_Render();
+$t08_po_add->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "add";
-var CurrentForm = ft06_articleadd = new ew_Form("ft06_articleadd", "add");
+var CurrentForm = ft08_poadd = new ew_Form("ft08_poadd", "add");
 
 // Validate form
-ft06_articleadd.Validate = function() {
+ft08_poadd.Validate = function() {
 	if (!this.ValidateRequired)
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
@@ -1271,21 +1295,27 @@ ft06_articleadd.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
-			elm = this.GetElements("x" + infix + "_SubGroupID");
+			elm = this.GetElements("x" + infix + "_NoPO");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_article->SubGroupID->FldCaption(), $t06_article->SubGroupID->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_Kode");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t08_po->NoPO->FldCaption(), $t08_po->NoPO->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_TglPO");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_article->Kode->FldCaption(), $t06_article->Kode->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_Nama");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t08_po->TglPO->FldCaption(), $t08_po->TglPO->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_TglPO");
+			if (elm && !ew_CheckEuroDate(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t08_po->TglPO->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_VendorID");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_article->Nama->FldCaption(), $t06_article->Nama->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_SatuanID");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t08_po->VendorID->FldCaption(), $t08_po->VendorID->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_ArticleID");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_article->SatuanID->FldCaption(), $t06_article->SatuanID->ReqErrMsg)) ?>");
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t08_po->ArticleID->FldCaption(), $t08_po->ArticleID->ReqErrMsg)) ?>");
 			elm = this.GetElements("x" + infix + "_Harga");
 			if (elm && !ew_CheckNumber(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t06_article->Harga->FldErrMsg()) ?>");
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t08_po->Harga->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_Qty");
+			if (elm && !ew_CheckInteger(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t08_po->Qty->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -1304,7 +1334,7 @@ ft06_articleadd.Validate = function() {
 }
 
 // Form_CustomValidate event
-ft06_articleadd.Form_CustomValidate = 
+ft08_poadd.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid.
@@ -1312,15 +1342,16 @@ ft06_articleadd.Form_CustomValidate =
  }
 
 // Use JavaScript validation or not
-ft06_articleadd.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
+ft08_poadd.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
 
 // Dynamic selection lists
-ft06_articleadd.Lists["x_MainGroupID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kode","x_Nama","",""],"ParentFields":[],"ChildFields":["x_SubGroupID"],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t04_maingroup"};
-ft06_articleadd.Lists["x_MainGroupID"].Data = "<?php echo $t06_article_add->MainGroupID->LookupFilterQuery(FALSE, "add") ?>";
-ft06_articleadd.Lists["x_SubGroupID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kode","x_Nama","",""],"ParentFields":["x_MainGroupID"],"ChildFields":[],"FilterFields":["x_MainGroupID"],"Options":[],"Template":"","LinkTable":"t05_subgroup"};
-ft06_articleadd.Lists["x_SubGroupID"].Data = "<?php echo $t06_article_add->SubGroupID->LookupFilterQuery(FALSE, "add") ?>";
-ft06_articleadd.Lists["x_SatuanID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_satuan"};
-ft06_articleadd.Lists["x_SatuanID"].Data = "<?php echo $t06_article_add->SatuanID->LookupFilterQuery(FALSE, "add") ?>";
+ft08_poadd.Lists["x_VendorID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t02_vendor"};
+ft08_poadd.Lists["x_VendorID"].Data = "<?php echo $t08_po_add->VendorID->LookupFilterQuery(FALSE, "add") ?>";
+ft08_poadd.Lists["x_ArticleID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":true,"DisplayFields":["x_Kode","x_Nama","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t06_article"};
+ft08_poadd.Lists["x_ArticleID"].Data = "<?php echo $t08_po_add->ArticleID->LookupFilterQuery(FALSE, "add") ?>";
+ft08_poadd.Lists["x_SatuanID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_satuan"};
+ft08_poadd.Lists["x_SatuanID"].Data = "<?php echo $t08_po_add->SatuanID->LookupFilterQuery(FALSE, "add") ?>";
+ft08_poadd.AutoSuggests["x_SatuanID"] = <?php echo json_encode(array("data" => "ajax=autosuggest&" . $t08_po_add->SatuanID->LookupFilterQuery(TRUE, "add"))) ?>;
 
 // Form object for search
 </script>
@@ -1328,109 +1359,130 @@ ft06_articleadd.Lists["x_SatuanID"].Data = "<?php echo $t06_article_add->SatuanI
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php $t06_article_add->ShowPageHeader(); ?>
+<?php $t08_po_add->ShowPageHeader(); ?>
 <?php
-$t06_article_add->ShowMessage();
+$t08_po_add->ShowMessage();
 ?>
-<form name="ft06_articleadd" id="ft06_articleadd" class="<?php echo $t06_article_add->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t06_article_add->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t06_article_add->Token ?>">
+<form name="ft08_poadd" id="ft08_poadd" class="<?php echo $t08_po_add->FormClassName ?>" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t08_po_add->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t08_po_add->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t06_article">
+<input type="hidden" name="t" value="t08_po">
 <input type="hidden" name="a_add" id="a_add" value="A">
-<input type="hidden" name="modal" value="<?php echo intval($t06_article_add->IsModal) ?>">
+<input type="hidden" name="modal" value="<?php echo intval($t08_po_add->IsModal) ?>">
 <div class="ewAddDiv"><!-- page* -->
-<?php if ($t06_article->MainGroupID->Visible) { // MainGroupID ?>
-	<div id="r_MainGroupID" class="form-group">
-		<label id="elh_t06_article_MainGroupID" for="x_MainGroupID" class="<?php echo $t06_article_add->LeftColumnClass ?>"><?php echo $t06_article->MainGroupID->FldCaption() ?></label>
-		<div class="<?php echo $t06_article_add->RightColumnClass ?>"><div<?php echo $t06_article->MainGroupID->CellAttributes() ?>>
-<span id="el_t06_article_MainGroupID">
-<?php $t06_article->MainGroupID->EditAttrs["onchange"] = "ew_UpdateOpt.call(this); " . @$t06_article->MainGroupID->EditAttrs["onchange"]; ?>
+<?php if ($t08_po->NoPO->Visible) { // NoPO ?>
+	<div id="r_NoPO" class="form-group">
+		<label id="elh_t08_po_NoPO" for="x_NoPO" class="<?php echo $t08_po_add->LeftColumnClass ?>"><?php echo $t08_po->NoPO->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="<?php echo $t08_po_add->RightColumnClass ?>"><div<?php echo $t08_po->NoPO->CellAttributes() ?>>
+<span id="el_t08_po_NoPO">
+<input type="text" data-table="t08_po" data-field="x_NoPO" name="x_NoPO" id="x_NoPO" size="15" maxlength="14" placeholder="<?php echo ew_HtmlEncode($t08_po->NoPO->getPlaceHolder()) ?>" value="<?php echo $t08_po->NoPO->EditValue ?>"<?php echo $t08_po->NoPO->EditAttributes() ?>>
+</span>
+<?php echo $t08_po->NoPO->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t08_po->TglPO->Visible) { // TglPO ?>
+	<div id="r_TglPO" class="form-group">
+		<label id="elh_t08_po_TglPO" for="x_TglPO" class="<?php echo $t08_po_add->LeftColumnClass ?>"><?php echo $t08_po->TglPO->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="<?php echo $t08_po_add->RightColumnClass ?>"><div<?php echo $t08_po->TglPO->CellAttributes() ?>>
+<span id="el_t08_po_TglPO">
+<input type="text" data-table="t08_po" data-field="x_TglPO" data-format="7" name="x_TglPO" id="x_TglPO" size="10" placeholder="<?php echo ew_HtmlEncode($t08_po->TglPO->getPlaceHolder()) ?>" value="<?php echo $t08_po->TglPO->EditValue ?>"<?php echo $t08_po->TglPO->EditAttributes() ?>>
+<?php if (!$t08_po->TglPO->ReadOnly && !$t08_po->TglPO->Disabled && !isset($t08_po->TglPO->EditAttrs["readonly"]) && !isset($t08_po->TglPO->EditAttrs["disabled"])) { ?>
+<script type="text/javascript">
+ew_CreateDateTimePicker("ft08_poadd", "x_TglPO", {"ignoreReadonly":true,"useCurrent":false,"format":7});
+</script>
+<?php } ?>
+</span>
+<?php echo $t08_po->TglPO->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t08_po->VendorID->Visible) { // VendorID ?>
+	<div id="r_VendorID" class="form-group">
+		<label id="elh_t08_po_VendorID" for="x_VendorID" class="<?php echo $t08_po_add->LeftColumnClass ?>"><?php echo $t08_po->VendorID->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="<?php echo $t08_po_add->RightColumnClass ?>"><div<?php echo $t08_po->VendorID->CellAttributes() ?>>
+<span id="el_t08_po_VendorID">
 <span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_MainGroupID"><?php echo (strval($t06_article->MainGroupID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->MainGroupID->ViewValue); ?></span>
+	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_VendorID"><?php echo (strval($t08_po->VendorID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t08_po->VendorID->ViewValue); ?></span>
 </span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->MainGroupID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_MainGroupID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->MainGroupID->ReadOnly || $t06_article->MainGroupID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_MainGroupID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->MainGroupID->DisplayValueSeparatorAttribute() ?>" name="x_MainGroupID" id="x_MainGroupID" value="<?php echo $t06_article->MainGroupID->CurrentValue ?>"<?php echo $t06_article->MainGroupID->EditAttributes() ?>>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t08_po->VendorID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_VendorID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t08_po->VendorID->ReadOnly || $t08_po->VendorID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<input type="hidden" data-table="t08_po" data-field="x_VendorID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t08_po->VendorID->DisplayValueSeparatorAttribute() ?>" name="x_VendorID" id="x_VendorID" value="<?php echo $t08_po->VendorID->CurrentValue ?>"<?php echo $t08_po->VendorID->EditAttributes() ?>>
 </span>
-<?php echo $t06_article->MainGroupID->CustomMsg ?></div></div>
+<?php echo $t08_po->VendorID->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
-<?php if ($t06_article->SubGroupID->Visible) { // SubGroupID ?>
-	<div id="r_SubGroupID" class="form-group">
-		<label id="elh_t06_article_SubGroupID" for="x_SubGroupID" class="<?php echo $t06_article_add->LeftColumnClass ?>"><?php echo $t06_article->SubGroupID->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="<?php echo $t06_article_add->RightColumnClass ?>"><div<?php echo $t06_article->SubGroupID->CellAttributes() ?>>
-<span id="el_t06_article_SubGroupID">
+<?php if ($t08_po->ArticleID->Visible) { // ArticleID ?>
+	<div id="r_ArticleID" class="form-group">
+		<label id="elh_t08_po_ArticleID" for="x_ArticleID" class="<?php echo $t08_po_add->LeftColumnClass ?>"><?php echo $t08_po->ArticleID->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
+		<div class="<?php echo $t08_po_add->RightColumnClass ?>"><div<?php echo $t08_po->ArticleID->CellAttributes() ?>>
+<span id="el_t08_po_ArticleID">
+<?php $t08_po->ArticleID->EditAttrs["onchange"] = "ew_AutoFill(this); " . @$t08_po->ArticleID->EditAttrs["onchange"]; ?>
 <span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_SubGroupID"><?php echo (strval($t06_article->SubGroupID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->SubGroupID->ViewValue); ?></span>
+	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_ArticleID"><?php echo (strval($t08_po->ArticleID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t08_po->ArticleID->ViewValue); ?></span>
 </span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->SubGroupID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_SubGroupID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->SubGroupID->ReadOnly || $t06_article->SubGroupID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_SubGroupID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->SubGroupID->DisplayValueSeparatorAttribute() ?>" name="x_SubGroupID" id="x_SubGroupID" value="<?php echo $t06_article->SubGroupID->CurrentValue ?>"<?php echo $t06_article->SubGroupID->EditAttributes() ?>>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t08_po->ArticleID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_ArticleID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t08_po->ArticleID->ReadOnly || $t08_po->ArticleID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
+<input type="hidden" data-table="t08_po" data-field="x_ArticleID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t08_po->ArticleID->DisplayValueSeparatorAttribute() ?>" name="x_ArticleID" id="x_ArticleID" value="<?php echo $t08_po->ArticleID->CurrentValue ?>"<?php echo $t08_po->ArticleID->EditAttributes() ?>>
+<input type="hidden" name="ln_x_ArticleID" id="ln_x_ArticleID" value="x_Harga,x_SatuanID">
 </span>
-<?php echo $t06_article->SubGroupID->CustomMsg ?></div></div>
+<?php echo $t08_po->ArticleID->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
-<?php if ($t06_article->Kode->Visible) { // Kode ?>
-	<div id="r_Kode" class="form-group">
-		<label id="elh_t06_article_Kode" for="x_Kode" class="<?php echo $t06_article_add->LeftColumnClass ?>"><?php echo $t06_article->Kode->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="<?php echo $t06_article_add->RightColumnClass ?>"><div<?php echo $t06_article->Kode->CellAttributes() ?>>
-<span id="el_t06_article_Kode">
-<input type="text" data-table="t06_article" data-field="x_Kode" name="x_Kode" id="x_Kode" size="30" maxlength="7" placeholder="<?php echo ew_HtmlEncode($t06_article->Kode->getPlaceHolder()) ?>" value="<?php echo $t06_article->Kode->EditValue ?>"<?php echo $t06_article->Kode->EditAttributes() ?>>
-</span>
-<?php echo $t06_article->Kode->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
-<?php if ($t06_article->Nama->Visible) { // Nama ?>
-	<div id="r_Nama" class="form-group">
-		<label id="elh_t06_article_Nama" for="x_Nama" class="<?php echo $t06_article_add->LeftColumnClass ?>"><?php echo $t06_article->Nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="<?php echo $t06_article_add->RightColumnClass ?>"><div<?php echo $t06_article->Nama->CellAttributes() ?>>
-<span id="el_t06_article_Nama">
-<input type="text" data-table="t06_article" data-field="x_Nama" name="x_Nama" id="x_Nama" size="30" maxlength="75" placeholder="<?php echo ew_HtmlEncode($t06_article->Nama->getPlaceHolder()) ?>" value="<?php echo $t06_article->Nama->EditValue ?>"<?php echo $t06_article->Nama->EditAttributes() ?>>
-</span>
-<?php echo $t06_article->Nama->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
-<?php if ($t06_article->SatuanID->Visible) { // SatuanID ?>
-	<div id="r_SatuanID" class="form-group">
-		<label id="elh_t06_article_SatuanID" for="x_SatuanID" class="<?php echo $t06_article_add->LeftColumnClass ?>"><?php echo $t06_article->SatuanID->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
-		<div class="<?php echo $t06_article_add->RightColumnClass ?>"><div<?php echo $t06_article->SatuanID->CellAttributes() ?>>
-<span id="el_t06_article_SatuanID">
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_SatuanID"><?php echo (strval($t06_article->SatuanID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t06_article->SatuanID->ViewValue); ?></span>
-</span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t06_article->SatuanID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_SatuanID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t06_article->SatuanID->ReadOnly || $t06_article->SatuanID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t06_article" data-field="x_SatuanID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t06_article->SatuanID->DisplayValueSeparatorAttribute() ?>" name="x_SatuanID" id="x_SatuanID" value="<?php echo $t06_article->SatuanID->CurrentValue ?>"<?php echo $t06_article->SatuanID->EditAttributes() ?>>
-<?php if (AllowAdd(CurrentProjectID() . "t07_satuan") && !$t06_article->SatuanID->ReadOnly) { ?>
-<button type="button" title="<?php echo ew_HtmlTitle($Language->Phrase("AddLink")) . "&nbsp;" . $t06_article->SatuanID->FldCaption() ?>" onclick="ew_AddOptDialogShow({lnk:this,el:'x_SatuanID',url:'t07_satuanaddopt.php'});" class="ewAddOptBtn btn btn-default btn-sm" id="aol_x_SatuanID"><span class="glyphicon glyphicon-plus ewIcon"></span><span class="hide"><?php echo $Language->Phrase("AddLink") ?>&nbsp;<?php echo $t06_article->SatuanID->FldCaption() ?></span></button>
-<?php } ?>
-</span>
-<?php echo $t06_article->SatuanID->CustomMsg ?></div></div>
-	</div>
-<?php } ?>
-<?php if ($t06_article->Harga->Visible) { // Harga ?>
+<?php if ($t08_po->Harga->Visible) { // Harga ?>
 	<div id="r_Harga" class="form-group">
-		<label id="elh_t06_article_Harga" for="x_Harga" class="<?php echo $t06_article_add->LeftColumnClass ?>"><?php echo $t06_article->Harga->FldCaption() ?></label>
-		<div class="<?php echo $t06_article_add->RightColumnClass ?>"><div<?php echo $t06_article->Harga->CellAttributes() ?>>
-<span id="el_t06_article_Harga">
-<input type="text" data-table="t06_article" data-field="x_Harga" name="x_Harga" id="x_Harga" size="30" placeholder="<?php echo ew_HtmlEncode($t06_article->Harga->getPlaceHolder()) ?>" value="<?php echo $t06_article->Harga->EditValue ?>"<?php echo $t06_article->Harga->EditAttributes() ?>>
+		<label id="elh_t08_po_Harga" for="x_Harga" class="<?php echo $t08_po_add->LeftColumnClass ?>"><?php echo $t08_po->Harga->FldCaption() ?></label>
+		<div class="<?php echo $t08_po_add->RightColumnClass ?>"><div<?php echo $t08_po->Harga->CellAttributes() ?>>
+<span id="el_t08_po_Harga">
+<input type="text" data-table="t08_po" data-field="x_Harga" name="x_Harga" id="x_Harga" size="10" placeholder="<?php echo ew_HtmlEncode($t08_po->Harga->getPlaceHolder()) ?>" value="<?php echo $t08_po->Harga->EditValue ?>"<?php echo $t08_po->Harga->EditAttributes() ?>>
 </span>
-<?php echo $t06_article->Harga->CustomMsg ?></div></div>
+<?php echo $t08_po->Harga->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t08_po->Qty->Visible) { // Qty ?>
+	<div id="r_Qty" class="form-group">
+		<label id="elh_t08_po_Qty" for="x_Qty" class="<?php echo $t08_po_add->LeftColumnClass ?>"><?php echo $t08_po->Qty->FldCaption() ?></label>
+		<div class="<?php echo $t08_po_add->RightColumnClass ?>"><div<?php echo $t08_po->Qty->CellAttributes() ?>>
+<span id="el_t08_po_Qty">
+<input type="text" data-table="t08_po" data-field="x_Qty" name="x_Qty" id="x_Qty" size="5" placeholder="<?php echo ew_HtmlEncode($t08_po->Qty->getPlaceHolder()) ?>" value="<?php echo $t08_po->Qty->EditValue ?>"<?php echo $t08_po->Qty->EditAttributes() ?>>
+</span>
+<?php echo $t08_po->Qty->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t08_po->SatuanID->Visible) { // SatuanID ?>
+	<div id="r_SatuanID" class="form-group">
+		<label id="elh_t08_po_SatuanID" class="<?php echo $t08_po_add->LeftColumnClass ?>"><?php echo $t08_po->SatuanID->FldCaption() ?></label>
+		<div class="<?php echo $t08_po_add->RightColumnClass ?>"><div<?php echo $t08_po->SatuanID->CellAttributes() ?>>
+<span id="el_t08_po_SatuanID">
+<?php
+$wrkonchange = trim(" " . @$t08_po->SatuanID->EditAttrs["onchange"]);
+if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
+$t08_po->SatuanID->EditAttrs["onchange"] = "";
+?>
+<span id="as_x_SatuanID" style="white-space: nowrap; z-index: 8920">
+	<input type="text" name="sv_x_SatuanID" id="sv_x_SatuanID" value="<?php echo $t08_po->SatuanID->EditValue ?>" size="5" placeholder="<?php echo ew_HtmlEncode($t08_po->SatuanID->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t08_po->SatuanID->getPlaceHolder()) ?>"<?php echo $t08_po->SatuanID->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t08_po" data-field="x_SatuanID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t08_po->SatuanID->DisplayValueSeparatorAttribute() ?>" name="x_SatuanID" id="x_SatuanID" value="<?php echo ew_HtmlEncode($t08_po->SatuanID->CurrentValue) ?>"<?php echo $wrkonchange ?>>
+<script type="text/javascript">
+ft08_poadd.CreateAutoSuggest({"id":"x_SatuanID","forceSelect":true});
+</script>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t08_po->SatuanID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_SatuanID',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t08_po->SatuanID->ReadOnly || $t08_po->SatuanID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
+</span>
+<?php echo $t08_po->SatuanID->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div><!-- /page* -->
-<?php if (!$t06_article_add->IsModal) { ?>
+<?php if (!$t08_po_add->IsModal) { ?>
 <div class="form-group"><!-- buttons .form-group -->
-	<div class="<?php echo $t06_article_add->OffsetColumnClass ?>"><!-- buttons offset -->
+	<div class="<?php echo $t08_po_add->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("AddBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t06_article_add->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t08_po_add->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
 	</div><!-- /buttons offset -->
 </div><!-- /buttons .form-group -->
 <?php } ?>
 </form>
 <script type="text/javascript">
-ft06_articleadd.Init();
+ft08_poadd.Init();
 </script>
 <?php
-$t06_article_add->ShowPageFooter();
+$t08_po_add->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -1439,8 +1491,10 @@ if (EW_DEBUG_ENABLED)
 // Write your table-specific startup script here
 // document.write("page loaded");
 
+$("#x_TglPO").val("<?php echo date('d-m-Y');?>");
+$("#x0_TglPO").val("<?php echo date('d-m-Y');?>");
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$t06_article_add->Page_Terminate();
+$t08_po_add->Page_Terminate();
 ?>
