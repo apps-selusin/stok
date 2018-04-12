@@ -1,21 +1,24 @@
 <?php
 
 // Global variable for table object
-$t08_po = NULL;
+$r01_beli = NULL;
 
 //
-// Table class for t08_po
+// Table class for r01_beli
 //
-class crt08_po extends crTableBase {
+class crr01_beli extends crTableBase {
 	var $ShowGroupHeaderAsRow = FALSE;
 	var $ShowCompactSummaryFooter = TRUE;
 	var $id;
 	var $TglPO;
 	var $NoPO;
 	var $VendorID;
+	var $VendorNama;
 	var $ArticleID;
+	var $ArticleNama;
 	var $Harga;
 	var $Qty;
+	var $SatuanNama;
 	var $SubTotal;
 
 	//
@@ -23,17 +26,17 @@ class crt08_po extends crTableBase {
 	//
 	function __construct() {
 		global $ReportLanguage, $grLanguage;
-		$this->TableVar = 't08_po';
-		$this->TableName = 't08_po';
-		$this->TableType = 'TABLE';
-		$this->TableReportType = 'rpt';
+		$this->TableVar = 'r01_beli';
+		$this->TableName = 'r01_beli';
+		$this->TableType = 'REPORT';
+		$this->TableReportType = 'summary';
 		$this->SourcTableIsCustomView = FALSE;
 		$this->DBID = 'DB';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0;
 
 		// id
-		$this->id = new crField('t08_po', 't08_po', 'x_id', 'id', '`id`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->id = new crField('r01_beli', 'r01_beli', 'x_id', 'id', '`id`', 3, EWR_DATATYPE_NUMBER, -1);
 		$this->id->Sortable = TRUE; // Allow sort
 		$this->id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
 		$this->id->DateFilter = "";
@@ -42,16 +45,22 @@ class crt08_po extends crTableBase {
 		$this->fields['id'] = &$this->id;
 
 		// TglPO
-		$this->TglPO = new crField('t08_po', 't08_po', 'x_TglPO', 'TglPO', '`TglPO`', 133, EWR_DATATYPE_DATE, 0);
+		$this->TglPO = new crField('r01_beli', 'r01_beli', 'x_TglPO', 'TglPO', '`TglPO`', 133, EWR_DATATYPE_DATE, 7);
 		$this->TglPO->Sortable = TRUE; // Allow sort
-		$this->TglPO->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_FORMAT"], $ReportLanguage->Phrase("IncorrectDate"));
+		$this->TglPO->GroupingFieldId = 1;
+		$this->TglPO->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
+		$this->TglPO->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
+		$this->TglPO->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_SEPARATOR"], $ReportLanguage->Phrase("IncorrectDateDMY"));
 		$this->TglPO->DateFilter = "";
 		$this->TglPO->SqlSelect = "";
 		$this->TglPO->SqlOrderBy = "";
+		$this->TglPO->FldGroupByType = "";
+		$this->TglPO->FldGroupInt = "0";
+		$this->TglPO->FldGroupSql = "";
 		$this->fields['TglPO'] = &$this->TglPO;
 
 		// NoPO
-		$this->NoPO = new crField('t08_po', 't08_po', 'x_NoPO', 'NoPO', '`NoPO`', 200, EWR_DATATYPE_STRING, -1);
+		$this->NoPO = new crField('r01_beli', 'r01_beli', 'x_NoPO', 'NoPO', '`NoPO`', 200, EWR_DATATYPE_STRING, -1);
 		$this->NoPO->Sortable = TRUE; // Allow sort
 		$this->NoPO->DateFilter = "";
 		$this->NoPO->SqlSelect = "";
@@ -59,7 +68,7 @@ class crt08_po extends crTableBase {
 		$this->fields['NoPO'] = &$this->NoPO;
 
 		// VendorID
-		$this->VendorID = new crField('t08_po', 't08_po', 'x_VendorID', 'VendorID', '`VendorID`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->VendorID = new crField('r01_beli', 'r01_beli', 'x_VendorID', 'VendorID', '`VendorID`', 3, EWR_DATATYPE_NUMBER, -1);
 		$this->VendorID->Sortable = TRUE; // Allow sort
 		$this->VendorID->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
 		$this->VendorID->DateFilter = "";
@@ -67,8 +76,17 @@ class crt08_po extends crTableBase {
 		$this->VendorID->SqlOrderBy = "";
 		$this->fields['VendorID'] = &$this->VendorID;
 
+		// VendorNama
+		$this->VendorNama = new crField('r01_beli', 'r01_beli', 'x_VendorNama', 'VendorNama', '(select nama from t02_vendor where id = vendorid)', 200, EWR_DATATYPE_STRING, -1);
+		$this->VendorNama->FldIsCustom = TRUE; // Custom field
+		$this->VendorNama->Sortable = TRUE; // Allow sort
+		$this->VendorNama->DateFilter = "";
+		$this->VendorNama->SqlSelect = "";
+		$this->VendorNama->SqlOrderBy = "";
+		$this->fields['VendorNama'] = &$this->VendorNama;
+
 		// ArticleID
-		$this->ArticleID = new crField('t08_po', 't08_po', 'x_ArticleID', 'ArticleID', '`ArticleID`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->ArticleID = new crField('r01_beli', 'r01_beli', 'x_ArticleID', 'ArticleID', '`ArticleID`', 3, EWR_DATATYPE_NUMBER, -1);
 		$this->ArticleID->Sortable = TRUE; // Allow sort
 		$this->ArticleID->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
 		$this->ArticleID->DateFilter = "";
@@ -76,8 +94,17 @@ class crt08_po extends crTableBase {
 		$this->ArticleID->SqlOrderBy = "";
 		$this->fields['ArticleID'] = &$this->ArticleID;
 
+		// ArticleNama
+		$this->ArticleNama = new crField('r01_beli', 'r01_beli', 'x_ArticleNama', 'ArticleNama', '(select concat(kode, \' - \', nama) from t06_article where id = articleid)', 200, EWR_DATATYPE_STRING, -1);
+		$this->ArticleNama->FldIsCustom = TRUE; // Custom field
+		$this->ArticleNama->Sortable = TRUE; // Allow sort
+		$this->ArticleNama->DateFilter = "";
+		$this->ArticleNama->SqlSelect = "";
+		$this->ArticleNama->SqlOrderBy = "";
+		$this->fields['ArticleNama'] = &$this->ArticleNama;
+
 		// Harga
-		$this->Harga = new crField('t08_po', 't08_po', 'x_Harga', 'Harga', '`Harga`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->Harga = new crField('r01_beli', 'r01_beli', 'x_Harga', 'Harga', '`Harga`', 4, EWR_DATATYPE_NUMBER, -1);
 		$this->Harga->Sortable = TRUE; // Allow sort
 		$this->Harga->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->Harga->DateFilter = "";
@@ -86,7 +113,7 @@ class crt08_po extends crTableBase {
 		$this->fields['Harga'] = &$this->Harga;
 
 		// Qty
-		$this->Qty = new crField('t08_po', 't08_po', 'x_Qty', 'Qty', '`Qty`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->Qty = new crField('r01_beli', 'r01_beli', 'x_Qty', 'Qty', '`Qty`', 4, EWR_DATATYPE_NUMBER, -1);
 		$this->Qty->Sortable = TRUE; // Allow sort
 		$this->Qty->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->Qty->DateFilter = "";
@@ -94,8 +121,17 @@ class crt08_po extends crTableBase {
 		$this->Qty->SqlOrderBy = "";
 		$this->fields['Qty'] = &$this->Qty;
 
+		// SatuanNama
+		$this->SatuanNama = new crField('r01_beli', 'r01_beli', 'x_SatuanNama', 'SatuanNama', '(SELECT b.nama FROM t06_article a, t07_satuan b where articleid = a.id and a.satuanid = b.id)', 200, EWR_DATATYPE_STRING, -1);
+		$this->SatuanNama->FldIsCustom = TRUE; // Custom field
+		$this->SatuanNama->Sortable = TRUE; // Allow sort
+		$this->SatuanNama->DateFilter = "";
+		$this->SatuanNama->SqlSelect = "";
+		$this->SatuanNama->SqlOrderBy = "";
+		$this->fields['SatuanNama'] = &$this->SatuanNama;
+
 		// SubTotal
-		$this->SubTotal = new crField('t08_po', 't08_po', 'x_SubTotal', 'SubTotal', '`SubTotal`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->SubTotal = new crField('r01_beli', 'r01_beli', 'x_SubTotal', 'SubTotal', '`SubTotal`', 4, EWR_DATATYPE_NUMBER, -1);
 		$this->SubTotal->Sortable = TRUE; // Allow sort
 		$this->SubTotal->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->SubTotal->DateFilter = "";
@@ -173,7 +209,7 @@ class crt08_po extends crTableBase {
 	var $_SqlFrom = "";
 
 	function getSqlFrom() {
-		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t08_po`";
+		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t08_beli`";
 	}
 
 	function SqlFrom() { // For backward compatibility
@@ -188,7 +224,7 @@ class crt08_po extends crTableBase {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() {
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT * FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (select nama from t02_vendor where id = vendorid) AS `VendorNama`, (select concat(kode, ' - ', nama) from t06_article where id = articleid) AS `ArticleNama`, (SELECT b.nama FROM t06_article a, t07_satuan b where articleid = a.id and a.satuanid = b.id) AS `SatuanNama` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -249,7 +285,7 @@ class crt08_po extends crTableBase {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() {
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`TglPO` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -260,11 +296,58 @@ class crt08_po extends crTableBase {
 		$this->_SqlOrderBy = $v;
 	}
 
+	// Table Level Group SQL
+	// First Group Field
+
+	var $_SqlFirstGroupField = "";
+
+	function getSqlFirstGroupField() {
+		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`TglPO`";
+	}
+
+	function SqlFirstGroupField() { // For backward compatibility
+		return $this->getSqlFirstGroupField();
+	}
+
+	function setSqlFirstGroupField($v) {
+		$this->_SqlFirstGroupField = $v;
+	}
+
+	// Select Group
+	var $_SqlSelectGroup = "";
+
+	function getSqlSelectGroup() {
+		return ($this->_SqlSelectGroup <> "") ? $this->_SqlSelectGroup : "SELECT DISTINCT " . $this->getSqlFirstGroupField() . " FROM " . $this->getSqlFrom();
+	}
+
+	function SqlSelectGroup() { // For backward compatibility
+		return $this->getSqlSelectGroup();
+	}
+
+	function setSqlSelectGroup($v) {
+		$this->_SqlSelectGroup = $v;
+	}
+
+	// Order By Group
+	var $_SqlOrderByGroup = "";
+
+	function getSqlOrderByGroup() {
+		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`TglPO` ASC";
+	}
+
+	function SqlOrderByGroup() { // For backward compatibility
+		return $this->getSqlOrderByGroup();
+	}
+
+	function setSqlOrderByGroup($v) {
+		$this->_SqlOrderByGroup = $v;
+	}
+
 	// Select Aggregate
 	var $_SqlSelectAgg = "";
 
 	function getSqlSelectAgg() {
-		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT * FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT SUM(`SubTotal`) AS `sum_subtotal` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelectAgg() { // For backward compatibility

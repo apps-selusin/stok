@@ -370,6 +370,9 @@
   <project>
     <phrase id="bodytitle" value="STOK Apps." />
     <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
+    <menu id="13">
+      <phrase id="menutext" value="Pembelian" />
+    </menu>
     <menu id="1">
       <phrase id="menutext" value="t 01 company" />
     </menu>
@@ -392,7 +395,7 @@
       <phrase id="menutext" value="t 07 satuan" />
     </menu>
     <menu id="8">
-      <phrase id="menutext" value="Pembelian" />
+      <phrase id="menutext" value="t 08 beli" />
     </menu>
     <menu id="9">
       <phrase id="menutext" value="t 96 employees" />
@@ -490,8 +493,8 @@
         <phrase id="fldcaption" value="Nama" />
       </field>
     </table>
-    <table id="t08_po">
-      <phrase id="tblcaption" value="Pembelian" />
+    <table id="t08_beli">
+      <phrase id="tblcaption" value="t 08 beli" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
@@ -504,8 +507,14 @@
       <field id="vendorid">
         <phrase id="fldcaption" value="Vendor ID" />
       </field>
+      <field id="vendornama">
+        <phrase id="fldcaption" value="Vendor" />
+      </field>
       <field id="articleid">
         <phrase id="fldcaption" value="Article ID" />
+      </field>
+      <field id="articlenama">
+        <phrase id="fldcaption" value="Article" />
       </field>
       <field id="harga">
         <phrase id="fldcaption" value="Harga" />
@@ -515,6 +524,9 @@
       </field>
       <field id="subtotal">
         <phrase id="fldcaption" value="Sub Total" />
+      </field>
+      <field id="satuannama">
+        <phrase id="fldcaption" value="Satuan" />
       </field>
     </table>
     <table id="t96_employees">
@@ -641,6 +653,42 @@
       </field>
       <field id="newvalue">
         <phrase id="fldcaption" value="newvalue" />
+      </field>
+    </table>
+    <table id="r01_beli">
+      <phrase id="tblcaption" value="Pembelian" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="tglpo">
+        <phrase id="fldcaption" value="Tgl PO" />
+      </field>
+      <field id="nopo">
+        <phrase id="fldcaption" value="No PO" />
+      </field>
+      <field id="vendorid">
+        <phrase id="fldcaption" value="Vendor ID" />
+      </field>
+      <field id="vendornama">
+        <phrase id="fldcaption" value="Vendor" />
+      </field>
+      <field id="articleid">
+        <phrase id="fldcaption" value="Article ID" />
+      </field>
+      <field id="articlenama">
+        <phrase id="fldcaption" value="Article" />
+      </field>
+      <field id="harga">
+        <phrase id="fldcaption" value="Harga" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="Qty" />
+      </field>
+      <field id="satuannama">
+        <phrase id="fldcaption" value="Satuan" />
+      </field>
+      <field id="subtotal">
+        <phrase id="fldcaption" value="Sub Total" />
       </field>
     </table>
   </project>

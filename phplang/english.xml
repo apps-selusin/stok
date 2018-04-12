@@ -627,7 +627,7 @@
     <menu id="10013">
       <phrase id="menutext" value="Laporan" />
     </menu>
-    <menu id="10008">
+    <menu id="10014">
       <phrase id="menutext" value="Pembelian" />
     </menu>
     <menu id="6">
@@ -689,6 +689,9 @@
     </menu>
     <menu id="10007">
       <phrase id="menutext" value="t 07 satuan" />
+    </menu>
+    <menu id="10008">
+      <phrase id="menutext" value="t 08 beli" />
     </menu>
     <menu id="10009">
       <phrase id="menutext" value="t 96 employees" />
@@ -792,7 +795,7 @@
         <phrase id="fldcaption" value="Nama" />
       </field>
     </table>
-    <table id="t08_po">
+    <table id="t08_beli">
       <phrase id="tblcaption" value="Pembelian" />
       <field id="id">
         <phrase id="fldcaption" value="id" />

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 11, 2018 at 06:43 PM
+-- Generation Time: Apr 12, 2018 at 06:21 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -182,10 +182,10 @@ INSERT INTO `t07_satuan` (`id`, `Nama`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `t08_po`
+-- Table structure for table `t08_beli`
 --
 
-CREATE TABLE IF NOT EXISTS `t08_po` (
+CREATE TABLE IF NOT EXISTS `t08_beli` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `TglPO` date NOT NULL,
   `NoPO` varchar(14) NOT NULL,
@@ -198,11 +198,11 @@ CREATE TABLE IF NOT EXISTS `t08_po` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
 
 --
--- Dumping data for table `t08_po`
+-- Dumping data for table `t08_beli`
 --
 
-INSERT INTO `t08_po` (`id`, `TglPO`, `NoPO`, `VendorID`, `ArticleID`, `Harga`, `Qty`, `SubTotal`) VALUES
-(1, '2018-04-11', 'PO201804110001', 2, 1, 50000.00, 3.00, 150000.00),
+INSERT INTO `t08_beli` (`id`, `TglPO`, `NoPO`, `VendorID`, `ArticleID`, `Harga`, `Qty`, `SubTotal`) VALUES
+(1, '2018-04-11', 'PO201804110001', 2, 1, 50000.00, 2.10, 105000.00),
 (2, '2018-04-11', 'PO201804110002', 1, 1, 75000.00, 3.00, 225000.00),
 (3, '2018-04-11', 'PO201804110003', 2, 1, 60000.00, 4.00, 240000.00);
 
@@ -324,7 +324,7 @@ CREATE TABLE IF NOT EXISTS `t99_audittrail` (
   `oldvalue` longtext CHARACTER SET latin1,
   `newvalue` longtext CHARACTER SET latin1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=158 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=161 ;
 
 --
 -- Dumping data for table `t99_audittrail`
@@ -485,7 +485,10 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (154, '2018-04-11 19:19:58', '/stok/t08_poedit.php', '1', 'U', 't08_po', 'SubTotal', '3', '0.00', '240000'),
 (155, '2018-04-11 19:26:17', '/stok/t08_polist.php', '1', 'U', 't08_po', 'VendorID', '1', '1', '2'),
 (156, '2018-04-11 19:26:17', '/stok/t08_polist.php', '1', 'U', 't08_po', 'Qty', '1', '2', '3'),
-(157, '2018-04-11 19:26:17', '/stok/t08_polist.php', '1', 'U', 't08_po', 'SubTotal', '1', '100000.00', '150000');
+(157, '2018-04-11 19:26:17', '/stok/t08_polist.php', '1', 'U', 't08_po', 'SubTotal', '1', '100000.00', '150000'),
+(158, '2018-04-12 09:01:48', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(159, '2018-04-12 09:56:17', '/stok/t08_polist.php', '1', 'U', 't08_po', 'Qty', '1', '3.00', '2.1'),
+(160, '2018-04-12 09:56:17', '/stok/t08_polist.php', '1', 'U', 't08_po', 'SubTotal', '1', '150000.00', '105000');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
