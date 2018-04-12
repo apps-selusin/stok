@@ -627,6 +627,9 @@
     <menu id="10013">
       <phrase id="menutext" value="Laporan" />
     </menu>
+    <menu id="10017">
+      <phrase id="menutext" value="Stok" />
+    </menu>
     <menu id="10014">
       <phrase id="menutext" value="Pembelian" />
     </menu>
@@ -668,6 +671,12 @@
     </menu>
     <menu id="5">
       <phrase id="menutext" value="Activity Log" />
+    </menu>
+    <menu id="10015">
+      <phrase id="menutext" value="v 01 beli" />
+    </menu>
+    <menu id="10016">
+      <phrase id="menutext" value="v 02 stok" />
     </menu>
     <menu id="10001">
       <phrase id="menutext" value="t 01 company" />

@@ -198,28 +198,8 @@ function f_BuatAjax() {
 	return null;
 }
 
-	// Table 't_04beli' Field 'qty'
-	$('[data-table=t_04beli][data-field=x_qty]').on(
-		{ // keys = event types, values = handler functions
-			"change keyup": function(e) {
-				var $row = $(this).fields();
-				var qty = parseInt($row["qty"].val());
-
-				//var harga = parseInt($row["harga"].val());
-				var harga_asli = $row["harga"].val();
-				var harga_clean = harga_asli.replace(/,/g, '');
-				var harga = parseInt(harga_clean);
-				var st = qty * harga;
-
-				//alert(st);
-				$row["sub_total"].val(st);
-				$row["jml_lunas"].val(st);
-			}
-		}
-	);
-
-	// Table 't08_po' Field 'Qty'
-	$('[data-table=t08_po][data-field=x_Qty]').on(
+	// Table 't08_beli' Field 'Qty'
+	$('[data-table=t08_beli][data-field=x_Qty]').on(
 		{ // keys = event types, values = handler functions
 			"change keyup": function(e) {
 				var $row = $(this).fields();
@@ -239,28 +219,8 @@ function f_BuatAjax() {
 		}
 	);
 
-	// Table 't_04beli' Field 'harga'
-	$('[data-table=t_04beli][data-field=x_harga]').on(
-		{ // keys = event types, values = handler functions
-			"change keyup": function(e) {
-				var $row = $(this).fields();
-				var qty = parseInt($row["qty"].val());
-
-				//var harga = parseInt($row["harga"].val());
-				var harga_asli = $row["harga"].val();
-				var harga_clean = harga_asli.replace(/,/g, '');
-				var harga = parseInt(harga_clean);
-				var st = qty * harga;
-
-				//alert(st);
-				$row["sub_total"].val(st);
-				$row["jml_lunas"].val(st);
-			}
-		}
-	);
-
-	// Table 't08_po' Field 'Harga'
-	$('[data-table=t08_po][data-field=x_Harga]').on(
+	// Table 't08_beli' Field 'Harga'
+	$('[data-table=t08_beli][data-field=x_Harga]').on(
 		{ // keys = event types, values = handler functions
 			"change keyup": function(e) {
 				var $row = $(this).fields();

@@ -370,6 +370,15 @@
   <project>
     <phrase id="bodytitle" value="STOK Apps." />
     <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
+    <menu id="16">
+      <phrase id="menutext" value="Stok" />
+    </menu>
+    <menu id="14">
+      <phrase id="menutext" value="v 01 beli" />
+    </menu>
+    <menu id="15">
+      <phrase id="menutext" value="v 02 stok" />
+    </menu>
     <menu id="13">
       <phrase id="menutext" value="Pembelian" />
     </menu>
@@ -686,6 +695,69 @@
       </field>
       <field id="satuannama">
         <phrase id="fldcaption" value="Satuan" />
+      </field>
+      <field id="subtotal">
+        <phrase id="fldcaption" value="Sub Total" />
+      </field>
+    </table>
+    <table id="v01_beli">
+      <phrase id="tblcaption" value="v 01 beli" />
+      <field id="articleid">
+        <phrase id="fldcaption" value="articleid" />
+      </field>
+      <field id="avgharga">
+        <phrase id="fldcaption" value="avgharga" />
+      </field>
+      <field id="sumqty">
+        <phrase id="fldcaption" value="sumqty" />
+      </field>
+      <field id="subtotal">
+        <phrase id="fldcaption" value="subtotal" />
+      </field>
+    </table>
+    <table id="v02_stok">
+      <phrase id="tblcaption" value="v 02 stok" />
+      <field id="satuan">
+        <phrase id="fldcaption" value="Satuan" />
+      </field>
+      <field id="avgharga">
+        <phrase id="fldcaption" value="Avg Harga" />
+      </field>
+      <field id="sumqty">
+        <phrase id="fldcaption" value="Sum Qty" />
+      </field>
+      <field id="subtotal">
+        <phrase id="fldcaption" value="Sub Total" />
+      </field>
+      <field id="maingroup">
+        <phrase id="fldcaption" value="Main Group" />
+      </field>
+      <field id="subgroup">
+        <phrase id="fldcaption" value="Sub Group" />
+      </field>
+      <field id="article">
+        <phrase id="fldcaption" value="Article" />
+      </field>
+    </table>
+    <table id="r02_stok">
+      <phrase id="tblcaption" value="Stok" />
+      <field id="maingroup">
+        <phrase id="fldcaption" value="Main Group" />
+      </field>
+      <field id="subgroup">
+        <phrase id="fldcaption" value="Sub Group" />
+      </field>
+      <field id="article">
+        <phrase id="fldcaption" value="Article" />
+      </field>
+      <field id="sumqty">
+        <phrase id="fldcaption" value="Sum Qty" />
+      </field>
+      <field id="satuan">
+        <phrase id="fldcaption" value="Satuan" />
+      </field>
+      <field id="avgharga">
+        <phrase id="fldcaption" value="Avg Harga" />
       </field>
       <field id="subtotal">
         <phrase id="fldcaption" value="Sub Total" />
