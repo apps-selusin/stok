@@ -404,6 +404,9 @@ function Row_Rendered() {
 	<a href="t06_articlelist.php">Article</a>
 </div>
 -->
+<div>
+<p>setiap pembelian dianggap hutang</p>
+</div>
 ]]></CustomScript>
   <CustomScript ScriptType="Client" ScriptCodeType="Global" ScriptName="Startup Script" ScriptCtrlID="" ScriptL1Key="" ScriptL2Key=""><![CDATA[// Write your global startup script here
 // document.write("page loaded");

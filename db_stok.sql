@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 12, 2018 at 06:21 AM
+-- Generation Time: Apr 12, 2018 at 10:41 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS `t08_beli` (
 
 INSERT INTO `t08_beli` (`id`, `TglPO`, `NoPO`, `VendorID`, `ArticleID`, `Harga`, `Qty`, `SubTotal`) VALUES
 (1, '2018-04-11', 'PO201804110001', 2, 1, 50000.00, 2.10, 105000.00),
-(2, '2018-04-11', 'PO201804110002', 1, 1, 75000.00, 3.00, 225000.00),
+(2, '2018-04-11', 'PO201804110002', 1, 1, 75000.00, 3.20, 240000.00),
 (3, '2018-04-11', 'PO201804110003', 2, 1, 60000.00, 4.00, 240000.00);
 
 -- --------------------------------------------------------
@@ -324,7 +324,7 @@ CREATE TABLE IF NOT EXISTS `t99_audittrail` (
   `oldvalue` longtext CHARACTER SET latin1,
   `newvalue` longtext CHARACTER SET latin1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=161 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=166 ;
 
 --
 -- Dumping data for table `t99_audittrail`
@@ -488,7 +488,55 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (157, '2018-04-11 19:26:17', '/stok/t08_polist.php', '1', 'U', 't08_po', 'SubTotal', '1', '100000.00', '150000'),
 (158, '2018-04-12 09:01:48', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
 (159, '2018-04-12 09:56:17', '/stok/t08_polist.php', '1', 'U', 't08_po', 'Qty', '1', '3.00', '2.1'),
-(160, '2018-04-12 09:56:17', '/stok/t08_polist.php', '1', 'U', 't08_po', 'SubTotal', '1', '150000.00', '105000');
+(160, '2018-04-12 09:56:17', '/stok/t08_polist.php', '1', 'U', 't08_po', 'SubTotal', '1', '150000.00', '105000'),
+(161, '2018-04-12 14:25:53', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '2', '3.00', '3.2'),
+(162, '2018-04-12 14:32:44', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '2', '3.20', '4'),
+(163, '2018-04-12 14:32:44', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '2', '225000.00', '300000'),
+(164, '2018-04-12 14:32:53', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '2', '4.00', '3.2'),
+(165, '2018-04-12 14:32:53', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '2', '300000.00', '240000');
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `v01_beli`
+--
+CREATE TABLE IF NOT EXISTS `v01_beli` (
+`articleid` int(11)
+,`avgharga` double(19,6)
+,`sumqty` double(19,2)
+,`subtotal` double(23,6)
+);
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `v02_stok`
+--
+CREATE TABLE IF NOT EXISTS `v02_stok` (
+`MainGroup` varchar(55)
+,`SubGroup` varchar(56)
+,`Article` varchar(85)
+,`SumQty` double(19,2)
+,`Satuan` varchar(25)
+,`AvgHarga` double(19,6)
+,`SubTotal` double(23,6)
+);
+-- --------------------------------------------------------
+
+--
+-- Structure for view `v01_beli`
+--
+DROP TABLE IF EXISTS `v01_beli`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v01_beli` AS select `t08_beli`.`ArticleID` AS `articleid`,avg(`t08_beli`.`Harga`) AS `avgharga`,sum(`t08_beli`.`Qty`) AS `sumqty`,(avg(`t08_beli`.`Harga`) * sum(`t08_beli`.`Qty`)) AS `subtotal` from `t08_beli` group by `t08_beli`.`ArticleID`;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `v02_stok`
+--
+DROP TABLE IF EXISTS `v02_stok`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v02_stok` AS select concat(`a`.`Kode`,' - ',`a`.`Nama`) AS `MainGroup`,concat(`b`.`Kode`,' - ',`b`.`Nama`) AS `SubGroup`,concat(`c`.`Kode`,' - ',`c`.`Nama`) AS `Article`,`e`.`sumqty` AS `SumQty`,`d`.`Nama` AS `Satuan`,`e`.`avgharga` AS `AvgHarga`,`e`.`subtotal` AS `SubTotal` from ((((`t04_maingroup` `a` left join `t05_subgroup` `b` on((`a`.`id` = `b`.`MainGroupID`))) left join `t06_article` `c` on((`b`.`id` = `c`.`SubGroupID`))) left join `t07_satuan` `d` on((`c`.`SatuanID` = `d`.`id`))) left join `v01_beli` `e` on((`c`.`id` = `e`.`articleid`)));
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

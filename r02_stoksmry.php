@@ -3094,65 +3094,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->TotalGrps > 0) { ?>
 </tbody>
 <tfoot>
-<?php
-	$Page->SumQty->Count = $Page->GrandCnt[2];
-	$Page->SumQty->SumValue = $Page->GrandSmry[2]; // Load SUM
-	$Page->SubTotal->Count = $Page->GrandCnt[5];
-	$Page->SubTotal->SumValue = $Page->GrandSmry[5]; // Load SUM
-	$Page->ResetAttrs();
-	$Page->RowType = EWR_ROWTYPE_TOTAL;
-	$Page->RowTotalType = EWR_ROWTOTAL_GRAND;
-	$Page->RowTotalSubType = EWR_ROWTOTAL_FOOTER;
-	$Page->RowAttrs["class"] = "ewRptGrandSummary";
-	$Page->RenderRow();
-?>
-<?php if ($Page->MainGroup->ShowCompactSummaryFooter) { ?>
-	<tr<?php echo $Page->RowAttributes() ?>><td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"><?php echo $ReportLanguage->Phrase("RptGrandSummary") ?> (<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->TotCount,0,-2,-2,-2) ?></span>)</td></tr>
-	<tr<?php echo $Page->RowAttributes() ?>>
-<?php if ($Page->GrpColumnCount > 0) { ?>
-		<td colspan="<?php echo $Page->GrpColumnCount ?>" class="ewRptGrpAggregate">&nbsp;</td>
-<?php } ?>
-<?php if ($Page->Article->Visible) { ?>
-		<td data-field="Article"<?php echo $Page->Article->CellAttributes() ?>></td>
-<?php } ?>
-<?php if ($Page->SumQty->Visible) { ?>
-		<td data-field="SumQty"<?php echo $Page->SumQty->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span<?php echo $Page->SumQty->ViewAttributes() ?>><?php echo $Page->SumQty->SumViewValue ?></span></td>
-<?php } ?>
-<?php if ($Page->Satuan->Visible) { ?>
-		<td data-field="Satuan"<?php echo $Page->Satuan->CellAttributes() ?>></td>
-<?php } ?>
-<?php if ($Page->AvgHarga->Visible) { ?>
-		<td data-field="AvgHarga"<?php echo $Page->AvgHarga->CellAttributes() ?>></td>
-<?php } ?>
-<?php if ($Page->SubTotal->Visible) { ?>
-		<td data-field="SubTotal"<?php echo $Page->SubTotal->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span<?php echo $Page->SubTotal->ViewAttributes() ?>><?php echo $Page->SubTotal->SumViewValue ?></span></td>
-<?php } ?>
-	</tr>
-<?php } else { ?>
-	<tr<?php echo $Page->RowAttributes() ?>><td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"><?php echo $ReportLanguage->Phrase("RptGrandSummary") ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->TotCount,0,-2,-2,-2); ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td></tr>
-	<tr<?php echo $Page->RowAttributes() ?>>
-<?php if ($Page->GrpColumnCount > 0) { ?>
-		<td colspan="<?php echo $Page->GrpColumnCount ?>" class="ewRptGrpAggregate"><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
-<?php } ?>
-<?php if ($Page->Article->Visible) { ?>
-		<td data-field="Article"<?php echo $Page->Article->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->SumQty->Visible) { ?>
-		<td data-field="SumQty"<?php echo $Page->SumQty->CellAttributes() ?>>
-<span<?php echo $Page->SumQty->ViewAttributes() ?>><?php echo $Page->SumQty->SumViewValue ?></span></td>
-<?php } ?>
-<?php if ($Page->Satuan->Visible) { ?>
-		<td data-field="Satuan"<?php echo $Page->Satuan->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->AvgHarga->Visible) { ?>
-		<td data-field="AvgHarga"<?php echo $Page->AvgHarga->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->SubTotal->Visible) { ?>
-		<td data-field="SubTotal"<?php echo $Page->SubTotal->CellAttributes() ?>>
-<span<?php echo $Page->SubTotal->ViewAttributes() ?>><?php echo $Page->SubTotal->SumViewValue ?></span></td>
-<?php } ?>
-	</tr>
-<?php } ?>
 	</tfoot>
 <?php } elseif (!$Page->ShowHeader && FALSE) { // No header displayed ?>
 <?php if ($Page->Export <> "pdf") { ?>
