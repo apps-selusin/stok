@@ -621,6 +621,12 @@
     <menu id="10020">
       <phrase id="menutext" value="v 01 beli" />
     </menu>
+    <menu id="1">
+      <phrase id="menutext" value="Home" />
+    </menu>
+    <menu id="19">
+      <phrase id="menutext" value="Pembelian" />
+    </menu>
     <menu id="10021">
       <phrase id="menutext" value="Hutang" />
     </menu>
@@ -629,12 +635,6 @@
     </menu>
     <menu id="10019">
       <phrase id="menutext" value="v 02 stok" />
-    </menu>
-    <menu id="1">
-      <phrase id="menutext" value="Home" />
-    </menu>
-    <menu id="19">
-      <phrase id="menutext" value="Pembelian" />
     </menu>
     <menu id="10013">
       <phrase id="menutext" value="Laporan" />

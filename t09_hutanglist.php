@@ -405,8 +405,11 @@ class ct09_hutang_list extends ct09_hutang {
 		// 
 		// Security = null;
 		// 
-		// Get export parameters
+		// Create form object
 
+		$objForm = new cFormObj();
+
+		// Get export parameters
 		$custom = "";
 		if (@$_GET["export"] <> "") {
 			$this->Export = $_GET["export"];
@@ -641,6 +644,27 @@ class ct09_hutang_list extends ct09_hutang {
 			if ($this->Export == "")
 				$this->SetupBreadcrumb();
 
+			// Check QueryString parameters
+			if (@$_GET["a"] <> "") {
+				$this->CurrentAction = $_GET["a"];
+
+				// Clear inline mode
+				if ($this->CurrentAction == "cancel")
+					$this->ClearInlineMode();
+
+				// Switch to inline add mode
+				if ($this->CurrentAction == "add" || $this->CurrentAction == "copy")
+					$this->InlineAddMode();
+			} else {
+				if (@$_POST["a_list"] <> "") {
+					$this->CurrentAction = $_POST["a_list"]; // Get action
+
+					// Insert Inline
+					if ($this->CurrentAction == "insert" && @$_SESSION[EW_SESSION_INLINE_MODE] == "add")
+						$this->InlineInsert();
+				}
+			}
+
 			// Hide list options
 			if ($this->Export <> "") {
 				$this->ListOptions->HideAllOptions(array("sequence"));
@@ -780,6 +804,49 @@ class ct09_hutang_list extends ct09_hutang {
 			// Reset start position
 			$this->StartRec = 1;
 			$this->setStartRecordNumber($this->StartRec);
+		}
+	}
+
+	// Exit inline mode
+	function ClearInlineMode() {
+		$this->JumlahHutang->FormValue = ""; // Clear form value
+		$this->JumlahBayar->FormValue = ""; // Clear form value
+		$this->LastAction = $this->CurrentAction; // Save last action
+		$this->CurrentAction = ""; // Clear action
+		$_SESSION[EW_SESSION_INLINE_MODE] = ""; // Clear inline mode
+	}
+
+	// Switch to Inline Add mode
+	function InlineAddMode() {
+		global $Security, $Language;
+		if (!$Security->CanAdd())
+			$this->Page_Terminate("login.php"); // Return to login page
+		$this->CurrentAction = "add";
+		$_SESSION[EW_SESSION_INLINE_MODE] = "add"; // Enable inline add
+	}
+
+	// Perform update to Inline Add/Copy record
+	function InlineInsert() {
+		global $Language, $objForm, $gsFormError;
+		$this->LoadOldRecord(); // Load old record
+		$objForm->Index = 0;
+		$this->LoadFormValues(); // Get form values
+
+		// Validate form
+		if (!$this->ValidateForm()) {
+			$this->setFailureMessage($gsFormError); // Set validation error message
+			$this->EventCancelled = TRUE; // Set event cancelled
+			$this->CurrentAction = "add"; // Stay in add mode
+			return;
+		}
+		$this->SendEmail = TRUE; // Send email on add success
+		if ($this->AddRow($this->OldRecordset)) { // Add record
+			if ($this->getSuccessMessage() == "")
+				$this->setSuccessMessage($Language->Phrase("AddSuccess")); // Set up add success message
+			$this->ClearInlineMode(); // Clear inline add mode
+		} else { // Add failed
+			$this->EventCancelled = TRUE; // Set event cancelled
+			$this->CurrentAction = "add"; // Stay in add mode
 		}
 	}
 
@@ -1147,7 +1214,7 @@ class ct09_hutang_list extends ct09_hutang {
 		// "copy"
 		$item = &$this->ListOptions->Add("copy");
 		$item->CssClass = "text-nowrap";
-		$item->Visible = $Security->CanAdd();
+		$item->Visible = $Security->CanAdd() && ($this->CurrentAction == "add");
 		$item->OnLeft = TRUE;
 
 		// "detail_t10_hutangdetail"
@@ -1182,18 +1249,26 @@ class ct09_hutang_list extends ct09_hutang {
 
 		// "checkbox"
 		$item = &$this->ListOptions->Add("checkbox");
-		$item->Visible = $Security->CanDelete();
+		$item->Visible = FALSE;
 		$item->OnLeft = TRUE;
 		$item->Header = "<input type=\"checkbox\" name=\"key\" id=\"key\" onclick=\"ew_SelectAllKey(this);\">";
 		$item->MoveTo(0);
 		$item->ShowInDropDown = FALSE;
 		$item->ShowInButtonGroup = FALSE;
 
+		// "sequence"
+		$item = &$this->ListOptions->Add("sequence");
+		$item->CssClass = "text-nowrap";
+		$item->Visible = TRUE;
+		$item->OnLeft = TRUE; // Always on left
+		$item->ShowInDropDown = FALSE;
+		$item->ShowInButtonGroup = FALSE;
+
 		// Drop down button for ListOptions
 		$this->ListOptions->UseImageAndText = TRUE;
-		$this->ListOptions->UseDropDownButton = TRUE;
+		$this->ListOptions->UseDropDownButton = FALSE;
 		$this->ListOptions->DropDownButtonPhrase = $Language->Phrase("ButtonListOptions");
-		$this->ListOptions->UseButtonGroup = FALSE;
+		$this->ListOptions->UseButtonGroup = TRUE;
 		if ($this->ListOptions->UseButtonGroup && ew_IsMobile())
 			$this->ListOptions->UseDropDownButton = TRUE;
 		$this->ListOptions->ButtonClass = "btn-sm"; // Class for button group
@@ -1213,6 +1288,39 @@ class ct09_hutang_list extends ct09_hutang {
 		// Call ListOptions_Rendering event
 		$this->ListOptions_Rendering();
 
+		// Set up row action and key
+		if (is_numeric($this->RowIndex) && $this->CurrentMode <> "view") {
+			$objForm->Index = $this->RowIndex;
+			$ActionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
+			$OldKeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormOldKeyName);
+			$KeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormKeyName);
+			$BlankRowName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormBlankRowName);
+			if ($this->RowAction <> "")
+				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $ActionName . "\" id=\"" . $ActionName . "\" value=\"" . $this->RowAction . "\">";
+			if ($this->RowAction == "delete") {
+				$rowkey = $objForm->GetValue($this->FormKeyName);
+				$this->SetupKeyValues($rowkey);
+			}
+			if ($this->RowAction == "insert" && $this->CurrentAction == "F" && $this->EmptyRow())
+				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $BlankRowName . "\" id=\"" . $BlankRowName . "\" value=\"1\">";
+		}
+
+		// "sequence"
+		$oListOpt = &$this->ListOptions->Items["sequence"];
+		$oListOpt->Body = ew_FormatSeqNo($this->RecCnt);
+
+		// "copy"
+		$oListOpt = &$this->ListOptions->Items["copy"];
+		if (($this->CurrentAction == "add" || $this->CurrentAction == "copy") && $this->RowType == EW_ROWTYPE_ADD) { // Inline Add/Copy
+			$this->ListOptions->CustomItem = "copy"; // Show copy column only
+			$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
+			$oListOpt->Body = "<div" . (($oListOpt->OnLeft) ? " style=\"text-align: right\"" : "") . ">" .
+				"<a class=\"ewGridLink ewInlineInsert\" title=\"" . ew_HtmlTitle($Language->Phrase("InsertLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InsertLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("InsertLink") . "</a>&nbsp;" .
+				"<a class=\"ewGridLink ewInlineCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("CancelLink") . "</a>" .
+				"<input type=\"hidden\" name=\"a_list\" id=\"a_list\" value=\"insert\"></div>";
+			return;
+		}
+
 		// "view"
 		$oListOpt = &$this->ListOptions->Items["view"];
 		$viewcaption = ew_HtmlTitle($Language->Phrase("ViewLink"));
@@ -1227,15 +1335,6 @@ class ct09_hutang_list extends ct09_hutang {
 		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
 		if ($Security->CanEdit()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
-		} else {
-			$oListOpt->Body = "";
-		}
-
-		// "copy"
-		$oListOpt = &$this->ListOptions->Items["copy"];
-		$copycaption = ew_HtmlTitle($Language->Phrase("CopyLink"));
-		if ($Security->CanAdd()) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
 		}
@@ -1292,13 +1391,6 @@ class ct09_hutang_list extends ct09_hutang {
 				if ($DetailEditTblVar <> "") $DetailEditTblVar .= ",";
 				$DetailEditTblVar .= "t10_hutangdetail";
 			}
-			if ($GLOBALS["t10_hutangdetail_grid"]->DetailAdd && $Security->CanAdd() && $Security->AllowAdd(CurrentProjectID() . 't10_hutangdetail')) {
-				$caption = $Language->Phrase("MasterDetailCopyLink");
-				$url = $this->GetCopyUrl(EW_TABLE_SHOW_DETAIL . "=t10_hutangdetail");
-				$links .= "<li><a class=\"ewRowLink ewDetailCopy\" data-action=\"add\" data-caption=\"" . ew_HtmlTitle($caption) . "\" href=\"" . ew_HtmlEncode($url) . "\">" . ew_HtmlImageAndText($caption) . "</a></li>";
-				if ($DetailCopyTblVar <> "") $DetailCopyTblVar .= ",";
-				$DetailCopyTblVar .= "t10_hutangdetail";
-			}
 			if ($links <> "") {
 				$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewDetail\" data-toggle=\"dropdown\"><b class=\"caret\"></b></button>";
 				$body .= "<ul class=\"dropdown-menu\">". $links . "</ul>";
@@ -1351,6 +1443,11 @@ class ct09_hutang_list extends ct09_hutang {
 		$addcaption = ew_HtmlTitle($Language->Phrase("AddLink"));
 		$item->Body = "<a class=\"ewAddEdit ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
 		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
+
+		// Inline Add
+		$item = &$option->Add("inlineadd");
+		$item->Body = "<a class=\"ewAddEdit ewInlineAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineAddUrl) . "\">" .$Language->Phrase("InlineAddLink") . "</a>";
+		$item->Visible = ($this->InlineAddUrl <> "" && $Security->CanAdd());
 		$option = $options["detail"];
 		$DetailTableLink = "";
 		$item = &$option->Add("detailadd_t10_hutangdetail");
@@ -1381,15 +1478,10 @@ class ct09_hutang_list extends ct09_hutang {
 		}
 		$option = $options["action"];
 
-		// Add multi delete
-		$item = &$option->Add("multidelete");
-		$item->Body = "<a class=\"ewAction ewMultiDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteSelectedLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteSelectedLink")) . "\" href=\"\" onclick=\"ew_SubmitAction(event,{f:document.ft09_hutanglist,url:'" . $this->MultiDeleteUrl . "'});return false;\">" . $Language->Phrase("DeleteSelectedLink") . "</a>";
-		$item->Visible = ($Security->CanDelete());
-
 		// Set up options default
 		foreach ($options as &$option) {
 			$option->UseImageAndText = TRUE;
-			$option->UseDropDownButton = TRUE;
+			$option->UseDropDownButton = FALSE;
 			$option->UseButtonGroup = TRUE;
 			$option->ButtonClass = "btn-sm"; // Class for button group
 			$item = &$option->Add($option->GroupOptionName);
@@ -1606,11 +1698,55 @@ class ct09_hutang_list extends ct09_hutang {
 		}
 	}
 
+	// Load default values
+	function LoadDefaultValues() {
+		$this->id->CurrentValue = NULL;
+		$this->id->OldValue = $this->id->CurrentValue;
+		$this->NoHutang->CurrentValue = NULL;
+		$this->NoHutang->OldValue = $this->NoHutang->CurrentValue;
+		$this->BeliID->CurrentValue = NULL;
+		$this->BeliID->OldValue = $this->BeliID->CurrentValue;
+		$this->JumlahHutang->CurrentValue = 0.00;
+		$this->JumlahBayar->CurrentValue = 0.00;
+	}
+
 	// Load basic search values
 	function LoadBasicSearchValues() {
 		$this->BasicSearch->Keyword = @$_GET[EW_TABLE_BASIC_SEARCH];
 		if ($this->BasicSearch->Keyword <> "" && $this->Command == "") $this->Command = "search";
 		$this->BasicSearch->Type = @$_GET[EW_TABLE_BASIC_SEARCH_TYPE];
+	}
+
+	// Load form values
+	function LoadFormValues() {
+
+		// Load from form
+		global $objForm;
+		if (!$this->NoHutang->FldIsDetailKey) {
+			$this->NoHutang->setFormValue($objForm->GetValue("x_NoHutang"));
+		}
+		if (!$this->BeliID->FldIsDetailKey) {
+			$this->BeliID->setFormValue($objForm->GetValue("x_BeliID"));
+		}
+		if (!$this->JumlahHutang->FldIsDetailKey) {
+			$this->JumlahHutang->setFormValue($objForm->GetValue("x_JumlahHutang"));
+		}
+		if (!$this->JumlahBayar->FldIsDetailKey) {
+			$this->JumlahBayar->setFormValue($objForm->GetValue("x_JumlahBayar"));
+		}
+		if (!$this->id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
+			$this->id->setFormValue($objForm->GetValue("x_id"));
+	}
+
+	// Restore form values
+	function RestoreFormValues() {
+		global $objForm;
+		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
+			$this->id->CurrentValue = $this->id->FormValue;
+		$this->NoHutang->CurrentValue = $this->NoHutang->FormValue;
+		$this->BeliID->CurrentValue = $this->BeliID->FormValue;
+		$this->JumlahHutang->CurrentValue = $this->JumlahHutang->FormValue;
+		$this->JumlahBayar->CurrentValue = $this->JumlahBayar->FormValue;
 	}
 
 	// Load recordset
@@ -1686,12 +1822,13 @@ class ct09_hutang_list extends ct09_hutang {
 
 	// Return a row with default values
 	function NewRow() {
+		$this->LoadDefaultValues();
 		$row = array();
-		$row['id'] = NULL;
-		$row['NoHutang'] = NULL;
-		$row['BeliID'] = NULL;
-		$row['JumlahHutang'] = NULL;
-		$row['JumlahBayar'] = NULL;
+		$row['id'] = $this->id->CurrentValue;
+		$row['NoHutang'] = $this->NoHutang->CurrentValue;
+		$row['BeliID'] = $this->BeliID->CurrentValue;
+		$row['JumlahHutang'] = $this->JumlahHutang->CurrentValue;
+		$row['JumlahBayar'] = $this->JumlahBayar->CurrentValue;
 		return $row;
 	}
 
@@ -1829,11 +1966,167 @@ class ct09_hutang_list extends ct09_hutang {
 			$this->JumlahBayar->LinkCustomAttributes = "";
 			$this->JumlahBayar->HrefValue = "";
 			$this->JumlahBayar->TooltipValue = "";
+		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
+
+			// NoHutang
+			$this->NoHutang->EditAttrs["class"] = "form-control";
+			$this->NoHutang->EditCustomAttributes = "";
+			$this->NoHutang->EditValue = ew_HtmlEncode($this->NoHutang->CurrentValue);
+			$this->NoHutang->PlaceHolder = ew_RemoveHtml($this->NoHutang->FldCaption());
+
+			// BeliID
+			$this->BeliID->EditAttrs["class"] = "form-control";
+			$this->BeliID->EditCustomAttributes = "";
+			$this->BeliID->EditValue = ew_HtmlEncode($this->BeliID->CurrentValue);
+			if (strval($this->BeliID->CurrentValue) <> "") {
+				$sFilterWrk = "`id`" . ew_SearchString("=", $this->BeliID->CurrentValue, EW_DATATYPE_NUMBER, "");
+			$sSqlWrk = "SELECT `id`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_beli`";
+			$sWhereWrk = "";
+			$this->BeliID->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`');
+			ew_AddFilter($sWhereWrk, $sFilterWrk);
+			$this->Lookup_Selecting($this->BeliID, $sWhereWrk); // Call Lookup Selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+				$rswrk = Conn()->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$arwrk = array();
+					$arwrk[1] = ew_HtmlEncode(ew_FormatDateTime($rswrk->fields('DispFld'), 7));
+					$arwrk[2] = ew_HtmlEncode($rswrk->fields('Disp2Fld'));
+					$this->BeliID->EditValue = $this->BeliID->DisplayValue($arwrk);
+					$rswrk->Close();
+				} else {
+					$this->BeliID->EditValue = ew_HtmlEncode($this->BeliID->CurrentValue);
+				}
+			} else {
+				$this->BeliID->EditValue = NULL;
+			}
+			$this->BeliID->PlaceHolder = ew_RemoveHtml($this->BeliID->FldCaption());
+
+			// JumlahHutang
+			$this->JumlahHutang->EditAttrs["class"] = "form-control";
+			$this->JumlahHutang->EditCustomAttributes = "";
+			$this->JumlahHutang->EditValue = ew_HtmlEncode($this->JumlahHutang->CurrentValue);
+			$this->JumlahHutang->PlaceHolder = ew_RemoveHtml($this->JumlahHutang->FldCaption());
+			if (strval($this->JumlahHutang->EditValue) <> "" && is_numeric($this->JumlahHutang->EditValue)) $this->JumlahHutang->EditValue = ew_FormatNumber($this->JumlahHutang->EditValue, -2, -2, -2, -2);
+
+			// JumlahBayar
+			$this->JumlahBayar->EditAttrs["class"] = "form-control";
+			$this->JumlahBayar->EditCustomAttributes = "";
+			$this->JumlahBayar->EditValue = ew_HtmlEncode($this->JumlahBayar->CurrentValue);
+			$this->JumlahBayar->PlaceHolder = ew_RemoveHtml($this->JumlahBayar->FldCaption());
+			if (strval($this->JumlahBayar->EditValue) <> "" && is_numeric($this->JumlahBayar->EditValue)) $this->JumlahBayar->EditValue = ew_FormatNumber($this->JumlahBayar->EditValue, -2, -2, -2, -2);
+
+			// Add refer script
+			// NoHutang
+
+			$this->NoHutang->LinkCustomAttributes = "";
+			$this->NoHutang->HrefValue = "";
+
+			// BeliID
+			$this->BeliID->LinkCustomAttributes = "";
+			$this->BeliID->HrefValue = "";
+
+			// JumlahHutang
+			$this->JumlahHutang->LinkCustomAttributes = "";
+			$this->JumlahHutang->HrefValue = "";
+
+			// JumlahBayar
+			$this->JumlahBayar->LinkCustomAttributes = "";
+			$this->JumlahBayar->HrefValue = "";
 		}
+		if ($this->RowType == EW_ROWTYPE_ADD || $this->RowType == EW_ROWTYPE_EDIT || $this->RowType == EW_ROWTYPE_SEARCH) // Add/Edit/Search row
+			$this->SetupFieldTitles();
 
 		// Call Row Rendered event
 		if ($this->RowType <> EW_ROWTYPE_AGGREGATEINIT)
 			$this->Row_Rendered();
+	}
+
+	// Validate form
+	function ValidateForm() {
+		global $Language, $gsFormError;
+
+		// Initialize form error message
+		$gsFormError = "";
+
+		// Check if validation required
+		if (!EW_SERVER_VALIDATE)
+			return ($gsFormError == "");
+		if (!$this->NoHutang->FldIsDetailKey && !is_null($this->NoHutang->FormValue) && $this->NoHutang->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->NoHutang->FldCaption(), $this->NoHutang->ReqErrMsg));
+		}
+		if (!$this->BeliID->FldIsDetailKey && !is_null($this->BeliID->FormValue) && $this->BeliID->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->BeliID->FldCaption(), $this->BeliID->ReqErrMsg));
+		}
+		if (!ew_CheckNumber($this->JumlahHutang->FormValue)) {
+			ew_AddMessage($gsFormError, $this->JumlahHutang->FldErrMsg());
+		}
+		if (!ew_CheckNumber($this->JumlahBayar->FormValue)) {
+			ew_AddMessage($gsFormError, $this->JumlahBayar->FldErrMsg());
+		}
+
+		// Return validate result
+		$ValidateForm = ($gsFormError == "");
+
+		// Call Form_CustomValidate event
+		$sFormCustomError = "";
+		$ValidateForm = $ValidateForm && $this->Form_CustomValidate($sFormCustomError);
+		if ($sFormCustomError <> "") {
+			ew_AddMessage($gsFormError, $sFormCustomError);
+		}
+		return $ValidateForm;
+	}
+
+	// Add record
+	function AddRow($rsold = NULL) {
+		global $Language, $Security;
+		$conn = &$this->Connection();
+
+		// Load db values from rsold
+		$this->LoadDbValues($rsold);
+		if ($rsold) {
+		}
+		$rsnew = array();
+
+		// NoHutang
+		$this->NoHutang->SetDbValueDef($rsnew, $this->NoHutang->CurrentValue, "", FALSE);
+
+		// BeliID
+		$this->BeliID->SetDbValueDef($rsnew, $this->BeliID->CurrentValue, 0, FALSE);
+
+		// JumlahHutang
+		$this->JumlahHutang->SetDbValueDef($rsnew, $this->JumlahHutang->CurrentValue, 0, strval($this->JumlahHutang->CurrentValue) == "");
+
+		// JumlahBayar
+		$this->JumlahBayar->SetDbValueDef($rsnew, $this->JumlahBayar->CurrentValue, 0, strval($this->JumlahBayar->CurrentValue) == "");
+
+		// Call Row Inserting event
+		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
+		$bInsertRow = $this->Row_Inserting($rs, $rsnew);
+		if ($bInsertRow) {
+			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+			$AddRow = $this->Insert($rsnew);
+			$conn->raiseErrorFn = '';
+			if ($AddRow) {
+			}
+		} else {
+			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
+
+				// Use the message, do nothing
+			} elseif ($this->CancelMessage <> "") {
+				$this->setFailureMessage($this->CancelMessage);
+				$this->CancelMessage = "";
+			} else {
+				$this->setFailureMessage($Language->Phrase("InsertCancelled"));
+			}
+			$AddRow = FALSE;
+		}
+		if ($AddRow) {
+
+			// Call Row Inserted event
+			$rs = ($rsold == NULL) ? NULL : $rsold->fields;
+			$this->Row_Inserted($rs, $rsnew);
+		}
+		return $AddRow;
 	}
 
 	// Set up export options
@@ -2115,6 +2408,18 @@ class ct09_hutang_list extends ct09_hutang {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_BeliID":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `id` AS `LinkFld`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_beli`";
+			$sWhereWrk = "{filter}";
+			$fld->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` IN ({filter_value})', "t0" => "3", "fn0" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->BeliID, $sWhereWrk); // Call Lookup Selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 
@@ -2123,6 +2428,18 @@ class ct09_hutang_list extends ct09_hutang {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_BeliID":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `id`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld` FROM `t08_beli`";
+			$sWhereWrk = "" . ew_CastDateFieldForLike('`TglPO`', 7, "DB") . " LIKE '{query_value}%' OR CONCAT(COALESCE(" . ew_CastDateFieldForLike('`TglPO`', 7, "DB") . ", ''),'" . ew_ValueSeparator(1, $this->BeliID) . "',COALESCE(`NoPO`,'')) LIKE '{query_value}%'";
+			$fld->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->BeliID, $sWhereWrk); // Call Lookup Selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		}
 	}
 
@@ -2281,6 +2598,41 @@ $t09_hutang_list->Page_Render();
 var CurrentPageID = EW_PAGE_ID = "list";
 var CurrentForm = ft09_hutanglist = new ew_Form("ft09_hutanglist", "list");
 ft09_hutanglist.FormKeyCountName = '<?php echo $t09_hutang_list->FormKeyCountName ?>';
+
+// Validate form
+ft09_hutanglist.Validate = function() {
+	if (!this.ValidateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
+	if ($fobj.find("#a_confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.FormKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = $fobj.find("#a_list").val() == "gridinsert";
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+			elm = this.GetElements("x" + infix + "_NoHutang");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t09_hutang->NoHutang->FldCaption(), $t09_hutang->NoHutang->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_BeliID");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t09_hutang->BeliID->FldCaption(), $t09_hutang->BeliID->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_JumlahHutang");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t09_hutang->JumlahHutang->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_JumlahBayar");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t09_hutang->JumlahBayar->FldErrMsg()) ?>");
+
+			// Fire Form_CustomValidate event
+			if (!this.Form_CustomValidate(fobj))
+				return false;
+	}
+	return true;
+}
 
 // Form_CustomValidate event
 ft09_hutanglist.Form_CustomValidate = 
@@ -2469,7 +2821,7 @@ $t09_hutang_list->ShowMessage();
 <?php } ?>
 <input type="hidden" name="t" value="t09_hutang">
 <div id="gmp_t09_hutang" class="<?php if (ew_IsResponsiveLayout()) { ?>table-responsive <?php } ?>ewGridMiddlePanel">
-<?php if ($t09_hutang_list->TotalRecs > 0 || $t09_hutang->CurrentAction == "gridedit") { ?>
+<?php if ($t09_hutang_list->TotalRecs > 0 || $t09_hutang->CurrentAction == "add" || $t09_hutang->CurrentAction == "copy" || $t09_hutang->CurrentAction == "gridedit") { ?>
 <table id="tbl_t09_hutanglist" class="table ewTable">
 <thead>
 	<tr class="ewTableHeader">
@@ -2529,6 +2881,89 @@ $t09_hutang_list->ListOptions->Render("header", "right");
 </thead>
 <tbody>
 <?php
+	if ($t09_hutang->CurrentAction == "add" || $t09_hutang->CurrentAction == "copy") {
+		$t09_hutang_list->RowIndex = 0;
+		$t09_hutang_list->KeyCount = $t09_hutang_list->RowIndex;
+		if ($t09_hutang->CurrentAction == "add")
+			$t09_hutang_list->LoadRowValues();
+		if ($t09_hutang->EventCancelled) // Insert failed
+			$t09_hutang_list->RestoreFormValues(); // Restore form values
+
+		// Set row properties
+		$t09_hutang->ResetAttrs();
+		$t09_hutang->RowAttrs = array_merge($t09_hutang->RowAttrs, array('data-rowindex'=>0, 'id'=>'r0_t09_hutang', 'data-rowtype'=>EW_ROWTYPE_ADD));
+		$t09_hutang->RowType = EW_ROWTYPE_ADD;
+
+		// Render row
+		$t09_hutang_list->RenderRow();
+
+		// Render list options
+		$t09_hutang_list->RenderListOptions();
+		$t09_hutang_list->StartRowCnt = 0;
+?>
+	<tr<?php echo $t09_hutang->RowAttributes() ?>>
+<?php
+
+// Render list options (body, left)
+$t09_hutang_list->ListOptions->Render("body", "left", $t09_hutang_list->RowCnt);
+?>
+	<?php if ($t09_hutang->NoHutang->Visible) { // NoHutang ?>
+		<td data-name="NoHutang">
+<span id="el<?php echo $t09_hutang_list->RowCnt ?>_t09_hutang_NoHutang" class="form-group t09_hutang_NoHutang">
+<input type="text" data-table="t09_hutang" data-field="x_NoHutang" name="x<?php echo $t09_hutang_list->RowIndex ?>_NoHutang" id="x<?php echo $t09_hutang_list->RowIndex ?>_NoHutang" size="30" maxlength="8" placeholder="<?php echo ew_HtmlEncode($t09_hutang->NoHutang->getPlaceHolder()) ?>" value="<?php echo $t09_hutang->NoHutang->EditValue ?>"<?php echo $t09_hutang->NoHutang->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t09_hutang" data-field="x_NoHutang" name="o<?php echo $t09_hutang_list->RowIndex ?>_NoHutang" id="o<?php echo $t09_hutang_list->RowIndex ?>_NoHutang" value="<?php echo ew_HtmlEncode($t09_hutang->NoHutang->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t09_hutang->BeliID->Visible) { // BeliID ?>
+		<td data-name="BeliID">
+<span id="el<?php echo $t09_hutang_list->RowCnt ?>_t09_hutang_BeliID" class="form-group t09_hutang_BeliID">
+<?php
+$wrkonchange = trim(" " . @$t09_hutang->BeliID->EditAttrs["onchange"]);
+if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
+$t09_hutang->BeliID->EditAttrs["onchange"] = "";
+?>
+<span id="as_x<?php echo $t09_hutang_list->RowIndex ?>_BeliID" style="white-space: nowrap; z-index: <?php echo (9000 - $t09_hutang_list->RowCnt * 10) ?>">
+	<input type="text" name="sv_x<?php echo $t09_hutang_list->RowIndex ?>_BeliID" id="sv_x<?php echo $t09_hutang_list->RowIndex ?>_BeliID" value="<?php echo $t09_hutang->BeliID->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($t09_hutang->BeliID->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t09_hutang->BeliID->getPlaceHolder()) ?>"<?php echo $t09_hutang->BeliID->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t09_hutang" data-field="x_BeliID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t09_hutang->BeliID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t09_hutang_list->RowIndex ?>_BeliID" id="x<?php echo $t09_hutang_list->RowIndex ?>_BeliID" value="<?php echo ew_HtmlEncode($t09_hutang->BeliID->CurrentValue) ?>"<?php echo $wrkonchange ?>>
+<script type="text/javascript">
+ft09_hutanglist.CreateAutoSuggest({"id":"x<?php echo $t09_hutang_list->RowIndex ?>_BeliID","forceSelect":true});
+</script>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t09_hutang->BeliID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t09_hutang_list->RowIndex ?>_BeliID',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t09_hutang->BeliID->ReadOnly || $t09_hutang->BeliID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
+</span>
+<input type="hidden" data-table="t09_hutang" data-field="x_BeliID" name="o<?php echo $t09_hutang_list->RowIndex ?>_BeliID" id="o<?php echo $t09_hutang_list->RowIndex ?>_BeliID" value="<?php echo ew_HtmlEncode($t09_hutang->BeliID->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t09_hutang->JumlahHutang->Visible) { // JumlahHutang ?>
+		<td data-name="JumlahHutang">
+<span id="el<?php echo $t09_hutang_list->RowCnt ?>_t09_hutang_JumlahHutang" class="form-group t09_hutang_JumlahHutang">
+<input type="text" data-table="t09_hutang" data-field="x_JumlahHutang" name="x<?php echo $t09_hutang_list->RowIndex ?>_JumlahHutang" id="x<?php echo $t09_hutang_list->RowIndex ?>_JumlahHutang" size="30" placeholder="<?php echo ew_HtmlEncode($t09_hutang->JumlahHutang->getPlaceHolder()) ?>" value="<?php echo $t09_hutang->JumlahHutang->EditValue ?>"<?php echo $t09_hutang->JumlahHutang->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t09_hutang" data-field="x_JumlahHutang" name="o<?php echo $t09_hutang_list->RowIndex ?>_JumlahHutang" id="o<?php echo $t09_hutang_list->RowIndex ?>_JumlahHutang" value="<?php echo ew_HtmlEncode($t09_hutang->JumlahHutang->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t09_hutang->JumlahBayar->Visible) { // JumlahBayar ?>
+		<td data-name="JumlahBayar">
+<span id="el<?php echo $t09_hutang_list->RowCnt ?>_t09_hutang_JumlahBayar" class="form-group t09_hutang_JumlahBayar">
+<input type="text" data-table="t09_hutang" data-field="x_JumlahBayar" name="x<?php echo $t09_hutang_list->RowIndex ?>_JumlahBayar" id="x<?php echo $t09_hutang_list->RowIndex ?>_JumlahBayar" size="30" placeholder="<?php echo ew_HtmlEncode($t09_hutang->JumlahBayar->getPlaceHolder()) ?>" value="<?php echo $t09_hutang->JumlahBayar->EditValue ?>"<?php echo $t09_hutang->JumlahBayar->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t09_hutang" data-field="x_JumlahBayar" name="o<?php echo $t09_hutang_list->RowIndex ?>_JumlahBayar" id="o<?php echo $t09_hutang_list->RowIndex ?>_JumlahBayar" value="<?php echo ew_HtmlEncode($t09_hutang->JumlahBayar->OldValue) ?>">
+</td>
+	<?php } ?>
+<?php
+
+// Render list options (body, right)
+$t09_hutang_list->ListOptions->Render("body", "right", $t09_hutang_list->RowCnt);
+?>
+<script type="text/javascript">
+ft09_hutanglist.UpdateOpts(<?php echo $t09_hutang_list->RowIndex ?>);
+</script>
+	</tr>
+<?php
+}
+?>
+<?php
 if ($t09_hutang->ExportAll && $t09_hutang->Export <> "") {
 	$t09_hutang_list->StopRec = $t09_hutang_list->TotalRecs;
 } else {
@@ -2538,6 +2973,15 @@ if ($t09_hutang->ExportAll && $t09_hutang->Export <> "") {
 		$t09_hutang_list->StopRec = $t09_hutang_list->StartRec + $t09_hutang_list->DisplayRecs - 1;
 	else
 		$t09_hutang_list->StopRec = $t09_hutang_list->TotalRecs;
+}
+
+// Restore number of post back records
+if ($objForm) {
+	$objForm->Index = -1;
+	if ($objForm->HasValue($t09_hutang_list->FormKeyCountName) && ($t09_hutang->CurrentAction == "gridadd" || $t09_hutang->CurrentAction == "gridedit" || $t09_hutang->CurrentAction == "F")) {
+		$t09_hutang_list->KeyCount = $objForm->GetValue($t09_hutang_list->FormKeyCountName);
+		$t09_hutang_list->StopRec = $t09_hutang_list->StartRec + $t09_hutang_list->KeyCount - 1;
+	}
 }
 $t09_hutang_list->RecCnt = $t09_hutang_list->StartRec - 1;
 if ($t09_hutang_list->Recordset && !$t09_hutang_list->Recordset->EOF) {
@@ -2565,6 +3009,7 @@ while ($t09_hutang_list->RecCnt < $t09_hutang_list->StopRec) {
 		$t09_hutang->ResetAttrs();
 		$t09_hutang->CssClass = "";
 		if ($t09_hutang->CurrentAction == "gridadd") {
+			$t09_hutang_list->LoadRowValues(); // Load default values
 		} else {
 			$t09_hutang_list->LoadRowValues($t09_hutang_list->Recordset); // Load row values
 		}
@@ -2631,6 +3076,9 @@ $t09_hutang_list->ListOptions->Render("body", "right", $t09_hutang_list->RowCnt)
 ?>
 </tbody>
 </table>
+<?php } ?>
+<?php if ($t09_hutang->CurrentAction == "add" || $t09_hutang->CurrentAction == "copy") { ?>
+<input type="hidden" name="<?php echo $t09_hutang_list->FormKeyCountName ?>" id="<?php echo $t09_hutang_list->FormKeyCountName ?>" value="<?php echo $t09_hutang_list->KeyCount ?>">
 <?php } ?>
 <?php if ($t09_hutang->CurrentAction == "") { ?>
 <input type="hidden" name="a_list" id="a_list" value="">

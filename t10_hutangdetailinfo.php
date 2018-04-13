@@ -44,7 +44,7 @@ class ct10_hutangdetail extends cTable {
 		$this->ExportWordColumnWidth = NULL; // Cell width (PHPWord only)
 		$this->DetailAdd = TRUE; // Allow detail add
 		$this->DetailEdit = TRUE; // Allow detail edit
-		$this->DetailView = TRUE; // Allow detail view
+		$this->DetailView = FALSE; // Allow detail view
 		$this->ShowMultipleDetails = FALSE; // Show multiple details
 		$this->GridAddRowCount = 5;
 		$this->AllowAddDeleteRow = TRUE; // Allow add/delete row
@@ -825,7 +825,6 @@ class ct10_hutangdetail extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
-					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->HutangID->Exportable) $Doc->ExportCaption($this->HutangID);
 					if ($this->NoBayar->Exportable) $Doc->ExportCaption($this->NoBayar);
 					if ($this->Tgl->Exportable) $Doc->ExportCaption($this->Tgl);
@@ -867,7 +866,6 @@ class ct10_hutangdetail extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
-						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->HutangID->Exportable) $Doc->ExportField($this->HutangID);
 						if ($this->NoBayar->Exportable) $Doc->ExportField($this->NoBayar);
 						if ($this->Tgl->Exportable) $Doc->ExportField($this->Tgl);
@@ -1086,7 +1084,9 @@ class ct10_hutangdetail extends cTable {
 
 		// Enter your code here
 		// To cancel, set return value to FALSE
+		// default nomor hutang detail baru
 
+		$rsnew["NoBayar"] = f_GetNextNoHutangDetail(); // mengantisipasi lebih satu user menginput data saat bersamaan
 		return TRUE;
 	}
 
@@ -1125,7 +1125,9 @@ class ct10_hutangdetail extends cTable {
 
 		// Enter your code here
 		// To reject grid insert, set return value to FALSE
+		// default nomor hutang detail baru
 
+		$rsnew["NoBayar"] = f_GetNextNoHutangDetail(); // mengantisipasi lebih satu user menginput data saat bersamaan
 		return TRUE;
 	}
 
@@ -1192,6 +1194,8 @@ class ct10_hutangdetail extends cTable {
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
 
+		$this->NoBayar->ReadOnly = true;
+		$this->Tgl->ReadOnly = true;
 	}
 
 	// User ID Filtering event

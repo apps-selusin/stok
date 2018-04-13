@@ -355,9 +355,6 @@ class ct10_hutangdetail_grid extends ct10_hutangdetail {
 
 		// Set up list options
 		$this->SetupListOptions();
-		$this->id->SetVisibility();
-		if ($this->IsAdd() || $this->IsCopy() || $this->IsGridAdd())
-			$this->id->Visible = FALSE;
 		$this->HutangID->SetVisibility();
 		$this->NoBayar->SetVisibility();
 		$this->Tgl->SetVisibility();
@@ -1006,27 +1003,23 @@ class ct10_hutangdetail_grid extends ct10_hutangdetail {
 		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
 
-		// "view"
-		$item = &$this->ListOptions->Add("view");
-		$item->CssClass = "text-nowrap";
-		$item->Visible = $Security->CanView();
-		$item->OnLeft = TRUE;
-
 		// "edit"
 		$item = &$this->ListOptions->Add("edit");
 		$item->CssClass = "text-nowrap";
 		$item->Visible = $Security->CanEdit();
 		$item->OnLeft = TRUE;
 
-		// "copy"
-		$item = &$this->ListOptions->Add("copy");
+		// "sequence"
+		$item = &$this->ListOptions->Add("sequence");
 		$item->CssClass = "text-nowrap";
-		$item->Visible = $Security->CanAdd();
-		$item->OnLeft = TRUE;
+		$item->Visible = TRUE;
+		$item->OnLeft = TRUE; // Always on left
+		$item->ShowInDropDown = FALSE;
+		$item->ShowInButtonGroup = FALSE;
 
 		// Drop down button for ListOptions
 		$this->ListOptions->UseImageAndText = TRUE;
-		$this->ListOptions->UseDropDownButton = TRUE;
+		$this->ListOptions->UseDropDownButton = FALSE;
 		$this->ListOptions->DropDownButtonPhrase = $Language->Phrase("ButtonListOptions");
 		$this->ListOptions->UseButtonGroup = FALSE;
 		if ($this->ListOptions->UseButtonGroup && ew_IsMobile())
@@ -1076,31 +1069,17 @@ class ct10_hutangdetail_grid extends ct10_hutangdetail {
 				}
 			}
 		}
-		if ($this->CurrentMode == "view") { // View mode
 
-		// "view"
-		$oListOpt = &$this->ListOptions->Items["view"];
-		$viewcaption = ew_HtmlTitle($Language->Phrase("ViewLink"));
-		if ($Security->CanView()) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewView\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . ew_HtmlEncode($this->ViewUrl) . "\">" . $Language->Phrase("ViewLink") . "</a>";
-		} else {
-			$oListOpt->Body = "";
-		}
+		// "sequence"
+		$oListOpt = &$this->ListOptions->Items["sequence"];
+		$oListOpt->Body = ew_FormatSeqNo($this->RecCnt);
+		if ($this->CurrentMode == "view") { // View mode
 
 		// "edit"
 		$oListOpt = &$this->ListOptions->Items["edit"];
 		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
 		if ($Security->CanEdit()) {
 			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
-		} else {
-			$oListOpt->Body = "";
-		}
-
-		// "copy"
-		$oListOpt = &$this->ListOptions->Items["copy"];
-		$copycaption = ew_HtmlTitle($Language->Phrase("CopyLink"));
-		if ($Security->CanAdd()) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
 		}
@@ -1229,8 +1208,6 @@ class ct10_hutangdetail_grid extends ct10_hutangdetail {
 		// Load from form
 		global $objForm;
 		$objForm->FormName = $this->FormName;
-		if (!$this->id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
-			$this->id->setFormValue($objForm->GetValue("x_id"));
 		if (!$this->HutangID->FldIsDetailKey) {
 			$this->HutangID->setFormValue($objForm->GetValue("x_HutangID"));
 		}
@@ -1248,6 +1225,8 @@ class ct10_hutangdetail_grid extends ct10_hutangdetail {
 			$this->JumlahBayar->setFormValue($objForm->GetValue("x_JumlahBayar"));
 		}
 		$this->JumlahBayar->setOldValue($objForm->GetValue("o_JumlahBayar"));
+		if (!$this->id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
+			$this->id->setFormValue($objForm->GetValue("x_id"));
 	}
 
 	// Restore form values
@@ -1429,11 +1408,6 @@ class ct10_hutangdetail_grid extends ct10_hutangdetail {
 		$this->JumlahBayar->CellCssStyle .= "text-align: right;";
 		$this->JumlahBayar->ViewCustomAttributes = "";
 
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
-
 			// HutangID
 			$this->HutangID->LinkCustomAttributes = "";
 			$this->HutangID->HrefValue = "";
@@ -1455,9 +1429,7 @@ class ct10_hutangdetail_grid extends ct10_hutangdetail {
 			$this->JumlahBayar->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
-			// id
 			// HutangID
-
 			$this->HutangID->EditAttrs["class"] = "form-control";
 			$this->HutangID->EditCustomAttributes = "";
 			if ($this->HutangID->getSessionValue() <> "") {
@@ -1493,12 +1465,8 @@ class ct10_hutangdetail_grid extends ct10_hutangdetail {
 			}
 
 			// Add refer script
-			// id
-
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-
 			// HutangID
+
 			$this->HutangID->LinkCustomAttributes = "";
 			$this->HutangID->HrefValue = "";
 
@@ -1514,12 +1482,6 @@ class ct10_hutangdetail_grid extends ct10_hutangdetail {
 			$this->JumlahBayar->LinkCustomAttributes = "";
 			$this->JumlahBayar->HrefValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
-
-			// id
-			$this->id->EditAttrs["class"] = "form-control";
-			$this->id->EditCustomAttributes = "";
-			$this->id->EditValue = $this->id->CurrentValue;
-			$this->id->ViewCustomAttributes = "";
 
 			// HutangID
 			$this->HutangID->EditAttrs["class"] = "form-control";
@@ -1557,12 +1519,8 @@ class ct10_hutangdetail_grid extends ct10_hutangdetail {
 			}
 
 			// Edit refer script
-			// id
-
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-
 			// HutangID
+
 			$this->HutangID->LinkCustomAttributes = "";
 			$this->HutangID->HrefValue = "";
 

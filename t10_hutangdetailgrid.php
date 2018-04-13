@@ -172,15 +172,6 @@ $t10_hutangdetail_grid->RenderListOptions();
 // Render list options (header, left)
 $t10_hutangdetail_grid->ListOptions->Render("header", "left");
 ?>
-<?php if ($t10_hutangdetail->id->Visible) { // id ?>
-	<?php if ($t10_hutangdetail->SortUrl($t10_hutangdetail->id) == "") { ?>
-		<th data-name="id" class="<?php echo $t10_hutangdetail->id->HeaderCellClass() ?>"><div id="elh_t10_hutangdetail_id" class="t10_hutangdetail_id"><div class="ewTableHeaderCaption"><?php echo $t10_hutangdetail->id->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="id" class="<?php echo $t10_hutangdetail->id->HeaderCellClass() ?>"><div><div id="elh_t10_hutangdetail_id" class="t10_hutangdetail_id">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t10_hutangdetail->id->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t10_hutangdetail->id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t10_hutangdetail->id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-		</div></div></th>
-	<?php } ?>
-<?php } ?>
 <?php if ($t10_hutangdetail->HutangID->Visible) { // HutangID ?>
 	<?php if ($t10_hutangdetail->SortUrl($t10_hutangdetail->HutangID) == "") { ?>
 		<th data-name="HutangID" class="<?php echo $t10_hutangdetail->HutangID->HeaderCellClass() ?>"><div id="elh_t10_hutangdetail_HutangID" class="t10_hutangdetail_HutangID"><div class="ewTableHeaderCaption"><?php echo $t10_hutangdetail->HutangID->FldCaption() ?></div></div></th>
@@ -326,33 +317,6 @@ while ($t10_hutangdetail_grid->RecCnt < $t10_hutangdetail_grid->StopRec) {
 // Render list options (body, left)
 $t10_hutangdetail_grid->ListOptions->Render("body", "left", $t10_hutangdetail_grid->RowCnt);
 ?>
-	<?php if ($t10_hutangdetail->id->Visible) { // id ?>
-		<td data-name="id"<?php echo $t10_hutangdetail->id->CellAttributes() ?>>
-<?php if ($t10_hutangdetail->RowType == EW_ROWTYPE_ADD) { // Add record ?>
-<input type="hidden" data-table="t10_hutangdetail" data-field="x_id" name="o<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" id="o<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t10_hutangdetail->id->OldValue) ?>">
-<?php } ?>
-<?php if ($t10_hutangdetail->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?php echo $t10_hutangdetail_grid->RowCnt ?>_t10_hutangdetail_id" class="form-group t10_hutangdetail_id">
-<span<?php echo $t10_hutangdetail->id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t10_hutangdetail->id->EditValue ?></p></span>
-</span>
-<input type="hidden" data-table="t10_hutangdetail" data-field="x_id" name="x<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" id="x<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t10_hutangdetail->id->CurrentValue) ?>">
-<?php } ?>
-<?php if ($t10_hutangdetail->RowType == EW_ROWTYPE_VIEW) { // View record ?>
-<span id="el<?php echo $t10_hutangdetail_grid->RowCnt ?>_t10_hutangdetail_id" class="t10_hutangdetail_id">
-<span<?php echo $t10_hutangdetail->id->ViewAttributes() ?>>
-<?php echo $t10_hutangdetail->id->ListViewValue() ?></span>
-</span>
-<?php if ($t10_hutangdetail->CurrentAction <> "F") { ?>
-<input type="hidden" data-table="t10_hutangdetail" data-field="x_id" name="x<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" id="x<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t10_hutangdetail->id->FormValue) ?>">
-<input type="hidden" data-table="t10_hutangdetail" data-field="x_id" name="o<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" id="o<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t10_hutangdetail->id->OldValue) ?>">
-<?php } else { ?>
-<input type="hidden" data-table="t10_hutangdetail" data-field="x_id" name="ft10_hutangdetailgrid$x<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" id="ft10_hutangdetailgrid$x<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t10_hutangdetail->id->FormValue) ?>">
-<input type="hidden" data-table="t10_hutangdetail" data-field="x_id" name="ft10_hutangdetailgrid$o<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" id="ft10_hutangdetailgrid$o<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t10_hutangdetail->id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-	<?php } ?>
 	<?php if ($t10_hutangdetail->HutangID->Visible) { // HutangID ?>
 		<td data-name="HutangID"<?php echo $t10_hutangdetail->HutangID->CellAttributes() ?>>
 <?php if ($t10_hutangdetail->RowType == EW_ROWTYPE_ADD) { // Add record ?>
@@ -397,6 +361,13 @@ $t10_hutangdetail_grid->ListOptions->Render("body", "left", $t10_hutangdetail_gr
 <?php } ?>
 </td>
 	<?php } ?>
+<?php if ($t10_hutangdetail->RowType == EW_ROWTYPE_ADD) { // Add record ?>
+<input type="hidden" data-table="t10_hutangdetail" data-field="x_id" name="x<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" id="x<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t10_hutangdetail->id->CurrentValue) ?>">
+<input type="hidden" data-table="t10_hutangdetail" data-field="x_id" name="o<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" id="o<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t10_hutangdetail->id->OldValue) ?>">
+<?php } ?>
+<?php if ($t10_hutangdetail->RowType == EW_ROWTYPE_EDIT || $t10_hutangdetail->CurrentMode == "edit") { ?>
+<input type="hidden" data-table="t10_hutangdetail" data-field="x_id" name="x<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" id="x<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t10_hutangdetail->id->CurrentValue) ?>">
+<?php } ?>
 	<?php if ($t10_hutangdetail->NoBayar->Visible) { // NoBayar ?>
 		<td data-name="NoBayar"<?php echo $t10_hutangdetail->NoBayar->CellAttributes() ?>>
 <?php if ($t10_hutangdetail->RowType == EW_ROWTYPE_ADD) { // Add record ?>
@@ -533,19 +504,6 @@ ft10_hutangdetailgrid.UpdateOpts(<?php echo $t10_hutangdetail_grid->RowIndex ?>)
 // Render list options (body, left)
 $t10_hutangdetail_grid->ListOptions->Render("body", "left", $t10_hutangdetail_grid->RowIndex);
 ?>
-	<?php if ($t10_hutangdetail->id->Visible) { // id ?>
-		<td data-name="id">
-<?php if ($t10_hutangdetail->CurrentAction <> "F") { ?>
-<?php } else { ?>
-<span id="el$rowindex$_t10_hutangdetail_id" class="form-group t10_hutangdetail_id">
-<span<?php echo $t10_hutangdetail->id->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t10_hutangdetail->id->ViewValue ?></p></span>
-</span>
-<input type="hidden" data-table="t10_hutangdetail" data-field="x_id" name="x<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" id="x<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t10_hutangdetail->id->FormValue) ?>">
-<?php } ?>
-<input type="hidden" data-table="t10_hutangdetail" data-field="x_id" name="o<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" id="o<?php echo $t10_hutangdetail_grid->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t10_hutangdetail->id->OldValue) ?>">
-</td>
-	<?php } ?>
 	<?php if ($t10_hutangdetail->HutangID->Visible) { // HutangID ?>
 		<td data-name="HutangID">
 <?php if ($t10_hutangdetail->CurrentAction <> "F") { ?>

@@ -1254,6 +1254,10 @@ class ct09_hutang extends cTable {
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
 
+		$this->NoHutang->ReadOnly = true;
+		$this->BeliID->ReadOnly = true;
+		$this->JumlahHutang->ReadOnly = true;
+		$this->JumlahBayar->ReadOnly = true;
 	}
 
 	// User ID Filtering event

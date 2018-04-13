@@ -330,9 +330,6 @@ class ct10_hutangdetail_delete extends ct10_hutangdetail {
 		// 
 
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->id->SetVisibility();
-		if ($this->IsAdd() || $this->IsCopy() || $this->IsGridAdd())
-			$this->id->Visible = FALSE;
 		$this->HutangID->SetVisibility();
 		$this->NoBayar->SetVisibility();
 		$this->Tgl->SetVisibility();
@@ -593,11 +590,6 @@ class ct10_hutangdetail_delete extends ct10_hutangdetail {
 		$this->JumlahBayar->ViewValue = ew_FormatNumber($this->JumlahBayar->ViewValue, 2, -2, -2, -2);
 		$this->JumlahBayar->CellCssStyle .= "text-align: right;";
 		$this->JumlahBayar->ViewCustomAttributes = "";
-
-			// id
-			$this->id->LinkCustomAttributes = "";
-			$this->id->HrefValue = "";
-			$this->id->TooltipValue = "";
 
 			// HutangID
 			$this->HutangID->LinkCustomAttributes = "";
@@ -920,9 +912,6 @@ $t10_hutangdetail_delete->ShowMessage();
 <table class="table ewTable">
 	<thead>
 	<tr class="ewTableHeader">
-<?php if ($t10_hutangdetail->id->Visible) { // id ?>
-		<th class="<?php echo $t10_hutangdetail->id->HeaderCellClass() ?>"><span id="elh_t10_hutangdetail_id" class="t10_hutangdetail_id"><?php echo $t10_hutangdetail->id->FldCaption() ?></span></th>
-<?php } ?>
 <?php if ($t10_hutangdetail->HutangID->Visible) { // HutangID ?>
 		<th class="<?php echo $t10_hutangdetail->HutangID->HeaderCellClass() ?>"><span id="elh_t10_hutangdetail_HutangID" class="t10_hutangdetail_HutangID"><?php echo $t10_hutangdetail->HutangID->FldCaption() ?></span></th>
 <?php } ?>
@@ -956,14 +945,6 @@ while (!$t10_hutangdetail_delete->Recordset->EOF) {
 	$t10_hutangdetail_delete->RenderRow();
 ?>
 	<tr<?php echo $t10_hutangdetail->RowAttributes() ?>>
-<?php if ($t10_hutangdetail->id->Visible) { // id ?>
-		<td<?php echo $t10_hutangdetail->id->CellAttributes() ?>>
-<span id="el<?php echo $t10_hutangdetail_delete->RowCnt ?>_t10_hutangdetail_id" class="t10_hutangdetail_id">
-<span<?php echo $t10_hutangdetail->id->ViewAttributes() ?>>
-<?php echo $t10_hutangdetail->id->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($t10_hutangdetail->HutangID->Visible) { // HutangID ?>
 		<td<?php echo $t10_hutangdetail->HutangID->CellAttributes() ?>>
 <span id="el<?php echo $t10_hutangdetail_delete->RowCnt ?>_t10_hutangdetail_HutangID" class="t10_hutangdetail_HutangID">

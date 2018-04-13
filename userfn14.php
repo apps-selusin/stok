@@ -54,4 +54,22 @@ function f_GetNextNoHutang() {
 	}
 	return $m_NextNo;
 }
+
+function f_GetNextNoHutangDetail() {
+	$m_NextNo = "";
+	$m_LastNo = "";
+	$m_No = ew_ExecuteScalar("select NoBayar from t10_hutangdetail order by NoBayar desc");
+	if ($m_No != "") { // jika sudah ada, langsung ambil dan proses...
+		$m_LastNo = intval(substr($m_No, -6)); // ambil 6 digit terakhir
+		$m_LastNo = intval($m_LastNo) + 1; // konversi ke integer, lalu tambahkan satu
+		$m_NextNo = "HD" . sprintf('%06s', $m_LastNo); // format hasilnya dan tambahkan prefix
+		if (strlen($m_NextNo) > 8) {
+			$m_NextNo = "HD" . "000001";
+		}
+	}
+	else { // jika belum ada, gunakan kode yang pertama
+		$m_NextNo = "HD" . "000001";
+	}
+	return $m_NextNo;
+}
 ?>
