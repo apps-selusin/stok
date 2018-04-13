@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 13, 2018 at 03:26 AM
+-- Generation Time: Apr 13, 2018 at 08:22 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -195,16 +195,14 @@ CREATE TABLE IF NOT EXISTS `t08_beli` (
   `Qty` float(15,2) NOT NULL DEFAULT '0.00',
   `SubTotal` float(15,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
 --
 -- Dumping data for table `t08_beli`
 --
 
 INSERT INTO `t08_beli` (`id`, `TglPO`, `NoPO`, `VendorID`, `ArticleID`, `Harga`, `Qty`, `SubTotal`) VALUES
-(1, '2018-04-11', 'PO201804110001', 2, 1, 50000.00, 2.10, 105000.00),
-(2, '2018-04-11', 'PO201804110002', 1, 1, 75000.00, 3.20, 240000.00),
-(3, '2018-04-11', 'PO201804110003', 2, 1, 60000.00, 4.00, 240000.00);
+(1, '2018-04-13', 'PO201804130001', 1, 1, 100000.00, 1.50, 150000.00);
 
 -- --------------------------------------------------------
 
@@ -219,7 +217,14 @@ CREATE TABLE IF NOT EXISTS `t09_hutang` (
   `JumlahHutang` float(15,2) NOT NULL DEFAULT '0.00',
   `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `t09_hutang`
+--
+
+INSERT INTO `t09_hutang` (`id`, `NoHutang`, `BeliID`, `JumlahHutang`, `JumlahBayar`) VALUES
+(1, 'HT000001', 1, 150000.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -354,7 +359,7 @@ CREATE TABLE IF NOT EXISTS `t99_audittrail` (
   `oldvalue` longtext CHARACTER SET latin1,
   `newvalue` longtext CHARACTER SET latin1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=167 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=213 ;
 
 --
 -- Dumping data for table `t99_audittrail`
@@ -524,7 +529,53 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (163, '2018-04-12 14:32:44', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '2', '225000.00', '300000'),
 (164, '2018-04-12 14:32:53', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '2', '4.00', '3.2'),
 (165, '2018-04-12 14:32:53', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '2', '300000.00', '240000'),
-(166, '2018-04-12 16:36:30', '/stok/login.php', 'admin', 'login', '::1', '', '', '', '');
+(166, '2018-04-12 16:36:30', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(167, '2018-04-13 12:49:48', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(168, '2018-04-13 12:52:33', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '1', '', '2018-04-13'),
+(169, '2018-04-13 12:52:33', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '1', '', 'PO201804130001'),
+(170, '2018-04-13 12:52:33', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '1', '', '1'),
+(171, '2018-04-13 12:52:33', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '1', '', '1'),
+(172, '2018-04-13 12:52:33', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '1', '', '100000.00'),
+(173, '2018-04-13 12:52:33', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '1', '', '1.5'),
+(174, '2018-04-13 12:52:33', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '1', '', '1'),
+(175, '2018-04-13 12:52:33', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '1', '', '150000'),
+(176, '2018-04-13 12:52:33', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '1', '', '1'),
+(177, '2018-04-13 12:56:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '1', '', '2018-04-13'),
+(178, '2018-04-13 12:56:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '1', '', 'PO201804130001'),
+(179, '2018-04-13 12:56:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '1', '', '1'),
+(180, '2018-04-13 12:56:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '1', '', '1'),
+(181, '2018-04-13 12:56:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '1', '', '100000.00'),
+(182, '2018-04-13 12:56:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '1', '', '1.2'),
+(183, '2018-04-13 12:56:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '1', '', '1'),
+(184, '2018-04-13 12:56:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '1', '', '120000'),
+(185, '2018-04-13 12:56:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '1', '', '1'),
+(186, '2018-04-13 12:59:19', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '1', '', '2018-04-13'),
+(187, '2018-04-13 12:59:19', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '1', '', 'PO201804130001'),
+(188, '2018-04-13 12:59:19', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '1', '', '1'),
+(189, '2018-04-13 12:59:19', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '1', '', '1'),
+(190, '2018-04-13 12:59:19', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '1', '', '100000.00'),
+(191, '2018-04-13 12:59:19', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '1', '', '1.3'),
+(192, '2018-04-13 12:59:19', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '1', '', '1'),
+(193, '2018-04-13 12:59:19', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '1', '', '130000'),
+(194, '2018-04-13 12:59:19', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '1', '', '1'),
+(195, '2018-04-13 13:04:21', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '2', '', '2018-04-13'),
+(196, '2018-04-13 13:04:21', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '2', '', 'PO201804130002'),
+(197, '2018-04-13 13:04:21', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '2', '', '2'),
+(198, '2018-04-13 13:04:21', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '2', '', '1'),
+(199, '2018-04-13 13:04:21', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '2', '', '100000.00'),
+(200, '2018-04-13 13:04:21', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '2', '', '1.4'),
+(201, '2018-04-13 13:04:21', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '2', '', '1'),
+(202, '2018-04-13 13:04:21', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '2', '', '140000'),
+(203, '2018-04-13 13:04:21', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '2', '', '2'),
+(204, '2018-04-13 13:08:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '1', '', '2018-04-13'),
+(205, '2018-04-13 13:08:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '1', '', 'PO201804130001'),
+(206, '2018-04-13 13:08:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '1', '', '1'),
+(207, '2018-04-13 13:08:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '1', '', '1'),
+(208, '2018-04-13 13:08:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '1', '', '100000.00'),
+(209, '2018-04-13 13:08:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '1', '', '1.5'),
+(210, '2018-04-13 13:08:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '1', '', '1'),
+(211, '2018-04-13 13:08:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '1', '', '150000'),
+(212, '2018-04-13 13:08:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '1', '', '1');
 
 -- --------------------------------------------------------
 

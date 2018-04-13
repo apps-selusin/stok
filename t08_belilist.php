@@ -3455,7 +3455,7 @@ ew_CreateDateTimePicker("ft08_belilist", "x<?php echo $t08_beli_list->RowIndex ?
 	<?php if ($t08_beli->NoPO->Visible) { // NoPO ?>
 		<td data-name="NoPO">
 <span id="el<?php echo $t08_beli_list->RowCnt ?>_t08_beli_NoPO" class="form-group t08_beli_NoPO">
-<input type="text" data-table="t08_beli" data-field="x_NoPO" name="x<?php echo $t08_beli_list->RowIndex ?>_NoPO" id="x<?php echo $t08_beli_list->RowIndex ?>_NoPO" size="10" maxlength="14" placeholder="<?php echo ew_HtmlEncode($t08_beli->NoPO->getPlaceHolder()) ?>" value="<?php echo $t08_beli->NoPO->EditValue ?>"<?php echo $t08_beli->NoPO->EditAttributes() ?>>
+<input type="text" data-table="t08_beli" data-field="x_NoPO" name="x<?php echo $t08_beli_list->RowIndex ?>_NoPO" id="x<?php echo $t08_beli_list->RowIndex ?>_NoPO" size="15" maxlength="14" placeholder="<?php echo ew_HtmlEncode($t08_beli->NoPO->getPlaceHolder()) ?>" value="<?php echo $t08_beli->NoPO->EditValue ?>"<?php echo $t08_beli->NoPO->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t08_beli" data-field="x_NoPO" name="o<?php echo $t08_beli_list->RowIndex ?>_NoPO" id="o<?php echo $t08_beli_list->RowIndex ?>_NoPO" value="<?php echo ew_HtmlEncode($t08_beli->NoPO->OldValue) ?>">
 </td>
@@ -3650,7 +3650,7 @@ ew_CreateDateTimePicker("ft08_belilist", "x<?php echo $t08_beli_list->RowIndex ?
 		<td data-name="NoPO"<?php echo $t08_beli->NoPO->CellAttributes() ?>>
 <?php if ($t08_beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t08_beli_list->RowCnt ?>_t08_beli_NoPO" class="form-group t08_beli_NoPO">
-<input type="text" data-table="t08_beli" data-field="x_NoPO" name="x<?php echo $t08_beli_list->RowIndex ?>_NoPO" id="x<?php echo $t08_beli_list->RowIndex ?>_NoPO" size="10" maxlength="14" placeholder="<?php echo ew_HtmlEncode($t08_beli->NoPO->getPlaceHolder()) ?>" value="<?php echo $t08_beli->NoPO->EditValue ?>"<?php echo $t08_beli->NoPO->EditAttributes() ?>>
+<input type="text" data-table="t08_beli" data-field="x_NoPO" name="x<?php echo $t08_beli_list->RowIndex ?>_NoPO" id="x<?php echo $t08_beli_list->RowIndex ?>_NoPO" size="15" maxlength="14" placeholder="<?php echo ew_HtmlEncode($t08_beli->NoPO->getPlaceHolder()) ?>" value="<?php echo $t08_beli->NoPO->EditValue ?>"<?php echo $t08_beli->NoPO->EditAttributes() ?>>
 </span>
 <?php } ?>
 <?php if ($t08_beli->RowType == EW_ROWTYPE_VIEW) { // View record ?>

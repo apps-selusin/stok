@@ -1306,6 +1306,7 @@ class ct08_beli extends cTable {
 
 		// Enter your code here
 		// To cancel, set return value to FALSE
+		// default nomor PO baru
 
 		$rsnew["NoPO"] = f_GetNextNoPO(); // mengantisipasi lebih satu user menginput data saat bersamaan
 		return TRUE;
@@ -1315,6 +1316,13 @@ class ct08_beli extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"
+		// setup no hutang baru
+
+		$NoHutang = f_GetNextNoHutang();
+
+		// insert ke tabel hutang dengan nomor PO baru
+		ew_Execute("insert into t09_hutang (nohutang, beliid, jumlahhutang) values
+		('".$NoHutang."', ".$rsnew["id"].", ".$rsnew["SubTotal"].")");
 	}
 
 	// Row Updating event
@@ -1416,6 +1424,7 @@ class ct08_beli extends cTable {
 		$this->NoPO->ReadOnly = true;
 		$this->TglPO->ReadOnly = true;
 		$this->SatuanID->ReadOnly = true;
+		$this->SubTotal->ReadOnly = true;
 
 		// Kondisi saat form Tambah sedang terbuka (tidak dalam mode konfirmasi)
 		if (CurrentPageID() == "add" && $this->CurrentAction != "F") {

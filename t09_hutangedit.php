@@ -831,9 +831,9 @@ class ct09_hutang_edit extends ct09_hutang {
 			$this->BeliID->ViewValue = $this->BeliID->CurrentValue;
 		if (strval($this->BeliID->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->BeliID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, `SubTotal` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_beli`";
+		$sSqlWrk = "SELECT `id`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_beli`";
 		$sWhereWrk = "";
-		$this->BeliID->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`', "dx3" => '`SubTotal`');
+		$this->BeliID->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->BeliID, $sWhereWrk); // Call Lookup Selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -842,7 +842,6 @@ class ct09_hutang_edit extends ct09_hutang {
 				$arwrk = array();
 				$arwrk[1] = ew_FormatDateTime($rswrk->fields('DispFld'), 7);
 				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$arwrk[3] = ew_FormatNumber($rswrk->fields('Disp3Fld'), 2, -2, -2, -2);
 				$this->BeliID->ViewValue = $this->BeliID->DisplayValue($arwrk);
 				$rswrk->Close();
 			} else {
@@ -899,9 +898,9 @@ class ct09_hutang_edit extends ct09_hutang {
 			$this->BeliID->EditValue = ew_HtmlEncode($this->BeliID->CurrentValue);
 			if (strval($this->BeliID->CurrentValue) <> "") {
 				$sFilterWrk = "`id`" . ew_SearchString("=", $this->BeliID->CurrentValue, EW_DATATYPE_NUMBER, "");
-			$sSqlWrk = "SELECT `id`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, `SubTotal` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_beli`";
+			$sSqlWrk = "SELECT `id`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_beli`";
 			$sWhereWrk = "";
-			$this->BeliID->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`', "dx3" => '`SubTotal`');
+			$this->BeliID->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`');
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->BeliID, $sWhereWrk); // Call Lookup Selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -910,7 +909,6 @@ class ct09_hutang_edit extends ct09_hutang {
 					$arwrk = array();
 					$arwrk[1] = ew_HtmlEncode(ew_FormatDateTime($rswrk->fields('DispFld'), 7));
 					$arwrk[2] = ew_HtmlEncode($rswrk->fields('Disp2Fld'));
-					$arwrk[3] = ew_HtmlEncode(ew_FormatNumber($rswrk->fields('Disp3Fld'), 2, -2, -2, -2));
 					$this->BeliID->EditValue = $this->BeliID->DisplayValue($arwrk);
 					$rswrk->Close();
 				} else {
@@ -1141,9 +1139,9 @@ class ct09_hutang_edit extends ct09_hutang {
 		switch ($fld->FldVar) {
 		case "x_BeliID":
 			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `id` AS `LinkFld`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, `SubTotal` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_beli`";
+			$sSqlWrk = "SELECT `id` AS `LinkFld`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_beli`";
 			$sWhereWrk = "{filter}";
-			$fld->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`', "dx3" => '`SubTotal`');
+			$fld->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`');
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`id` IN ({filter_value})', "t0" => "3", "fn0" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->BeliID, $sWhereWrk); // Call Lookup Selecting
@@ -1161,9 +1159,9 @@ class ct09_hutang_edit extends ct09_hutang {
 		switch ($fld->FldVar) {
 		case "x_BeliID":
 			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `id`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, `SubTotal` AS `Disp3Fld` FROM `t08_beli`";
-			$sWhereWrk = "" . ew_CastDateFieldForLike('`TglPO`', 7, "DB") . " LIKE '{query_value}%' OR CONCAT(COALESCE(" . ew_CastDateFieldForLike('`TglPO`', 7, "DB") . ", ''),'" . ew_ValueSeparator(1, $this->BeliID) . "',COALESCE(`NoPO`,''),'" . ew_ValueSeparator(2, $this->BeliID) . "',COALESCE(`SubTotal`,'')) LIKE '{query_value}%'";
-			$fld->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`', "dx3" => '`SubTotal`');
+			$sSqlWrk = "SELECT `id`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld` FROM `t08_beli`";
+			$sWhereWrk = "" . ew_CastDateFieldForLike('`TglPO`', 7, "DB") . " LIKE '{query_value}%' OR CONCAT(COALESCE(" . ew_CastDateFieldForLike('`TglPO`', 7, "DB") . ", ''),'" . ew_ValueSeparator(1, $this->BeliID) . "',COALESCE(`NoPO`,'')) LIKE '{query_value}%'";
+			$fld->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`');
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
 			$sSqlWrk = "";
 			$this->Lookup_Selecting($this->BeliID, $sWhereWrk); // Call Lookup Selecting
@@ -1323,7 +1321,7 @@ ft09_hutangedit.Form_CustomValidate =
 ft09_hutangedit.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
 
 // Dynamic selection lists
-ft09_hutangedit.Lists["x_BeliID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_TglPO","x_NoPO","x_SubTotal",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t08_beli"};
+ft09_hutangedit.Lists["x_BeliID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_TglPO","x_NoPO","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t08_beli"};
 ft09_hutangedit.Lists["x_BeliID"].Data = "<?php echo $t09_hutang_edit->BeliID->LookupFilterQuery(FALSE, "edit") ?>";
 ft09_hutangedit.AutoSuggests["x_BeliID"] = <?php echo json_encode(array("data" => "ajax=autosuggest&" . $t09_hutang_edit->BeliID->LookupFilterQuery(TRUE, "edit"))) ?>;
 

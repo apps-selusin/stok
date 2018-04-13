@@ -1776,9 +1776,9 @@ class ct09_hutang_list extends ct09_hutang {
 			$this->BeliID->ViewValue = $this->BeliID->CurrentValue;
 		if (strval($this->BeliID->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->BeliID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, `SubTotal` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_beli`";
+		$sSqlWrk = "SELECT `id`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_beli`";
 		$sWhereWrk = "";
-		$this->BeliID->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`', "dx3" => '`SubTotal`');
+		$this->BeliID->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->BeliID, $sWhereWrk); // Call Lookup Selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -1787,7 +1787,6 @@ class ct09_hutang_list extends ct09_hutang {
 				$arwrk = array();
 				$arwrk[1] = ew_FormatDateTime($rswrk->fields('DispFld'), 7);
 				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$arwrk[3] = ew_FormatNumber($rswrk->fields('Disp3Fld'), 2, -2, -2, -2);
 				$this->BeliID->ViewValue = $this->BeliID->DisplayValue($arwrk);
 				$rswrk->Close();
 			} else {
@@ -2295,7 +2294,7 @@ ft09_hutanglist.Form_CustomValidate =
 ft09_hutanglist.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
 
 // Dynamic selection lists
-ft09_hutanglist.Lists["x_BeliID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_TglPO","x_NoPO","x_SubTotal",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t08_beli"};
+ft09_hutanglist.Lists["x_BeliID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_TglPO","x_NoPO","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t08_beli"};
 ft09_hutanglist.Lists["x_BeliID"].Data = "<?php echo $t09_hutang_list->BeliID->LookupFilterQuery(FALSE, "list") ?>";
 ft09_hutanglist.AutoSuggests["x_BeliID"] = <?php echo json_encode(array("data" => "ajax=autosuggest&" . $t09_hutang_list->BeliID->LookupFilterQuery(TRUE, "list"))) ?>;
 

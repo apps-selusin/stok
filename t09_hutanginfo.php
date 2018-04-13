@@ -207,7 +207,7 @@ class ct09_hutang extends cTable {
 	function getSqlSelectList() { // Select for List page
 		$select = "";
 		$select = "SELECT * FROM (" .
-			"SELECT *, (SELECT CONCAT(COALESCE(`TglPO`, ''),'" . ew_ValueSeparator(1, $this->BeliID) . "',COALESCE(`NoPO`,''),'" . ew_ValueSeparator(2, $this->BeliID) . "',COALESCE(`SubTotal`,'')) FROM `t08_beli` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t09_hutang`.`BeliID` LIMIT 1) AS `EV__BeliID` FROM `t09_hutang`" .
+			"SELECT *, (SELECT CONCAT(COALESCE(`TglPO`, ''),'" . ew_ValueSeparator(1, $this->BeliID) . "',COALESCE(`NoPO`,'')) FROM `t08_beli` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t09_hutang`.`BeliID` LIMIT 1) AS `EV__BeliID` FROM `t09_hutang`" .
 			") `EW_TMP_TABLE`";
 		return ($this->_SqlSelectList <> "") ? $this->_SqlSelectList : $select;
 	}
@@ -757,9 +757,9 @@ class ct09_hutang extends cTable {
 			$this->BeliID->ViewValue = $this->BeliID->CurrentValue;
 		if (strval($this->BeliID->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->BeliID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, `SubTotal` AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_beli`";
+		$sSqlWrk = "SELECT `id`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_beli`";
 		$sWhereWrk = "";
-		$this->BeliID->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`', "dx3" => '`SubTotal`');
+		$this->BeliID->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->BeliID, $sWhereWrk); // Call Lookup Selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
@@ -768,7 +768,6 @@ class ct09_hutang extends cTable {
 				$arwrk = array();
 				$arwrk[1] = ew_FormatDateTime($rswrk->fields('DispFld'), 7);
 				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$arwrk[3] = ew_FormatNumber($rswrk->fields('Disp3Fld'), 2, -2, -2, -2);
 				$this->BeliID->ViewValue = $this->BeliID->DisplayValue($arwrk);
 				$rswrk->Close();
 			} else {
