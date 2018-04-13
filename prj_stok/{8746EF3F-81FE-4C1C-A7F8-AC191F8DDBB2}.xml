@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <configuration date="2018/04/12" author="e.World Technology Ltd.">
-  <project id="{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}" file="C:\xampp\htdocs\stok\prj_stok.pmp" name="prj_stok" product="PHPMaker" version="14.0" datetime="2018/04/12 14:31:17" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" relatedid="{A2EF3792-3541-4459-9D68-D8F1DBA083C2}">
+  <project id="{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}" file="C:\xampp\htdocs\stok\prj_stok.pmp" name="prj_stok" product="PHPMaker" version="14.0" datetime="2018/04/12 22:37:46" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" relatedid="{A2EF3792-3541-4459-9D68-D8F1DBA083C2}">
     <table id="cf01_home_php" name="cf01_home.php" caption="Home" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t01_company" name="t01_company" caption="Company" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t02_vendor" name="t02_vendor" caption="Vendor" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
@@ -10,9 +10,13 @@
     <table id="t06_article" name="t06_article" caption="Article" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t07_satuan" name="t07_satuan" caption="Satuan" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t08_beli" name="t08_beli" caption="Pembelian" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t09_hutang" name="t09_hutang" caption="Hutang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t10_hutangdetail" name="t10_hutangdetail" caption="Hutang Detail" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t96_employees" name="t96_employees" caption="User" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t97_userlevels" name="t97_userlevels" caption="Hak Akses" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t98_userlevelpermissions" name="t98_userlevelpermissions" caption="Akses Menu" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t99_audittrail" name="t99_audittrail" caption="Catatan Aktifitas" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="v01_beli" name="v01_beli" caption="v 01 beli" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="v02_stok" name="v02_stok" caption="v 02 stok" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
   </project>
 </configuration>

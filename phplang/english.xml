@@ -618,6 +618,18 @@
   <project>
     <phrase id="bodytitle" value="STOK Apps." />
     <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
+    <menu id="10020">
+      <phrase id="menutext" value="v 01 beli" />
+    </menu>
+    <menu id="10021">
+      <phrase id="menutext" value="Hutang" />
+    </menu>
+    <menu id="10022">
+      <phrase id="menutext" value="Hutang Detail" />
+    </menu>
+    <menu id="10019">
+      <phrase id="menutext" value="v 02 stok" />
+    </menu>
     <menu id="1">
       <phrase id="menutext" value="Home" />
     </menu>
@@ -672,10 +684,10 @@
     <menu id="5">
       <phrase id="menutext" value="Activity Log" />
     </menu>
-    <menu id="10015">
+    <menu id="10018">
       <phrase id="menutext" value="v 01 beli" />
     </menu>
-    <menu id="10016">
+    <menu id="10015">
       <phrase id="menutext" value="v 02 stok" />
     </menu>
     <menu id="10001">
@@ -834,6 +846,42 @@
         <phrase id="fldcaption" value="Sub Total" />
       </field>
     </table>
+    <table id="t09_hutang">
+      <phrase id="tblcaption" value="Hutang" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="nohutang">
+        <phrase id="fldcaption" value="No Hutang" />
+      </field>
+      <field id="beliid">
+        <phrase id="fldcaption" value="Beli ID" />
+      </field>
+      <field id="jumlahhutang">
+        <phrase id="fldcaption" value="Jumlah Hutang" />
+      </field>
+      <field id="jumlahbayar">
+        <phrase id="fldcaption" value="Jumlah Bayar" />
+      </field>
+    </table>
+    <table id="t10_hutangdetail">
+      <phrase id="tblcaption" value="Hutang Detail" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="hutangid">
+        <phrase id="fldcaption" value="Hutang ID" />
+      </field>
+      <field id="nobayar">
+        <phrase id="fldcaption" value="No Bayar" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="Tgl" />
+      </field>
+      <field id="jumlahbayar">
+        <phrase id="fldcaption" value="Jumlah Bayar" />
+      </field>
+    </table>
     <table id="t96_employees">
       <phrase id="tblcaption" value="User" />
       <phrase id="tblpagecaption1" value="Page 1" />
@@ -966,6 +1014,45 @@
       </field>
       <field id="newvalue">
         <phrase id="fldcaption" value="newvalue" />
+      </field>
+    </table>
+    <table id="v01_beli">
+      <phrase id="tblcaption" value="v 01 beli" />
+      <field id="articleid">
+        <phrase id="fldcaption" value="articleid" />
+      </field>
+      <field id="avgharga">
+        <phrase id="fldcaption" value="avgharga" />
+      </field>
+      <field id="sumqty">
+        <phrase id="fldcaption" value="sumqty" />
+      </field>
+      <field id="subtotal">
+        <phrase id="fldcaption" value="subtotal" />
+      </field>
+    </table>
+    <table id="v02_stok">
+      <phrase id="tblcaption" value="v 02 stok" />
+      <field id="satuan">
+        <phrase id="fldcaption" value="Satuan" />
+      </field>
+      <field id="avgharga">
+        <phrase id="fldcaption" value="Avg Harga" />
+      </field>
+      <field id="sumqty">
+        <phrase id="fldcaption" value="Sum Qty" />
+      </field>
+      <field id="subtotal">
+        <phrase id="fldcaption" value="Sub Total" />
+      </field>
+      <field id="maingroup">
+        <phrase id="fldcaption" value="Main Group" />
+      </field>
+      <field id="subgroup">
+        <phrase id="fldcaption" value="Sub Group" />
+      </field>
+      <field id="article">
+        <phrase id="fldcaption" value="Article" />
       </field>
     </table>
   </project>

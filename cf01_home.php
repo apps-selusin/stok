@@ -353,6 +353,9 @@ Page_Rendering();
 	<a href="t06_articlelist.php">Article</a>
 </div>
 -->
+<div>
+<p>setiap pembelian dianggap hutang</p>
+</div>
 <?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
 <?php include_once "footer.php" ?>
 <?php

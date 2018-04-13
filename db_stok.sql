@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 12, 2018 at 10:41 AM
+-- Generation Time: Apr 13, 2018 at 03:26 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -209,6 +209,36 @@ INSERT INTO `t08_beli` (`id`, `TglPO`, `NoPO`, `VendorID`, `ArticleID`, `Harga`,
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `t09_hutang`
+--
+
+CREATE TABLE IF NOT EXISTS `t09_hutang` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `NoHutang` varchar(8) NOT NULL,
+  `BeliID` int(11) NOT NULL,
+  `JumlahHutang` float(15,2) NOT NULL DEFAULT '0.00',
+  `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `t10_hutangdetail`
+--
+
+CREATE TABLE IF NOT EXISTS `t10_hutangdetail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `HutangID` int(11) NOT NULL,
+  `NoBayar` varchar(8) NOT NULL,
+  `Tgl` date NOT NULL,
+  `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `t96_employees`
 --
 
@@ -324,7 +354,7 @@ CREATE TABLE IF NOT EXISTS `t99_audittrail` (
   `oldvalue` longtext CHARACTER SET latin1,
   `newvalue` longtext CHARACTER SET latin1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=166 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=167 ;
 
 --
 -- Dumping data for table `t99_audittrail`
@@ -493,7 +523,8 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (162, '2018-04-12 14:32:44', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '2', '3.20', '4'),
 (163, '2018-04-12 14:32:44', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '2', '225000.00', '300000'),
 (164, '2018-04-12 14:32:53', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '2', '4.00', '3.2'),
-(165, '2018-04-12 14:32:53', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '2', '300000.00', '240000');
+(165, '2018-04-12 14:32:53', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '2', '300000.00', '240000'),
+(166, '2018-04-12 16:36:30', '/stok/login.php', 'admin', 'login', '::1', '', '', '', '');
 
 -- --------------------------------------------------------
 

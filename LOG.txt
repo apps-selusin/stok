@@ -32,3 +32,11 @@ cerita dulu :
 - check dengan komposisi kode terbaru yang hanya onchange nya ada di subgroup saja
 - agar nanti F2 di article benar benar membaca nilai subgroup yang ada di barisnya
 
+
+4:43 PM 4/12/2018
+prosedur pencatatan hutang :
+- setiap transaksi pembelian yang berhasil disimpan data inputannya maka
+  akan menambah satu record di tabel hutang
+- apa-apa saja data yang disimpan di tabel hutang ?
+- satu nomor po akan menciptakan satu nomor hutang
+- 

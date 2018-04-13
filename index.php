@@ -321,6 +321,10 @@ class cdefault {
 			$this->Page_Terminate("t07_satuanlist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't08_beli'))
 			$this->Page_Terminate("t08_belilist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't09_hutang'))
+			$this->Page_Terminate("t09_hutanglist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't10_hutangdetail'))
+			$this->Page_Terminate("t10_hutangdetaillist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't96_employees'))
 			$this->Page_Terminate("t96_employeeslist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't97_userlevels'))
