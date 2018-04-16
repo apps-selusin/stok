@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 13, 2018 at 10:50 AM
+-- Generation Time: Apr 16, 2018 at 02:15 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -239,7 +239,14 @@ CREATE TABLE IF NOT EXISTS `t10_hutangdetail` (
   `Tgl` date NOT NULL,
   `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `t10_hutangdetail`
+--
+
+INSERT INTO `t10_hutangdetail` (`id`, `HutangID`, `NoBayar`, `Tgl`, `JumlahBayar`) VALUES
+(1, 1, 'HD000001', '2018-04-15', 3000.00);
 
 -- --------------------------------------------------------
 
@@ -359,7 +366,7 @@ CREATE TABLE IF NOT EXISTS `t99_audittrail` (
   `oldvalue` longtext CHARACTER SET latin1,
   `newvalue` longtext CHARACTER SET latin1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=213 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=220 ;
 
 --
 -- Dumping data for table `t99_audittrail`
@@ -575,7 +582,14 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (209, '2018-04-13 13:08:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '1', '', '1.5'),
 (210, '2018-04-13 13:08:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '1', '', '1'),
 (211, '2018-04-13 13:08:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '1', '', '150000'),
-(212, '2018-04-13 13:08:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '1', '', '1');
+(212, '2018-04-13 13:08:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '1', '', '1'),
+(213, '2018-04-13 21:37:57', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(214, '2018-04-15 10:15:10', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(215, '2018-04-15 10:29:33', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '1', '', '1'),
+(216, '2018-04-15 10:29:33', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '1', '', 'HD000001'),
+(217, '2018-04-15 10:29:33', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '1', '', '2018-04-15'),
+(218, '2018-04-15 10:29:33', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '1', '', '3000'),
+(219, '2018-04-15 10:29:33', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '1', '', '1');
 
 -- --------------------------------------------------------
 

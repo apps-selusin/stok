@@ -825,7 +825,6 @@ class ct10_hutangdetail extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
-					if ($this->HutangID->Exportable) $Doc->ExportCaption($this->HutangID);
 					if ($this->NoBayar->Exportable) $Doc->ExportCaption($this->NoBayar);
 					if ($this->Tgl->Exportable) $Doc->ExportCaption($this->Tgl);
 					if ($this->JumlahBayar->Exportable) $Doc->ExportCaption($this->JumlahBayar);
@@ -866,7 +865,6 @@ class ct10_hutangdetail extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
-						if ($this->HutangID->Exportable) $Doc->ExportField($this->HutangID);
 						if ($this->NoBayar->Exportable) $Doc->ExportField($this->NoBayar);
 						if ($this->Tgl->Exportable) $Doc->ExportField($this->Tgl);
 						if ($this->JumlahBayar->Exportable) $Doc->ExportField($this->JumlahBayar);
@@ -1086,7 +1084,7 @@ class ct10_hutangdetail extends cTable {
 		// To cancel, set return value to FALSE
 		// default nomor hutang detail baru
 
-		$rsnew["NoBayar"] = f_GetNextNoHutangDetail(); // mengantisipasi lebih satu user menginput data saat bersamaan
+		$rsnew["NoBayar"] = f_GetNextNoBayar(); // mengantisipasi lebih satu user menginput data saat bersamaan
 		return TRUE;
 	}
 
@@ -1125,9 +1123,7 @@ class ct10_hutangdetail extends cTable {
 
 		// Enter your code here
 		// To reject grid insert, set return value to FALSE
-		// default nomor hutang detail baru
 
-		$rsnew["NoBayar"] = f_GetNextNoHutangDetail(); // mengantisipasi lebih satu user menginput data saat bersamaan
 		return TRUE;
 	}
 
@@ -1196,6 +1192,19 @@ class ct10_hutangdetail extends cTable {
 
 		$this->NoBayar->ReadOnly = true;
 		$this->Tgl->ReadOnly = true;
+
+		// Kondisi saat form Tambah sedang terbuka (tidak dalam mode konfirmasi)
+		if (CurrentPageID() == "add" && $this->CurrentAction != "F") {
+			$this->NoBayar->CurrentValue = f_GetNextNoBayar(); // trik
+			$this->NoBayar->EditValue = $this->NoBayar->CurrentValue; // tampilkan
+
+			//$this->Kode->ReadOnly = TRUE; // supaya tidak bisa diubah
+		}
+
+		// Kondisi saat form Tambah sedang dalam mode konfirmasi
+		if ($this->CurrentAction == "add" && $this->CurrentAction=="F") {
+			$this->NoBayar->ViewValue = $this->NoBayar->CurrentValue; // ambil dari mode sebelumnya
+		}
 	}
 
 	// User ID Filtering event

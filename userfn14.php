@@ -55,7 +55,7 @@ function f_GetNextNoHutang() {
 	return $m_NextNo;
 }
 
-function f_GetNextNoHutangDetail() {
+function f_GetNextNoBayar() {
 	$m_NextNo = "";
 	$m_LastNo = "";
 	$m_No = ew_ExecuteScalar("select NoBayar from t10_hutangdetail order by NoBayar desc");

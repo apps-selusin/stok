@@ -462,7 +462,6 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->HutangID->SetVisibility();
 		$this->NoBayar->SetVisibility();
 		$this->Tgl->SetVisibility();
 		$this->JumlahBayar->SetVisibility();
@@ -1221,7 +1220,6 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 		if (@$_GET["order"] <> "") {
 			$this->CurrentOrder = @$_GET["order"];
 			$this->CurrentOrderType = @$_GET["ordertype"];
-			$this->UpdateSort($this->HutangID, $bCtrl); // HutangID
 			$this->UpdateSort($this->NoBayar, $bCtrl); // NoBayar
 			$this->UpdateSort($this->Tgl, $bCtrl); // Tgl
 			$this->UpdateSort($this->JumlahBayar, $bCtrl); // JumlahBayar
@@ -1265,7 +1263,6 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
-				$this->HutangID->setSort("");
 				$this->NoBayar->setSort("");
 				$this->Tgl->setSort("");
 				$this->JumlahBayar->setSort("");
@@ -1326,9 +1323,9 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 
 		// Drop down button for ListOptions
 		$this->ListOptions->UseImageAndText = TRUE;
-		$this->ListOptions->UseDropDownButton = FALSE;
+		$this->ListOptions->UseDropDownButton = TRUE;
 		$this->ListOptions->DropDownButtonPhrase = $Language->Phrase("ButtonListOptions");
-		$this->ListOptions->UseButtonGroup = TRUE;
+		$this->ListOptions->UseButtonGroup = FALSE;
 		if ($this->ListOptions->UseButtonGroup && ew_IsMobile())
 			$this->ListOptions->UseDropDownButton = TRUE;
 		$this->ListOptions->ButtonClass = "btn-sm"; // Class for button group
@@ -1398,7 +1395,6 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 		$oListOpt = &$this->ListOptions->Items["edit"];
 		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
 		if ($Security->CanEdit()) {
-			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
 			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" href=\"" . ew_HtmlEncode(ew_UrlAddHash($this->InlineEditUrl, "r" . $this->RowCnt . "_" . $this->TableVar)) . "\">" . $Language->Phrase("InlineEditLink") . "</a>";
 		} else {
 			$oListOpt->Body = "";
@@ -1448,12 +1444,6 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 		$options = &$this->OtherOptions;
 		$option = $options["addedit"];
 
-		// Add
-		$item = &$option->Add("add");
-		$addcaption = ew_HtmlTitle($Language->Phrase("AddLink"));
-		$item->Body = "<a class=\"ewAddEdit ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
-		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
-
 		// Inline Add
 		$item = &$option->Add("inlineadd");
 		$item->Body = "<a class=\"ewAddEdit ewInlineAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineAddUrl) . "\">" .$Language->Phrase("InlineAddLink") . "</a>";
@@ -1468,7 +1458,7 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 		// Set up options default
 		foreach ($options as &$option) {
 			$option->UseImageAndText = TRUE;
-			$option->UseDropDownButton = FALSE;
+			$option->UseDropDownButton = TRUE;
 			$option->UseButtonGroup = TRUE;
 			$option->ButtonClass = "btn-sm"; // Class for button group
 			$item = &$option->Add($option->GroupOptionName);
@@ -1710,9 +1700,6 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 
 		// Load from form
 		global $objForm;
-		if (!$this->HutangID->FldIsDetailKey) {
-			$this->HutangID->setFormValue($objForm->GetValue("x_HutangID"));
-		}
 		if (!$this->NoBayar->FldIsDetailKey) {
 			$this->NoBayar->setFormValue($objForm->GetValue("x_NoBayar"));
 		}
@@ -1732,7 +1719,6 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 		global $objForm;
 		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
 			$this->id->CurrentValue = $this->id->FormValue;
-		$this->HutangID->CurrentValue = $this->HutangID->FormValue;
 		$this->NoBayar->CurrentValue = $this->NoBayar->FormValue;
 		$this->Tgl->CurrentValue = $this->Tgl->FormValue;
 		$this->Tgl->CurrentValue = ew_UnFormatDateTime($this->Tgl->CurrentValue, 7);
@@ -1902,11 +1888,6 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 		$this->JumlahBayar->CellCssStyle .= "text-align: right;";
 		$this->JumlahBayar->ViewCustomAttributes = "";
 
-			// HutangID
-			$this->HutangID->LinkCustomAttributes = "";
-			$this->HutangID->HrefValue = "";
-			$this->HutangID->TooltipValue = "";
-
 			// NoBayar
 			$this->NoBayar->LinkCustomAttributes = "";
 			$this->NoBayar->HrefValue = "";
@@ -1922,18 +1903,6 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 			$this->JumlahBayar->HrefValue = "";
 			$this->JumlahBayar->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
-
-			// HutangID
-			$this->HutangID->EditAttrs["class"] = "form-control";
-			$this->HutangID->EditCustomAttributes = "";
-			if ($this->HutangID->getSessionValue() <> "") {
-				$this->HutangID->CurrentValue = $this->HutangID->getSessionValue();
-			$this->HutangID->ViewValue = $this->HutangID->CurrentValue;
-			$this->HutangID->ViewCustomAttributes = "";
-			} else {
-			$this->HutangID->EditValue = ew_HtmlEncode($this->HutangID->CurrentValue);
-			$this->HutangID->PlaceHolder = ew_RemoveHtml($this->HutangID->FldCaption());
-			}
 
 			// NoBayar
 			$this->NoBayar->EditAttrs["class"] = "form-control";
@@ -1955,12 +1924,8 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 			if (strval($this->JumlahBayar->EditValue) <> "" && is_numeric($this->JumlahBayar->EditValue)) $this->JumlahBayar->EditValue = ew_FormatNumber($this->JumlahBayar->EditValue, -2, -2, -2, -2);
 
 			// Add refer script
-			// HutangID
-
-			$this->HutangID->LinkCustomAttributes = "";
-			$this->HutangID->HrefValue = "";
-
 			// NoBayar
+
 			$this->NoBayar->LinkCustomAttributes = "";
 			$this->NoBayar->HrefValue = "";
 
@@ -1972,18 +1937,6 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 			$this->JumlahBayar->LinkCustomAttributes = "";
 			$this->JumlahBayar->HrefValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
-
-			// HutangID
-			$this->HutangID->EditAttrs["class"] = "form-control";
-			$this->HutangID->EditCustomAttributes = "";
-			if ($this->HutangID->getSessionValue() <> "") {
-				$this->HutangID->CurrentValue = $this->HutangID->getSessionValue();
-			$this->HutangID->ViewValue = $this->HutangID->CurrentValue;
-			$this->HutangID->ViewCustomAttributes = "";
-			} else {
-			$this->HutangID->EditValue = ew_HtmlEncode($this->HutangID->CurrentValue);
-			$this->HutangID->PlaceHolder = ew_RemoveHtml($this->HutangID->FldCaption());
-			}
 
 			// NoBayar
 			$this->NoBayar->EditAttrs["class"] = "form-control";
@@ -2005,12 +1958,8 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 			if (strval($this->JumlahBayar->EditValue) <> "" && is_numeric($this->JumlahBayar->EditValue)) $this->JumlahBayar->EditValue = ew_FormatNumber($this->JumlahBayar->EditValue, -2, -2, -2, -2);
 
 			// Edit refer script
-			// HutangID
-
-			$this->HutangID->LinkCustomAttributes = "";
-			$this->HutangID->HrefValue = "";
-
 			// NoBayar
+
 			$this->NoBayar->LinkCustomAttributes = "";
 			$this->NoBayar->HrefValue = "";
 
@@ -2040,12 +1989,6 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 		// Check if validation required
 		if (!EW_SERVER_VALIDATE)
 			return ($gsFormError == "");
-		if (!$this->HutangID->FldIsDetailKey && !is_null($this->HutangID->FormValue) && $this->HutangID->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->HutangID->FldCaption(), $this->HutangID->ReqErrMsg));
-		}
-		if (!ew_CheckInteger($this->HutangID->FormValue)) {
-			ew_AddMessage($gsFormError, $this->HutangID->FldErrMsg());
-		}
 		if (!$this->NoBayar->FldIsDetailKey && !is_null($this->NoBayar->FormValue) && $this->NoBayar->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->NoBayar->FldCaption(), $this->NoBayar->ReqErrMsg));
 		}
@@ -2093,9 +2036,6 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 			$rsold = &$rs->fields;
 			$this->LoadDbValues($rsold);
 			$rsnew = array();
-
-			// HutangID
-			$this->HutangID->SetDbValueDef($rsnew, $this->HutangID->CurrentValue, 0, $this->HutangID->ReadOnly);
 
 			// NoBayar
 			$this->NoBayar->SetDbValueDef($rsnew, $this->NoBayar->CurrentValue, "", $this->NoBayar->ReadOnly);
@@ -2149,9 +2089,6 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 		}
 		$rsnew = array();
 
-		// HutangID
-		$this->HutangID->SetDbValueDef($rsnew, $this->HutangID->CurrentValue, 0, FALSE);
-
 		// NoBayar
 		$this->NoBayar->SetDbValueDef($rsnew, $this->NoBayar->CurrentValue, "", FALSE);
 
@@ -2160,6 +2097,11 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 
 		// JumlahBayar
 		$this->JumlahBayar->SetDbValueDef($rsnew, $this->JumlahBayar->CurrentValue, 0, strval($this->JumlahBayar->CurrentValue) == "");
+
+		// HutangID
+		if ($this->HutangID->getSessionValue() <> "") {
+			$rsnew['HutangID'] = $this->HutangID->getSessionValue();
+		}
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -2739,12 +2681,6 @@ ft10_hutangdetaillist.Validate = function() {
 	for (var i = startcnt; i <= rowcnt; i++) {
 		var infix = ($k[0]) ? String(i) : "";
 		$fobj.data("rowindex", infix);
-			elm = this.GetElements("x" + infix + "_HutangID");
-			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
-				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t10_hutangdetail->HutangID->FldCaption(), $t10_hutangdetail->HutangID->ReqErrMsg)) ?>");
-			elm = this.GetElements("x" + infix + "_HutangID");
-			if (elm && !ew_CheckInteger(elm.value))
-				return this.OnError(elm, "<?php echo ew_JsEncode2($t10_hutangdetail->HutangID->FldErrMsg()) ?>");
 			elm = this.GetElements("x" + infix + "_NoBayar");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t10_hutangdetail->NoBayar->FldCaption(), $t10_hutangdetail->NoBayar->ReqErrMsg)) ?>");
@@ -2979,15 +2915,6 @@ $t10_hutangdetail_list->RenderListOptions();
 // Render list options (header, left)
 $t10_hutangdetail_list->ListOptions->Render("header", "left");
 ?>
-<?php if ($t10_hutangdetail->HutangID->Visible) { // HutangID ?>
-	<?php if ($t10_hutangdetail->SortUrl($t10_hutangdetail->HutangID) == "") { ?>
-		<th data-name="HutangID" class="<?php echo $t10_hutangdetail->HutangID->HeaderCellClass() ?>"><div id="elh_t10_hutangdetail_HutangID" class="t10_hutangdetail_HutangID"><div class="ewTableHeaderCaption"><?php echo $t10_hutangdetail->HutangID->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="HutangID" class="<?php echo $t10_hutangdetail->HutangID->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t10_hutangdetail->SortUrl($t10_hutangdetail->HutangID) ?>',2);"><div id="elh_t10_hutangdetail_HutangID" class="t10_hutangdetail_HutangID">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t10_hutangdetail->HutangID->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t10_hutangdetail->HutangID->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t10_hutangdetail->HutangID->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-		</div></div></th>
-	<?php } ?>
-<?php } ?>
 <?php if ($t10_hutangdetail->NoBayar->Visible) { // NoBayar ?>
 	<?php if ($t10_hutangdetail->SortUrl($t10_hutangdetail->NoBayar) == "") { ?>
 		<th data-name="NoBayar" class="<?php echo $t10_hutangdetail->NoBayar->HeaderCellClass() ?>"><div id="elh_t10_hutangdetail_NoBayar" class="t10_hutangdetail_NoBayar"><div class="ewTableHeaderCaption"><?php echo $t10_hutangdetail->NoBayar->FldCaption() ?></div></div></th>
@@ -3050,22 +2977,6 @@ $t10_hutangdetail_list->ListOptions->Render("header", "right");
 // Render list options (body, left)
 $t10_hutangdetail_list->ListOptions->Render("body", "left", $t10_hutangdetail_list->RowCnt);
 ?>
-	<?php if ($t10_hutangdetail->HutangID->Visible) { // HutangID ?>
-		<td data-name="HutangID">
-<?php if ($t10_hutangdetail->HutangID->getSessionValue() <> "") { ?>
-<span id="el<?php echo $t10_hutangdetail_list->RowCnt ?>_t10_hutangdetail_HutangID" class="form-group t10_hutangdetail_HutangID">
-<span<?php echo $t10_hutangdetail->HutangID->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t10_hutangdetail->HutangID->ViewValue ?></p></span>
-</span>
-<input type="hidden" id="x<?php echo $t10_hutangdetail_list->RowIndex ?>_HutangID" name="x<?php echo $t10_hutangdetail_list->RowIndex ?>_HutangID" value="<?php echo ew_HtmlEncode($t10_hutangdetail->HutangID->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el<?php echo $t10_hutangdetail_list->RowCnt ?>_t10_hutangdetail_HutangID" class="form-group t10_hutangdetail_HutangID">
-<input type="text" data-table="t10_hutangdetail" data-field="x_HutangID" name="x<?php echo $t10_hutangdetail_list->RowIndex ?>_HutangID" id="x<?php echo $t10_hutangdetail_list->RowIndex ?>_HutangID" size="30" placeholder="<?php echo ew_HtmlEncode($t10_hutangdetail->HutangID->getPlaceHolder()) ?>" value="<?php echo $t10_hutangdetail->HutangID->EditValue ?>"<?php echo $t10_hutangdetail->HutangID->EditAttributes() ?>>
-</span>
-<?php } ?>
-<input type="hidden" data-table="t10_hutangdetail" data-field="x_HutangID" name="o<?php echo $t10_hutangdetail_list->RowIndex ?>_HutangID" id="o<?php echo $t10_hutangdetail_list->RowIndex ?>_HutangID" value="<?php echo ew_HtmlEncode($t10_hutangdetail->HutangID->OldValue) ?>">
-</td>
-	<?php } ?>
 	<?php if ($t10_hutangdetail->NoBayar->Visible) { // NoBayar ?>
 		<td data-name="NoBayar">
 <span id="el<?php echo $t10_hutangdetail_list->RowCnt ?>_t10_hutangdetail_NoBayar" class="form-group t10_hutangdetail_NoBayar">
@@ -3188,32 +3099,6 @@ while ($t10_hutangdetail_list->RecCnt < $t10_hutangdetail_list->StopRec) {
 // Render list options (body, left)
 $t10_hutangdetail_list->ListOptions->Render("body", "left", $t10_hutangdetail_list->RowCnt);
 ?>
-	<?php if ($t10_hutangdetail->HutangID->Visible) { // HutangID ?>
-		<td data-name="HutangID"<?php echo $t10_hutangdetail->HutangID->CellAttributes() ?>>
-<?php if ($t10_hutangdetail->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
-<?php if ($t10_hutangdetail->HutangID->getSessionValue() <> "") { ?>
-<span id="el<?php echo $t10_hutangdetail_list->RowCnt ?>_t10_hutangdetail_HutangID" class="form-group t10_hutangdetail_HutangID">
-<span<?php echo $t10_hutangdetail->HutangID->ViewAttributes() ?>>
-<p class="form-control-static"><?php echo $t10_hutangdetail->HutangID->ViewValue ?></p></span>
-</span>
-<input type="hidden" id="x<?php echo $t10_hutangdetail_list->RowIndex ?>_HutangID" name="x<?php echo $t10_hutangdetail_list->RowIndex ?>_HutangID" value="<?php echo ew_HtmlEncode($t10_hutangdetail->HutangID->CurrentValue) ?>">
-<?php } else { ?>
-<span id="el<?php echo $t10_hutangdetail_list->RowCnt ?>_t10_hutangdetail_HutangID" class="form-group t10_hutangdetail_HutangID">
-<input type="text" data-table="t10_hutangdetail" data-field="x_HutangID" name="x<?php echo $t10_hutangdetail_list->RowIndex ?>_HutangID" id="x<?php echo $t10_hutangdetail_list->RowIndex ?>_HutangID" size="30" placeholder="<?php echo ew_HtmlEncode($t10_hutangdetail->HutangID->getPlaceHolder()) ?>" value="<?php echo $t10_hutangdetail->HutangID->EditValue ?>"<?php echo $t10_hutangdetail->HutangID->EditAttributes() ?>>
-</span>
-<?php } ?>
-<?php } ?>
-<?php if ($t10_hutangdetail->RowType == EW_ROWTYPE_VIEW) { // View record ?>
-<span id="el<?php echo $t10_hutangdetail_list->RowCnt ?>_t10_hutangdetail_HutangID" class="t10_hutangdetail_HutangID">
-<span<?php echo $t10_hutangdetail->HutangID->ViewAttributes() ?>>
-<?php echo $t10_hutangdetail->HutangID->ListViewValue() ?></span>
-</span>
-<?php } ?>
-</td>
-	<?php } ?>
-<?php if ($t10_hutangdetail->RowType == EW_ROWTYPE_EDIT || $t10_hutangdetail->CurrentMode == "edit") { ?>
-<input type="hidden" data-table="t10_hutangdetail" data-field="x_id" name="x<?php echo $t10_hutangdetail_list->RowIndex ?>_id" id="x<?php echo $t10_hutangdetail_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t10_hutangdetail->id->CurrentValue) ?>">
-<?php } ?>
 	<?php if ($t10_hutangdetail->NoBayar->Visible) { // NoBayar ?>
 		<td data-name="NoBayar"<?php echo $t10_hutangdetail->NoBayar->CellAttributes() ?>>
 <?php if ($t10_hutangdetail->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
@@ -3229,6 +3114,9 @@ $t10_hutangdetail_list->ListOptions->Render("body", "left", $t10_hutangdetail_li
 <?php } ?>
 </td>
 	<?php } ?>
+<?php if ($t10_hutangdetail->RowType == EW_ROWTYPE_EDIT || $t10_hutangdetail->CurrentMode == "edit") { ?>
+<input type="hidden" data-table="t10_hutangdetail" data-field="x_id" name="x<?php echo $t10_hutangdetail_list->RowIndex ?>_id" id="x<?php echo $t10_hutangdetail_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t10_hutangdetail->id->CurrentValue) ?>">
+<?php } ?>
 	<?php if ($t10_hutangdetail->Tgl->Visible) { // Tgl ?>
 		<td data-name="Tgl"<?php echo $t10_hutangdetail->Tgl->CellAttributes() ?>>
 <?php if ($t10_hutangdetail->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
@@ -3405,6 +3293,8 @@ if (EW_DEBUG_ENABLED)
 // Write your table-specific startup script here
 // document.write("page loaded");
 
+$("#x0_NoBayar").val("<?php echo f_GetNextNoBayar();?>");
+$("#x0_Tgl").val("<?php echo date('d-m-Y');?>");
 </script>
 <?php } ?>
 <?php include_once "footer.php" ?>
