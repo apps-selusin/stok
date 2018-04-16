@@ -460,6 +460,7 @@ class ct09_hutang_list extends ct09_hutang {
 		$this->BeliID->SetVisibility();
 		$this->JumlahHutang->SetVisibility();
 		$this->JumlahBayar->SetVisibility();
+		$this->SaldoHutang->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -833,6 +834,7 @@ class ct09_hutang_list extends ct09_hutang {
 		$sFilterList = ew_Concat($sFilterList, $this->BeliID->AdvancedSearch->ToJson(), ","); // Field BeliID
 		$sFilterList = ew_Concat($sFilterList, $this->JumlahHutang->AdvancedSearch->ToJson(), ","); // Field JumlahHutang
 		$sFilterList = ew_Concat($sFilterList, $this->JumlahBayar->AdvancedSearch->ToJson(), ","); // Field JumlahBayar
+		$sFilterList = ew_Concat($sFilterList, $this->SaldoHutang->AdvancedSearch->ToJson(), ","); // Field SaldoHutang
 		if ($this->BasicSearch->Keyword <> "") {
 			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
 			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
@@ -916,6 +918,14 @@ class ct09_hutang_list extends ct09_hutang {
 		$this->JumlahBayar->AdvancedSearch->SearchValue2 = @$filter["y_JumlahBayar"];
 		$this->JumlahBayar->AdvancedSearch->SearchOperator2 = @$filter["w_JumlahBayar"];
 		$this->JumlahBayar->AdvancedSearch->Save();
+
+		// Field SaldoHutang
+		$this->SaldoHutang->AdvancedSearch->SearchValue = @$filter["x_SaldoHutang"];
+		$this->SaldoHutang->AdvancedSearch->SearchOperator = @$filter["z_SaldoHutang"];
+		$this->SaldoHutang->AdvancedSearch->SearchCondition = @$filter["v_SaldoHutang"];
+		$this->SaldoHutang->AdvancedSearch->SearchValue2 = @$filter["y_SaldoHutang"];
+		$this->SaldoHutang->AdvancedSearch->SearchOperator2 = @$filter["w_SaldoHutang"];
+		$this->SaldoHutang->AdvancedSearch->Save();
 		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
 		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
 	}
@@ -1077,6 +1087,7 @@ class ct09_hutang_list extends ct09_hutang {
 			$this->UpdateSort($this->BeliID, $bCtrl); // BeliID
 			$this->UpdateSort($this->JumlahHutang, $bCtrl); // JumlahHutang
 			$this->UpdateSort($this->JumlahBayar, $bCtrl); // JumlahBayar
+			$this->UpdateSort($this->SaldoHutang, $bCtrl); // SaldoHutang
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -1088,6 +1099,7 @@ class ct09_hutang_list extends ct09_hutang {
 			if ($this->getSqlOrderBy() <> "") {
 				$sOrderBy = $this->getSqlOrderBy();
 				$this->setSessionOrderBy($sOrderBy);
+				$this->NoHutang->setSort("ASC");
 			}
 		}
 	}
@@ -1114,6 +1126,7 @@ class ct09_hutang_list extends ct09_hutang {
 				$this->BeliID->setSort("");
 				$this->JumlahHutang->setSort("");
 				$this->JumlahBayar->setSort("");
+				$this->SaldoHutang->setSort("");
 			}
 
 			// Reset start position
@@ -1588,6 +1601,7 @@ class ct09_hutang_list extends ct09_hutang {
 		}
 		$this->JumlahHutang->setDbValue($row['JumlahHutang']);
 		$this->JumlahBayar->setDbValue($row['JumlahBayar']);
+		$this->SaldoHutang->setDbValue($row['SaldoHutang']);
 	}
 
 	// Return a row with default values
@@ -1598,6 +1612,7 @@ class ct09_hutang_list extends ct09_hutang {
 		$row['BeliID'] = NULL;
 		$row['JumlahHutang'] = NULL;
 		$row['JumlahBayar'] = NULL;
+		$row['SaldoHutang'] = NULL;
 		return $row;
 	}
 
@@ -1611,6 +1626,7 @@ class ct09_hutang_list extends ct09_hutang {
 		$this->BeliID->DbValue = $row['BeliID'];
 		$this->JumlahHutang->DbValue = $row['JumlahHutang'];
 		$this->JumlahBayar->DbValue = $row['JumlahBayar'];
+		$this->SaldoHutang->DbValue = $row['SaldoHutang'];
 	}
 
 	// Load old record
@@ -1655,6 +1671,10 @@ class ct09_hutang_list extends ct09_hutang {
 		if ($this->JumlahBayar->FormValue == $this->JumlahBayar->CurrentValue && is_numeric(ew_StrToFloat($this->JumlahBayar->CurrentValue)))
 			$this->JumlahBayar->CurrentValue = ew_StrToFloat($this->JumlahBayar->CurrentValue);
 
+		// Convert decimal values if posted back
+		if ($this->SaldoHutang->FormValue == $this->SaldoHutang->CurrentValue && is_numeric(ew_StrToFloat($this->SaldoHutang->CurrentValue)))
+			$this->SaldoHutang->CurrentValue = ew_StrToFloat($this->SaldoHutang->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
@@ -1664,6 +1684,7 @@ class ct09_hutang_list extends ct09_hutang {
 		// BeliID
 		// JumlahHutang
 		// JumlahBayar
+		// SaldoHutang
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1707,14 +1728,20 @@ class ct09_hutang_list extends ct09_hutang {
 		// JumlahHutang
 		$this->JumlahHutang->ViewValue = $this->JumlahHutang->CurrentValue;
 		$this->JumlahHutang->ViewValue = ew_FormatNumber($this->JumlahHutang->ViewValue, 2, -2, -2, -2);
-		$this->JumlahHutang->CellCssStyle .= "text-align: right;";
+		$this->JumlahHutang->CellCssStyle .= "text-align: left;";
 		$this->JumlahHutang->ViewCustomAttributes = "";
 
 		// JumlahBayar
 		$this->JumlahBayar->ViewValue = $this->JumlahBayar->CurrentValue;
 		$this->JumlahBayar->ViewValue = ew_FormatNumber($this->JumlahBayar->ViewValue, 2, -2, -2, -2);
-		$this->JumlahBayar->CellCssStyle .= "text-align: right;";
+		$this->JumlahBayar->CellCssStyle .= "text-align: left;";
 		$this->JumlahBayar->ViewCustomAttributes = "";
+
+		// SaldoHutang
+		$this->SaldoHutang->ViewValue = $this->SaldoHutang->CurrentValue;
+		$this->SaldoHutang->ViewValue = ew_FormatNumber($this->SaldoHutang->ViewValue, 2, -2, -2, -2);
+		$this->SaldoHutang->CellCssStyle .= "text-align: left;";
+		$this->SaldoHutang->ViewCustomAttributes = "";
 
 			// NoHutang
 			$this->NoHutang->LinkCustomAttributes = "";
@@ -1735,6 +1762,11 @@ class ct09_hutang_list extends ct09_hutang {
 			$this->JumlahBayar->LinkCustomAttributes = "";
 			$this->JumlahBayar->HrefValue = "";
 			$this->JumlahBayar->TooltipValue = "";
+
+			// SaldoHutang
+			$this->SaldoHutang->LinkCustomAttributes = "";
+			$this->SaldoHutang->HrefValue = "";
+			$this->SaldoHutang->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -2426,6 +2458,15 @@ $t09_hutang_list->ListOptions->Render("header", "left");
 		</div></div></th>
 	<?php } ?>
 <?php } ?>
+<?php if ($t09_hutang->SaldoHutang->Visible) { // SaldoHutang ?>
+	<?php if ($t09_hutang->SortUrl($t09_hutang->SaldoHutang) == "") { ?>
+		<th data-name="SaldoHutang" class="<?php echo $t09_hutang->SaldoHutang->HeaderCellClass() ?>"><div id="elh_t09_hutang_SaldoHutang" class="t09_hutang_SaldoHutang"><div class="ewTableHeaderCaption"><?php echo $t09_hutang->SaldoHutang->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="SaldoHutang" class="<?php echo $t09_hutang->SaldoHutang->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t09_hutang->SortUrl($t09_hutang->SaldoHutang) ?>',2);"><div id="elh_t09_hutang_SaldoHutang" class="t09_hutang_SaldoHutang">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_hutang->SaldoHutang->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_hutang->SaldoHutang->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_hutang->SaldoHutang->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		</div></div></th>
+	<?php } ?>
+<?php } ?>
 <?php
 
 // Render list options (header, right)
@@ -2520,6 +2561,14 @@ $t09_hutang_list->ListOptions->Render("body", "left", $t09_hutang_list->RowCnt);
 <span id="el<?php echo $t09_hutang_list->RowCnt ?>_t09_hutang_JumlahBayar" class="t09_hutang_JumlahBayar">
 <span<?php echo $t09_hutang->JumlahBayar->ViewAttributes() ?>>
 <?php echo $t09_hutang->JumlahBayar->ListViewValue() ?></span>
+</span>
+</td>
+	<?php } ?>
+	<?php if ($t09_hutang->SaldoHutang->Visible) { // SaldoHutang ?>
+		<td data-name="SaldoHutang"<?php echo $t09_hutang->SaldoHutang->CellAttributes() ?>>
+<span id="el<?php echo $t09_hutang_list->RowCnt ?>_t09_hutang_SaldoHutang" class="t09_hutang_SaldoHutang">
+<span<?php echo $t09_hutang->SaldoHutang->ViewAttributes() ?>>
+<?php echo $t09_hutang->SaldoHutang->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>

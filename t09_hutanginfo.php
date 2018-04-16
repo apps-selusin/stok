@@ -18,6 +18,7 @@ class ct09_hutang extends cTable {
 	var $BeliID;
 	var $JumlahHutang;
 	var $JumlahBayar;
+	var $SaldoHutang;
 
 	//
 	// Table class constructor
@@ -79,6 +80,13 @@ class ct09_hutang extends cTable {
 		$this->JumlahBayar->Sortable = TRUE; // Allow sort
 		$this->JumlahBayar->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
 		$this->fields['JumlahBayar'] = &$this->JumlahBayar;
+
+		// SaldoHutang
+		$this->SaldoHutang = new cField('t09_hutang', 't09_hutang', 'x_SaldoHutang', 'SaldoHutang', '(select jumlahhutang - jumlahbayar)', '(select jumlahhutang - jumlahbayar)', 5, -1, FALSE, '(select jumlahhutang - jumlahbayar)', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->SaldoHutang->FldIsCustom = TRUE; // Custom field
+		$this->SaldoHutang->Sortable = TRUE; // Allow sort
+		$this->SaldoHutang->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['SaldoHutang'] = &$this->SaldoHutang;
 	}
 
 	// Field Visibility
@@ -192,7 +200,7 @@ class ct09_hutang extends cTable {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() { // Select
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT * FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (select jumlahhutang - jumlahbayar) AS `SaldoHutang` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -207,7 +215,7 @@ class ct09_hutang extends cTable {
 	function getSqlSelectList() { // Select for List page
 		$select = "";
 		$select = "SELECT * FROM (" .
-			"SELECT *, (SELECT CONCAT(COALESCE(`TglPO`, ''),'" . ew_ValueSeparator(1, $this->BeliID) . "',COALESCE(`NoPO`,'')) FROM `t08_beli` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t09_hutang`.`BeliID` LIMIT 1) AS `EV__BeliID` FROM `t09_hutang`" .
+			"SELECT *, (select jumlahhutang - jumlahbayar) AS `SaldoHutang`, (SELECT CONCAT(COALESCE(`TglPO`, ''),'" . ew_ValueSeparator(1, $this->BeliID) . "',COALESCE(`NoPO`,'')) FROM `t08_beli` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t09_hutang`.`BeliID` LIMIT 1) AS `EV__BeliID` FROM `t09_hutang`" .
 			") `EW_TMP_TABLE`";
 		return ($this->_SqlSelectList <> "") ? $this->_SqlSelectList : $select;
 	}
@@ -264,7 +272,7 @@ class ct09_hutang extends cTable {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() { // Order By
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`NoHutang` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -726,6 +734,7 @@ class ct09_hutang extends cTable {
 		$this->BeliID->setDbValue($rs->fields('BeliID'));
 		$this->JumlahHutang->setDbValue($rs->fields('JumlahHutang'));
 		$this->JumlahBayar->setDbValue($rs->fields('JumlahBayar'));
+		$this->SaldoHutang->setDbValue($rs->fields('SaldoHutang'));
 	}
 
 	// Render list row values
@@ -741,6 +750,7 @@ class ct09_hutang extends cTable {
 		// BeliID
 		// JumlahHutang
 		// JumlahBayar
+		// SaldoHutang
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
@@ -782,14 +792,20 @@ class ct09_hutang extends cTable {
 		// JumlahHutang
 		$this->JumlahHutang->ViewValue = $this->JumlahHutang->CurrentValue;
 		$this->JumlahHutang->ViewValue = ew_FormatNumber($this->JumlahHutang->ViewValue, 2, -2, -2, -2);
-		$this->JumlahHutang->CellCssStyle .= "text-align: right;";
+		$this->JumlahHutang->CellCssStyle .= "text-align: left;";
 		$this->JumlahHutang->ViewCustomAttributes = "";
 
 		// JumlahBayar
 		$this->JumlahBayar->ViewValue = $this->JumlahBayar->CurrentValue;
 		$this->JumlahBayar->ViewValue = ew_FormatNumber($this->JumlahBayar->ViewValue, 2, -2, -2, -2);
-		$this->JumlahBayar->CellCssStyle .= "text-align: right;";
+		$this->JumlahBayar->CellCssStyle .= "text-align: left;";
 		$this->JumlahBayar->ViewCustomAttributes = "";
+
+		// SaldoHutang
+		$this->SaldoHutang->ViewValue = $this->SaldoHutang->CurrentValue;
+		$this->SaldoHutang->ViewValue = ew_FormatNumber($this->SaldoHutang->ViewValue, 2, -2, -2, -2);
+		$this->SaldoHutang->CellCssStyle .= "text-align: left;";
+		$this->SaldoHutang->ViewCustomAttributes = "";
 
 		// id
 		$this->id->LinkCustomAttributes = "";
@@ -815,6 +831,11 @@ class ct09_hutang extends cTable {
 		$this->JumlahBayar->LinkCustomAttributes = "";
 		$this->JumlahBayar->HrefValue = "";
 		$this->JumlahBayar->TooltipValue = "";
+
+		// SaldoHutang
+		$this->SaldoHutang->LinkCustomAttributes = "";
+		$this->SaldoHutang->HrefValue = "";
+		$this->SaldoHutang->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -862,6 +883,13 @@ class ct09_hutang extends cTable {
 		$this->JumlahBayar->PlaceHolder = ew_RemoveHtml($this->JumlahBayar->FldCaption());
 		if (strval($this->JumlahBayar->EditValue) <> "" && is_numeric($this->JumlahBayar->EditValue)) $this->JumlahBayar->EditValue = ew_FormatNumber($this->JumlahBayar->EditValue, -2, -2, -2, -2);
 
+		// SaldoHutang
+		$this->SaldoHutang->EditAttrs["class"] = "form-control";
+		$this->SaldoHutang->EditCustomAttributes = "";
+		$this->SaldoHutang->EditValue = $this->SaldoHutang->CurrentValue;
+		$this->SaldoHutang->PlaceHolder = ew_RemoveHtml($this->SaldoHutang->FldCaption());
+		if (strval($this->SaldoHutang->EditValue) <> "" && is_numeric($this->SaldoHutang->EditValue)) $this->SaldoHutang->EditValue = ew_FormatNumber($this->SaldoHutang->EditValue, -2, -2, -2, -2);
+
 		// Call Row Rendered event
 		$this->Row_Rendered();
 	}
@@ -893,12 +921,14 @@ class ct09_hutang extends cTable {
 					if ($this->BeliID->Exportable) $Doc->ExportCaption($this->BeliID);
 					if ($this->JumlahHutang->Exportable) $Doc->ExportCaption($this->JumlahHutang);
 					if ($this->JumlahBayar->Exportable) $Doc->ExportCaption($this->JumlahBayar);
+					if ($this->SaldoHutang->Exportable) $Doc->ExportCaption($this->SaldoHutang);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
 					if ($this->NoHutang->Exportable) $Doc->ExportCaption($this->NoHutang);
 					if ($this->BeliID->Exportable) $Doc->ExportCaption($this->BeliID);
 					if ($this->JumlahHutang->Exportable) $Doc->ExportCaption($this->JumlahHutang);
 					if ($this->JumlahBayar->Exportable) $Doc->ExportCaption($this->JumlahBayar);
+					if ($this->SaldoHutang->Exportable) $Doc->ExportCaption($this->SaldoHutang);
 				}
 				$Doc->EndExportRow();
 			}
@@ -934,12 +964,14 @@ class ct09_hutang extends cTable {
 						if ($this->BeliID->Exportable) $Doc->ExportField($this->BeliID);
 						if ($this->JumlahHutang->Exportable) $Doc->ExportField($this->JumlahHutang);
 						if ($this->JumlahBayar->Exportable) $Doc->ExportField($this->JumlahBayar);
+						if ($this->SaldoHutang->Exportable) $Doc->ExportField($this->SaldoHutang);
 					} else {
 						if ($this->id->Exportable) $Doc->ExportField($this->id);
 						if ($this->NoHutang->Exportable) $Doc->ExportField($this->NoHutang);
 						if ($this->BeliID->Exportable) $Doc->ExportField($this->BeliID);
 						if ($this->JumlahHutang->Exportable) $Doc->ExportField($this->JumlahHutang);
 						if ($this->JumlahBayar->Exportable) $Doc->ExportField($this->JumlahBayar);
+						if ($this->SaldoHutang->Exportable) $Doc->ExportField($this->SaldoHutang);
 					}
 					$Doc->EndExportRow($RowCnt);
 				}

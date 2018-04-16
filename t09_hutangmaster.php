@@ -4,6 +4,7 @@
 // BeliID
 // JumlahHutang
 // JumlahBayar
+// SaldoHutang
 
 ?>
 <?php if ($t09_hutang->Visible) { ?>
@@ -50,6 +51,17 @@
 <span id="el_t09_hutang_JumlahBayar">
 <span<?php echo $t09_hutang->JumlahBayar->ViewAttributes() ?>>
 <?php echo $t09_hutang->JumlahBayar->ListViewValue() ?></span>
+</span>
+</td>
+		</tr>
+<?php } ?>
+<?php if ($t09_hutang->SaldoHutang->Visible) { // SaldoHutang ?>
+		<tr id="r_SaldoHutang">
+			<td class="col-sm-2"><?php echo $t09_hutang->SaldoHutang->FldCaption() ?></td>
+			<td<?php echo $t09_hutang->SaldoHutang->CellAttributes() ?>>
+<span id="el_t09_hutang_SaldoHutang">
+<span<?php echo $t09_hutang->SaldoHutang->ViewAttributes() ?>>
+<?php echo $t09_hutang->SaldoHutang->ListViewValue() ?></span>
 </span>
 </td>
 		</tr>

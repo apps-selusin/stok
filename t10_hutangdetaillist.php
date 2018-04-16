@@ -1234,6 +1234,8 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 			if ($this->getSqlOrderBy() <> "") {
 				$sOrderBy = $this->getSqlOrderBy();
 				$this->setSessionOrderBy($sOrderBy);
+				$this->NoBayar->setSort("ASC");
+				$this->Tgl->setSort("ASC");
 			}
 		}
 	}
@@ -2552,6 +2554,14 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 	function Page_Render() {
 
 		//echo "Page Render";
+		// check total jumlah bayar
+		//$tot_jml_byr = ew_Execute();
+		//echo $this->HutangID->CurrentValue;
+		//var_dump($this->HutangID);
+		// sembunyikan button add jika jumlah bayar >= jumlah hutang
+
+		$this->OtherOptions["addedit"] = new cListOptions();
+		$this->OtherOptions["addedit"]->Body = "";
 	}
 
 	// Page Data Rendering event

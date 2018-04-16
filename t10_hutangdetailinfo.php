@@ -248,7 +248,7 @@ class ct10_hutangdetail extends cTable {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() { // Order By
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`NoBayar` ASC,`Tgl` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -1092,6 +1092,8 @@ class ct10_hutangdetail extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"
+		$tot_det = ew_ExecuteScalar("SELECT SUM(JumlahBayar) FROM t10_hutangdetail WHERE HutangID = ".$rsnew["HutangID"]."");
+		ew_Execute("UPDATE t09_hutang SET JumlahBayar = ".$tot_det." WHERE id = ".$rsnew["HutangID"]."");
 	}
 
 	// Row Updating event
@@ -1107,6 +1109,8 @@ class ct10_hutangdetail extends cTable {
 	function Row_Updated($rsold, &$rsnew) {
 
 		//echo "Row Updated";
+		$tot_det = ew_ExecuteScalar("SELECT SUM(JumlahBayar) FROM t10_hutangdetail WHERE HutangID = ".$rsold["HutangID"]."");
+		ew_Execute("UPDATE t09_hutang SET JumlahBayar = ".$tot_det." WHERE id = ".$rsold["HutangID"]."");
 	}
 
 	// Row Update Conflict event
@@ -1161,6 +1165,14 @@ class ct10_hutangdetail extends cTable {
 	function Row_Deleted(&$rs) {
 
 		//echo "Row Deleted";
+		$rec_cnt_det = ew_ExecuteScalar("SELECT COUNT(JumlahBayar) FROM t10_hutangdetail WHERE HutangID = ".$rs["HutangID"]."");
+		if ($rec_cnt_det > 0) {
+			$tot_det = ew_ExecuteScalar("SELECT SUM(JumlahBayar) FROM t10_hutangdetail WHERE HutangID = ".$rs["HutangID"]."");
+			ew_Execute("UPDATE t09_hutang SET JumlahBayar = ".$tot_det." WHERE id = ".$rs["HutangID"]."");
+		}
+		else {
+			ew_Execute("UPDATE t09_hutang SET JumlahBayar = 0 WHERE id = ".$rs["HutangID"]."");
+		}
 	}
 
 	// Email Sending event
