@@ -2562,6 +2562,8 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 
 		$this->OtherOptions["addedit"] = new cListOptions();
 		$this->OtherOptions["addedit"]->Body = "";
+
+		//echo "-".$this->HutangID->CurrentValue;
 	}
 
 	// Page Data Rendering event

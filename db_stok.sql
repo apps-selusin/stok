@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 16, 2018 at 10:53 AM
+-- Generation Time: Apr 17, 2018 at 02:39 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -368,7 +368,7 @@ CREATE TABLE IF NOT EXISTS `t99_audittrail` (
   `oldvalue` longtext CHARACTER SET latin1,
   `newvalue` longtext CHARACTER SET latin1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=258 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=259 ;
 
 --
 -- Dumping data for table `t99_audittrail`
@@ -629,7 +629,8 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (254, '2018-04-16 10:08:07', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '4', '', '2018-04-16'),
 (255, '2018-04-16 10:08:07', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '4', '', '15000'),
 (256, '2018-04-16 10:08:07', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '4', '', '1'),
-(257, '2018-04-16 10:08:07', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '4', '', '4');
+(257, '2018-04-16 10:08:07', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '4', '', '4'),
+(258, '2018-04-16 18:20:10', '/stok/login.php', 'admin', 'login', '::1', '', '', '', '');
 
 -- --------------------------------------------------------
 

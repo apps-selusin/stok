@@ -1049,6 +1049,7 @@ class ct10_hutangdetail extends cTable {
 	function Recordset_Selected(&$rs) {
 
 		//echo "Recordset Selected";
+		var_dump($rs);
 	}
 
 	// Recordset Search Validated event
@@ -1217,6 +1218,11 @@ class ct10_hutangdetail extends cTable {
 		if ($this->CurrentAction == "add" && $this->CurrentAction=="F") {
 			$this->NoBayar->ViewValue = $this->NoBayar->CurrentValue; // ambil dari mode sebelumnya
 		}
+
+		// check total jumlah bayar berdasarkan hutangid terpilih
+		//$tot_jml_byr = ew_ExecuteScalar("SELECT SUM(JumlahBayar) FROM t10_hutangdetail WHERE HutangID = ".$this->HutangID->CurrentValue."");
+		//echo $tot_jml_byr;
+
 	}
 
 	// User ID Filtering event
