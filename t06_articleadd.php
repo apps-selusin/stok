@@ -337,6 +337,7 @@ class ct06_article_add extends ct06_article {
 		$this->Nama->SetVisibility();
 		$this->SatuanID->SetVisibility();
 		$this->Harga->SetVisibility();
+		$this->HargaJual->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -551,6 +552,7 @@ class ct06_article_add extends ct06_article {
 		$this->SatuanID->CurrentValue = NULL;
 		$this->SatuanID->OldValue = $this->SatuanID->CurrentValue;
 		$this->Harga->CurrentValue = 0.00;
+		$this->HargaJual->CurrentValue = 0.00;
 	}
 
 	// Load form values
@@ -576,6 +578,9 @@ class ct06_article_add extends ct06_article {
 		if (!$this->Harga->FldIsDetailKey) {
 			$this->Harga->setFormValue($objForm->GetValue("x_Harga"));
 		}
+		if (!$this->HargaJual->FldIsDetailKey) {
+			$this->HargaJual->setFormValue($objForm->GetValue("x_HargaJual"));
+		}
 	}
 
 	// Restore form values
@@ -587,6 +592,7 @@ class ct06_article_add extends ct06_article {
 		$this->Nama->CurrentValue = $this->Nama->FormValue;
 		$this->SatuanID->CurrentValue = $this->SatuanID->FormValue;
 		$this->Harga->CurrentValue = $this->Harga->FormValue;
+		$this->HargaJual->CurrentValue = $this->HargaJual->FormValue;
 	}
 
 	// Load row based on key values
@@ -644,6 +650,7 @@ class ct06_article_add extends ct06_article {
 			$this->SatuanID->VirtualValue = ""; // Clear value
 		}
 		$this->Harga->setDbValue($row['Harga']);
+		$this->HargaJual->setDbValue($row['HargaJual']);
 	}
 
 	// Return a row with default values
@@ -657,6 +664,7 @@ class ct06_article_add extends ct06_article {
 		$row['Nama'] = $this->Nama->CurrentValue;
 		$row['SatuanID'] = $this->SatuanID->CurrentValue;
 		$row['Harga'] = $this->Harga->CurrentValue;
+		$row['HargaJual'] = $this->HargaJual->CurrentValue;
 		return $row;
 	}
 
@@ -672,6 +680,7 @@ class ct06_article_add extends ct06_article {
 		$this->Nama->DbValue = $row['Nama'];
 		$this->SatuanID->DbValue = $row['SatuanID'];
 		$this->Harga->DbValue = $row['Harga'];
+		$this->HargaJual->DbValue = $row['HargaJual'];
 	}
 
 	// Load old record
@@ -706,6 +715,10 @@ class ct06_article_add extends ct06_article {
 		if ($this->Harga->FormValue == $this->Harga->CurrentValue && is_numeric(ew_StrToFloat($this->Harga->CurrentValue)))
 			$this->Harga->CurrentValue = ew_StrToFloat($this->Harga->CurrentValue);
 
+		// Convert decimal values if posted back
+		if ($this->HargaJual->FormValue == $this->HargaJual->CurrentValue && is_numeric(ew_StrToFloat($this->HargaJual->CurrentValue)))
+			$this->HargaJual->CurrentValue = ew_StrToFloat($this->HargaJual->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
@@ -717,6 +730,7 @@ class ct06_article_add extends ct06_article {
 		// Nama
 		// SatuanID
 		// Harga
+		// HargaJual
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -821,6 +835,12 @@ class ct06_article_add extends ct06_article {
 		$this->Harga->CellCssStyle .= "text-align: right;";
 		$this->Harga->ViewCustomAttributes = "";
 
+		// HargaJual
+		$this->HargaJual->ViewValue = $this->HargaJual->CurrentValue;
+		$this->HargaJual->ViewValue = ew_FormatNumber($this->HargaJual->ViewValue, 2, -2, -2, -2);
+		$this->HargaJual->CellCssStyle .= "text-align: right;";
+		$this->HargaJual->ViewCustomAttributes = "";
+
 			// MainGroupID
 			$this->MainGroupID->LinkCustomAttributes = "";
 			$this->MainGroupID->HrefValue = "";
@@ -850,6 +870,11 @@ class ct06_article_add extends ct06_article {
 			$this->Harga->LinkCustomAttributes = "";
 			$this->Harga->HrefValue = "";
 			$this->Harga->TooltipValue = "";
+
+			// HargaJual
+			$this->HargaJual->LinkCustomAttributes = "";
+			$this->HargaJual->HrefValue = "";
+			$this->HargaJual->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
 			// MainGroupID
@@ -948,6 +973,13 @@ class ct06_article_add extends ct06_article {
 			$this->Harga->PlaceHolder = ew_RemoveHtml($this->Harga->FldCaption());
 			if (strval($this->Harga->EditValue) <> "" && is_numeric($this->Harga->EditValue)) $this->Harga->EditValue = ew_FormatNumber($this->Harga->EditValue, -2, -2, -2, -2);
 
+			// HargaJual
+			$this->HargaJual->EditAttrs["class"] = "form-control";
+			$this->HargaJual->EditCustomAttributes = "";
+			$this->HargaJual->EditValue = ew_HtmlEncode($this->HargaJual->CurrentValue);
+			$this->HargaJual->PlaceHolder = ew_RemoveHtml($this->HargaJual->FldCaption());
+			if (strval($this->HargaJual->EditValue) <> "" && is_numeric($this->HargaJual->EditValue)) $this->HargaJual->EditValue = ew_FormatNumber($this->HargaJual->EditValue, -2, -2, -2, -2);
+
 			// Add refer script
 			// MainGroupID
 
@@ -973,6 +1005,10 @@ class ct06_article_add extends ct06_article {
 			// Harga
 			$this->Harga->LinkCustomAttributes = "";
 			$this->Harga->HrefValue = "";
+
+			// HargaJual
+			$this->HargaJual->LinkCustomAttributes = "";
+			$this->HargaJual->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD || $this->RowType == EW_ROWTYPE_EDIT || $this->RowType == EW_ROWTYPE_SEARCH) // Add/Edit/Search row
 			$this->SetupFieldTitles();
@@ -1006,6 +1042,9 @@ class ct06_article_add extends ct06_article {
 		}
 		if (!ew_CheckNumber($this->Harga->FormValue)) {
 			ew_AddMessage($gsFormError, $this->Harga->FldErrMsg());
+		}
+		if (!ew_CheckNumber($this->HargaJual->FormValue)) {
+			ew_AddMessage($gsFormError, $this->HargaJual->FldErrMsg());
 		}
 
 		// Return validate result
@@ -1070,6 +1109,9 @@ class ct06_article_add extends ct06_article {
 
 		// Harga
 		$this->Harga->SetDbValueDef($rsnew, $this->Harga->CurrentValue, 0, strval($this->Harga->CurrentValue) == "");
+
+		// HargaJual
+		$this->HargaJual->SetDbValueDef($rsnew, $this->HargaJual->CurrentValue, 0, strval($this->HargaJual->CurrentValue) == "");
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -1286,6 +1328,9 @@ ft06_articleadd.Validate = function() {
 			elm = this.GetElements("x" + infix + "_Harga");
 			if (elm && !ew_CheckNumber(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t06_article->Harga->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_HargaJual");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t06_article->HargaJual->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
 			if (!this.Form_CustomValidate(fobj))
@@ -1374,7 +1419,7 @@ $t06_article_add->ShowMessage();
 		<label id="elh_t06_article_Kode" for="x_Kode" class="<?php echo $t06_article_add->LeftColumnClass ?>"><?php echo $t06_article->Kode->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
 		<div class="<?php echo $t06_article_add->RightColumnClass ?>"><div<?php echo $t06_article->Kode->CellAttributes() ?>>
 <span id="el_t06_article_Kode">
-<input type="text" data-table="t06_article" data-field="x_Kode" name="x_Kode" id="x_Kode" size="30" maxlength="7" placeholder="<?php echo ew_HtmlEncode($t06_article->Kode->getPlaceHolder()) ?>" value="<?php echo $t06_article->Kode->EditValue ?>"<?php echo $t06_article->Kode->EditAttributes() ?>>
+<input type="text" data-table="t06_article" data-field="x_Kode" name="x_Kode" id="x_Kode" size="5" maxlength="7" placeholder="<?php echo ew_HtmlEncode($t06_article->Kode->getPlaceHolder()) ?>" value="<?php echo $t06_article->Kode->EditValue ?>"<?php echo $t06_article->Kode->EditAttributes() ?>>
 </span>
 <?php echo $t06_article->Kode->CustomMsg ?></div></div>
 	</div>
@@ -1384,7 +1429,7 @@ $t06_article_add->ShowMessage();
 		<label id="elh_t06_article_Nama" for="x_Nama" class="<?php echo $t06_article_add->LeftColumnClass ?>"><?php echo $t06_article->Nama->FldCaption() ?><?php echo $Language->Phrase("FieldRequiredIndicator") ?></label>
 		<div class="<?php echo $t06_article_add->RightColumnClass ?>"><div<?php echo $t06_article->Nama->CellAttributes() ?>>
 <span id="el_t06_article_Nama">
-<input type="text" data-table="t06_article" data-field="x_Nama" name="x_Nama" id="x_Nama" size="30" maxlength="75" placeholder="<?php echo ew_HtmlEncode($t06_article->Nama->getPlaceHolder()) ?>" value="<?php echo $t06_article->Nama->EditValue ?>"<?php echo $t06_article->Nama->EditAttributes() ?>>
+<input type="text" data-table="t06_article" data-field="x_Nama" name="x_Nama" id="x_Nama" size="15" maxlength="75" placeholder="<?php echo ew_HtmlEncode($t06_article->Nama->getPlaceHolder()) ?>" value="<?php echo $t06_article->Nama->EditValue ?>"<?php echo $t06_article->Nama->EditAttributes() ?>>
 </span>
 <?php echo $t06_article->Nama->CustomMsg ?></div></div>
 	</div>
@@ -1411,9 +1456,19 @@ $t06_article_add->ShowMessage();
 		<label id="elh_t06_article_Harga" for="x_Harga" class="<?php echo $t06_article_add->LeftColumnClass ?>"><?php echo $t06_article->Harga->FldCaption() ?></label>
 		<div class="<?php echo $t06_article_add->RightColumnClass ?>"><div<?php echo $t06_article->Harga->CellAttributes() ?>>
 <span id="el_t06_article_Harga">
-<input type="text" data-table="t06_article" data-field="x_Harga" name="x_Harga" id="x_Harga" size="30" placeholder="<?php echo ew_HtmlEncode($t06_article->Harga->getPlaceHolder()) ?>" value="<?php echo $t06_article->Harga->EditValue ?>"<?php echo $t06_article->Harga->EditAttributes() ?>>
+<input type="text" data-table="t06_article" data-field="x_Harga" name="x_Harga" id="x_Harga" size="7" placeholder="<?php echo ew_HtmlEncode($t06_article->Harga->getPlaceHolder()) ?>" value="<?php echo $t06_article->Harga->EditValue ?>"<?php echo $t06_article->Harga->EditAttributes() ?>>
 </span>
 <?php echo $t06_article->Harga->CustomMsg ?></div></div>
+	</div>
+<?php } ?>
+<?php if ($t06_article->HargaJual->Visible) { // HargaJual ?>
+	<div id="r_HargaJual" class="form-group">
+		<label id="elh_t06_article_HargaJual" for="x_HargaJual" class="<?php echo $t06_article_add->LeftColumnClass ?>"><?php echo $t06_article->HargaJual->FldCaption() ?></label>
+		<div class="<?php echo $t06_article_add->RightColumnClass ?>"><div<?php echo $t06_article->HargaJual->CellAttributes() ?>>
+<span id="el_t06_article_HargaJual">
+<input type="text" data-table="t06_article" data-field="x_HargaJual" name="x_HargaJual" id="x_HargaJual" size="7" placeholder="<?php echo ew_HtmlEncode($t06_article->HargaJual->getPlaceHolder()) ?>" value="<?php echo $t06_article->HargaJual->EditValue ?>"<?php echo $t06_article->HargaJual->EditAttributes() ?>>
+</span>
+<?php echo $t06_article->HargaJual->CustomMsg ?></div></div>
 	</div>
 <?php } ?>
 </div><!-- /page* -->

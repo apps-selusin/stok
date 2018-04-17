@@ -5,6 +5,7 @@ $RootMenu = new cMenu("RootMenu", TRUE);
 $RootMenu->AddMenuItem(1, "mi_cf01_home_php", $Language->MenuPhrase("1", "MenuText"), "cf01_home.php", -1, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}cf01_home.php'), FALSE, TRUE, "");
 $RootMenu->AddMenuItem(19, "mi_t08_beli", $Language->MenuPhrase("19", "MenuText"), "t08_belilist.php", -1, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t08_beli'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(10021, "mi_t09_hutang", $Language->MenuPhrase("10021", "MenuText"), "t09_hutanglist.php", -1, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t09_hutang'), FALSE, FALSE, "");
+$RootMenu->AddMenuItem(10027, "mi_t11_jual", $Language->MenuPhrase("10027", "MenuText"), "t11_juallist.php", -1, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t11_jual'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(10013, "mci_Laporan", $Language->MenuPhrase("10013", "MenuText"), "", -1, "", TRUE, FALSE, TRUE, "");
 $RootMenu->AddMenuItem(10017, "mri_r025fstok", $Language->MenuPhrase("10017", "MenuText"), "r02_stoksmry.php", 10013, "{A2EF3792-3541-4459-9D68-D8F1DBA083C2}", AllowListMenu('{A2EF3792-3541-4459-9D68-D8F1DBA083C2}r02_stok'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(10014, "mri_r015fbeli", $Language->MenuPhrase("10014", "MenuText"), "r01_belismry.php", 10013, "{A2EF3792-3541-4459-9D68-D8F1DBA083C2}", AllowListMenu('{A2EF3792-3541-4459-9D68-D8F1DBA083C2}r01_beli'), FALSE, FALSE, "");

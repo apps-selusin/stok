@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg14.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql14.php") ?>
 <?php include_once "phpfn14.php" ?>
-<?php include_once "t06_articleinfo.php" ?>
+<?php include_once "t11_jualinfo.php" ?>
 <?php include_once "t96_employeesinfo.php" ?>
 <?php include_once "userfn14.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t06_article_delete = NULL; // Initialize page object first
+$t11_jual_delete = NULL; // Initialize page object first
 
-class ct06_article_delete extends ct06_article {
+class ct11_jual_delete extends ct11_jual {
 
 	// Page ID
 	var $PageID = 'delete';
@@ -25,10 +25,10 @@ class ct06_article_delete extends ct06_article {
 	var $ProjectID = '{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}';
 
 	// Table name
-	var $TableName = 't06_article';
+	var $TableName = 't11_jual';
 
 	// Page object name
-	var $PageObjName = 't06_article_delete';
+	var $PageObjName = 't11_jual_delete';
 
 	// Page headings
 	var $Heading = '';
@@ -256,10 +256,10 @@ class ct06_article_delete extends ct06_article {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t06_article)
-		if (!isset($GLOBALS["t06_article"]) || get_class($GLOBALS["t06_article"]) == "ct06_article") {
-			$GLOBALS["t06_article"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t06_article"];
+		// Table object (t11_jual)
+		if (!isset($GLOBALS["t11_jual"]) || get_class($GLOBALS["t11_jual"]) == "ct11_jual") {
+			$GLOBALS["t11_jual"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t11_jual"];
 		}
 
 		// Table object (t96_employees)
@@ -271,7 +271,7 @@ class ct06_article_delete extends ct06_article {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't06_article', TRUE);
+			define("EW_TABLE_NAME", 't11_jual', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"]))
@@ -310,7 +310,7 @@ class ct06_article_delete extends ct06_article {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
 			if ($Security->CanList())
-				$this->Page_Terminate(ew_GetUrl("t06_articlelist.php"));
+				$this->Page_Terminate(ew_GetUrl("t11_juallist.php"));
 			else
 				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
@@ -326,13 +326,11 @@ class ct06_article_delete extends ct06_article {
 		// 
 
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->MainGroupID->SetVisibility();
-		$this->SubGroupID->SetVisibility();
-		$this->Kode->SetVisibility();
-		$this->Nama->SetVisibility();
-		$this->SatuanID->SetVisibility();
-		$this->Harga->SetVisibility();
-		$this->HargaJual->SetVisibility();
+		$this->TglSO->SetVisibility();
+		$this->NoSO->SetVisibility();
+		$this->CustomerID->SetVisibility();
+		$this->CustomerPO->SetVisibility();
+		$this->Total->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -364,13 +362,13 @@ class ct06_article_delete extends ct06_article {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t06_article;
+		global $EW_EXPORT, $t11_jual;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t06_article);
+				$doc = new $class($t11_jual);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -417,10 +415,10 @@ class ct06_article_delete extends ct06_article {
 		$this->RecKeys = $this->GetRecordKeys(); // Load record keys
 		$sFilter = $this->GetKeyFilter();
 		if ($sFilter == "")
-			$this->Page_Terminate("t06_articlelist.php"); // Prevent SQL injection, return to list
+			$this->Page_Terminate("t11_juallist.php"); // Prevent SQL injection, return to list
 
 		// Set up filter (SQL WHHERE clause) and get return SQL
-		// SQL constructor in t06_article class, t06_articleinfo.php
+		// SQL constructor in t11_jual class, t11_jualinfo.php
 
 		$this->CurrentFilter = $sFilter;
 
@@ -448,7 +446,7 @@ class ct06_article_delete extends ct06_article {
 			if ($this->TotalRecs <= 0) { // No record found, exit
 				if ($this->Recordset)
 					$this->Recordset->Close();
-				$this->Page_Terminate("t06_articlelist.php"); // Return to list
+				$this->Page_Terminate("t11_juallist.php"); // Return to list
 			}
 		}
 	}
@@ -513,41 +511,27 @@ class ct06_article_delete extends ct06_article {
 		if (!$rs || $rs->EOF)
 			return;
 		$this->id->setDbValue($row['id']);
-		$this->MainGroupID->setDbValue($row['MainGroupID']);
-		if (array_key_exists('EV__MainGroupID', $rs->fields)) {
-			$this->MainGroupID->VirtualValue = $rs->fields('EV__MainGroupID'); // Set up virtual field value
+		$this->TglSO->setDbValue($row['TglSO']);
+		$this->NoSO->setDbValue($row['NoSO']);
+		$this->CustomerID->setDbValue($row['CustomerID']);
+		if (array_key_exists('EV__CustomerID', $rs->fields)) {
+			$this->CustomerID->VirtualValue = $rs->fields('EV__CustomerID'); // Set up virtual field value
 		} else {
-			$this->MainGroupID->VirtualValue = ""; // Clear value
+			$this->CustomerID->VirtualValue = ""; // Clear value
 		}
-		$this->SubGroupID->setDbValue($row['SubGroupID']);
-		if (array_key_exists('EV__SubGroupID', $rs->fields)) {
-			$this->SubGroupID->VirtualValue = $rs->fields('EV__SubGroupID'); // Set up virtual field value
-		} else {
-			$this->SubGroupID->VirtualValue = ""; // Clear value
-		}
-		$this->Kode->setDbValue($row['Kode']);
-		$this->Nama->setDbValue($row['Nama']);
-		$this->SatuanID->setDbValue($row['SatuanID']);
-		if (array_key_exists('EV__SatuanID', $rs->fields)) {
-			$this->SatuanID->VirtualValue = $rs->fields('EV__SatuanID'); // Set up virtual field value
-		} else {
-			$this->SatuanID->VirtualValue = ""; // Clear value
-		}
-		$this->Harga->setDbValue($row['Harga']);
-		$this->HargaJual->setDbValue($row['HargaJual']);
+		$this->CustomerPO->setDbValue($row['CustomerPO']);
+		$this->Total->setDbValue($row['Total']);
 	}
 
 	// Return a row with default values
 	function NewRow() {
 		$row = array();
 		$row['id'] = NULL;
-		$row['MainGroupID'] = NULL;
-		$row['SubGroupID'] = NULL;
-		$row['Kode'] = NULL;
-		$row['Nama'] = NULL;
-		$row['SatuanID'] = NULL;
-		$row['Harga'] = NULL;
-		$row['HargaJual'] = NULL;
+		$row['TglSO'] = NULL;
+		$row['NoSO'] = NULL;
+		$row['CustomerID'] = NULL;
+		$row['CustomerPO'] = NULL;
+		$row['Total'] = NULL;
 		return $row;
 	}
 
@@ -557,13 +541,11 @@ class ct06_article_delete extends ct06_article {
 			return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
-		$this->MainGroupID->DbValue = $row['MainGroupID'];
-		$this->SubGroupID->DbValue = $row['SubGroupID'];
-		$this->Kode->DbValue = $row['Kode'];
-		$this->Nama->DbValue = $row['Nama'];
-		$this->SatuanID->DbValue = $row['SatuanID'];
-		$this->Harga->DbValue = $row['Harga'];
-		$this->HargaJual->DbValue = $row['HargaJual'];
+		$this->TglSO->DbValue = $row['TglSO'];
+		$this->NoSO->DbValue = $row['NoSO'];
+		$this->CustomerID->DbValue = $row['CustomerID'];
+		$this->CustomerPO->DbValue = $row['CustomerPO'];
+		$this->Total->DbValue = $row['Total'];
 	}
 
 	// Render row values based on field settings
@@ -573,25 +555,19 @@ class ct06_article_delete extends ct06_article {
 		// Initialize URLs
 		// Convert decimal values if posted back
 
-		if ($this->Harga->FormValue == $this->Harga->CurrentValue && is_numeric(ew_StrToFloat($this->Harga->CurrentValue)))
-			$this->Harga->CurrentValue = ew_StrToFloat($this->Harga->CurrentValue);
-
-		// Convert decimal values if posted back
-		if ($this->HargaJual->FormValue == $this->HargaJual->CurrentValue && is_numeric(ew_StrToFloat($this->HargaJual->CurrentValue)))
-			$this->HargaJual->CurrentValue = ew_StrToFloat($this->HargaJual->CurrentValue);
+		if ($this->Total->FormValue == $this->Total->CurrentValue && is_numeric(ew_StrToFloat($this->Total->CurrentValue)))
+			$this->Total->CurrentValue = ew_StrToFloat($this->Total->CurrentValue);
 
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
 		// id
-		// MainGroupID
-		// SubGroupID
-		// Kode
-		// Nama
-		// SatuanID
-		// Harga
-		// HargaJual
+		// TglSO
+		// NoSO
+		// CustomerID
+		// CustomerPO
+		// Total
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -599,143 +575,76 @@ class ct06_article_delete extends ct06_article {
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// MainGroupID
-		if ($this->MainGroupID->VirtualValue <> "") {
-			$this->MainGroupID->ViewValue = $this->MainGroupID->VirtualValue;
+		// TglSO
+		$this->TglSO->ViewValue = $this->TglSO->CurrentValue;
+		$this->TglSO->ViewValue = ew_FormatDateTime($this->TglSO->ViewValue, 7);
+		$this->TglSO->ViewCustomAttributes = "";
+
+		// NoSO
+		$this->NoSO->ViewValue = $this->NoSO->CurrentValue;
+		$this->NoSO->ViewCustomAttributes = "";
+
+		// CustomerID
+		if ($this->CustomerID->VirtualValue <> "") {
+			$this->CustomerID->ViewValue = $this->CustomerID->VirtualValue;
 		} else {
-		if (strval($this->MainGroupID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->MainGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t04_maingroup`";
+		if (strval($this->CustomerID->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->CustomerID->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t03_customer`";
 		$sWhereWrk = "";
-		$this->MainGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
+		$this->CustomerID->LookupFilters = array("dx1" => '`Nama`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->MainGroupID, $sWhereWrk); // Call Lookup Selecting
+		$this->Lookup_Selecting($this->CustomerID, $sWhereWrk); // Call Lookup Selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 			$rswrk = Conn()->Execute($sSqlWrk);
 			if ($rswrk && !$rswrk->EOF) { // Lookup values found
 				$arwrk = array();
 				$arwrk[1] = $rswrk->fields('DispFld');
-				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$this->MainGroupID->ViewValue = $this->MainGroupID->DisplayValue($arwrk);
+				$this->CustomerID->ViewValue = $this->CustomerID->DisplayValue($arwrk);
 				$rswrk->Close();
 			} else {
-				$this->MainGroupID->ViewValue = $this->MainGroupID->CurrentValue;
+				$this->CustomerID->ViewValue = $this->CustomerID->CurrentValue;
 			}
 		} else {
-			$this->MainGroupID->ViewValue = NULL;
+			$this->CustomerID->ViewValue = NULL;
 		}
 		}
-		$this->MainGroupID->ViewCustomAttributes = "";
+		$this->CustomerID->ViewCustomAttributes = "";
 
-		// SubGroupID
-		if ($this->SubGroupID->VirtualValue <> "") {
-			$this->SubGroupID->ViewValue = $this->SubGroupID->VirtualValue;
-		} else {
-		if (strval($this->SubGroupID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->SubGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t05_subgroup`";
-		$sWhereWrk = "";
-		$this->SubGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->SubGroupID, $sWhereWrk); // Call Lookup Selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$this->SubGroupID->ViewValue = $this->SubGroupID->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->SubGroupID->ViewValue = $this->SubGroupID->CurrentValue;
-			}
-		} else {
-			$this->SubGroupID->ViewValue = NULL;
-		}
-		}
-		$this->SubGroupID->ViewCustomAttributes = "";
+		// CustomerPO
+		$this->CustomerPO->ViewValue = $this->CustomerPO->CurrentValue;
+		$this->CustomerPO->ViewCustomAttributes = "";
 
-		// Kode
-		$this->Kode->ViewValue = $this->Kode->CurrentValue;
-		$this->Kode->ViewCustomAttributes = "";
+		// Total
+		$this->Total->ViewValue = $this->Total->CurrentValue;
+		$this->Total->ViewValue = ew_FormatNumber($this->Total->ViewValue, 2, -2, -2, -2);
+		$this->Total->CellCssStyle .= "text-align: right;";
+		$this->Total->ViewCustomAttributes = "";
 
-		// Nama
-		$this->Nama->ViewValue = $this->Nama->CurrentValue;
-		$this->Nama->ViewCustomAttributes = "";
+			// TglSO
+			$this->TglSO->LinkCustomAttributes = "";
+			$this->TglSO->HrefValue = "";
+			$this->TglSO->TooltipValue = "";
 
-		// SatuanID
-		if ($this->SatuanID->VirtualValue <> "") {
-			$this->SatuanID->ViewValue = $this->SatuanID->VirtualValue;
-		} else {
-		if (strval($this->SatuanID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->SatuanID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_satuan`";
-		$sWhereWrk = "";
-		$this->SatuanID->LookupFilters = array("dx1" => '`Nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->SatuanID, $sWhereWrk); // Call Lookup Selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->SatuanID->ViewValue = $this->SatuanID->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->SatuanID->ViewValue = $this->SatuanID->CurrentValue;
-			}
-		} else {
-			$this->SatuanID->ViewValue = NULL;
-		}
-		}
-		$this->SatuanID->ViewCustomAttributes = "";
+			// NoSO
+			$this->NoSO->LinkCustomAttributes = "";
+			$this->NoSO->HrefValue = "";
+			$this->NoSO->TooltipValue = "";
 
-		// Harga
-		$this->Harga->ViewValue = $this->Harga->CurrentValue;
-		$this->Harga->ViewValue = ew_FormatNumber($this->Harga->ViewValue, 2, -2, -2, -2);
-		$this->Harga->CellCssStyle .= "text-align: right;";
-		$this->Harga->ViewCustomAttributes = "";
+			// CustomerID
+			$this->CustomerID->LinkCustomAttributes = "";
+			$this->CustomerID->HrefValue = "";
+			$this->CustomerID->TooltipValue = "";
 
-		// HargaJual
-		$this->HargaJual->ViewValue = $this->HargaJual->CurrentValue;
-		$this->HargaJual->ViewValue = ew_FormatNumber($this->HargaJual->ViewValue, 2, -2, -2, -2);
-		$this->HargaJual->CellCssStyle .= "text-align: right;";
-		$this->HargaJual->ViewCustomAttributes = "";
+			// CustomerPO
+			$this->CustomerPO->LinkCustomAttributes = "";
+			$this->CustomerPO->HrefValue = "";
+			$this->CustomerPO->TooltipValue = "";
 
-			// MainGroupID
-			$this->MainGroupID->LinkCustomAttributes = "";
-			$this->MainGroupID->HrefValue = "";
-			$this->MainGroupID->TooltipValue = "";
-
-			// SubGroupID
-			$this->SubGroupID->LinkCustomAttributes = "";
-			$this->SubGroupID->HrefValue = "";
-			$this->SubGroupID->TooltipValue = "";
-
-			// Kode
-			$this->Kode->LinkCustomAttributes = "";
-			$this->Kode->HrefValue = "";
-			$this->Kode->TooltipValue = "";
-
-			// Nama
-			$this->Nama->LinkCustomAttributes = "";
-			$this->Nama->HrefValue = "";
-			$this->Nama->TooltipValue = "";
-
-			// SatuanID
-			$this->SatuanID->LinkCustomAttributes = "";
-			$this->SatuanID->HrefValue = "";
-			$this->SatuanID->TooltipValue = "";
-
-			// Harga
-			$this->Harga->LinkCustomAttributes = "";
-			$this->Harga->HrefValue = "";
-			$this->Harga->TooltipValue = "";
-
-			// HargaJual
-			$this->HargaJual->LinkCustomAttributes = "";
-			$this->HargaJual->HrefValue = "";
-			$this->HargaJual->TooltipValue = "";
+			// Total
+			$this->Total->LinkCustomAttributes = "";
+			$this->Total->HrefValue = "";
+			$this->Total->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -831,7 +740,7 @@ class ct06_article_delete extends ct06_article {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t06_articlelist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t11_juallist.php"), "", $this->TableVar, TRUE);
 		$PageId = "delete";
 		$Breadcrumb->Add("delete", $PageId, $url);
 	}
@@ -917,29 +826,29 @@ class ct06_article_delete extends ct06_article {
 <?php
 
 // Create page object
-if (!isset($t06_article_delete)) $t06_article_delete = new ct06_article_delete();
+if (!isset($t11_jual_delete)) $t11_jual_delete = new ct11_jual_delete();
 
 // Page init
-$t06_article_delete->Page_Init();
+$t11_jual_delete->Page_Init();
 
 // Page main
-$t06_article_delete->Page_Main();
+$t11_jual_delete->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t06_article_delete->Page_Render();
+$t11_jual_delete->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "delete";
-var CurrentForm = ft06_articledelete = new ew_Form("ft06_articledelete", "delete");
+var CurrentForm = ft11_jualdelete = new ew_Form("ft11_jualdelete", "delete");
 
 // Form_CustomValidate event
-ft06_articledelete.Form_CustomValidate = 
+ft11_jualdelete.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid.
@@ -947,15 +856,11 @@ ft06_articledelete.Form_CustomValidate =
  }
 
 // Use JavaScript validation or not
-ft06_articledelete.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
+ft11_jualdelete.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
 
 // Dynamic selection lists
-ft06_articledelete.Lists["x_MainGroupID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kode","x_Nama","",""],"ParentFields":[],"ChildFields":["x_SubGroupID"],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t04_maingroup"};
-ft06_articledelete.Lists["x_MainGroupID"].Data = "<?php echo $t06_article_delete->MainGroupID->LookupFilterQuery(FALSE, "delete") ?>";
-ft06_articledelete.Lists["x_SubGroupID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kode","x_Nama","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t05_subgroup"};
-ft06_articledelete.Lists["x_SubGroupID"].Data = "<?php echo $t06_article_delete->SubGroupID->LookupFilterQuery(FALSE, "delete") ?>";
-ft06_articledelete.Lists["x_SatuanID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_satuan"};
-ft06_articledelete.Lists["x_SatuanID"].Data = "<?php echo $t06_article_delete->SatuanID->LookupFilterQuery(FALSE, "delete") ?>";
+ft11_jualdelete.Lists["x_CustomerID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t03_customer"};
+ft11_jualdelete.Lists["x_CustomerID"].Data = "<?php echo $t11_jual_delete->CustomerID->LookupFilterQuery(FALSE, "delete") ?>";
 
 // Form object for search
 </script>
@@ -963,17 +868,17 @@ ft06_articledelete.Lists["x_SatuanID"].Data = "<?php echo $t06_article_delete->S
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php $t06_article_delete->ShowPageHeader(); ?>
+<?php $t11_jual_delete->ShowPageHeader(); ?>
 <?php
-$t06_article_delete->ShowMessage();
+$t11_jual_delete->ShowMessage();
 ?>
-<form name="ft06_articledelete" id="ft06_articledelete" class="form-inline ewForm ewDeleteForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t06_article_delete->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t06_article_delete->Token ?>">
+<form name="ft11_jualdelete" id="ft11_jualdelete" class="form-inline ewForm ewDeleteForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t11_jual_delete->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t11_jual_delete->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t06_article">
+<input type="hidden" name="t" value="t11_jual">
 <input type="hidden" name="a_delete" id="a_delete" value="D">
-<?php foreach ($t06_article_delete->RecKeys as $key) { ?>
+<?php foreach ($t11_jual_delete->RecKeys as $key) { ?>
 <?php $keyvalue = is_array($key) ? implode($EW_COMPOSITE_KEY_SEPARATOR, $key) : $key; ?>
 <input type="hidden" name="key_m[]" value="<?php echo ew_HtmlEncode($keyvalue) ?>">
 <?php } ?>
@@ -982,109 +887,87 @@ $t06_article_delete->ShowMessage();
 <table class="table ewTable">
 	<thead>
 	<tr class="ewTableHeader">
-<?php if ($t06_article->MainGroupID->Visible) { // MainGroupID ?>
-		<th class="<?php echo $t06_article->MainGroupID->HeaderCellClass() ?>"><span id="elh_t06_article_MainGroupID" class="t06_article_MainGroupID"><?php echo $t06_article->MainGroupID->FldCaption() ?></span></th>
+<?php if ($t11_jual->TglSO->Visible) { // TglSO ?>
+		<th class="<?php echo $t11_jual->TglSO->HeaderCellClass() ?>"><span id="elh_t11_jual_TglSO" class="t11_jual_TglSO"><?php echo $t11_jual->TglSO->FldCaption() ?></span></th>
 <?php } ?>
-<?php if ($t06_article->SubGroupID->Visible) { // SubGroupID ?>
-		<th class="<?php echo $t06_article->SubGroupID->HeaderCellClass() ?>"><span id="elh_t06_article_SubGroupID" class="t06_article_SubGroupID"><?php echo $t06_article->SubGroupID->FldCaption() ?></span></th>
+<?php if ($t11_jual->NoSO->Visible) { // NoSO ?>
+		<th class="<?php echo $t11_jual->NoSO->HeaderCellClass() ?>"><span id="elh_t11_jual_NoSO" class="t11_jual_NoSO"><?php echo $t11_jual->NoSO->FldCaption() ?></span></th>
 <?php } ?>
-<?php if ($t06_article->Kode->Visible) { // Kode ?>
-		<th class="<?php echo $t06_article->Kode->HeaderCellClass() ?>"><span id="elh_t06_article_Kode" class="t06_article_Kode"><?php echo $t06_article->Kode->FldCaption() ?></span></th>
+<?php if ($t11_jual->CustomerID->Visible) { // CustomerID ?>
+		<th class="<?php echo $t11_jual->CustomerID->HeaderCellClass() ?>"><span id="elh_t11_jual_CustomerID" class="t11_jual_CustomerID"><?php echo $t11_jual->CustomerID->FldCaption() ?></span></th>
 <?php } ?>
-<?php if ($t06_article->Nama->Visible) { // Nama ?>
-		<th class="<?php echo $t06_article->Nama->HeaderCellClass() ?>"><span id="elh_t06_article_Nama" class="t06_article_Nama"><?php echo $t06_article->Nama->FldCaption() ?></span></th>
+<?php if ($t11_jual->CustomerPO->Visible) { // CustomerPO ?>
+		<th class="<?php echo $t11_jual->CustomerPO->HeaderCellClass() ?>"><span id="elh_t11_jual_CustomerPO" class="t11_jual_CustomerPO"><?php echo $t11_jual->CustomerPO->FldCaption() ?></span></th>
 <?php } ?>
-<?php if ($t06_article->SatuanID->Visible) { // SatuanID ?>
-		<th class="<?php echo $t06_article->SatuanID->HeaderCellClass() ?>"><span id="elh_t06_article_SatuanID" class="t06_article_SatuanID"><?php echo $t06_article->SatuanID->FldCaption() ?></span></th>
-<?php } ?>
-<?php if ($t06_article->Harga->Visible) { // Harga ?>
-		<th class="<?php echo $t06_article->Harga->HeaderCellClass() ?>"><span id="elh_t06_article_Harga" class="t06_article_Harga"><?php echo $t06_article->Harga->FldCaption() ?></span></th>
-<?php } ?>
-<?php if ($t06_article->HargaJual->Visible) { // HargaJual ?>
-		<th class="<?php echo $t06_article->HargaJual->HeaderCellClass() ?>"><span id="elh_t06_article_HargaJual" class="t06_article_HargaJual"><?php echo $t06_article->HargaJual->FldCaption() ?></span></th>
+<?php if ($t11_jual->Total->Visible) { // Total ?>
+		<th class="<?php echo $t11_jual->Total->HeaderCellClass() ?>"><span id="elh_t11_jual_Total" class="t11_jual_Total"><?php echo $t11_jual->Total->FldCaption() ?></span></th>
 <?php } ?>
 	</tr>
 	</thead>
 	<tbody>
 <?php
-$t06_article_delete->RecCnt = 0;
+$t11_jual_delete->RecCnt = 0;
 $i = 0;
-while (!$t06_article_delete->Recordset->EOF) {
-	$t06_article_delete->RecCnt++;
-	$t06_article_delete->RowCnt++;
+while (!$t11_jual_delete->Recordset->EOF) {
+	$t11_jual_delete->RecCnt++;
+	$t11_jual_delete->RowCnt++;
 
 	// Set row properties
-	$t06_article->ResetAttrs();
-	$t06_article->RowType = EW_ROWTYPE_VIEW; // View
+	$t11_jual->ResetAttrs();
+	$t11_jual->RowType = EW_ROWTYPE_VIEW; // View
 
 	// Get the field contents
-	$t06_article_delete->LoadRowValues($t06_article_delete->Recordset);
+	$t11_jual_delete->LoadRowValues($t11_jual_delete->Recordset);
 
 	// Render row
-	$t06_article_delete->RenderRow();
+	$t11_jual_delete->RenderRow();
 ?>
-	<tr<?php echo $t06_article->RowAttributes() ?>>
-<?php if ($t06_article->MainGroupID->Visible) { // MainGroupID ?>
-		<td<?php echo $t06_article->MainGroupID->CellAttributes() ?>>
-<span id="el<?php echo $t06_article_delete->RowCnt ?>_t06_article_MainGroupID" class="t06_article_MainGroupID">
-<span<?php echo $t06_article->MainGroupID->ViewAttributes() ?>>
-<?php echo $t06_article->MainGroupID->ListViewValue() ?></span>
+	<tr<?php echo $t11_jual->RowAttributes() ?>>
+<?php if ($t11_jual->TglSO->Visible) { // TglSO ?>
+		<td<?php echo $t11_jual->TglSO->CellAttributes() ?>>
+<span id="el<?php echo $t11_jual_delete->RowCnt ?>_t11_jual_TglSO" class="t11_jual_TglSO">
+<span<?php echo $t11_jual->TglSO->ViewAttributes() ?>>
+<?php echo $t11_jual->TglSO->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($t06_article->SubGroupID->Visible) { // SubGroupID ?>
-		<td<?php echo $t06_article->SubGroupID->CellAttributes() ?>>
-<span id="el<?php echo $t06_article_delete->RowCnt ?>_t06_article_SubGroupID" class="t06_article_SubGroupID">
-<span<?php echo $t06_article->SubGroupID->ViewAttributes() ?>>
-<?php echo $t06_article->SubGroupID->ListViewValue() ?></span>
+<?php if ($t11_jual->NoSO->Visible) { // NoSO ?>
+		<td<?php echo $t11_jual->NoSO->CellAttributes() ?>>
+<span id="el<?php echo $t11_jual_delete->RowCnt ?>_t11_jual_NoSO" class="t11_jual_NoSO">
+<span<?php echo $t11_jual->NoSO->ViewAttributes() ?>>
+<?php echo $t11_jual->NoSO->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($t06_article->Kode->Visible) { // Kode ?>
-		<td<?php echo $t06_article->Kode->CellAttributes() ?>>
-<span id="el<?php echo $t06_article_delete->RowCnt ?>_t06_article_Kode" class="t06_article_Kode">
-<span<?php echo $t06_article->Kode->ViewAttributes() ?>>
-<?php echo $t06_article->Kode->ListViewValue() ?></span>
+<?php if ($t11_jual->CustomerID->Visible) { // CustomerID ?>
+		<td<?php echo $t11_jual->CustomerID->CellAttributes() ?>>
+<span id="el<?php echo $t11_jual_delete->RowCnt ?>_t11_jual_CustomerID" class="t11_jual_CustomerID">
+<span<?php echo $t11_jual->CustomerID->ViewAttributes() ?>>
+<?php echo $t11_jual->CustomerID->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($t06_article->Nama->Visible) { // Nama ?>
-		<td<?php echo $t06_article->Nama->CellAttributes() ?>>
-<span id="el<?php echo $t06_article_delete->RowCnt ?>_t06_article_Nama" class="t06_article_Nama">
-<span<?php echo $t06_article->Nama->ViewAttributes() ?>>
-<?php echo $t06_article->Nama->ListViewValue() ?></span>
+<?php if ($t11_jual->CustomerPO->Visible) { // CustomerPO ?>
+		<td<?php echo $t11_jual->CustomerPO->CellAttributes() ?>>
+<span id="el<?php echo $t11_jual_delete->RowCnt ?>_t11_jual_CustomerPO" class="t11_jual_CustomerPO">
+<span<?php echo $t11_jual->CustomerPO->ViewAttributes() ?>>
+<?php echo $t11_jual->CustomerPO->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($t06_article->SatuanID->Visible) { // SatuanID ?>
-		<td<?php echo $t06_article->SatuanID->CellAttributes() ?>>
-<span id="el<?php echo $t06_article_delete->RowCnt ?>_t06_article_SatuanID" class="t06_article_SatuanID">
-<span<?php echo $t06_article->SatuanID->ViewAttributes() ?>>
-<?php echo $t06_article->SatuanID->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($t06_article->Harga->Visible) { // Harga ?>
-		<td<?php echo $t06_article->Harga->CellAttributes() ?>>
-<span id="el<?php echo $t06_article_delete->RowCnt ?>_t06_article_Harga" class="t06_article_Harga">
-<span<?php echo $t06_article->Harga->ViewAttributes() ?>>
-<?php echo $t06_article->Harga->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($t06_article->HargaJual->Visible) { // HargaJual ?>
-		<td<?php echo $t06_article->HargaJual->CellAttributes() ?>>
-<span id="el<?php echo $t06_article_delete->RowCnt ?>_t06_article_HargaJual" class="t06_article_HargaJual">
-<span<?php echo $t06_article->HargaJual->ViewAttributes() ?>>
-<?php echo $t06_article->HargaJual->ListViewValue() ?></span>
+<?php if ($t11_jual->Total->Visible) { // Total ?>
+		<td<?php echo $t11_jual->Total->CellAttributes() ?>>
+<span id="el<?php echo $t11_jual_delete->RowCnt ?>_t11_jual_Total" class="t11_jual_Total">
+<span<?php echo $t11_jual->Total->ViewAttributes() ?>>
+<?php echo $t11_jual->Total->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
 	</tr>
 <?php
-	$t06_article_delete->Recordset->MoveNext();
+	$t11_jual_delete->Recordset->MoveNext();
 }
-$t06_article_delete->Recordset->Close();
+$t11_jual_delete->Recordset->Close();
 ?>
 </tbody>
 </table>
@@ -1092,14 +975,14 @@ $t06_article_delete->Recordset->Close();
 </div>
 <div>
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("DeleteBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t06_article_delete->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t11_jual_delete->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
 </div>
 </form>
 <script type="text/javascript">
-ft06_articledelete.Init();
+ft11_jualdelete.Init();
 </script>
 <?php
-$t06_article_delete->ShowPageFooter();
+$t11_jual_delete->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -1111,5 +994,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$t06_article_delete->Page_Terminate();
+$t11_jual_delete->Page_Terminate();
 ?>

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 17, 2018 at 11:14 AM
+-- Generation Time: Apr 17, 2018 at 09:23 PM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -147,6 +147,7 @@ CREATE TABLE IF NOT EXISTS `t06_article` (
   `Nama` varchar(75) NOT NULL,
   `SatuanID` int(11) NOT NULL,
   `Harga` float(15,2) NOT NULL DEFAULT '0.00',
+  `HargaJual` float(15,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
@@ -154,8 +155,8 @@ CREATE TABLE IF NOT EXISTS `t06_article` (
 -- Dumping data for table `t06_article`
 --
 
-INSERT INTO `t06_article` (`id`, `SubGroupID`, `Kode`, `Nama`, `SatuanID`, `Harga`) VALUES
-(1, 1, '5501001', 'MEAT Has Luar Lokal', 1, 100000.00);
+INSERT INTO `t06_article` (`id`, `SubGroupID`, `Kode`, `Nama`, `SatuanID`, `Harga`, `HargaJual`) VALUES
+(1, 1, '5501001', 'MEAT Has Luar Lokal', 1, 100000.00, 125000.00);
 
 -- --------------------------------------------------------
 
@@ -165,9 +166,9 @@ INSERT INTO `t06_article` (`id`, `SubGroupID`, `Kode`, `Nama`, `SatuanID`, `Harg
 
 CREATE TABLE IF NOT EXISTS `t07_satuan` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Nama` varchar(25) NOT NULL,
+  `Nama` varchar(25) CHARACTER SET latin1 NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `t07_satuan`
@@ -188,14 +189,14 @@ INSERT INTO `t07_satuan` (`id`, `Nama`) VALUES
 CREATE TABLE IF NOT EXISTS `t08_beli` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `TglPO` date NOT NULL,
-  `NoPO` varchar(14) NOT NULL,
+  `NoPO` varchar(14) CHARACTER SET latin1 NOT NULL,
   `VendorID` int(11) NOT NULL,
   `ArticleID` int(11) NOT NULL,
   `Harga` float(15,2) NOT NULL DEFAULT '0.00',
   `Qty` float(15,2) NOT NULL DEFAULT '0.00',
   `SubTotal` float(15,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `t08_beli`
@@ -213,12 +214,12 @@ INSERT INTO `t08_beli` (`id`, `TglPO`, `NoPO`, `VendorID`, `ArticleID`, `Harga`,
 
 CREATE TABLE IF NOT EXISTS `t09_hutang` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `NoHutang` varchar(8) NOT NULL,
+  `NoHutang` varchar(8) CHARACTER SET latin1 NOT NULL,
   `BeliID` int(11) NOT NULL,
   `JumlahHutang` float(15,2) NOT NULL DEFAULT '0.00',
   `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `t09_hutang`
@@ -226,7 +227,7 @@ CREATE TABLE IF NOT EXISTS `t09_hutang` (
 
 INSERT INTO `t09_hutang` (`id`, `NoHutang`, `BeliID`, `JumlahHutang`, `JumlahBayar`) VALUES
 (1, 'HT000001', 1, 210000.00, 210000.00),
-(2, 'HT000002', 2, 400000.00, 0.00);
+(2, 'HT000002', 2, 400000.00, 100000.00);
 
 -- --------------------------------------------------------
 
@@ -237,11 +238,11 @@ INSERT INTO `t09_hutang` (`id`, `NoHutang`, `BeliID`, `JumlahHutang`, `JumlahBay
 CREATE TABLE IF NOT EXISTS `t10_hutangdetail` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `HutangID` int(11) NOT NULL,
-  `NoBayar` varchar(8) NOT NULL,
+  `NoBayar` varchar(8) CHARACTER SET latin1 NOT NULL,
   `Tgl` date NOT NULL,
   `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=20 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=22 ;
 
 --
 -- Dumping data for table `t10_hutangdetail`
@@ -251,7 +252,55 @@ INSERT INTO `t10_hutangdetail` (`id`, `HutangID`, `NoBayar`, `Tgl`, `JumlahBayar
 (2, 1, 'HD000002', '2018-04-16', 60000.00),
 (3, 1, 'HD000003', '2018-04-16', 75000.00),
 (17, 1, 'HD000005', '2018-04-17', 25000.00),
-(19, 1, 'HD000006', '2018-04-17', 50000.00);
+(19, 1, 'HD000006', '2018-04-17', 50000.00),
+(21, 2, 'HD000008', '2018-04-17', 100000.00);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `t11_jual`
+--
+
+CREATE TABLE IF NOT EXISTS `t11_jual` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `TglSO` date NOT NULL,
+  `NoSO` varchar(14) CHARACTER SET latin1 NOT NULL,
+  `CustomerID` int(11) NOT NULL,
+  `CustomerPO` varchar(50) CHARACTER SET latin1 NOT NULL,
+  `Total` float(15,2) NOT NULL DEFAULT '0.00',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `t11_jual`
+--
+
+INSERT INTO `t11_jual` (`id`, `TglSO`, `NoSO`, `CustomerID`, `CustomerPO`, `Total`) VALUES
+(1, '2018-04-18', 'SO201804180001', 1, '-', 0.00);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `t12_jualdetail`
+--
+
+CREATE TABLE IF NOT EXISTS `t12_jualdetail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `JualID` int(11) NOT NULL,
+  `ArticleID` int(11) NOT NULL,
+  `HargaJual` float(15,2) NOT NULL DEFAULT '0.00',
+  `Qty` float(15,2) NOT NULL DEFAULT '0.00',
+  `SubTotal` float(15,2) NOT NULL DEFAULT '0.00',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+
+--
+-- Dumping data for table `t12_jualdetail`
+--
+
+INSERT INTO `t12_jualdetail` (`id`, `JualID`, `ArticleID`, `HargaJual`, `Qty`, `SubTotal`) VALUES
+(1, 1, 1, 125000.00, 2.20, 275000.00),
+(2, 1, 1, 125000.00, 2.00, 250000.00);
 
 -- --------------------------------------------------------
 
@@ -371,7 +420,7 @@ CREATE TABLE IF NOT EXISTS `t99_audittrail` (
   `oldvalue` longtext CHARACTER SET latin1,
   `newvalue` longtext CHARACTER SET latin1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=437 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=496 ;
 
 --
 -- Dumping data for table `t99_audittrail`
@@ -811,7 +860,67 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (433, '2018-04-17 16:12:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '19', '', '2018-04-17'),
 (434, '2018-04-17 16:12:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '19', '', '50000'),
 (435, '2018-04-17 16:12:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '19', '', '1'),
-(436, '2018-04-17 16:12:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '19', '', '19');
+(436, '2018-04-17 16:12:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '19', '', '19'),
+(437, '2018-04-17 16:55:21', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(438, '2018-04-17 16:55:44', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '20', '', 'HD000007');
+INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `table`, `field`, `keyvalue`, `oldvalue`, `newvalue`) VALUES
+(439, '2018-04-17 16:55:44', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '20', '', '2018-04-17'),
+(440, '2018-04-17 16:55:44', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '20', '', '400000'),
+(441, '2018-04-17 16:55:44', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '20', '', '2'),
+(442, '2018-04-17 16:55:44', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '20', '', '20'),
+(443, '2018-04-17 16:55:57', '/stok/t10_hutangdetaillist.php', '1', 'U', 't10_hutangdetail', 'JumlahBayar', '20', '400000.00', '300000'),
+(444, '2018-04-17 16:56:07', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '21', '', 'HD000008'),
+(445, '2018-04-17 16:56:07', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '21', '', '2018-04-17'),
+(446, '2018-04-17 16:56:07', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '21', '', '100000'),
+(447, '2018-04-17 16:56:07', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '21', '', '2'),
+(448, '2018-04-17 16:56:07', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '21', '', '21'),
+(449, '2018-04-17 16:56:15', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete begin ***', 't10_hutangdetail', '', '', '', ''),
+(450, '2018-04-17 16:56:15', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '20', '20', ''),
+(451, '2018-04-17 16:56:15', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '20', '2', ''),
+(452, '2018-04-17 16:56:15', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '20', 'HD000007', ''),
+(453, '2018-04-17 16:56:15', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '20', '2018-04-17', ''),
+(454, '2018-04-17 16:56:15', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '20', '300000.00', ''),
+(455, '2018-04-17 16:56:16', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete successful ***', 't10_hutangdetail', '', '', '', ''),
+(456, '2018-04-17 21:15:45', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(457, '2018-04-17 23:18:46', '/stok/t06_articleedit.php', '1', 'U', 't06_article', 'HargaJual', '1', '0.00', '125000'),
+(458, '2018-04-17 23:58:01', '/stok/logout.php', 'admin', 'logout', '::1', '', '', '', ''),
+(459, '2018-04-17 23:58:06', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(460, '2018-04-18 00:51:38', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'TglSO', '1', '', '2018-04-18'),
+(461, '2018-04-18 00:51:38', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'NoSO', '1', '', 'SO201804180001'),
+(462, '2018-04-18 00:51:38', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'CustomerID', '1', '', '1'),
+(463, '2018-04-18 00:51:38', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'CustomerPO', '1', '', '-'),
+(464, '2018-04-18 00:51:38', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'Total', '1', '', '0'),
+(465, '2018-04-18 00:51:38', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'id', '1', '', '1'),
+(466, '2018-04-18 00:51:38', '/stok/t11_jualadd.php', '1', '*** Batch insert begin ***', 't12_jualdetail', '', '', '', ''),
+(467, '2018-04-18 00:51:38', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'JualID', '1', '', '1'),
+(468, '2018-04-18 00:51:38', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'ArticleID', '1', '', '1'),
+(469, '2018-04-18 00:51:38', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'HargaJual', '1', '', '125000.00'),
+(470, '2018-04-18 00:51:38', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'Qty', '1', '', '0'),
+(471, '2018-04-18 00:51:38', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SatuanID', '1', '', '1'),
+(472, '2018-04-18 00:51:38', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SubTotal', '1', '', '0'),
+(473, '2018-04-18 00:51:38', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'id', '1', '', '1'),
+(474, '2018-04-18 00:51:39', '/stok/t11_jualadd.php', '1', '*** Batch insert successful ***', 't12_jualdetail', '', '', '', ''),
+(475, '2018-04-18 00:55:00', '/stok/logout.php', 'admin', 'logout', '::1', '', '', '', ''),
+(476, '2018-04-18 00:55:04', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(477, '2018-04-18 01:15:02', '/stok/t11_jualedit.php', '1', '*** Batch update begin ***', 't12_jualdetail', '', '', '', ''),
+(478, '2018-04-18 01:15:02', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'Qty', '1', '0.00', '4'),
+(479, '2018-04-18 01:15:02', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'SubTotal', '1', '0.00', '500000'),
+(480, '2018-04-18 01:15:02', '/stok/t11_jualedit.php', '1', 'A', 't12_jualdetail', 'JualID', '2', '', '1'),
+(481, '2018-04-18 01:15:02', '/stok/t11_jualedit.php', '1', 'A', 't12_jualdetail', 'ArticleID', '2', '', '1'),
+(482, '2018-04-18 01:15:02', '/stok/t11_jualedit.php', '1', 'A', 't12_jualdetail', 'HargaJual', '2', '', '125000.00'),
+(483, '2018-04-18 01:15:02', '/stok/t11_jualedit.php', '1', 'A', 't12_jualdetail', 'Qty', '2', '', '5'),
+(484, '2018-04-18 01:15:02', '/stok/t11_jualedit.php', '1', 'A', 't12_jualdetail', 'SatuanID', '2', '', '1'),
+(485, '2018-04-18 01:15:02', '/stok/t11_jualedit.php', '1', 'A', 't12_jualdetail', 'SubTotal', '2', '', '625000'),
+(486, '2018-04-18 01:15:02', '/stok/t11_jualedit.php', '1', 'A', 't12_jualdetail', 'id', '2', '', '2'),
+(487, '2018-04-18 01:15:03', '/stok/t11_jualedit.php', '1', '*** Batch update successful ***', 't12_jualdetail', '', '', '', ''),
+(488, '2018-04-18 02:20:04', '/stok/t11_jualedit.php', '1', '*** Batch update begin ***', 't12_jualdetail', '', '', '', ''),
+(489, '2018-04-18 02:20:05', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'Qty', '1', '4.00', '3.5'),
+(490, '2018-04-18 02:20:05', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'SubTotal', '1', '500000.00', '437500'),
+(491, '2018-04-18 02:20:05', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'Qty', '2', '5.00', '2'),
+(492, '2018-04-18 02:20:05', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'SubTotal', '2', '625000.00', '250000'),
+(493, '2018-04-18 02:20:05', '/stok/t11_jualedit.php', '1', '*** Batch update successful ***', 't12_jualdetail', '', '', '', ''),
+(494, '2018-04-18 02:20:46', '/stok/t12_jualdetailedit.php', '1', 'U', 't12_jualdetail', 'Qty', '1', '3.50', '2.2'),
+(495, '2018-04-18 02:20:46', '/stok/t12_jualdetailedit.php', '1', 'U', 't12_jualdetail', 'SubTotal', '1', '437500.00', '275000');
 
 -- --------------------------------------------------------
 
@@ -841,6 +950,20 @@ CREATE TABLE IF NOT EXISTS `v02_stok` (
 -- --------------------------------------------------------
 
 --
+-- Stand-in structure for view `v03_hutang`
+--
+CREATE TABLE IF NOT EXISTS `v03_hutang` (
+`nohutang` varchar(8)
+,`tglpo` date
+,`nopo` varchar(14)
+,`nama` varchar(50)
+,`jumlahhutang` float(15,2)
+,`jumlahbayar` float(15,2)
+,`sisahutang` double(19,2)
+);
+-- --------------------------------------------------------
+
+--
 -- Structure for view `v01_beli`
 --
 DROP TABLE IF EXISTS `v01_beli`;
@@ -855,6 +978,15 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 DROP TABLE IF EXISTS `v02_stok`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v02_stok` AS select concat(`a`.`Kode`,' - ',`a`.`Nama`) AS `MainGroup`,concat(`b`.`Kode`,' - ',`b`.`Nama`) AS `SubGroup`,concat(`c`.`Kode`,' - ',`c`.`Nama`) AS `Article`,`e`.`sumqty` AS `SumQty`,`d`.`Nama` AS `Satuan`,`e`.`avgharga` AS `AvgHarga`,`e`.`subtotal` AS `SubTotal` from ((((`t04_maingroup` `a` left join `t05_subgroup` `b` on((`a`.`id` = `b`.`MainGroupID`))) left join `t06_article` `c` on((`b`.`id` = `c`.`SubGroupID`))) left join `t07_satuan` `d` on((`c`.`SatuanID` = `d`.`id`))) left join `v01_beli` `e` on((`c`.`id` = `e`.`articleid`)));
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `v03_hutang`
+--
+DROP TABLE IF EXISTS `v03_hutang`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v03_hutang` AS select `a`.`NoHutang` AS `nohutang`,`b`.`TglPO` AS `tglpo`,`b`.`NoPO` AS `nopo`,`c`.`Nama` AS `nama`,`a`.`JumlahHutang` AS `jumlahhutang`,`a`.`JumlahBayar` AS `jumlahbayar`,(`a`.`JumlahHutang` - `a`.`JumlahBayar`) AS `sisahutang` from ((`t09_hutang` `a` left join `t08_beli` `b` on((`a`.`BeliID` = `b`.`id`))) left join `t02_vendor` `c` on((`b`.`VendorID` = `c`.`id`)));
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

@@ -129,51 +129,17 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt14.js");
 
 var ArticleCode;
 var AjaxArticleCode;
-var p_RowIndex;
-
-function f_Article_MainGroupID_onChange(event, RowIndex) {
-	if (RowIndex == "x") {
-		$("#x_SubGroupID").val("");
-		$("#x_Kode").val("");
-	}
-	else {
-		$("#x"+RowIndex+"_SubGroupID").val("");
-		$("#x"+RowIndex+"_Kode").val("");
-	}
-}
-
-function f_Article_SubGroupID_onChange(event, RowIndex) {
-	p_RowIndex = RowIndex;
-	if (RowIndex == "x") {
-		var article_SubGroupID = $("#x_SubGroupID").val();
-	}
-	else {
-		var article_SubGroupID = $("#x"+RowIndex+"_SubGroupID").val();
-	}
-	if (article_SubGroupID != "") {
-		f_GetNextArticleCode(article_SubGroupID);
-	}
-}
+var $p_row;
 
 function stateChangedArticleCode() {
 	var data;
 	if (AjaxArticleCode.readyState == 4) {
 		data = AjaxArticleCode.responseText;
 		if(data.length > 0) {
-			if (p_RowIndex == "x") {
-				$("#x_Kode").val(data); 
-			}
-			else {
-				$("#x"+p_RowIndex+"_Kode").val(data);
-			}
+			$p_row["Kode"].val(data);
 		}
 		else {
-			if (p_RowIndex == "x") {
-				$("#x_Kode").val(""); 
-			}
-			else {
-				$("#x"+p_RowIndex+"_Kode").val("");
-			}
+			$p_row["Kode"].val("");
 		}
 	}
 }
@@ -236,6 +202,61 @@ function f_BuatAjax() {
 				$row["SubTotal"].val(st);
 
 				//$row["jml_lunas"].val(st);
+			}
+		}
+	);
+
+	// Table 't12_jualdetail' Field 'Qty'
+	$('[data-table=t12_jualdetail][data-field=x_Qty]').on(
+		{ // keys = event types, values = handler functions
+			"change keyup": function(e) {
+				var $row = $(this).fields();
+				var qty = parseFloat($row["Qty"].val());
+
+				//var harga = parseInt($row["harga"].val());
+				var harga_asli = $row["HargaJual"].val();
+				var harga_clean = harga_asli.replace(/,/g, '');
+				var harga = parseFloat(harga_clean);
+				var st = qty * harga;
+
+				//alert(st);
+				$row["SubTotal"].val(st);
+
+				//$row["jml_lunas"].val(st);
+			}
+		}
+	);
+
+	// Table 't12_jualdetail' Field 'Harga'
+	$('[data-table=t12_jualdetail][data-field=x_HargaJual]').on(
+		{ // keys = event types, values = handler functions
+			"change keyup": function(e) {
+				var $row = $(this).fields();
+				var qty = parseFloat($row["Qty"].val());
+
+				//var harga = parseInt($row["harga"].val());
+				var harga_asli = $row["HargaJual"].val();
+				var harga_clean = harga_asli.replace(/,/g, '');
+				var harga = parseFloat(harga_clean);
+				var st = qty * harga;
+
+				//alert(st);
+				$row["SubTotal"].val(st);
+
+				//$row["jml_lunas"].val(st);
+			}
+		}
+	);
+
+	// Table 't06_article' Field 'SubGroupID'
+	$('[data-table=t06_article][data-field=x_SubGroupID]').on(
+		{ // keys = event types, values = handler functions
+			"change keyup": function(e) {
+				$p_row = $(this).fields();
+				var SubGroupID = ($p_row["SubGroupID"].val());
+				if (SubGroupID != "") {
+					f_GetNextArticleCode(SubGroupID);
+				}
 			}
 		}
 	);

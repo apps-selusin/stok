@@ -79,4 +79,22 @@ function f_GetSisaHutang($mparam1) {
 	$mSisa = ew_ExecuteScalar($q);
 	return $mSisa;
 }
+
+function f_GetNextNoSO() {
+	$m_NextNo = "";
+	$m_LastNo = "";
+	$m_No = ew_ExecuteScalar("select NoSO from t11_jual order by NoSO desc");
+	if ($m_No != "") { // jika sudah ada, langsung ambil dan proses...
+		$m_LastNo = intval(substr($m_No, -4)); // ambil 4 digit terakhir
+		$m_LastNo = intval($m_LastNo) + 1; // konversi ke integer, lalu tambahkan satu
+		$m_NextNo = "SO" . date("Ymd") . sprintf('%04s', $m_LastNo); // format hasilnya dan tambahkan prefix
+		if (strlen($m_NextNo) > 14) {
+			$m_NextNo = "SO" . date("Ymd") . "0001";
+		}
+	}
+	else { // jika belum ada, gunakan kode yang pertama
+		$m_NextNo = "SO" . date("Ymd") . "0001";
+	}
+	return $m_NextNo;
+}
 ?>

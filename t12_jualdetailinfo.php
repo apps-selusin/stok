@@ -1,12 +1,12 @@
 <?php
 
 // Global variable for table object
-$t06_article = NULL;
+$t12_jualdetail = NULL;
 
 //
-// Table class for t06_article
+// Table class for t12_jualdetail
 //
-class ct06_article extends cTable {
+class ct12_jualdetail extends cTable {
 	var $AuditTrailOnAdd = TRUE;
 	var $AuditTrailOnEdit = TRUE;
 	var $AuditTrailOnDelete = TRUE;
@@ -14,13 +14,12 @@ class ct06_article extends cTable {
 	var $AuditTrailOnViewData = FALSE;
 	var $AuditTrailOnSearch = FALSE;
 	var $id;
-	var $MainGroupID;
-	var $SubGroupID;
-	var $Kode;
-	var $Nama;
-	var $SatuanID;
-	var $Harga;
+	var $JualID;
+	var $ArticleID;
 	var $HargaJual;
+	var $Qty;
+	var $SatuanID;
+	var $SubTotal;
 
 	//
 	// Table class constructor
@@ -30,12 +29,12 @@ class ct06_article extends cTable {
 
 		// Language object
 		if (!isset($Language)) $Language = new cLanguage();
-		$this->TableVar = 't06_article';
-		$this->TableName = 't06_article';
+		$this->TableVar = 't12_jualdetail';
+		$this->TableName = 't12_jualdetail';
 		$this->TableType = 'TABLE';
 
 		// Update Table
-		$this->UpdateTable = "`t06_article`";
+		$this->UpdateTable = "`t12_jualdetail`";
 		$this->DBID = 'DB';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -45,9 +44,9 @@ class ct06_article extends cTable {
 		$this->ExportExcelPageSize = ""; // Page size (PHPExcel only)
 		$this->ExportWordPageOrientation = "portrait"; // Page orientation (PHPWord only)
 		$this->ExportWordColumnWidth = NULL; // Cell width (PHPWord only)
-		$this->DetailAdd = FALSE; // Allow detail add
-		$this->DetailEdit = FALSE; // Allow detail edit
-		$this->DetailView = FALSE; // Allow detail view
+		$this->DetailAdd = TRUE; // Allow detail add
+		$this->DetailEdit = TRUE; // Allow detail edit
+		$this->DetailView = TRUE; // Allow detail view
 		$this->ShowMultipleDetails = FALSE; // Show multiple details
 		$this->GridAddRowCount = 5;
 		$this->AllowAddDeleteRow = TRUE; // Allow add/delete row
@@ -55,56 +54,49 @@ class ct06_article extends cTable {
 		$this->BasicSearch = new cBasicSearch($this->TableVar);
 
 		// id
-		$this->id = new cField('t06_article', 't06_article', 'x_id', 'id', '`id`', '`id`', 3, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
+		$this->id = new cField('t12_jualdetail', 't12_jualdetail', 'x_id', 'id', '`id`', '`id`', 3, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
 		$this->id->Sortable = TRUE; // Allow sort
 		$this->id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['id'] = &$this->id;
 
-		// MainGroupID
-		$this->MainGroupID = new cField('t06_article', 't06_article', 'x_MainGroupID', 'MainGroupID', '(select MainGroupID from t05_subgroup where id = SubGroupID)', '(select MainGroupID from t05_subgroup where id = SubGroupID)', 3, -1, FALSE, '`EV__MainGroupID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'SELECT');
-		$this->MainGroupID->FldIsCustom = TRUE; // Custom field
-		$this->MainGroupID->Sortable = TRUE; // Allow sort
-		$this->MainGroupID->UsePleaseSelect = TRUE; // Use PleaseSelect by default
-		$this->MainGroupID->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
-		$this->MainGroupID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['MainGroupID'] = &$this->MainGroupID;
+		// JualID
+		$this->JualID = new cField('t12_jualdetail', 't12_jualdetail', 'x_JualID', 'JualID', '`JualID`', '`JualID`', 3, -1, FALSE, '`JualID`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->JualID->Sortable = TRUE; // Allow sort
+		$this->JualID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['JualID'] = &$this->JualID;
 
-		// SubGroupID
-		$this->SubGroupID = new cField('t06_article', 't06_article', 'x_SubGroupID', 'SubGroupID', '`SubGroupID`', '`SubGroupID`', 3, -1, FALSE, '`EV__SubGroupID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'SELECT');
-		$this->SubGroupID->Sortable = TRUE; // Allow sort
-		$this->SubGroupID->UsePleaseSelect = TRUE; // Use PleaseSelect by default
-		$this->SubGroupID->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
-		$this->SubGroupID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['SubGroupID'] = &$this->SubGroupID;
-
-		// Kode
-		$this->Kode = new cField('t06_article', 't06_article', 'x_Kode', 'Kode', '`Kode`', '`Kode`', 200, -1, FALSE, '`Kode`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->Kode->Sortable = TRUE; // Allow sort
-		$this->fields['Kode'] = &$this->Kode;
-
-		// Nama
-		$this->Nama = new cField('t06_article', 't06_article', 'x_Nama', 'Nama', '`Nama`', '`Nama`', 200, -1, FALSE, '`Nama`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->Nama->Sortable = TRUE; // Allow sort
-		$this->fields['Nama'] = &$this->Nama;
-
-		// SatuanID
-		$this->SatuanID = new cField('t06_article', 't06_article', 'x_SatuanID', 'SatuanID', '`SatuanID`', '`SatuanID`', 3, -1, FALSE, '`EV__SatuanID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'SELECT');
-		$this->SatuanID->Sortable = TRUE; // Allow sort
-		$this->SatuanID->UsePleaseSelect = TRUE; // Use PleaseSelect by default
-		$this->SatuanID->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
-		$this->fields['SatuanID'] = &$this->SatuanID;
-
-		// Harga
-		$this->Harga = new cField('t06_article', 't06_article', 'x_Harga', 'Harga', '`Harga`', '`Harga`', 4, -1, FALSE, '`Harga`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->Harga->Sortable = TRUE; // Allow sort
-		$this->Harga->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
-		$this->fields['Harga'] = &$this->Harga;
+		// ArticleID
+		$this->ArticleID = new cField('t12_jualdetail', 't12_jualdetail', 'x_ArticleID', 'ArticleID', '`ArticleID`', '`ArticleID`', 3, -1, FALSE, '`EV__ArticleID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'SELECT');
+		$this->ArticleID->Sortable = TRUE; // Allow sort
+		$this->ArticleID->UsePleaseSelect = TRUE; // Use PleaseSelect by default
+		$this->ArticleID->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
+		$this->ArticleID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['ArticleID'] = &$this->ArticleID;
 
 		// HargaJual
-		$this->HargaJual = new cField('t06_article', 't06_article', 'x_HargaJual', 'HargaJual', '`HargaJual`', '`HargaJual`', 4, -1, FALSE, '`HargaJual`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->HargaJual = new cField('t12_jualdetail', 't12_jualdetail', 'x_HargaJual', 'HargaJual', '`HargaJual`', '`HargaJual`', 4, -1, FALSE, '`HargaJual`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->HargaJual->Sortable = TRUE; // Allow sort
 		$this->HargaJual->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
 		$this->fields['HargaJual'] = &$this->HargaJual;
+
+		// Qty
+		$this->Qty = new cField('t12_jualdetail', 't12_jualdetail', 'x_Qty', 'Qty', '`Qty`', '`Qty`', 4, -1, FALSE, '`Qty`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Qty->Sortable = TRUE; // Allow sort
+		$this->Qty->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['Qty'] = &$this->Qty;
+
+		// SatuanID
+		$this->SatuanID = new cField('t12_jualdetail', 't12_jualdetail', 'x_SatuanID', 'SatuanID', '(SELECT satuanid  FROM t06_article a where articleid = a.id)', '(SELECT satuanid  FROM t06_article a where articleid = a.id)', 3, -1, FALSE, '`EV__SatuanID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'TEXT');
+		$this->SatuanID->FldIsCustom = TRUE; // Custom field
+		$this->SatuanID->Sortable = TRUE; // Allow sort
+		$this->SatuanID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['SatuanID'] = &$this->SatuanID;
+
+		// SubTotal
+		$this->SubTotal = new cField('t12_jualdetail', 't12_jualdetail', 'x_SubTotal', 'SubTotal', '`SubTotal`', '`SubTotal`', 4, -1, FALSE, '`SubTotal`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->SubTotal->Sortable = TRUE; // Allow sort
+		$this->SubTotal->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['SubTotal'] = &$this->SubTotal;
 	}
 
 	// Field Visibility
@@ -177,11 +169,58 @@ class ct06_article extends cTable {
 		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST] = $v;
 	}
 
+	// Current master table name
+	function getCurrentMasterTable() {
+		return @$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_MASTER_TABLE];
+	}
+
+	function setCurrentMasterTable($v) {
+		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_MASTER_TABLE] = $v;
+	}
+
+	// Session master WHERE clause
+	function GetMasterFilter() {
+
+		// Master filter
+		$sMasterFilter = "";
+		if ($this->getCurrentMasterTable() == "t11_jual") {
+			if ($this->JualID->getSessionValue() <> "")
+				$sMasterFilter .= "`id`=" . ew_QuotedValue($this->JualID->getSessionValue(), EW_DATATYPE_NUMBER, "DB");
+			else
+				return "";
+		}
+		return $sMasterFilter;
+	}
+
+	// Session detail WHERE clause
+	function GetDetailFilter() {
+
+		// Detail filter
+		$sDetailFilter = "";
+		if ($this->getCurrentMasterTable() == "t11_jual") {
+			if ($this->JualID->getSessionValue() <> "")
+				$sDetailFilter .= "`JualID`=" . ew_QuotedValue($this->JualID->getSessionValue(), EW_DATATYPE_NUMBER, "DB");
+			else
+				return "";
+		}
+		return $sDetailFilter;
+	}
+
+	// Master filter
+	function SqlMasterFilter_t11_jual() {
+		return "`id`=@id@";
+	}
+
+	// Detail filter
+	function SqlDetailFilter_t11_jual() {
+		return "`JualID`=@JualID@";
+	}
+
 	// Table level SQL
 	var $_SqlFrom = "";
 
 	function getSqlFrom() { // From
-		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t06_article`";
+		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t12_jualdetail`";
 	}
 
 	function SqlFrom() { // For backward compatibility
@@ -194,7 +233,7 @@ class ct06_article extends cTable {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() { // Select
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (select MainGroupID from t05_subgroup where id = SubGroupID) AS `MainGroupID` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (SELECT satuanid  FROM t06_article a where articleid = a.id) AS `SatuanID` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -209,7 +248,7 @@ class ct06_article extends cTable {
 	function getSqlSelectList() { // Select for List page
 		$select = "";
 		$select = "SELECT * FROM (" .
-			"SELECT *, (select MainGroupID from t05_subgroup where id = SubGroupID) AS `MainGroupID`, (SELECT CONCAT(COALESCE(`Kode`, ''),'" . ew_ValueSeparator(1, $this->MainGroupID) . "',COALESCE(`Nama`,'')) FROM `t04_maingroup` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t06_article`.`MainGroupID` LIMIT 1) AS `EV__MainGroupID`, (SELECT CONCAT(COALESCE(`Kode`, ''),'" . ew_ValueSeparator(1, $this->SubGroupID) . "',COALESCE(`Nama`,'')) FROM `t05_subgroup` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t06_article`.`SubGroupID` LIMIT 1) AS `EV__SubGroupID`, (SELECT `Nama` FROM `t07_satuan` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t06_article`.`SatuanID` LIMIT 1) AS `EV__SatuanID` FROM `t06_article`" .
+			"SELECT *, (SELECT satuanid  FROM t06_article a where articleid = a.id) AS `SatuanID`, (SELECT CONCAT(COALESCE(`Kode`, ''),'" . ew_ValueSeparator(1, $this->ArticleID) . "',COALESCE(`Nama`,'')) FROM `t06_article` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t12_jualdetail`.`ArticleID` LIMIT 1) AS `EV__ArticleID`, (SELECT `Nama` FROM `t07_satuan` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t12_jualdetail`.`SatuanID` LIMIT 1) AS `EV__SatuanID` FROM `t12_jualdetail`" .
 			") `EW_TMP_TABLE`";
 		return ($this->_SqlSelectList <> "") ? $this->_SqlSelectList : $select;
 	}
@@ -266,7 +305,7 @@ class ct06_article extends cTable {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() { // Order By
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`Kode` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -357,19 +396,11 @@ class ct06_article extends cTable {
 			$sWhere = " " . str_replace(array("(",")"), array("",""), $sWhere) . " ";
 		if ($sOrderBy <> "")
 			$sOrderBy = " " . str_replace(array("(",")"), array("",""), $sOrderBy) . " ";
-		if ($this->MainGroupID->AdvancedSearch->SearchValue <> "" ||
-			$this->MainGroupID->AdvancedSearch->SearchValue2 <> "" ||
-			strpos($sWhere, " " . $this->MainGroupID->FldVirtualExpression . " ") !== FALSE)
+		if ($this->ArticleID->AdvancedSearch->SearchValue <> "" ||
+			$this->ArticleID->AdvancedSearch->SearchValue2 <> "" ||
+			strpos($sWhere, " " . $this->ArticleID->FldVirtualExpression . " ") !== FALSE)
 			return TRUE;
-		if (strpos($sOrderBy, " " . $this->MainGroupID->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		if ($this->SubGroupID->AdvancedSearch->SearchValue <> "" ||
-			$this->SubGroupID->AdvancedSearch->SearchValue2 <> "" ||
-			strpos($sWhere, " " . $this->SubGroupID->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		if (strpos($sOrderBy, " " . $this->SubGroupID->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		if ($this->BasicSearch->getKeyword() <> "")
+		if (strpos($sOrderBy, " " . $this->ArticleID->FldVirtualExpression . " ") !== FALSE)
 			return TRUE;
 		if ($this->SatuanID->AdvancedSearch->SearchValue <> "" ||
 			$this->SatuanID->AdvancedSearch->SearchValue2 <> "" ||
@@ -560,7 +591,7 @@ class ct06_article extends cTable {
 		if (@$_SESSION[$name] <> "") {
 			return $_SESSION[$name];
 		} else {
-			return "t06_articlelist.php";
+			return "t12_jualdetaillist.php";
 		}
 	}
 
@@ -571,11 +602,11 @@ class ct06_article extends cTable {
 	// Get modal caption
 	function GetModalCaption($pageName) {
 		global $Language;
-		if ($pageName == "t06_articleview.php")
+		if ($pageName == "t12_jualdetailview.php")
 			return $Language->Phrase("View");
-		elseif ($pageName == "t06_articleedit.php")
+		elseif ($pageName == "t12_jualdetailedit.php")
 			return $Language->Phrase("Edit");
-		elseif ($pageName == "t06_articleadd.php")
+		elseif ($pageName == "t12_jualdetailadd.php")
 			return $Language->Phrase("Add");
 		else
 			return "";
@@ -583,30 +614,30 @@ class ct06_article extends cTable {
 
 	// List URL
 	function GetListUrl() {
-		return "t06_articlelist.php";
+		return "t12_jualdetaillist.php";
 	}
 
 	// View URL
 	function GetViewUrl($parm = "") {
 		if ($parm <> "")
-			$url = $this->KeyUrl("t06_articleview.php", $this->UrlParm($parm));
+			$url = $this->KeyUrl("t12_jualdetailview.php", $this->UrlParm($parm));
 		else
-			$url = $this->KeyUrl("t06_articleview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+			$url = $this->KeyUrl("t12_jualdetailview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
 		return $this->AddMasterUrl($url);
 	}
 
 	// Add URL
 	function GetAddUrl($parm = "") {
 		if ($parm <> "")
-			$url = "t06_articleadd.php?" . $this->UrlParm($parm);
+			$url = "t12_jualdetailadd.php?" . $this->UrlParm($parm);
 		else
-			$url = "t06_articleadd.php";
+			$url = "t12_jualdetailadd.php";
 		return $this->AddMasterUrl($url);
 	}
 
 	// Edit URL
 	function GetEditUrl($parm = "") {
-		$url = $this->KeyUrl("t06_articleedit.php", $this->UrlParm($parm));
+		$url = $this->KeyUrl("t12_jualdetailedit.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -618,7 +649,7 @@ class ct06_article extends cTable {
 
 	// Copy URL
 	function GetCopyUrl($parm = "") {
-		$url = $this->KeyUrl("t06_articleadd.php", $this->UrlParm($parm));
+		$url = $this->KeyUrl("t12_jualdetailadd.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -630,11 +661,15 @@ class ct06_article extends cTable {
 
 	// Delete URL
 	function GetDeleteUrl() {
-		return $this->KeyUrl("t06_articledelete.php", $this->UrlParm());
+		return $this->KeyUrl("t12_jualdetaildelete.php", $this->UrlParm());
 	}
 
 	// Add master url
 	function AddMasterUrl($url) {
+		if ($this->getCurrentMasterTable() == "t11_jual" && strpos($url, EW_TABLE_SHOW_MASTER . "=") === FALSE) {
+			$url .= (strpos($url, "?") !== FALSE ? "&" : "?") . EW_TABLE_SHOW_MASTER . "=" . $this->getCurrentMasterTable();
+			$url .= "&fk_id=" . urlencode($this->JualID->CurrentValue);
+		}
 		return $url;
 	}
 
@@ -732,13 +767,12 @@ class ct06_article extends cTable {
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
 		$this->id->setDbValue($rs->fields('id'));
-		$this->MainGroupID->setDbValue($rs->fields('MainGroupID'));
-		$this->SubGroupID->setDbValue($rs->fields('SubGroupID'));
-		$this->Kode->setDbValue($rs->fields('Kode'));
-		$this->Nama->setDbValue($rs->fields('Nama'));
-		$this->SatuanID->setDbValue($rs->fields('SatuanID'));
-		$this->Harga->setDbValue($rs->fields('Harga'));
+		$this->JualID->setDbValue($rs->fields('JualID'));
+		$this->ArticleID->setDbValue($rs->fields('ArticleID'));
 		$this->HargaJual->setDbValue($rs->fields('HargaJual'));
+		$this->Qty->setDbValue($rs->fields('Qty'));
+		$this->SatuanID->setDbValue($rs->fields('SatuanID'));
+		$this->SubTotal->setDbValue($rs->fields('SubTotal'));
 	}
 
 	// Render list row values
@@ -750,86 +784,66 @@ class ct06_article extends cTable {
 
 	// Common render codes
 		// id
-		// MainGroupID
-		// SubGroupID
-		// Kode
-		// Nama
-		// SatuanID
-		// Harga
+		// JualID
+		// ArticleID
 		// HargaJual
+		// Qty
+		// SatuanID
+		// SubTotal
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// MainGroupID
-		if ($this->MainGroupID->VirtualValue <> "") {
-			$this->MainGroupID->ViewValue = $this->MainGroupID->VirtualValue;
+		// JualID
+		$this->JualID->ViewValue = $this->JualID->CurrentValue;
+		$this->JualID->ViewCustomAttributes = "";
+
+		// ArticleID
+		if ($this->ArticleID->VirtualValue <> "") {
+			$this->ArticleID->ViewValue = $this->ArticleID->VirtualValue;
 		} else {
-		if (strval($this->MainGroupID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->MainGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t04_maingroup`";
+		if (strval($this->ArticleID->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->ArticleID->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t06_article`";
 		$sWhereWrk = "";
-		$this->MainGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
+		$this->ArticleID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->MainGroupID, $sWhereWrk); // Call Lookup Selecting
+		$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 			$rswrk = Conn()->Execute($sSqlWrk);
 			if ($rswrk && !$rswrk->EOF) { // Lookup values found
 				$arwrk = array();
 				$arwrk[1] = $rswrk->fields('DispFld');
 				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$this->MainGroupID->ViewValue = $this->MainGroupID->DisplayValue($arwrk);
+				$this->ArticleID->ViewValue = $this->ArticleID->DisplayValue($arwrk);
 				$rswrk->Close();
 			} else {
-				$this->MainGroupID->ViewValue = $this->MainGroupID->CurrentValue;
+				$this->ArticleID->ViewValue = $this->ArticleID->CurrentValue;
 			}
 		} else {
-			$this->MainGroupID->ViewValue = NULL;
+			$this->ArticleID->ViewValue = NULL;
 		}
 		}
-		$this->MainGroupID->ViewCustomAttributes = "";
+		$this->ArticleID->ViewCustomAttributes = "";
 
-		// SubGroupID
-		if ($this->SubGroupID->VirtualValue <> "") {
-			$this->SubGroupID->ViewValue = $this->SubGroupID->VirtualValue;
-		} else {
-		if (strval($this->SubGroupID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->SubGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t05_subgroup`";
-		$sWhereWrk = "";
-		$this->SubGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->SubGroupID, $sWhereWrk); // Call Lookup Selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$this->SubGroupID->ViewValue = $this->SubGroupID->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->SubGroupID->ViewValue = $this->SubGroupID->CurrentValue;
-			}
-		} else {
-			$this->SubGroupID->ViewValue = NULL;
-		}
-		}
-		$this->SubGroupID->ViewCustomAttributes = "";
+		// HargaJual
+		$this->HargaJual->ViewValue = $this->HargaJual->CurrentValue;
+		$this->HargaJual->ViewValue = ew_FormatNumber($this->HargaJual->ViewValue, 2, -2, -2, -2);
+		$this->HargaJual->CellCssStyle .= "text-align: right;";
+		$this->HargaJual->ViewCustomAttributes = "";
 
-		// Kode
-		$this->Kode->ViewValue = $this->Kode->CurrentValue;
-		$this->Kode->ViewCustomAttributes = "";
-
-		// Nama
-		$this->Nama->ViewValue = $this->Nama->CurrentValue;
-		$this->Nama->ViewCustomAttributes = "";
+		// Qty
+		$this->Qty->ViewValue = $this->Qty->CurrentValue;
+		$this->Qty->ViewValue = ew_FormatNumber($this->Qty->ViewValue, 2, -2, -2, -2);
+		$this->Qty->CellCssStyle .= "text-align: right;";
+		$this->Qty->ViewCustomAttributes = "";
 
 		// SatuanID
 		if ($this->SatuanID->VirtualValue <> "") {
 			$this->SatuanID->ViewValue = $this->SatuanID->VirtualValue;
 		} else {
+			$this->SatuanID->ViewValue = $this->SatuanID->CurrentValue;
 		if (strval($this->SatuanID->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->SatuanID->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_satuan`";
@@ -853,57 +867,46 @@ class ct06_article extends cTable {
 		}
 		$this->SatuanID->ViewCustomAttributes = "";
 
-		// Harga
-		$this->Harga->ViewValue = $this->Harga->CurrentValue;
-		$this->Harga->ViewValue = ew_FormatNumber($this->Harga->ViewValue, 2, -2, -2, -2);
-		$this->Harga->CellCssStyle .= "text-align: right;";
-		$this->Harga->ViewCustomAttributes = "";
-
-		// HargaJual
-		$this->HargaJual->ViewValue = $this->HargaJual->CurrentValue;
-		$this->HargaJual->ViewValue = ew_FormatNumber($this->HargaJual->ViewValue, 2, -2, -2, -2);
-		$this->HargaJual->CellCssStyle .= "text-align: right;";
-		$this->HargaJual->ViewCustomAttributes = "";
+		// SubTotal
+		$this->SubTotal->ViewValue = $this->SubTotal->CurrentValue;
+		$this->SubTotal->ViewValue = ew_FormatNumber($this->SubTotal->ViewValue, 2, -2, -2, -2);
+		$this->SubTotal->CellCssStyle .= "text-align: right;";
+		$this->SubTotal->ViewCustomAttributes = "";
 
 		// id
 		$this->id->LinkCustomAttributes = "";
 		$this->id->HrefValue = "";
 		$this->id->TooltipValue = "";
 
-		// MainGroupID
-		$this->MainGroupID->LinkCustomAttributes = "";
-		$this->MainGroupID->HrefValue = "";
-		$this->MainGroupID->TooltipValue = "";
+		// JualID
+		$this->JualID->LinkCustomAttributes = "";
+		$this->JualID->HrefValue = "";
+		$this->JualID->TooltipValue = "";
 
-		// SubGroupID
-		$this->SubGroupID->LinkCustomAttributes = "";
-		$this->SubGroupID->HrefValue = "";
-		$this->SubGroupID->TooltipValue = "";
+		// ArticleID
+		$this->ArticleID->LinkCustomAttributes = "";
+		$this->ArticleID->HrefValue = "";
+		$this->ArticleID->TooltipValue = "";
 
-		// Kode
-		$this->Kode->LinkCustomAttributes = "";
-		$this->Kode->HrefValue = "";
-		$this->Kode->TooltipValue = "";
+		// HargaJual
+		$this->HargaJual->LinkCustomAttributes = "";
+		$this->HargaJual->HrefValue = "";
+		$this->HargaJual->TooltipValue = "";
 
-		// Nama
-		$this->Nama->LinkCustomAttributes = "";
-		$this->Nama->HrefValue = "";
-		$this->Nama->TooltipValue = "";
+		// Qty
+		$this->Qty->LinkCustomAttributes = "";
+		$this->Qty->HrefValue = "";
+		$this->Qty->TooltipValue = "";
 
 		// SatuanID
 		$this->SatuanID->LinkCustomAttributes = "";
 		$this->SatuanID->HrefValue = "";
 		$this->SatuanID->TooltipValue = "";
 
-		// Harga
-		$this->Harga->LinkCustomAttributes = "";
-		$this->Harga->HrefValue = "";
-		$this->Harga->TooltipValue = "";
-
-		// HargaJual
-		$this->HargaJual->LinkCustomAttributes = "";
-		$this->HargaJual->HrefValue = "";
-		$this->HargaJual->TooltipValue = "";
+		// SubTotal
+		$this->SubTotal->LinkCustomAttributes = "";
+		$this->SubTotal->HrefValue = "";
+		$this->SubTotal->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -925,36 +928,21 @@ class ct06_article extends cTable {
 		$this->id->EditValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// MainGroupID
-		$this->MainGroupID->EditAttrs["class"] = "form-control";
-		$this->MainGroupID->EditCustomAttributes = "";
+		// JualID
+		$this->JualID->EditAttrs["class"] = "form-control";
+		$this->JualID->EditCustomAttributes = "";
+		if ($this->JualID->getSessionValue() <> "") {
+			$this->JualID->CurrentValue = $this->JualID->getSessionValue();
+		$this->JualID->ViewValue = $this->JualID->CurrentValue;
+		$this->JualID->ViewCustomAttributes = "";
+		} else {
+		$this->JualID->EditValue = $this->JualID->CurrentValue;
+		$this->JualID->PlaceHolder = ew_RemoveHtml($this->JualID->FldCaption());
+		}
 
-		// SubGroupID
-		$this->SubGroupID->EditAttrs["class"] = "form-control";
-		$this->SubGroupID->EditCustomAttributes = "";
-
-		// Kode
-		$this->Kode->EditAttrs["class"] = "form-control";
-		$this->Kode->EditCustomAttributes = "";
-		$this->Kode->EditValue = $this->Kode->CurrentValue;
-		$this->Kode->PlaceHolder = ew_RemoveHtml($this->Kode->FldCaption());
-
-		// Nama
-		$this->Nama->EditAttrs["class"] = "form-control";
-		$this->Nama->EditCustomAttributes = "";
-		$this->Nama->EditValue = $this->Nama->CurrentValue;
-		$this->Nama->PlaceHolder = ew_RemoveHtml($this->Nama->FldCaption());
-
-		// SatuanID
-		$this->SatuanID->EditAttrs["class"] = "form-control";
-		$this->SatuanID->EditCustomAttributes = "";
-
-		// Harga
-		$this->Harga->EditAttrs["class"] = "form-control";
-		$this->Harga->EditCustomAttributes = "";
-		$this->Harga->EditValue = $this->Harga->CurrentValue;
-		$this->Harga->PlaceHolder = ew_RemoveHtml($this->Harga->FldCaption());
-		if (strval($this->Harga->EditValue) <> "" && is_numeric($this->Harga->EditValue)) $this->Harga->EditValue = ew_FormatNumber($this->Harga->EditValue, -2, -2, -2, -2);
+		// ArticleID
+		$this->ArticleID->EditAttrs["class"] = "form-control";
+		$this->ArticleID->EditCustomAttributes = "";
 
 		// HargaJual
 		$this->HargaJual->EditAttrs["class"] = "form-control";
@@ -962,6 +950,26 @@ class ct06_article extends cTable {
 		$this->HargaJual->EditValue = $this->HargaJual->CurrentValue;
 		$this->HargaJual->PlaceHolder = ew_RemoveHtml($this->HargaJual->FldCaption());
 		if (strval($this->HargaJual->EditValue) <> "" && is_numeric($this->HargaJual->EditValue)) $this->HargaJual->EditValue = ew_FormatNumber($this->HargaJual->EditValue, -2, -2, -2, -2);
+
+		// Qty
+		$this->Qty->EditAttrs["class"] = "form-control";
+		$this->Qty->EditCustomAttributes = "";
+		$this->Qty->EditValue = $this->Qty->CurrentValue;
+		$this->Qty->PlaceHolder = ew_RemoveHtml($this->Qty->FldCaption());
+		if (strval($this->Qty->EditValue) <> "" && is_numeric($this->Qty->EditValue)) $this->Qty->EditValue = ew_FormatNumber($this->Qty->EditValue, -2, -2, -2, -2);
+
+		// SatuanID
+		$this->SatuanID->EditAttrs["class"] = "form-control";
+		$this->SatuanID->EditCustomAttributes = "";
+		$this->SatuanID->EditValue = $this->SatuanID->CurrentValue;
+		$this->SatuanID->PlaceHolder = ew_RemoveHtml($this->SatuanID->FldCaption());
+
+		// SubTotal
+		$this->SubTotal->EditAttrs["class"] = "form-control";
+		$this->SubTotal->EditCustomAttributes = "";
+		$this->SubTotal->EditValue = $this->SubTotal->CurrentValue;
+		$this->SubTotal->PlaceHolder = ew_RemoveHtml($this->SubTotal->FldCaption());
+		if (strval($this->SubTotal->EditValue) <> "" && is_numeric($this->SubTotal->EditValue)) $this->SubTotal->EditValue = ew_FormatNumber($this->SubTotal->EditValue, -2, -2, -2, -2);
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -990,22 +998,20 @@ class ct06_article extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
-					if ($this->MainGroupID->Exportable) $Doc->ExportCaption($this->MainGroupID);
-					if ($this->SubGroupID->Exportable) $Doc->ExportCaption($this->SubGroupID);
-					if ($this->Kode->Exportable) $Doc->ExportCaption($this->Kode);
-					if ($this->Nama->Exportable) $Doc->ExportCaption($this->Nama);
-					if ($this->SatuanID->Exportable) $Doc->ExportCaption($this->SatuanID);
-					if ($this->Harga->Exportable) $Doc->ExportCaption($this->Harga);
+					if ($this->JualID->Exportable) $Doc->ExportCaption($this->JualID);
+					if ($this->ArticleID->Exportable) $Doc->ExportCaption($this->ArticleID);
 					if ($this->HargaJual->Exportable) $Doc->ExportCaption($this->HargaJual);
+					if ($this->Qty->Exportable) $Doc->ExportCaption($this->Qty);
+					if ($this->SatuanID->Exportable) $Doc->ExportCaption($this->SatuanID);
+					if ($this->SubTotal->Exportable) $Doc->ExportCaption($this->SubTotal);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
-					if ($this->MainGroupID->Exportable) $Doc->ExportCaption($this->MainGroupID);
-					if ($this->SubGroupID->Exportable) $Doc->ExportCaption($this->SubGroupID);
-					if ($this->Kode->Exportable) $Doc->ExportCaption($this->Kode);
-					if ($this->Nama->Exportable) $Doc->ExportCaption($this->Nama);
-					if ($this->SatuanID->Exportable) $Doc->ExportCaption($this->SatuanID);
-					if ($this->Harga->Exportable) $Doc->ExportCaption($this->Harga);
+					if ($this->JualID->Exportable) $Doc->ExportCaption($this->JualID);
+					if ($this->ArticleID->Exportable) $Doc->ExportCaption($this->ArticleID);
 					if ($this->HargaJual->Exportable) $Doc->ExportCaption($this->HargaJual);
+					if ($this->Qty->Exportable) $Doc->ExportCaption($this->Qty);
+					if ($this->SatuanID->Exportable) $Doc->ExportCaption($this->SatuanID);
+					if ($this->SubTotal->Exportable) $Doc->ExportCaption($this->SubTotal);
 				}
 				$Doc->EndExportRow();
 			}
@@ -1037,22 +1043,20 @@ class ct06_article extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
-						if ($this->MainGroupID->Exportable) $Doc->ExportField($this->MainGroupID);
-						if ($this->SubGroupID->Exportable) $Doc->ExportField($this->SubGroupID);
-						if ($this->Kode->Exportable) $Doc->ExportField($this->Kode);
-						if ($this->Nama->Exportable) $Doc->ExportField($this->Nama);
-						if ($this->SatuanID->Exportable) $Doc->ExportField($this->SatuanID);
-						if ($this->Harga->Exportable) $Doc->ExportField($this->Harga);
+						if ($this->JualID->Exportable) $Doc->ExportField($this->JualID);
+						if ($this->ArticleID->Exportable) $Doc->ExportField($this->ArticleID);
 						if ($this->HargaJual->Exportable) $Doc->ExportField($this->HargaJual);
+						if ($this->Qty->Exportable) $Doc->ExportField($this->Qty);
+						if ($this->SatuanID->Exportable) $Doc->ExportField($this->SatuanID);
+						if ($this->SubTotal->Exportable) $Doc->ExportField($this->SubTotal);
 					} else {
 						if ($this->id->Exportable) $Doc->ExportField($this->id);
-						if ($this->MainGroupID->Exportable) $Doc->ExportField($this->MainGroupID);
-						if ($this->SubGroupID->Exportable) $Doc->ExportField($this->SubGroupID);
-						if ($this->Kode->Exportable) $Doc->ExportField($this->Kode);
-						if ($this->Nama->Exportable) $Doc->ExportField($this->Nama);
-						if ($this->SatuanID->Exportable) $Doc->ExportField($this->SatuanID);
-						if ($this->Harga->Exportable) $Doc->ExportField($this->Harga);
+						if ($this->JualID->Exportable) $Doc->ExportField($this->JualID);
+						if ($this->ArticleID->Exportable) $Doc->ExportField($this->ArticleID);
 						if ($this->HargaJual->Exportable) $Doc->ExportField($this->HargaJual);
+						if ($this->Qty->Exportable) $Doc->ExportField($this->Qty);
+						if ($this->SatuanID->Exportable) $Doc->ExportField($this->SatuanID);
+						if ($this->SubTotal->Exportable) $Doc->ExportField($this->SubTotal);
 					}
 					$Doc->EndExportRow($RowCnt);
 				}
@@ -1072,6 +1076,29 @@ class ct06_article extends cTable {
 	function GetAutoFill($id, $val) {
 		$rsarr = array();
 		$rowcnt = 0;
+		if (preg_match('/^x(\d)*_ArticleID$/', $id)) {
+			$conn = &$this->Connection();
+			$sSqlWrk = "SELECT `HargaJual` AS FIELD0, `SatuanID` AS FIELD1 FROM `t06_article`";
+			$sWhereWrk = "(`id` = " . ew_QuotedValue($val, EW_DATATYPE_NUMBER, $this->DBID) . ")";
+			$this->ArticleID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
+			$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($rs = ew_LoadRecordset($sSqlWrk, $conn)) {
+				while ($rs && !$rs->EOF) {
+					$ar = array();
+					$this->HargaJual->setDbValue($rs->fields[0]);
+					$this->SatuanID->setDbValue($rs->fields[1]);
+					$this->RowType == EW_ROWTYPE_EDIT;
+					$this->RenderEditRow();
+					$ar[] = ($this->HargaJual->AutoFillOriginalValue) ? $this->HargaJual->CurrentValue : $this->HargaJual->EditValue;
+					$ar[] = ($this->SatuanID->AutoFillOriginalValue) ? $this->SatuanID->CurrentValue : $this->SatuanID->EditValue;
+					$rowcnt += 1;
+					$rsarr[] = $ar;
+					$rs->MoveNext();
+				}
+				$rs->Close();
+			}
+		}
 
 		// Output
 		if (is_array($rsarr) && $rowcnt > 0) {
@@ -1096,7 +1123,7 @@ class ct06_article extends cTable {
 
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
-		$table = 't06_article';
+		$table = 't12_jualdetail';
 		$usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
@@ -1105,7 +1132,7 @@ class ct06_article extends cTable {
 	function WriteAuditTrailOnAdd(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnAdd) return;
-		$table = 't06_article';
+		$table = 't12_jualdetail';
 
 		// Get key value
 		$key = "";
@@ -1139,7 +1166,7 @@ class ct06_article extends cTable {
 	function WriteAuditTrailOnEdit(&$rsold, &$rsnew) {
 		global $Language;
 		if (!$this->AuditTrailOnEdit) return;
-		$table = 't06_article';
+		$table = 't12_jualdetail';
 
 		// Get key value
 		$key = "";
@@ -1186,7 +1213,7 @@ class ct06_article extends cTable {
 	function WriteAuditTrailOnDelete(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnDelete) return;
-		$table = 't06_article';
+		$table = 't12_jualdetail';
 
 		// Get key value
 		$key = "";
@@ -1366,9 +1393,7 @@ class ct06_article extends cTable {
 
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
-		// Kode set readonly
 
-		$this->Kode->ReadOnly = true;
 	}
 
 	// User ID Filtering event
