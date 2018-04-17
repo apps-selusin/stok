@@ -1316,7 +1316,7 @@ class ct08_beli extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"
-		// setup no hutang baru
+		// setup nomor hutang baru
 
 		$NoHutang = f_GetNextNoHutang();
 

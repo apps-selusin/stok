@@ -2554,20 +2554,12 @@ class ct10_hutangdetail_list extends ct10_hutangdetail {
 	function Page_Render() {
 
 		//echo "Page Render";
-		//var_dump($this->getCurrentMasterTable());
-		//var_dump($this);
-		//echo $this->HutangID->CurrentValue;
-		//var_dump($this->HutangID);
-		//echo Page("t09_hutang")->id->CurrentValue;
-		//if (isset($_GET["fk_id"])) {
-		//if (f_GetSisaHutang($_GET["fk_id"]) == 0) {
+		//var_dump(Page("t09_hutang"));
 
 		if (f_GetSisaHutang(Page("t09_hutang")->id->CurrentValue) == 0) {
 			$this->OtherOptions["addedit"] = new cListOptions();
 			$this->OtherOptions["addedit"]->Body = "";
 		}
-
-		//}
 	}
 
 	// Page Data Rendering event

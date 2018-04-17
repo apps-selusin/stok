@@ -1,33 +1,29 @@
 <?php
 
 // Global variable for table object
-$r01_beli = NULL;
+$r03_hutang = NULL;
 
 //
-// Table class for r01_beli
+// Table class for r03_hutang
 //
-class crr01_beli extends crTableBase {
+class crr03_hutang extends crTableBase {
 	var $ShowGroupHeaderAsRow = FALSE;
 	var $ShowCompactSummaryFooter = TRUE;
-	var $id;
-	var $TglPO;
-	var $NoPO;
-	var $VendorID;
-	var $VendorNama;
-	var $ArticleID;
-	var $ArticleNama;
-	var $Harga;
-	var $Qty;
-	var $SatuanNama;
-	var $SubTotal;
+	var $nohutang;
+	var $tglpo;
+	var $nopo;
+	var $nama;
+	var $jumlahhutang;
+	var $jumlahbayar;
+	var $sisahutang;
 
 	//
 	// Table class constructor
 	//
 	function __construct() {
 		global $ReportLanguage, $grLanguage;
-		$this->TableVar = 'r01_beli';
-		$this->TableName = 'r01_beli';
+		$this->TableVar = 'r03_hutang';
+		$this->TableName = 'r03_hutang';
 		$this->TableType = 'REPORT';
 		$this->TableReportType = 'summary';
 		$this->SourcTableIsCustomView = FALSE;
@@ -35,109 +31,65 @@ class crr01_beli extends crTableBase {
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0;
 
-		// id
-		$this->id = new crField('r01_beli', 'r01_beli', 'x_id', 'id', '`id`', 3, EWR_DATATYPE_NUMBER, -1);
-		$this->id->Sortable = TRUE; // Allow sort
-		$this->id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
-		$this->id->DateFilter = "";
-		$this->id->SqlSelect = "";
-		$this->id->SqlOrderBy = "";
-		$this->fields['id'] = &$this->id;
+		// nohutang
+		$this->nohutang = new crField('r03_hutang', 'r03_hutang', 'x_nohutang', 'nohutang', '`nohutang`', 200, EWR_DATATYPE_STRING, -1);
+		$this->nohutang->Sortable = TRUE; // Allow sort
+		$this->nohutang->DateFilter = "";
+		$this->nohutang->SqlSelect = "";
+		$this->nohutang->SqlOrderBy = "";
+		$this->fields['nohutang'] = &$this->nohutang;
 
-		// TglPO
-		$this->TglPO = new crField('r01_beli', 'r01_beli', 'x_TglPO', 'TglPO', '`TglPO`', 133, EWR_DATATYPE_DATE, 7);
-		$this->TglPO->Sortable = TRUE; // Allow sort
-		$this->TglPO->GroupingFieldId = 1;
-		$this->TglPO->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
-		$this->TglPO->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
-		$this->TglPO->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_SEPARATOR"], $ReportLanguage->Phrase("IncorrectDateDMY"));
-		$this->TglPO->DateFilter = "";
-		$this->TglPO->SqlSelect = "";
-		$this->TglPO->SqlOrderBy = "";
-		$this->TglPO->FldGroupByType = "";
-		$this->TglPO->FldGroupInt = "0";
-		$this->TglPO->FldGroupSql = "";
-		$this->fields['TglPO'] = &$this->TglPO;
+		// tglpo
+		$this->tglpo = new crField('r03_hutang', 'r03_hutang', 'x_tglpo', 'tglpo', '`tglpo`', 133, EWR_DATATYPE_DATE, 7);
+		$this->tglpo->Sortable = TRUE; // Allow sort
+		$this->tglpo->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_SEPARATOR"], $ReportLanguage->Phrase("IncorrectDateDMY"));
+		$this->tglpo->DateFilter = "";
+		$this->tglpo->SqlSelect = "";
+		$this->tglpo->SqlOrderBy = "";
+		$this->fields['tglpo'] = &$this->tglpo;
 
-		// NoPO
-		$this->NoPO = new crField('r01_beli', 'r01_beli', 'x_NoPO', 'NoPO', '`NoPO`', 200, EWR_DATATYPE_STRING, -1);
-		$this->NoPO->Sortable = TRUE; // Allow sort
-		$this->NoPO->DateFilter = "";
-		$this->NoPO->SqlSelect = "";
-		$this->NoPO->SqlOrderBy = "";
-		$this->fields['NoPO'] = &$this->NoPO;
+		// nopo
+		$this->nopo = new crField('r03_hutang', 'r03_hutang', 'x_nopo', 'nopo', '`nopo`', 200, EWR_DATATYPE_STRING, -1);
+		$this->nopo->Sortable = TRUE; // Allow sort
+		$this->nopo->DateFilter = "";
+		$this->nopo->SqlSelect = "";
+		$this->nopo->SqlOrderBy = "";
+		$this->fields['nopo'] = &$this->nopo;
 
-		// VendorID
-		$this->VendorID = new crField('r01_beli', 'r01_beli', 'x_VendorID', 'VendorID', '`VendorID`', 3, EWR_DATATYPE_NUMBER, -1);
-		$this->VendorID->Sortable = TRUE; // Allow sort
-		$this->VendorID->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
-		$this->VendorID->DateFilter = "";
-		$this->VendorID->SqlSelect = "";
-		$this->VendorID->SqlOrderBy = "";
-		$this->fields['VendorID'] = &$this->VendorID;
+		// nama
+		$this->nama = new crField('r03_hutang', 'r03_hutang', 'x_nama', 'nama', '`nama`', 200, EWR_DATATYPE_STRING, -1);
+		$this->nama->Sortable = TRUE; // Allow sort
+		$this->nama->DateFilter = "";
+		$this->nama->SqlSelect = "";
+		$this->nama->SqlOrderBy = "";
+		$this->fields['nama'] = &$this->nama;
 
-		// VendorNama
-		$this->VendorNama = new crField('r01_beli', 'r01_beli', 'x_VendorNama', 'VendorNama', '(select nama from t02_vendor where id = vendorid)', 200, EWR_DATATYPE_STRING, -1);
-		$this->VendorNama->FldIsCustom = TRUE; // Custom field
-		$this->VendorNama->Sortable = TRUE; // Allow sort
-		$this->VendorNama->DateFilter = "";
-		$this->VendorNama->SqlSelect = "";
-		$this->VendorNama->SqlOrderBy = "";
-		$this->fields['VendorNama'] = &$this->VendorNama;
+		// jumlahhutang
+		$this->jumlahhutang = new crField('r03_hutang', 'r03_hutang', 'x_jumlahhutang', 'jumlahhutang', '`jumlahhutang`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->jumlahhutang->Sortable = TRUE; // Allow sort
+		$this->jumlahhutang->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
+		$this->jumlahhutang->DateFilter = "";
+		$this->jumlahhutang->SqlSelect = "";
+		$this->jumlahhutang->SqlOrderBy = "";
+		$this->fields['jumlahhutang'] = &$this->jumlahhutang;
 
-		// ArticleID
-		$this->ArticleID = new crField('r01_beli', 'r01_beli', 'x_ArticleID', 'ArticleID', '`ArticleID`', 3, EWR_DATATYPE_NUMBER, -1);
-		$this->ArticleID->Sortable = TRUE; // Allow sort
-		$this->ArticleID->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
-		$this->ArticleID->DateFilter = "";
-		$this->ArticleID->SqlSelect = "";
-		$this->ArticleID->SqlOrderBy = "";
-		$this->fields['ArticleID'] = &$this->ArticleID;
+		// jumlahbayar
+		$this->jumlahbayar = new crField('r03_hutang', 'r03_hutang', 'x_jumlahbayar', 'jumlahbayar', '`jumlahbayar`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->jumlahbayar->Sortable = TRUE; // Allow sort
+		$this->jumlahbayar->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
+		$this->jumlahbayar->DateFilter = "";
+		$this->jumlahbayar->SqlSelect = "";
+		$this->jumlahbayar->SqlOrderBy = "";
+		$this->fields['jumlahbayar'] = &$this->jumlahbayar;
 
-		// ArticleNama
-		$this->ArticleNama = new crField('r01_beli', 'r01_beli', 'x_ArticleNama', 'ArticleNama', '(select concat(kode, \' - \', nama) from t06_article where id = articleid)', 200, EWR_DATATYPE_STRING, -1);
-		$this->ArticleNama->FldIsCustom = TRUE; // Custom field
-		$this->ArticleNama->Sortable = TRUE; // Allow sort
-		$this->ArticleNama->DateFilter = "";
-		$this->ArticleNama->SqlSelect = "";
-		$this->ArticleNama->SqlOrderBy = "";
-		$this->fields['ArticleNama'] = &$this->ArticleNama;
-
-		// Harga
-		$this->Harga = new crField('r01_beli', 'r01_beli', 'x_Harga', 'Harga', '`Harga`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->Harga->Sortable = TRUE; // Allow sort
-		$this->Harga->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
-		$this->Harga->DateFilter = "";
-		$this->Harga->SqlSelect = "";
-		$this->Harga->SqlOrderBy = "";
-		$this->fields['Harga'] = &$this->Harga;
-
-		// Qty
-		$this->Qty = new crField('r01_beli', 'r01_beli', 'x_Qty', 'Qty', '`Qty`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->Qty->Sortable = TRUE; // Allow sort
-		$this->Qty->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
-		$this->Qty->DateFilter = "";
-		$this->Qty->SqlSelect = "";
-		$this->Qty->SqlOrderBy = "";
-		$this->fields['Qty'] = &$this->Qty;
-
-		// SatuanNama
-		$this->SatuanNama = new crField('r01_beli', 'r01_beli', 'x_SatuanNama', 'SatuanNama', '(SELECT b.nama FROM t06_article a, t07_satuan b where articleid = a.id and a.satuanid = b.id)', 200, EWR_DATATYPE_STRING, -1);
-		$this->SatuanNama->FldIsCustom = TRUE; // Custom field
-		$this->SatuanNama->Sortable = TRUE; // Allow sort
-		$this->SatuanNama->DateFilter = "";
-		$this->SatuanNama->SqlSelect = "";
-		$this->SatuanNama->SqlOrderBy = "";
-		$this->fields['SatuanNama'] = &$this->SatuanNama;
-
-		// SubTotal
-		$this->SubTotal = new crField('r01_beli', 'r01_beli', 'x_SubTotal', 'SubTotal', '`SubTotal`', 4, EWR_DATATYPE_NUMBER, -1);
-		$this->SubTotal->Sortable = TRUE; // Allow sort
-		$this->SubTotal->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
-		$this->SubTotal->DateFilter = "";
-		$this->SubTotal->SqlSelect = "";
-		$this->SubTotal->SqlOrderBy = "";
-		$this->fields['SubTotal'] = &$this->SubTotal;
+		// sisahutang
+		$this->sisahutang = new crField('r03_hutang', 'r03_hutang', 'x_sisahutang', 'sisahutang', '`sisahutang`', 5, EWR_DATATYPE_NUMBER, -1);
+		$this->sisahutang->Sortable = TRUE; // Allow sort
+		$this->sisahutang->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
+		$this->sisahutang->DateFilter = "";
+		$this->sisahutang->SqlSelect = "";
+		$this->sisahutang->SqlOrderBy = "";
+		$this->fields['sisahutang'] = &$this->sisahutang;
 	}
 
 	// Set Field Visibility
@@ -209,7 +161,7 @@ class crr01_beli extends crTableBase {
 	var $_SqlFrom = "";
 
 	function getSqlFrom() {
-		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t08_beli`";
+		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`v03_hutang`";
 	}
 
 	function SqlFrom() { // For backward compatibility
@@ -224,7 +176,7 @@ class crr01_beli extends crTableBase {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() {
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (select nama from t02_vendor where id = vendorid) AS `VendorNama`, (select concat(kode, ' - ', nama) from t06_article where id = articleid) AS `ArticleNama`, (SELECT b.nama FROM t06_article a, t07_satuan b where articleid = a.id and a.satuanid = b.id) AS `SatuanNama` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT * FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -285,7 +237,7 @@ class crr01_beli extends crTableBase {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() {
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`TglPO` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -302,7 +254,7 @@ class crr01_beli extends crTableBase {
 	var $_SqlFirstGroupField = "";
 
 	function getSqlFirstGroupField() {
-		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`TglPO`";
+		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "";
 	}
 
 	function SqlFirstGroupField() { // For backward compatibility
@@ -332,7 +284,7 @@ class crr01_beli extends crTableBase {
 	var $_SqlOrderByGroup = "";
 
 	function getSqlOrderByGroup() {
-		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`TglPO` ASC";
+		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "";
 	}
 
 	function SqlOrderByGroup() { // For backward compatibility
@@ -347,7 +299,7 @@ class crr01_beli extends crTableBase {
 	var $_SqlSelectAgg = "";
 
 	function getSqlSelectAgg() {
-		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT SUM(`SubTotal`) AS `sum_subtotal` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT SUM(`jumlahhutang`) AS `sum_jumlahhutang`, SUM(`jumlahbayar`) AS `sum_jumlahbayar`, SUM(`sisahutang`) AS `sum_sisahutang` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelectAgg() { // For backward compatibility
@@ -423,24 +375,13 @@ class crr01_beli extends crTableBase {
 	function SetupLookupFilters($fld) {
 		global $grLanguage;
 		switch ($fld->FldVar) {
-		case "x_VendorNama":
-			$fld->LookupFilters = array("d" => "DB", "f0" => '(select nama from t02_vendor where id = vendorid) = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter), "af" => json_encode($fld->AdvancedFilters));
+		case "x_nama":
+			$fld->LookupFilters = array("d" => "DB", "f0" => '`nama` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter), "af" => json_encode($fld->AdvancedFilters));
 		$sWhereWrk = "";
 		$fld->LookupFilters += array(
-			"select" => "SELECT DISTINCT (select nama from t02_vendor where id = vendorid), (select nama from t02_vendor where id = vendorid) AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `t08_beli`",
+			"select" => "SELECT DISTINCT `nama`, `nama` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v03_hutang`",
 			"where" => $sWhereWrk,
-			"orderby" => "(select nama from t02_vendor where id = vendorid) ASC"
-		);
-		$this->Lookup_Selecting($fld, $fld->LookupFilters["where"]); // Call Lookup selecting
-		$fld->LookupFilters["s"] = ewr_BuildReportSql($fld->LookupFilters["select"], $fld->LookupFilters["where"], "", "", $fld->LookupFilters["orderby"], "", "");
-			break;
-		case "x_ArticleNama":
-			$fld->LookupFilters = array("d" => "DB", "f0" => '(select concat(kode, \' - \', nama) from t06_article where id = articleid) = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter), "af" => json_encode($fld->AdvancedFilters));
-		$sWhereWrk = "";
-		$fld->LookupFilters += array(
-			"select" => "SELECT DISTINCT (select concat(kode, ' - ', nama) from t06_article where id = articleid), (select concat(kode, ' - ', nama) from t06_article where id = articleid) AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `t08_beli`",
-			"where" => $sWhereWrk,
-			"orderby" => "(select concat(kode, ' - ', nama) from t06_article where id = articleid) ASC"
+			"orderby" => "`nama` ASC"
 		);
 		$this->Lookup_Selecting($fld, $fld->LookupFilters["where"]); // Call Lookup selecting
 		$fld->LookupFilters["s"] = ewr_BuildReportSql($fld->LookupFilters["select"], $fld->LookupFilters["where"], "", "", $fld->LookupFilters["orderby"], "", "");

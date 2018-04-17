@@ -618,9 +618,6 @@
   <project>
     <phrase id="bodytitle" value="STOK Apps." />
     <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
-    <menu id="10020">
-      <phrase id="menutext" value="v 01 beli" />
-    </menu>
     <menu id="1">
       <phrase id="menutext" value="Home" />
     </menu>
@@ -630,12 +627,6 @@
     <menu id="10021">
       <phrase id="menutext" value="Hutang" />
     </menu>
-    <menu id="10022">
-      <phrase id="menutext" value="Hutang Detail" />
-    </menu>
-    <menu id="10019">
-      <phrase id="menutext" value="v 02 stok" />
-    </menu>
     <menu id="10013">
       <phrase id="menutext" value="Laporan" />
     </menu>
@@ -644,6 +635,9 @@
     </menu>
     <menu id="10014">
       <phrase id="menutext" value="Pembelian" />
+    </menu>
+    <menu id="10020">
+      <phrase id="menutext" value="Hutang" />
     </menu>
     <menu id="6">
       <phrase id="menutext" value="Setup" />
@@ -684,7 +678,16 @@
     <menu id="5">
       <phrase id="menutext" value="Activity Log" />
     </menu>
+    <menu id="10022">
+      <phrase id="menutext" value="Hutang Detail" />
+    </menu>
     <menu id="10018">
+      <phrase id="menutext" value="t 10 hutangdetail" />
+    </menu>
+    <menu id="10019">
+      <phrase id="menutext" value="Hutang" />
+    </menu>
+    <menu id="10023">
       <phrase id="menutext" value="v 01 beli" />
     </menu>
     <menu id="10015">
