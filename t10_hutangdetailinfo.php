@@ -1049,7 +1049,6 @@ class ct10_hutangdetail extends cTable {
 	function Recordset_Selected(&$rs) {
 
 		//echo "Recordset Selected";
-		var_dump($rs);
 	}
 
 	// Recordset Search Validated event

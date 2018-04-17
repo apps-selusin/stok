@@ -72,4 +72,11 @@ function f_GetNextNoBayar() {
 	}
 	return $m_NextNo;
 }
+
+function f_GetSisaHutang($mparam1) {
+	$mSisa = 0;
+	$q = "select jumlahhutang - jumlahbayar from t09_hutang where id = ".$mparam1."";
+	$mSisa = ew_ExecuteScalar($q);
+	return $mSisa;
+}
 ?>

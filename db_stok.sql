@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 17, 2018 at 02:39 AM
+-- Generation Time: Apr 17, 2018 at 11:14 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -195,14 +195,15 @@ CREATE TABLE IF NOT EXISTS `t08_beli` (
   `Qty` float(15,2) NOT NULL DEFAULT '0.00',
   `SubTotal` float(15,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `t08_beli`
 --
 
 INSERT INTO `t08_beli` (`id`, `TglPO`, `NoPO`, `VendorID`, `ArticleID`, `Harga`, `Qty`, `SubTotal`) VALUES
-(1, '2018-04-16', 'PO201804160001', 1, 1, 100000.00, 2.10, 210000.00);
+(1, '2018-04-16', 'PO201804160001', 1, 1, 100000.00, 2.10, 210000.00),
+(2, '2018-04-17', 'PO201804170002', 2, 1, 125000.00, 3.20, 400000.00);
 
 -- --------------------------------------------------------
 
@@ -217,14 +218,15 @@ CREATE TABLE IF NOT EXISTS `t09_hutang` (
   `JumlahHutang` float(15,2) NOT NULL DEFAULT '0.00',
   `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `t09_hutang`
 --
 
 INSERT INTO `t09_hutang` (`id`, `NoHutang`, `BeliID`, `JumlahHutang`, `JumlahBayar`) VALUES
-(1, 'HT000001', 1, 210000.00, 150000.00);
+(1, 'HT000001', 1, 210000.00, 210000.00),
+(2, 'HT000002', 2, 400000.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -239,7 +241,7 @@ CREATE TABLE IF NOT EXISTS `t10_hutangdetail` (
   `Tgl` date NOT NULL,
   `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=20 ;
 
 --
 -- Dumping data for table `t10_hutangdetail`
@@ -248,7 +250,8 @@ CREATE TABLE IF NOT EXISTS `t10_hutangdetail` (
 INSERT INTO `t10_hutangdetail` (`id`, `HutangID`, `NoBayar`, `Tgl`, `JumlahBayar`) VALUES
 (2, 1, 'HD000002', '2018-04-16', 60000.00),
 (3, 1, 'HD000003', '2018-04-16', 75000.00),
-(4, 1, 'HD000004', '2018-04-16', 15000.00);
+(17, 1, 'HD000005', '2018-04-17', 25000.00),
+(19, 1, 'HD000006', '2018-04-17', 50000.00);
 
 -- --------------------------------------------------------
 
@@ -368,7 +371,7 @@ CREATE TABLE IF NOT EXISTS `t99_audittrail` (
   `oldvalue` longtext CHARACTER SET latin1,
   `newvalue` longtext CHARACTER SET latin1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=259 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=437 ;
 
 --
 -- Dumping data for table `t99_audittrail`
@@ -630,7 +633,185 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (255, '2018-04-16 10:08:07', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '4', '', '15000'),
 (256, '2018-04-16 10:08:07', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '4', '', '1'),
 (257, '2018-04-16 10:08:07', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '4', '', '4'),
-(258, '2018-04-16 18:20:10', '/stok/login.php', 'admin', 'login', '::1', '', '', '', '');
+(258, '2018-04-17 13:57:34', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(259, '2018-04-17 15:03:24', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '5', '', 'HD000005'),
+(260, '2018-04-17 15:03:24', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '5', '', '2018-04-17'),
+(261, '2018-04-17 15:03:24', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '5', '', '25000'),
+(262, '2018-04-17 15:03:24', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '5', '', '1'),
+(263, '2018-04-17 15:03:24', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '5', '', '5'),
+(264, '2018-04-17 15:04:04', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '6', '', 'HD000006'),
+(265, '2018-04-17 15:04:04', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '6', '', '2018-04-17'),
+(266, '2018-04-17 15:04:04', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '6', '', '35000'),
+(267, '2018-04-17 15:04:04', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '6', '', '1'),
+(268, '2018-04-17 15:04:04', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '6', '', '6'),
+(269, '2018-04-17 15:04:36', '/stok/t10_hutangdetaillist.php', '1', 'U', 't10_hutangdetail', 'JumlahBayar', '6', '35000.00', '30000'),
+(270, '2018-04-17 15:06:06', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '7', '', 'HD000007'),
+(271, '2018-04-17 15:06:06', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '7', '', '2018-04-17'),
+(272, '2018-04-17 15:06:06', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '7', '', '5000'),
+(273, '2018-04-17 15:06:06', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '7', '', '1'),
+(274, '2018-04-17 15:06:06', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '7', '', '7'),
+(275, '2018-04-17 15:08:25', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete begin ***', 't10_hutangdetail', '', '', '', ''),
+(276, '2018-04-17 15:08:25', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '7', '7', ''),
+(277, '2018-04-17 15:08:25', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '7', '1', ''),
+(278, '2018-04-17 15:08:25', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '7', 'HD000007', ''),
+(279, '2018-04-17 15:08:25', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '7', '2018-04-17', ''),
+(280, '2018-04-17 15:08:25', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '7', '5000.00', ''),
+(281, '2018-04-17 15:08:25', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete successful ***', 't10_hutangdetail', '', '', '', ''),
+(282, '2018-04-17 15:08:42', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '8', '', 'HD000007'),
+(283, '2018-04-17 15:08:42', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '8', '', '2018-04-17'),
+(284, '2018-04-17 15:08:42', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '8', '', '5000'),
+(285, '2018-04-17 15:08:42', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '8', '', '1'),
+(286, '2018-04-17 15:08:42', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '8', '', '8'),
+(287, '2018-04-17 15:14:48', '/stok/t10_hutangdetaillist.php', '1', 'U', 't10_hutangdetail', 'JumlahBayar', '8', '5000.00', '4000'),
+(288, '2018-04-17 15:15:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '9', '', 'HD000008'),
+(289, '2018-04-17 15:15:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '9', '', '2018-04-17'),
+(290, '2018-04-17 15:15:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '9', '', '1000'),
+(291, '2018-04-17 15:15:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '9', '', '1'),
+(292, '2018-04-17 15:15:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '9', '', '9'),
+(293, '2018-04-17 15:18:02', '/stok/t10_hutangdetaillist.php', '1', 'U', 't10_hutangdetail', 'JumlahBayar', '8', '4000.00', '2500'),
+(294, '2018-04-17 15:18:12', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '10', '', 'HD000009'),
+(295, '2018-04-17 15:18:12', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '10', '', '2018-04-17'),
+(296, '2018-04-17 15:18:12', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '10', '', '1500'),
+(297, '2018-04-17 15:18:12', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '10', '', '1'),
+(298, '2018-04-17 15:18:12', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '10', '', '10'),
+(299, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete begin ***', 't10_hutangdetail', '', '', '', ''),
+(300, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '5', '5', ''),
+(301, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '5', '1', ''),
+(302, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '5', 'HD000005', ''),
+(303, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '5', '2018-04-17', ''),
+(304, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '5', '25000.00', ''),
+(305, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '6', '6', ''),
+(306, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '6', '1', ''),
+(307, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '6', 'HD000006', ''),
+(308, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '6', '2018-04-17', ''),
+(309, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '6', '30000.00', ''),
+(310, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '8', '8', ''),
+(311, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '8', '1', ''),
+(312, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '8', 'HD000007', ''),
+(313, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '8', '2018-04-17', ''),
+(314, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '8', '2500.00', ''),
+(315, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '9', '9', ''),
+(316, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '9', '1', ''),
+(317, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '9', 'HD000008', ''),
+(318, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '9', '2018-04-17', ''),
+(319, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '9', '1000.00', ''),
+(320, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '10', '10', ''),
+(321, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '10', '1', ''),
+(322, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '10', 'HD000009', ''),
+(323, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '10', '2018-04-17', ''),
+(324, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '10', '1500.00', ''),
+(325, '2018-04-17 15:18:50', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete successful ***', 't10_hutangdetail', '', '', '', ''),
+(326, '2018-04-17 15:20:11', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '11', '', 'HD000005'),
+(327, '2018-04-17 15:20:11', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '11', '', '2018-04-17'),
+(328, '2018-04-17 15:20:11', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '11', '', '60000'),
+(329, '2018-04-17 15:20:11', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '11', '', '1'),
+(330, '2018-04-17 15:20:11', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '11', '', '11'),
+(331, '2018-04-17 15:20:36', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete begin ***', 't10_hutangdetail', '', '', '', ''),
+(332, '2018-04-17 15:20:36', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '11', '11', ''),
+(333, '2018-04-17 15:20:36', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '11', '1', ''),
+(334, '2018-04-17 15:20:36', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '11', 'HD000005', ''),
+(335, '2018-04-17 15:20:36', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '11', '2018-04-17', ''),
+(336, '2018-04-17 15:20:36', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '11', '60000.00', ''),
+(337, '2018-04-17 15:20:36', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete successful ***', 't10_hutangdetail', '', '', '', ''),
+(338, '2018-04-17 15:21:18', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '12', '', 'HD000005'),
+(339, '2018-04-17 15:21:18', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '12', '', '2018-04-17'),
+(340, '2018-04-17 15:21:18', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '12', '', '60000'),
+(341, '2018-04-17 15:21:18', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '12', '', '1'),
+(342, '2018-04-17 15:21:18', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '12', '', '12'),
+(343, '2018-04-17 15:21:29', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete begin ***', 't10_hutangdetail', '', '', '', ''),
+(344, '2018-04-17 15:21:29', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '4', '4', ''),
+(345, '2018-04-17 15:21:29', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '4', '1', ''),
+(346, '2018-04-17 15:21:29', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '4', 'HD000004', ''),
+(347, '2018-04-17 15:21:29', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '4', '2018-04-16', ''),
+(348, '2018-04-17 15:21:29', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '4', '15000.00', ''),
+(349, '2018-04-17 15:21:29', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete successful ***', 't10_hutangdetail', '', '', '', ''),
+(350, '2018-04-17 15:21:45', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete begin ***', 't10_hutangdetail', '', '', '', ''),
+(351, '2018-04-17 15:21:45', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '12', '12', ''),
+(352, '2018-04-17 15:21:45', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '12', '1', ''),
+(353, '2018-04-17 15:21:45', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '12', 'HD000005', ''),
+(354, '2018-04-17 15:21:45', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '12', '2018-04-17', ''),
+(355, '2018-04-17 15:21:45', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '12', '60000.00', ''),
+(356, '2018-04-17 15:21:45', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete successful ***', 't10_hutangdetail', '', '', '', ''),
+(357, '2018-04-17 15:30:10', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '2', '', '2018-04-17'),
+(358, '2018-04-17 15:30:10', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '2', '', 'PO201804170002'),
+(359, '2018-04-17 15:30:10', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '2', '', '2'),
+(360, '2018-04-17 15:30:10', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '2', '', '1'),
+(361, '2018-04-17 15:30:10', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '2', '', '125000'),
+(362, '2018-04-17 15:30:10', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '2', '', '3.2'),
+(363, '2018-04-17 15:30:10', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '2', '', '1'),
+(364, '2018-04-17 15:30:10', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '2', '', '400000'),
+(365, '2018-04-17 15:30:10', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '2', '', '2'),
+(366, '2018-04-17 15:54:16', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '13', '', 'HD000004'),
+(367, '2018-04-17 15:54:16', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '13', '', '2018-04-17'),
+(368, '2018-04-17 15:54:16', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '13', '', '75000'),
+(369, '2018-04-17 15:54:16', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '13', '', '1'),
+(370, '2018-04-17 15:54:16', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '13', '', '13'),
+(371, '2018-04-17 15:54:32', '/stok/t10_hutangdetaillist.php', '1', 'U', 't10_hutangdetail', 'JumlahBayar', '13', '75000.00', '65000'),
+(372, '2018-04-17 15:54:55', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete begin ***', 't10_hutangdetail', '', '', '', ''),
+(373, '2018-04-17 15:54:55', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '13', '13', ''),
+(374, '2018-04-17 15:54:55', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '13', '1', ''),
+(375, '2018-04-17 15:54:55', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '13', 'HD000004', ''),
+(376, '2018-04-17 15:54:55', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '13', '2018-04-17', ''),
+(377, '2018-04-17 15:54:55', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '13', '65000.00', ''),
+(378, '2018-04-17 15:54:55', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete successful ***', 't10_hutangdetail', '', '', '', ''),
+(379, '2018-04-17 16:09:51', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '14', '', 'HD000004'),
+(380, '2018-04-17 16:09:51', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '14', '', '2018-04-17'),
+(381, '2018-04-17 16:09:51', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '14', '', '75000'),
+(382, '2018-04-17 16:09:51', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '14', '', '1'),
+(383, '2018-04-17 16:09:51', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '14', '', '14'),
+(384, '2018-04-17 16:10:01', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete begin ***', 't10_hutangdetail', '', '', '', ''),
+(385, '2018-04-17 16:10:01', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '14', '14', ''),
+(386, '2018-04-17 16:10:01', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '14', '1', ''),
+(387, '2018-04-17 16:10:01', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '14', 'HD000004', ''),
+(388, '2018-04-17 16:10:01', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '14', '2018-04-17', ''),
+(389, '2018-04-17 16:10:01', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '14', '75000.00', ''),
+(390, '2018-04-17 16:10:01', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete successful ***', 't10_hutangdetail', '', '', '', ''),
+(391, '2018-04-17 16:10:48', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '15', '', 'HD000004'),
+(392, '2018-04-17 16:10:48', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '15', '', '2018-04-17'),
+(393, '2018-04-17 16:10:48', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '15', '', '75000'),
+(394, '2018-04-17 16:10:48', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '15', '', '1'),
+(395, '2018-04-17 16:10:48', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '15', '', '15'),
+(396, '2018-04-17 16:10:54', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete begin ***', 't10_hutangdetail', '', '', '', ''),
+(397, '2018-04-17 16:10:54', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '15', '15', ''),
+(398, '2018-04-17 16:10:54', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '15', '1', ''),
+(399, '2018-04-17 16:10:54', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '15', 'HD000004', ''),
+(400, '2018-04-17 16:10:54', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '15', '2018-04-17', ''),
+(401, '2018-04-17 16:10:54', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '15', '75000.00', ''),
+(402, '2018-04-17 16:10:54', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete successful ***', 't10_hutangdetail', '', '', '', ''),
+(403, '2018-04-17 16:11:08', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '16', '', 'HD000004'),
+(404, '2018-04-17 16:11:08', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '16', '', '2018-04-17'),
+(405, '2018-04-17 16:11:08', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '16', '', '50000'),
+(406, '2018-04-17 16:11:08', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '16', '', '1'),
+(407, '2018-04-17 16:11:08', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '16', '', '16'),
+(408, '2018-04-17 16:11:16', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '17', '', 'HD000005'),
+(409, '2018-04-17 16:11:16', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '17', '', '2018-04-17'),
+(410, '2018-04-17 16:11:16', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '17', '', '25000'),
+(411, '2018-04-17 16:11:16', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '17', '', '1'),
+(412, '2018-04-17 16:11:16', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '17', '', '17'),
+(413, '2018-04-17 16:11:25', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete begin ***', 't10_hutangdetail', '', '', '', ''),
+(414, '2018-04-17 16:11:25', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '16', '16', ''),
+(415, '2018-04-17 16:11:25', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '16', '1', ''),
+(416, '2018-04-17 16:11:25', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '16', 'HD000004', ''),
+(417, '2018-04-17 16:11:25', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '16', '2018-04-17', ''),
+(418, '2018-04-17 16:11:25', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '16', '50000.00', ''),
+(419, '2018-04-17 16:11:25', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete successful ***', 't10_hutangdetail', '', '', '', ''),
+(420, '2018-04-17 16:11:43', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '18', '', 'HD000006'),
+(421, '2018-04-17 16:11:43', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '18', '', '2018-04-17'),
+(422, '2018-04-17 16:11:43', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '18', '', '400000'),
+(423, '2018-04-17 16:11:43', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '18', '', '2'),
+(424, '2018-04-17 16:11:43', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '18', '', '18'),
+(425, '2018-04-17 16:11:59', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete begin ***', 't10_hutangdetail', '', '', '', ''),
+(426, '2018-04-17 16:11:59', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'id', '18', '18', ''),
+(427, '2018-04-17 16:11:59', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'HutangID', '18', '2', ''),
+(428, '2018-04-17 16:11:59', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'NoBayar', '18', 'HD000006', ''),
+(429, '2018-04-17 16:11:59', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'Tgl', '18', '2018-04-17', ''),
+(430, '2018-04-17 16:11:59', '/stok/t10_hutangdetaildelete.php', '1', 'D', 't10_hutangdetail', 'JumlahBayar', '18', '400000.00', ''),
+(431, '2018-04-17 16:11:59', '/stok/t10_hutangdetaildelete.php', '1', '*** Batch delete successful ***', 't10_hutangdetail', '', '', '', ''),
+(432, '2018-04-17 16:12:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '19', '', 'HD000006'),
+(433, '2018-04-17 16:12:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '19', '', '2018-04-17'),
+(434, '2018-04-17 16:12:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '19', '', '50000'),
+(435, '2018-04-17 16:12:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '19', '', '1'),
+(436, '2018-04-17 16:12:19', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '19', '', '19');
 
 -- --------------------------------------------------------
 

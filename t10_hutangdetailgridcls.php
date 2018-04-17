@@ -1781,16 +1781,20 @@ class ct10_hutangdetail_grid extends ct10_hutangdetail {
 	function Page_Render() {
 
 		//echo "Page Render";
-		// check total jumlah bayar
-		//$tot_jml_byr = ew_Execute();
+		//var_dump($this->getCurrentMasterTable());
+		//var_dump($this);
 		//echo $this->HutangID->CurrentValue;
 		//var_dump($this->HutangID);
-		// sembunyikan button add jika jumlah bayar >= jumlah hutang
+		//echo Page("t09_hutang")->id->CurrentValue;
+		//if (isset($_GET["fk_id"])) {
+		//if (f_GetSisaHutang($_GET["fk_id"]) == 0) {
 
-		$this->OtherOptions["addedit"] = new cListOptions();
-		$this->OtherOptions["addedit"]->Body = "";
+		if (f_GetSisaHutang(Page("t09_hutang")->id->CurrentValue) == 0) {
+			$this->OtherOptions["addedit"] = new cListOptions();
+			$this->OtherOptions["addedit"]->Body = "";
+		}
 
-		//echo "-".$this->HutangID->CurrentValue;
+		//}
 	}
 
 	// Page Data Rendering event
