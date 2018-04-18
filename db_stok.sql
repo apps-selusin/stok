@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 17, 2018 at 09:23 PM
+-- Generation Time: Apr 18, 2018 at 11:27 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -276,7 +276,7 @@ CREATE TABLE IF NOT EXISTS `t11_jual` (
 --
 
 INSERT INTO `t11_jual` (`id`, `TglSO`, `NoSO`, `CustomerID`, `CustomerPO`, `Total`) VALUES
-(1, '2018-04-18', 'SO201804180001', 1, '-', 0.00);
+(1, '2018-04-18', 'SO201804180001', 1, '-', 875000.00);
 
 -- --------------------------------------------------------
 
@@ -299,8 +299,8 @@ CREATE TABLE IF NOT EXISTS `t12_jualdetail` (
 --
 
 INSERT INTO `t12_jualdetail` (`id`, `JualID`, `ArticleID`, `HargaJual`, `Qty`, `SubTotal`) VALUES
-(1, 1, 1, 125000.00, 2.20, 275000.00),
-(2, 1, 1, 125000.00, 2.00, 250000.00);
+(1, 1, 1, 125000.00, 3.00, 375000.00),
+(2, 1, 1, 125000.00, 4.00, 500000.00);
 
 -- --------------------------------------------------------
 
@@ -420,7 +420,7 @@ CREATE TABLE IF NOT EXISTS `t99_audittrail` (
   `oldvalue` longtext CHARACTER SET latin1,
   `newvalue` longtext CHARACTER SET latin1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=496 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=510 ;
 
 --
 -- Dumping data for table `t99_audittrail`
@@ -920,7 +920,21 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (492, '2018-04-18 02:20:05', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'SubTotal', '2', '625000.00', '250000'),
 (493, '2018-04-18 02:20:05', '/stok/t11_jualedit.php', '1', '*** Batch update successful ***', 't12_jualdetail', '', '', '', ''),
 (494, '2018-04-18 02:20:46', '/stok/t12_jualdetailedit.php', '1', 'U', 't12_jualdetail', 'Qty', '1', '3.50', '2.2'),
-(495, '2018-04-18 02:20:46', '/stok/t12_jualdetailedit.php', '1', 'U', 't12_jualdetail', 'SubTotal', '1', '437500.00', '275000');
+(495, '2018-04-18 02:20:46', '/stok/t12_jualdetailedit.php', '1', 'U', 't12_jualdetail', 'SubTotal', '1', '437500.00', '275000'),
+(496, '2018-04-18 09:42:39', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(497, '2018-04-18 11:28:20', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(498, '2018-04-18 11:52:37', '/stok/t11_jualedit.php', '1', '*** Batch update begin ***', 't12_jualdetail', '', '', '', ''),
+(499, '2018-04-18 11:52:37', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'Qty', '1', '2.20', '2.3'),
+(500, '2018-04-18 11:52:37', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'SubTotal', '1', '275000.00', '287500'),
+(501, '2018-04-18 11:52:37', '/stok/t11_jualedit.php', '1', '*** Batch update successful ***', 't12_jualdetail', '', '', '', ''),
+(502, '2018-04-18 11:57:48', '/stok/logout.php', 'admin', 'logout', '::1', '', '', '', ''),
+(503, '2018-04-18 12:25:31', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(504, '2018-04-18 12:29:49', '/stok/t11_jualedit.php', '1', '*** Batch update begin ***', 't12_jualdetail', '', '', '', ''),
+(505, '2018-04-18 12:29:49', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'Qty', '1', '2.30', '3'),
+(506, '2018-04-18 12:29:49', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'SubTotal', '1', '287500.00', '375000'),
+(507, '2018-04-18 12:29:49', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'Qty', '2', '2.00', '4'),
+(508, '2018-04-18 12:29:49', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'SubTotal', '2', '250000.00', '500000'),
+(509, '2018-04-18 12:29:49', '/stok/t11_jualedit.php', '1', '*** Batch update successful ***', 't12_jualdetail', '', '', '', '');
 
 -- --------------------------------------------------------
 
@@ -964,6 +978,21 @@ CREATE TABLE IF NOT EXISTS `v03_hutang` (
 -- --------------------------------------------------------
 
 --
+-- Stand-in structure for view `v04_jual`
+--
+CREATE TABLE IF NOT EXISTS `v04_jual` (
+`TglSO` date
+,`NoSO` varchar(14)
+,`CustomerID` int(11)
+,`CustomerPO` varchar(50)
+,`ArticleID` int(11)
+,`HargaJual` float(15,2)
+,`Qty` float(15,2)
+,`SubTotal` float(15,2)
+);
+-- --------------------------------------------------------
+
+--
 -- Structure for view `v01_beli`
 --
 DROP TABLE IF EXISTS `v01_beli`;
@@ -987,6 +1016,15 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 DROP TABLE IF EXISTS `v03_hutang`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v03_hutang` AS select `a`.`NoHutang` AS `nohutang`,`b`.`TglPO` AS `tglpo`,`b`.`NoPO` AS `nopo`,`c`.`Nama` AS `nama`,`a`.`JumlahHutang` AS `jumlahhutang`,`a`.`JumlahBayar` AS `jumlahbayar`,(`a`.`JumlahHutang` - `a`.`JumlahBayar`) AS `sisahutang` from ((`t09_hutang` `a` left join `t08_beli` `b` on((`a`.`BeliID` = `b`.`id`))) left join `t02_vendor` `c` on((`b`.`VendorID` = `c`.`id`)));
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `v04_jual`
+--
+DROP TABLE IF EXISTS `v04_jual`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v04_jual` AS select `a`.`TglSO` AS `TglSO`,`a`.`NoSO` AS `NoSO`,`a`.`CustomerID` AS `CustomerID`,`a`.`CustomerPO` AS `CustomerPO`,`b`.`ArticleID` AS `ArticleID`,`b`.`HargaJual` AS `HargaJual`,`b`.`Qty` AS `Qty`,`b`.`SubTotal` AS `SubTotal` from (`t11_jual` `a` left join `t12_jualdetail` `b` on((`a`.`id` = `b`.`JualID`)));
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

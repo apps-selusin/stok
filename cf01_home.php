@@ -356,6 +356,11 @@ Page_Rendering();
 <div>
 <p>setiap pembelian dianggap hutang</p>
 </div>
+
+<div>
+	<p>lanjutkan jual detail :: 1). readonly; 2). total head</p>
+</div>
+
 -->
 <?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
 <?php include_once "footer.php" ?>

@@ -1296,6 +1296,10 @@ class ct12_jualdetail extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"
+		// simpan akumulasi subtotal ke master
+
+		$tot_det = ew_ExecuteScalar("SELECT SUM(subtotal) FROM t12_jualdetail WHERE jualid = ".$rsnew["JualID"]."");
+		ew_Execute("UPDATE t11_jual SET total = ".$tot_det." WHERE id = ".$rsnew["JualID"]."");
 	}
 
 	// Row Updating event
@@ -1311,6 +1315,10 @@ class ct12_jualdetail extends cTable {
 	function Row_Updated($rsold, &$rsnew) {
 
 		//echo "Row Updated";
+		// update akumulasi subtotal ke master
+
+		$tot_det = ew_ExecuteScalar("SELECT SUM(subtotal) FROM t12_jualdetail WHERE jualid = ".$rsold["JualID"]."");
+		ew_Execute("UPDATE t11_jual SET total = ".$tot_det." WHERE id = ".$rsold["JualID"]."");
 	}
 
 	// Row Update Conflict event
@@ -1365,6 +1373,16 @@ class ct12_jualdetail extends cTable {
 	function Row_Deleted(&$rs) {
 
 		//echo "Row Deleted";
+		// update akumulasi subtotal ke master
+
+		$rec_cnt_det = ew_ExecuteScalar("SELECT COUNT(subtotal) FROM t12_jualdetail WHERE jualid = ".$rs["JualID"]."");
+		if ($rec_cnt_det > 0) {
+			$tot_det = ew_ExecuteScalar("SELECT SUM(subtotal) FROM t12_jualdetail WHERE jualid = ".$rs["JualID"]."");
+			ew_Execute("UPDATE t11_jual SET total = ".$tot_det." WHERE id = ".$rs["JualID"]."");
+		}
+		else {
+			ew_Execute("UPDATE t11_jual SET total = 0 WHERE id = ".$rs["JualID"]."");
+		}
 	}
 
 	// Email Sending event
@@ -1394,6 +1412,8 @@ class ct12_jualdetail extends cTable {
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
 
+		$this->SatuanID->ReadOnly = true;
+		$this->SubTotal->ReadOnly = true;
 	}
 
 	// User ID Filtering event

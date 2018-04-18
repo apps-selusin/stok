@@ -1092,6 +1092,8 @@ class ct10_hutangdetail extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"
+		// simpan akumulasi jumlah bayar ke master
+
 		$tot_det = ew_ExecuteScalar("SELECT SUM(JumlahBayar) FROM t10_hutangdetail WHERE HutangID = ".$rsnew["HutangID"]."");
 		ew_Execute("UPDATE t09_hutang SET JumlahBayar = ".$tot_det." WHERE id = ".$rsnew["HutangID"]."");
 	}
@@ -1109,6 +1111,8 @@ class ct10_hutangdetail extends cTable {
 	function Row_Updated($rsold, &$rsnew) {
 
 		//echo "Row Updated";
+		// update akumulasi jumlah bayar ke master
+
 		$tot_det = ew_ExecuteScalar("SELECT SUM(JumlahBayar) FROM t10_hutangdetail WHERE HutangID = ".$rsold["HutangID"]."");
 		ew_Execute("UPDATE t09_hutang SET JumlahBayar = ".$tot_det." WHERE id = ".$rsold["HutangID"]."");
 	}
@@ -1165,6 +1169,8 @@ class ct10_hutangdetail extends cTable {
 	function Row_Deleted(&$rs) {
 
 		//echo "Row Deleted";
+		// update akumulasi jumlah bayar ke master
+
 		$rec_cnt_det = ew_ExecuteScalar("SELECT COUNT(JumlahBayar) FROM t10_hutangdetail WHERE HutangID = ".$rs["HutangID"]."");
 		if ($rec_cnt_det > 0) {
 			$tot_det = ew_ExecuteScalar("SELECT SUM(JumlahBayar) FROM t10_hutangdetail WHERE HutangID = ".$rs["HutangID"]."");

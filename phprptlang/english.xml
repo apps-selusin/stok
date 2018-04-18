@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/4/17" version="11.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/4/18" version="11.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -370,6 +370,18 @@
   <project>
     <phrase id="bodytitle" value="STOK Apps." />
     <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
+    <menu id="21">
+      <phrase id="menutext" value="t 11 jual" />
+    </menu>
+    <menu id="22">
+      <phrase id="menutext" value="t 12 jualdetail" />
+    </menu>
+    <menu id="23">
+      <phrase id="menutext" value="v 04 jual" />
+    </menu>
+    <menu id="24">
+      <phrase id="menutext" value="Penjualan" />
+    </menu>
     <menu id="16">
       <phrase id="menutext" value="Stok" />
     </menu>
@@ -490,6 +502,30 @@
         <phrase id="fldcaption" value="Sub Total" />
       </field>
     </table>
+    <table id="r03_hutang">
+      <phrase id="tblcaption" value="Hutang" />
+      <field id="nohutang">
+        <phrase id="fldcaption" value="No. Hutang" />
+      </field>
+      <field id="tglpo">
+        <phrase id="fldcaption" value="Tgl. PO" />
+      </field>
+      <field id="nopo">
+        <phrase id="fldcaption" value="No. PO" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="Vendor" />
+      </field>
+      <field id="jumlahhutang">
+        <phrase id="fldcaption" value="Jumlah Hutang" />
+      </field>
+      <field id="jumlahbayar">
+        <phrase id="fldcaption" value="Jumlah Bayar" />
+      </field>
+      <field id="sisahutang">
+        <phrase id="fldcaption" value="Sisa Hutang" />
+      </field>
+    </table>
     <table id="t01_company">
       <phrase id="tblcaption" value="t 01 company" />
       <field id="id">
@@ -564,6 +600,9 @@
       <field id="harga">
         <phrase id="fldcaption" value="Harga" />
       </field>
+      <field id="hargajual">
+        <phrase id="fldcaption" value="Harga Jual" />
+      </field>
     </table>
     <table id="t07_satuan">
       <phrase id="tblcaption" value="t 07 satuan" />
@@ -603,11 +642,11 @@
       <field id="qty">
         <phrase id="fldcaption" value="Qty" />
       </field>
-      <field id="subtotal">
-        <phrase id="fldcaption" value="Sub Total" />
-      </field>
       <field id="satuannama">
         <phrase id="fldcaption" value="Satuan" />
+      </field>
+      <field id="subtotal">
+        <phrase id="fldcaption" value="Sub Total" />
       </field>
     </table>
     <table id="t09_hutang">
@@ -644,6 +683,48 @@
       </field>
       <field id="jumlahbayar">
         <phrase id="fldcaption" value="Jumlah Bayar" />
+      </field>
+    </table>
+    <table id="t11_jual">
+      <phrase id="tblcaption" value="t 11 jual" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="tglso">
+        <phrase id="fldcaption" value="Tgl SO" />
+      </field>
+      <field id="noso">
+        <phrase id="fldcaption" value="No SO" />
+      </field>
+      <field id="customerid">
+        <phrase id="fldcaption" value="Customer ID" />
+      </field>
+      <field id="customerpo">
+        <phrase id="fldcaption" value="Customer PO" />
+      </field>
+      <field id="total">
+        <phrase id="fldcaption" value="Total" />
+      </field>
+    </table>
+    <table id="t12_jualdetail">
+      <phrase id="tblcaption" value="t 12 jualdetail" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="jualid">
+        <phrase id="fldcaption" value="Jual ID" />
+      </field>
+      <field id="articleid">
+        <phrase id="fldcaption" value="Article ID" />
+      </field>
+      <field id="hargajual">
+        <phrase id="fldcaption" value="Harga Jual" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="Qty" />
+      </field>
+      <field id="subtotal">
+        <phrase id="fldcaption" value="Sub Total" />
       </field>
     </table>
     <table id="t96_employees">
@@ -835,28 +916,76 @@
         <phrase id="fldcaption" value="sisahutang" />
       </field>
     </table>
-    <table id="r03_hutang">
-      <phrase id="tblcaption" value="Hutang" />
-      <field id="nohutang">
-        <phrase id="fldcaption" value="No. Hutang" />
+    <table id="v04_jual">
+      <phrase id="tblcaption" value="v 04 jual" />
+      <field id="tglso">
+        <phrase id="fldcaption" value="Tgl SO" />
       </field>
-      <field id="tglpo">
-        <phrase id="fldcaption" value="Tgl. PO" />
+      <field id="noso">
+        <phrase id="fldcaption" value="No SO" />
       </field>
-      <field id="nopo">
-        <phrase id="fldcaption" value="No. PO" />
+      <field id="customerid">
+        <phrase id="fldcaption" value="Customer ID" />
       </field>
-      <field id="nama">
-        <phrase id="fldcaption" value="Vendor" />
+      <field id="customernama">
+        <phrase id="fldcaption" value="Customer" />
       </field>
-      <field id="jumlahhutang">
-        <phrase id="fldcaption" value="Jumlah Hutang" />
+      <field id="customerpo">
+        <phrase id="fldcaption" value="Customer PO" />
       </field>
-      <field id="jumlahbayar">
-        <phrase id="fldcaption" value="Jumlah Bayar" />
+      <field id="articleid">
+        <phrase id="fldcaption" value="Article ID" />
       </field>
-      <field id="sisahutang">
-        <phrase id="fldcaption" value="Sisa Hutang" />
+      <field id="articlenama">
+        <phrase id="fldcaption" value="Article" />
+      </field>
+      <field id="hargajual">
+        <phrase id="fldcaption" value="Harga Jual" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="Qty" />
+      </field>
+      <field id="satuannama">
+        <phrase id="fldcaption" value="Satuan" />
+      </field>
+      <field id="subtotal">
+        <phrase id="fldcaption" value="Sub Total" />
+      </field>
+    </table>
+    <table id="r04_jual">
+      <phrase id="tblcaption" value="Penjualan" />
+      <field id="tglso">
+        <phrase id="fldcaption" value="Tgl. SO" />
+      </field>
+      <field id="noso">
+        <phrase id="fldcaption" value="No. SO" />
+      </field>
+      <field id="customerid">
+        <phrase id="fldcaption" value="Customer ID" />
+      </field>
+      <field id="customernama">
+        <phrase id="fldcaption" value="Customer" />
+      </field>
+      <field id="customerpo">
+        <phrase id="fldcaption" value="Customer PO" />
+      </field>
+      <field id="articleid">
+        <phrase id="fldcaption" value="Article ID" />
+      </field>
+      <field id="articlenama">
+        <phrase id="fldcaption" value="Article" />
+      </field>
+      <field id="hargajual">
+        <phrase id="fldcaption" value="Harga Jual" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="Qty" />
+      </field>
+      <field id="satuannama">
+        <phrase id="fldcaption" value="Satuan" />
+      </field>
+      <field id="subtotal">
+        <phrase id="fldcaption" value="Sub Total" />
       </field>
     </table>
   </project>

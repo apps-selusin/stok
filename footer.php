@@ -127,7 +127,6 @@ jQuery.get("<?php echo $EW_RELATIVE_PATH ?>phpjs/userevt14.js");
 // Write your global startup script here
 // document.write("page loaded");
 
-var ArticleCode;
 var AjaxArticleCode;
 var $p_row;
 
@@ -170,17 +169,11 @@ function f_BuatAjax() {
 			"change keyup": function(e) {
 				var $row = $(this).fields();
 				var qty = parseFloat($row["Qty"].val());
-
-				//var harga = parseInt($row["harga"].val());
 				var harga_asli = $row["Harga"].val();
 				var harga_clean = harga_asli.replace(/,/g, '');
 				var harga = parseFloat(harga_clean);
 				var st = qty * harga;
-
-				//alert(st);
 				$row["SubTotal"].val(st);
-
-				//$row["jml_lunas"].val(st);
 			}
 		}
 	);
@@ -191,17 +184,11 @@ function f_BuatAjax() {
 			"change keyup": function(e) {
 				var $row = $(this).fields();
 				var qty = parseFloat($row["Qty"].val());
-
-				//var harga = parseInt($row["harga"].val());
 				var harga_asli = $row["Harga"].val();
 				var harga_clean = harga_asli.replace(/,/g, '');
 				var harga = parseFloat(harga_clean);
 				var st = qty * harga;
-
-				//alert(st);
 				$row["SubTotal"].val(st);
-
-				//$row["jml_lunas"].val(st);
 			}
 		}
 	);
@@ -212,17 +199,11 @@ function f_BuatAjax() {
 			"change keyup": function(e) {
 				var $row = $(this).fields();
 				var qty = parseFloat($row["Qty"].val());
-
-				//var harga = parseInt($row["harga"].val());
 				var harga_asli = $row["HargaJual"].val();
 				var harga_clean = harga_asli.replace(/,/g, '');
 				var harga = parseFloat(harga_clean);
 				var st = qty * harga;
-
-				//alert(st);
 				$row["SubTotal"].val(st);
-
-				//$row["jml_lunas"].val(st);
 			}
 		}
 	);
@@ -233,17 +214,11 @@ function f_BuatAjax() {
 			"change keyup": function(e) {
 				var $row = $(this).fields();
 				var qty = parseFloat($row["Qty"].val());
-
-				//var harga = parseInt($row["harga"].val());
 				var harga_asli = $row["HargaJual"].val();
 				var harga_clean = harga_asli.replace(/,/g, '');
 				var harga = parseFloat(harga_clean);
 				var st = qty * harga;
-
-				//alert(st);
 				$row["SubTotal"].val(st);
-
-				//$row["jml_lunas"].val(st);
 			}
 		}
 	);

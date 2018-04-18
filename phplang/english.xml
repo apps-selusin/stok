@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/4/17" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/4/18" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -624,20 +624,20 @@
     <menu id="1">
       <phrase id="menutext" value="Home" />
     </menu>
-    <menu id="10025">
-      <phrase id="menutext" value="v 02 stok" />
-    </menu>
     <menu id="19">
       <phrase id="menutext" value="Pembelian" />
     </menu>
-    <menu id="10026">
-      <phrase id="menutext" value="v 03 hutang" />
+    <menu id="10025">
+      <phrase id="menutext" value="v 02 stok" />
     </menu>
     <menu id="10021">
       <phrase id="menutext" value="Hutang" />
     </menu>
     <menu id="10027">
       <phrase id="menutext" value="Penjualan" />
+    </menu>
+    <menu id="10026">
+      <phrase id="menutext" value="v 03 hutang" />
     </menu>
     <menu id="10013">
       <phrase id="menutext" value="Laporan" />
@@ -651,8 +651,8 @@
     <menu id="10020">
       <phrase id="menutext" value="Hutang" />
     </menu>
-    <menu id="10028">
-      <phrase id="menutext" value="Penjualan Detail" />
+    <menu id="10032">
+      <phrase id="menutext" value="Penjualan" />
     </menu>
     <menu id="6">
       <phrase id="menutext" value="Setup" />
@@ -692,6 +692,9 @@
     </menu>
     <menu id="5">
       <phrase id="menutext" value="Activity Log" />
+    </menu>
+    <menu id="10028">
+      <phrase id="menutext" value="Penjualan Detail" />
     </menu>
     <menu id="10022">
       <phrase id="menutext" value="Hutang Detail" />
@@ -743,6 +746,18 @@
     </menu>
     <menu id="10012">
       <phrase id="menutext" value="t 99 audittrail" />
+    </menu>
+    <menu id="10029">
+      <phrase id="menutext" value="t 11 jual" />
+    </menu>
+    <menu id="10030">
+      <phrase id="menutext" value="t 12 jualdetail" />
+    </menu>
+    <menu id="10031">
+      <phrase id="menutext" value="v 04 jual" />
+    </menu>
+    <menu id="10033">
+      <phrase id="menutext" value="t 09 hutang" />
     </menu>
     <table id="cf01_home_php">
       <phrase id="tblcaption" value="Home" />
@@ -912,10 +927,10 @@
         <phrase id="fldcaption" value="id" />
       </field>
       <field id="tglso">
-        <phrase id="fldcaption" value="Tgl SO" />
+        <phrase id="fldcaption" value="Tgl. SO" />
       </field>
       <field id="noso">
-        <phrase id="fldcaption" value="No SO" />
+        <phrase id="fldcaption" value="No. SO" />
       </field>
       <field id="customerid">
         <phrase id="fldcaption" value="Customer" />

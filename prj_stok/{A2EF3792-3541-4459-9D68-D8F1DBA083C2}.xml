@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<configuration date="2018/04/17" author="e.World Technology Ltd.">
-  <project id="{A2EF3792-3541-4459-9D68-D8F1DBA083C2}" file="C:\xampp\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="11.0" datetime="2018/04/17 20:56:24" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
+<configuration date="2018/04/18" author="e.World Technology Ltd.">
+  <project id="{A2EF3792-3541-4459-9D68-D8F1DBA083C2}" file="C:\xampp\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="11.0" datetime="2018/04/18 16:26:56" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
     <table id="r01_beli" name="r01_beli" caption="Pembelian" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="r02_stok" name="r02_stok" caption="Stok" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="r03_hutang" name="r03_hutang" caption="Hutang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t01_company" name="t01_company" caption="t 01 company" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t02_vendor" name="t02_vendor" caption="t 02 vendor" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t03_customer" name="t03_customer" caption="t 03 customer" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
@@ -13,6 +14,8 @@
     <table id="t08_beli" name="t08_beli" caption="t 08 beli" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t09_hutang" name="t09_hutang" caption="t 09 hutang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t10_hutangdetail" name="t10_hutangdetail" caption="t 10 hutangdetail" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t11_jual" name="t11_jual" caption="t 11 jual" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="t12_jualdetail" name="t12_jualdetail" caption="t 12 jualdetail" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t96_employees" name="t96_employees" caption="t 96 employees" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t97_userlevels" name="t97_userlevels" caption="t 97 userlevels" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t98_userlevelpermissions" name="t98_userlevelpermissions" caption="t 98 userlevelpermissions" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
@@ -20,6 +23,7 @@
     <table id="v01_beli" name="v01_beli" caption="v 01 beli" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="v02_stok" name="v02_stok" caption="v 02 stok" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="v03_hutang" name="v03_hutang" caption="Hutang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
-    <table id="r03_hutang" name="r03_hutang" caption="Hutang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="v04_jual" name="v04_jual" caption="v 04 jual" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="r04_jual" name="r04_jual" caption="Penjualan" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
   </project>
 </configuration>

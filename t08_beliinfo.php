@@ -1421,8 +1421,8 @@ class ct08_beli extends cTable {
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
 
-		$this->NoPO->ReadOnly = true;
 		$this->TglPO->ReadOnly = true;
+		$this->NoPO->ReadOnly = true;
 		$this->SatuanID->ReadOnly = true;
 		$this->SubTotal->ReadOnly = true;
 
@@ -1435,7 +1435,7 @@ class ct08_beli extends cTable {
 		}
 
 		// Kondisi saat form Tambah sedang dalam mode konfirmasi
-		if ($this->CurrentAction == "add" && $this->CurrentAction=="F") {
+		if ($this->CurrentAction == "add" && $this->CurrentAction == "F") {
 			$this->NoPO->ViewValue = $this->NoPO->CurrentValue; // ambil dari mode sebelumnya
 		}
 	}

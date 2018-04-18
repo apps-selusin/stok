@@ -618,7 +618,7 @@ class ct11_jual_delete extends ct11_jual {
 		// Total
 		$this->Total->ViewValue = $this->Total->CurrentValue;
 		$this->Total->ViewValue = ew_FormatNumber($this->Total->ViewValue, 2, -2, -2, -2);
-		$this->Total->CellCssStyle .= "text-align: right;";
+		$this->Total->CellCssStyle .= "text-align: left;";
 		$this->Total->ViewCustomAttributes = "";
 
 			// TglSO
