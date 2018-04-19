@@ -11,10 +11,8 @@ class crr04_jual extends crTableBase {
 	var $ShowCompactSummaryFooter = TRUE;
 	var $TglSO;
 	var $NoSO;
-	var $CustomerID;
 	var $CustomerNama;
 	var $CustomerPO;
-	var $ArticleID;
 	var $ArticleNama;
 	var $HargaJual;
 	var $Qty;
@@ -41,7 +39,7 @@ class crr04_jual extends crTableBase {
 		$this->TglSO->GroupingFieldId = 1;
 		$this->TglSO->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
 		$this->TglSO->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
-		$this->TglSO->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_SEPARATOR"], $ReportLanguage->Phrase("IncorrectDateDMY"));
+		$this->TglSO->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectField");
 		$this->TglSO->DateFilter = "";
 		$this->TglSO->SqlSelect = "";
 		$this->TglSO->SqlOrderBy = "";
@@ -63,15 +61,6 @@ class crr04_jual extends crTableBase {
 		$this->NoSO->FldGroupInt = "0";
 		$this->NoSO->FldGroupSql = "";
 		$this->fields['NoSO'] = &$this->NoSO;
-
-		// CustomerID
-		$this->CustomerID = new crField('r04_jual', 'r04_jual', 'x_CustomerID', 'CustomerID', '`CustomerID`', 3, EWR_DATATYPE_NUMBER, -1);
-		$this->CustomerID->Sortable = TRUE; // Allow sort
-		$this->CustomerID->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
-		$this->CustomerID->DateFilter = "";
-		$this->CustomerID->SqlSelect = "";
-		$this->CustomerID->SqlOrderBy = "";
-		$this->fields['CustomerID'] = &$this->CustomerID;
 
 		// CustomerNama
 		$this->CustomerNama = new crField('r04_jual', 'r04_jual', 'x_CustomerNama', 'CustomerNama', '`CustomerNama`', 200, EWR_DATATYPE_STRING, -1);
@@ -100,15 +89,6 @@ class crr04_jual extends crTableBase {
 		$this->CustomerPO->FldGroupInt = "0";
 		$this->CustomerPO->FldGroupSql = "";
 		$this->fields['CustomerPO'] = &$this->CustomerPO;
-
-		// ArticleID
-		$this->ArticleID = new crField('r04_jual', 'r04_jual', 'x_ArticleID', 'ArticleID', '`ArticleID`', 3, EWR_DATATYPE_NUMBER, -1);
-		$this->ArticleID->Sortable = TRUE; // Allow sort
-		$this->ArticleID->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
-		$this->ArticleID->DateFilter = "";
-		$this->ArticleID->SqlSelect = "";
-		$this->ArticleID->SqlOrderBy = "";
-		$this->fields['ArticleID'] = &$this->ArticleID;
 
 		// ArticleNama
 		$this->ArticleNama = new crField('r04_jual', 'r04_jual', 'x_ArticleNama', 'ArticleNama', '`ArticleNama`', 200, EWR_DATATYPE_STRING, -1);
@@ -238,7 +218,7 @@ class crr04_jual extends crTableBase {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() {
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (select nama from t03_customer where id = customerid) AS `CustomerNama`, (select concat(kode, ' - ', nama) from t06_article where id = articleid) AS `ArticleNama`, (SELECT b.nama FROM t06_article a, t07_satuan b where articleid = a.id and a.satuanid = b.id) AS `SatuanNama` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT * FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility

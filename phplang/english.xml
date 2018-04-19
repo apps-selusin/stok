@@ -618,6 +618,9 @@
   <project>
     <phrase id="bodytitle" value="STOK Apps." />
     <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
+    <menu id="10034">
+      <phrase id="menutext" value="v 04 jual" />
+    </menu>
     <menu id="10024">
       <phrase id="menutext" value="v 01 beli" />
     </menu>
@@ -1161,6 +1164,36 @@
       </field>
       <field id="sisahutang">
         <phrase id="fldcaption" value="sisahutang" />
+      </field>
+    </table>
+    <table id="v04_jual">
+      <phrase id="tblcaption" value="v 04 jual" />
+      <field id="tglso">
+        <phrase id="fldcaption" value="Tgl SO" />
+      </field>
+      <field id="noso">
+        <phrase id="fldcaption" value="No SO" />
+      </field>
+      <field id="customerpo">
+        <phrase id="fldcaption" value="Customer PO" />
+      </field>
+      <field id="hargajual">
+        <phrase id="fldcaption" value="Harga Jual" />
+      </field>
+      <field id="qty">
+        <phrase id="fldcaption" value="Qty" />
+      </field>
+      <field id="subtotal">
+        <phrase id="fldcaption" value="Sub Total" />
+      </field>
+      <field id="customernama">
+        <phrase id="fldcaption" value="Customer Nama" />
+      </field>
+      <field id="articlenama">
+        <phrase id="fldcaption" value="Article Nama" />
+      </field>
+      <field id="satuannama">
+        <phrase id="fldcaption" value="Satuan Nama" />
       </field>
     </table>
   </project>

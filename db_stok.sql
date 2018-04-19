@@ -1,20 +1,22 @@
 -- phpMyAdmin SQL Dump
--- version 4.0.9
--- http://www.phpmyadmin.net
+-- version 4.8.0
+-- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Apr 18, 2018 at 11:27 AM
+-- Host: localhost
+-- Generation Time: Apr 19, 2018 at 02:56 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `db_stok`
@@ -26,11 +28,10 @@ SET time_zone = "+00:00";
 -- Table structure for table `t01_company`
 --
 
-CREATE TABLE IF NOT EXISTS `t01_company` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Nama` varchar(50) CHARACTER SET latin1 NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+CREATE TABLE `t01_company` (
+  `id` int(11) NOT NULL,
+  `Nama` varchar(50) CHARACTER SET latin1 NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t01_company`
@@ -45,11 +46,10 @@ INSERT INTO `t01_company` (`id`, `Nama`) VALUES
 -- Table structure for table `t02_vendor`
 --
 
-CREATE TABLE IF NOT EXISTS `t02_vendor` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Nama` varchar(50) CHARACTER SET latin1 NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+CREATE TABLE `t02_vendor` (
+  `id` int(11) NOT NULL,
+  `Nama` varchar(50) CHARACTER SET latin1 NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t02_vendor`
@@ -65,11 +65,10 @@ INSERT INTO `t02_vendor` (`id`, `Nama`) VALUES
 -- Table structure for table `t03_customer`
 --
 
-CREATE TABLE IF NOT EXISTS `t03_customer` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Nama` varchar(50) CHARACTER SET latin1 NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+CREATE TABLE `t03_customer` (
+  `id` int(11) NOT NULL,
+  `Nama` varchar(50) CHARACTER SET latin1 NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t03_customer`
@@ -85,12 +84,11 @@ INSERT INTO `t03_customer` (`id`, `Nama`) VALUES
 -- Table structure for table `t04_maingroup`
 --
 
-CREATE TABLE IF NOT EXISTS `t04_maingroup` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `t04_maingroup` (
+  `id` int(11) NOT NULL,
   `Kode` varchar(2) NOT NULL,
-  `Nama` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+  `Nama` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t04_maingroup`
@@ -107,13 +105,12 @@ INSERT INTO `t04_maingroup` (`id`, `Kode`, `Nama`) VALUES
 -- Table structure for table `t05_subgroup`
 --
 
-CREATE TABLE IF NOT EXISTS `t05_subgroup` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `t05_subgroup` (
+  `id` int(11) NOT NULL,
   `MainGroupID` int(11) NOT NULL,
   `Kode` varchar(3) NOT NULL,
-  `Nama` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+  `Nama` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t05_subgroup`
@@ -140,16 +137,15 @@ INSERT INTO `t05_subgroup` (`id`, `MainGroupID`, `Kode`, `Nama`) VALUES
 -- Table structure for table `t06_article`
 --
 
-CREATE TABLE IF NOT EXISTS `t06_article` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `t06_article` (
+  `id` int(11) NOT NULL,
   `SubGroupID` int(11) NOT NULL,
   `Kode` varchar(7) NOT NULL,
   `Nama` varchar(75) NOT NULL,
   `SatuanID` int(11) NOT NULL,
   `Harga` float(15,2) NOT NULL DEFAULT '0.00',
-  `HargaJual` float(15,2) NOT NULL DEFAULT '0.00',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+  `HargaJual` float(15,2) NOT NULL DEFAULT '0.00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t06_article`
@@ -164,11 +160,10 @@ INSERT INTO `t06_article` (`id`, `SubGroupID`, `Kode`, `Nama`, `SatuanID`, `Harg
 -- Table structure for table `t07_satuan`
 --
 
-CREATE TABLE IF NOT EXISTS `t07_satuan` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `Nama` varchar(25) CHARACTER SET latin1 NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+CREATE TABLE `t07_satuan` (
+  `id` int(11) NOT NULL,
+  `Nama` varchar(25) CHARACTER SET latin1 NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t07_satuan`
@@ -186,17 +181,16 @@ INSERT INTO `t07_satuan` (`id`, `Nama`) VALUES
 -- Table structure for table `t08_beli`
 --
 
-CREATE TABLE IF NOT EXISTS `t08_beli` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `t08_beli` (
+  `id` int(11) NOT NULL,
   `TglPO` date NOT NULL,
   `NoPO` varchar(14) CHARACTER SET latin1 NOT NULL,
   `VendorID` int(11) NOT NULL,
   `ArticleID` int(11) NOT NULL,
   `Harga` float(15,2) NOT NULL DEFAULT '0.00',
   `Qty` float(15,2) NOT NULL DEFAULT '0.00',
-  `SubTotal` float(15,2) NOT NULL DEFAULT '0.00',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+  `SubTotal` float(15,2) NOT NULL DEFAULT '0.00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t08_beli`
@@ -212,14 +206,13 @@ INSERT INTO `t08_beli` (`id`, `TglPO`, `NoPO`, `VendorID`, `ArticleID`, `Harga`,
 -- Table structure for table `t09_hutang`
 --
 
-CREATE TABLE IF NOT EXISTS `t09_hutang` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `t09_hutang` (
+  `id` int(11) NOT NULL,
   `NoHutang` varchar(8) CHARACTER SET latin1 NOT NULL,
   `BeliID` int(11) NOT NULL,
   `JumlahHutang` float(15,2) NOT NULL DEFAULT '0.00',
-  `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+  `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t09_hutang`
@@ -235,14 +228,13 @@ INSERT INTO `t09_hutang` (`id`, `NoHutang`, `BeliID`, `JumlahHutang`, `JumlahBay
 -- Table structure for table `t10_hutangdetail`
 --
 
-CREATE TABLE IF NOT EXISTS `t10_hutangdetail` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `t10_hutangdetail` (
+  `id` int(11) NOT NULL,
   `HutangID` int(11) NOT NULL,
   `NoBayar` varchar(8) CHARACTER SET latin1 NOT NULL,
   `Tgl` date NOT NULL,
-  `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=22 ;
+  `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t10_hutangdetail`
@@ -261,22 +253,22 @@ INSERT INTO `t10_hutangdetail` (`id`, `HutangID`, `NoBayar`, `Tgl`, `JumlahBayar
 -- Table structure for table `t11_jual`
 --
 
-CREATE TABLE IF NOT EXISTS `t11_jual` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `t11_jual` (
+  `id` int(11) NOT NULL,
   `TglSO` date NOT NULL,
   `NoSO` varchar(14) CHARACTER SET latin1 NOT NULL,
   `CustomerID` int(11) NOT NULL,
   `CustomerPO` varchar(50) CHARACTER SET latin1 NOT NULL,
-  `Total` float(15,2) NOT NULL DEFAULT '0.00',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+  `Total` float(15,2) NOT NULL DEFAULT '0.00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t11_jual`
 --
 
 INSERT INTO `t11_jual` (`id`, `TglSO`, `NoSO`, `CustomerID`, `CustomerPO`, `Total`) VALUES
-(1, '2018-04-18', 'SO201804180001', 1, '-', 875000.00);
+(1, '2018-04-18', 'SO201804180001', 1, '-', 1500000.00),
+(2, '2018-04-18', 'SO201804180002', 1, '-', 362500.00);
 
 -- --------------------------------------------------------
 
@@ -284,15 +276,14 @@ INSERT INTO `t11_jual` (`id`, `TglSO`, `NoSO`, `CustomerID`, `CustomerPO`, `Tota
 -- Table structure for table `t12_jualdetail`
 --
 
-CREATE TABLE IF NOT EXISTS `t12_jualdetail` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `t12_jualdetail` (
+  `id` int(11) NOT NULL,
   `JualID` int(11) NOT NULL,
   `ArticleID` int(11) NOT NULL,
   `HargaJual` float(15,2) NOT NULL DEFAULT '0.00',
   `Qty` float(15,2) NOT NULL DEFAULT '0.00',
-  `SubTotal` float(15,2) NOT NULL DEFAULT '0.00',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+  `SubTotal` float(15,2) NOT NULL DEFAULT '0.00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t12_jualdetail`
@@ -300,7 +291,10 @@ CREATE TABLE IF NOT EXISTS `t12_jualdetail` (
 
 INSERT INTO `t12_jualdetail` (`id`, `JualID`, `ArticleID`, `HargaJual`, `Qty`, `SubTotal`) VALUES
 (1, 1, 1, 125000.00, 3.00, 375000.00),
-(2, 1, 1, 125000.00, 4.00, 500000.00);
+(2, 1, 1, 125000.00, 4.00, 500000.00),
+(3, 1, 1, 125000.00, 5.00, 625000.00),
+(4, 2, 1, 125000.00, 0.65, 81250.00),
+(5, 2, 1, 125000.00, 2.25, 281250.00);
 
 -- --------------------------------------------------------
 
@@ -308,8 +302,8 @@ INSERT INTO `t12_jualdetail` (`id`, `JualID`, `ArticleID`, `HargaJual`, `Qty`, `
 -- Table structure for table `t96_employees`
 --
 
-CREATE TABLE IF NOT EXISTS `t96_employees` (
-  `EmployeeID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `t96_employees` (
+  `EmployeeID` int(11) NOT NULL,
   `LastName` varchar(20) DEFAULT NULL,
   `FirstName` varchar(10) DEFAULT NULL,
   `Title` varchar(30) DEFAULT NULL,
@@ -331,10 +325,8 @@ CREATE TABLE IF NOT EXISTS `t96_employees` (
   `UserLevel` int(11) DEFAULT NULL,
   `Username` varchar(20) NOT NULL DEFAULT '',
   `Activated` enum('Y','N') NOT NULL DEFAULT 'N',
-  `Profile` longtext,
-  PRIMARY KEY (`EmployeeID`),
-  UNIQUE KEY `Username` (`Username`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+  `Profile` longtext
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t96_employees`
@@ -349,10 +341,9 @@ INSERT INTO `t96_employees` (`EmployeeID`, `LastName`, `FirstName`, `Title`, `Ti
 -- Table structure for table `t97_userlevels`
 --
 
-CREATE TABLE IF NOT EXISTS `t97_userlevels` (
+CREATE TABLE `t97_userlevels` (
   `userlevelid` int(11) NOT NULL,
-  `userlevelname` varchar(255) NOT NULL,
-  PRIMARY KEY (`userlevelid`)
+  `userlevelname` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -370,11 +361,10 @@ INSERT INTO `t97_userlevels` (`userlevelid`, `userlevelname`) VALUES
 -- Table structure for table `t98_userlevelpermissions`
 --
 
-CREATE TABLE IF NOT EXISTS `t98_userlevelpermissions` (
+CREATE TABLE `t98_userlevelpermissions` (
   `userlevelid` int(11) NOT NULL,
   `tablename` varchar(255) NOT NULL,
-  `permission` int(11) NOT NULL,
-  PRIMARY KEY (`userlevelid`,`tablename`)
+  `permission` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -408,8 +398,8 @@ INSERT INTO `t98_userlevelpermissions` (`userlevelid`, `tablename`, `permission`
 -- Table structure for table `t99_audittrail`
 --
 
-CREATE TABLE IF NOT EXISTS `t99_audittrail` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `t99_audittrail` (
+  `id` int(11) NOT NULL,
   `datetime` datetime NOT NULL,
   `script` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
   `user` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
@@ -418,9 +408,8 @@ CREATE TABLE IF NOT EXISTS `t99_audittrail` (
   `field` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
   `keyvalue` longtext CHARACTER SET latin1,
   `oldvalue` longtext CHARACTER SET latin1,
-  `newvalue` longtext CHARACTER SET latin1,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=510 ;
+  `newvalue` longtext CHARACTER SET latin1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t99_audittrail`
@@ -934,25 +923,61 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (506, '2018-04-18 12:29:49', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'SubTotal', '1', '287500.00', '375000'),
 (507, '2018-04-18 12:29:49', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'Qty', '2', '2.00', '4'),
 (508, '2018-04-18 12:29:49', '/stok/t11_jualedit.php', '1', 'U', 't12_jualdetail', 'SubTotal', '2', '250000.00', '500000'),
-(509, '2018-04-18 12:29:49', '/stok/t11_jualedit.php', '1', '*** Batch update successful ***', 't12_jualdetail', '', '', '', '');
+(509, '2018-04-18 12:29:49', '/stok/t11_jualedit.php', '1', '*** Batch update successful ***', 't12_jualdetail', '', '', '', ''),
+(510, '2018-04-18 17:18:17', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(511, '2018-04-18 18:09:54', '/stok/t11_jualedit.php', '1', '*** Batch update begin ***', 't12_jualdetail', '', '', '', ''),
+(512, '2018-04-18 18:09:54', '/stok/t11_jualedit.php', '1', 'A', 't12_jualdetail', 'JualID', '3', '', '1'),
+(513, '2018-04-18 18:09:54', '/stok/t11_jualedit.php', '1', 'A', 't12_jualdetail', 'ArticleID', '3', '', '1'),
+(514, '2018-04-18 18:09:54', '/stok/t11_jualedit.php', '1', 'A', 't12_jualdetail', 'HargaJual', '3', '', '125000.00'),
+(515, '2018-04-18 18:09:54', '/stok/t11_jualedit.php', '1', 'A', 't12_jualdetail', 'Qty', '3', '', '5'),
+(516, '2018-04-18 18:09:54', '/stok/t11_jualedit.php', '1', 'A', 't12_jualdetail', 'SatuanID', '3', '', '1'),
+(517, '2018-04-18 18:09:54', '/stok/t11_jualedit.php', '1', 'A', 't12_jualdetail', 'SubTotal', '3', '', '625000'),
+(518, '2018-04-18 18:09:54', '/stok/t11_jualedit.php', '1', 'A', 't12_jualdetail', 'id', '3', '', '3'),
+(519, '2018-04-18 18:09:55', '/stok/t11_jualedit.php', '1', '*** Batch update successful ***', 't12_jualdetail', '', '', '', ''),
+(520, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'TglSO', '2', '', '2018-04-18'),
+(521, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'NoSO', '2', '', 'SO201804180002'),
+(522, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'CustomerID', '2', '', '1'),
+(523, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'CustomerPO', '2', '', '-'),
+(524, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'Total', '2', '', '0'),
+(525, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'id', '2', '', '2'),
+(526, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', '*** Batch insert begin ***', 't12_jualdetail', '', '', '', ''),
+(527, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'JualID', '4', '', '2'),
+(528, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'ArticleID', '4', '', '1'),
+(529, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'HargaJual', '4', '', '125000.00'),
+(530, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'Qty', '4', '', '.65'),
+(531, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SatuanID', '4', '', '1'),
+(532, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SubTotal', '4', '', '81250'),
+(533, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'id', '4', '', '4'),
+(534, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'JualID', '5', '', '2'),
+(535, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'ArticleID', '5', '', '1'),
+(536, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'HargaJual', '5', '', '125000.00'),
+(537, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'Qty', '5', '', '2.25'),
+(538, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SatuanID', '5', '', '1'),
+(539, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SubTotal', '5', '', '281250'),
+(540, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'id', '5', '', '5'),
+(541, '2018-04-18 18:11:02', '/stok/t11_jualadd.php', '1', '*** Batch insert successful ***', 't12_jualdetail', '', '', '', ''),
+(542, '2018-04-18 22:42:37', '/stok/login.php', 'admin', 'login', '::1', '', '', '', '');
 
 -- --------------------------------------------------------
 
 --
 -- Stand-in structure for view `v01_beli`
+-- (See below for the actual view)
 --
-CREATE TABLE IF NOT EXISTS `v01_beli` (
+CREATE TABLE `v01_beli` (
 `articleid` int(11)
 ,`avgharga` double(19,6)
 ,`sumqty` double(19,2)
 ,`subtotal` double(23,6)
 );
+
 -- --------------------------------------------------------
 
 --
 -- Stand-in structure for view `v02_stok`
+-- (See below for the actual view)
 --
-CREATE TABLE IF NOT EXISTS `v02_stok` (
+CREATE TABLE `v02_stok` (
 `MainGroup` varchar(55)
 ,`SubGroup` varchar(56)
 ,`Article` varchar(85)
@@ -961,12 +986,14 @@ CREATE TABLE IF NOT EXISTS `v02_stok` (
 ,`AvgHarga` double(19,6)
 ,`SubTotal` double(23,6)
 );
+
 -- --------------------------------------------------------
 
 --
 -- Stand-in structure for view `v03_hutang`
+-- (See below for the actual view)
 --
-CREATE TABLE IF NOT EXISTS `v03_hutang` (
+CREATE TABLE `v03_hutang` (
 `nohutang` varchar(8)
 ,`tglpo` date
 ,`nopo` varchar(14)
@@ -975,21 +1002,25 @@ CREATE TABLE IF NOT EXISTS `v03_hutang` (
 ,`jumlahbayar` float(15,2)
 ,`sisahutang` double(19,2)
 );
+
 -- --------------------------------------------------------
 
 --
 -- Stand-in structure for view `v04_jual`
+-- (See below for the actual view)
 --
-CREATE TABLE IF NOT EXISTS `v04_jual` (
+CREATE TABLE `v04_jual` (
 `TglSO` date
 ,`NoSO` varchar(14)
-,`CustomerID` int(11)
+,`CustomerNama` varchar(50)
 ,`CustomerPO` varchar(50)
-,`ArticleID` int(11)
+,`ArticleNama` varchar(85)
 ,`HargaJual` float(15,2)
 ,`Qty` float(15,2)
+,`SatuanNama` varchar(25)
 ,`SubTotal` float(15,2)
 );
+
 -- --------------------------------------------------------
 
 --
@@ -997,7 +1028,7 @@ CREATE TABLE IF NOT EXISTS `v04_jual` (
 --
 DROP TABLE IF EXISTS `v01_beli`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v01_beli` AS select `t08_beli`.`ArticleID` AS `articleid`,avg(`t08_beli`.`Harga`) AS `avgharga`,sum(`t08_beli`.`Qty`) AS `sumqty`,(avg(`t08_beli`.`Harga`) * sum(`t08_beli`.`Qty`)) AS `subtotal` from `t08_beli` group by `t08_beli`.`ArticleID`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v01_beli`  AS  select `t08_beli`.`ArticleID` AS `articleid`,avg(`t08_beli`.`Harga`) AS `avgharga`,sum(`t08_beli`.`Qty`) AS `sumqty`,(avg(`t08_beli`.`Harga`) * sum(`t08_beli`.`Qty`)) AS `subtotal` from `t08_beli` group by `t08_beli`.`ArticleID` ;
 
 -- --------------------------------------------------------
 
@@ -1006,7 +1037,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `v02_stok`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v02_stok` AS select concat(`a`.`Kode`,' - ',`a`.`Nama`) AS `MainGroup`,concat(`b`.`Kode`,' - ',`b`.`Nama`) AS `SubGroup`,concat(`c`.`Kode`,' - ',`c`.`Nama`) AS `Article`,`e`.`sumqty` AS `SumQty`,`d`.`Nama` AS `Satuan`,`e`.`avgharga` AS `AvgHarga`,`e`.`subtotal` AS `SubTotal` from ((((`t04_maingroup` `a` left join `t05_subgroup` `b` on((`a`.`id` = `b`.`MainGroupID`))) left join `t06_article` `c` on((`b`.`id` = `c`.`SubGroupID`))) left join `t07_satuan` `d` on((`c`.`SatuanID` = `d`.`id`))) left join `v01_beli` `e` on((`c`.`id` = `e`.`articleid`)));
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v02_stok`  AS  select concat(`a`.`Kode`,' - ',`a`.`Nama`) AS `MainGroup`,concat(`b`.`Kode`,' - ',`b`.`Nama`) AS `SubGroup`,concat(`c`.`Kode`,' - ',`c`.`Nama`) AS `Article`,`e`.`sumqty` AS `SumQty`,`d`.`Nama` AS `Satuan`,`e`.`avgharga` AS `AvgHarga`,`e`.`subtotal` AS `SubTotal` from ((((`t04_maingroup` `a` left join `t05_subgroup` `b` on((`a`.`id` = `b`.`MainGroupID`))) left join `t06_article` `c` on((`b`.`id` = `c`.`SubGroupID`))) left join `t07_satuan` `d` on((`c`.`SatuanID` = `d`.`id`))) left join `v01_beli` `e` on((`c`.`id` = `e`.`articleid`))) ;
 
 -- --------------------------------------------------------
 
@@ -1015,7 +1046,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `v03_hutang`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v03_hutang` AS select `a`.`NoHutang` AS `nohutang`,`b`.`TglPO` AS `tglpo`,`b`.`NoPO` AS `nopo`,`c`.`Nama` AS `nama`,`a`.`JumlahHutang` AS `jumlahhutang`,`a`.`JumlahBayar` AS `jumlahbayar`,(`a`.`JumlahHutang` - `a`.`JumlahBayar`) AS `sisahutang` from ((`t09_hutang` `a` left join `t08_beli` `b` on((`a`.`BeliID` = `b`.`id`))) left join `t02_vendor` `c` on((`b`.`VendorID` = `c`.`id`)));
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v03_hutang`  AS  select `a`.`NoHutang` AS `nohutang`,`b`.`TglPO` AS `tglpo`,`b`.`NoPO` AS `nopo`,`c`.`Nama` AS `nama`,`a`.`JumlahHutang` AS `jumlahhutang`,`a`.`JumlahBayar` AS `jumlahbayar`,(`a`.`JumlahHutang` - `a`.`JumlahBayar`) AS `sisahutang` from ((`t09_hutang` `a` left join `t08_beli` `b` on((`a`.`BeliID` = `b`.`id`))) left join `t02_vendor` `c` on((`b`.`VendorID` = `c`.`id`))) ;
 
 -- --------------------------------------------------------
 
@@ -1024,7 +1055,197 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `v04_jual`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v04_jual` AS select `a`.`TglSO` AS `TglSO`,`a`.`NoSO` AS `NoSO`,`a`.`CustomerID` AS `CustomerID`,`a`.`CustomerPO` AS `CustomerPO`,`b`.`ArticleID` AS `ArticleID`,`b`.`HargaJual` AS `HargaJual`,`b`.`Qty` AS `Qty`,`b`.`SubTotal` AS `SubTotal` from (`t11_jual` `a` left join `t12_jualdetail` `b` on((`a`.`id` = `b`.`JualID`)));
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v04_jual`  AS  select `a`.`TglSO` AS `TglSO`,`a`.`NoSO` AS `NoSO`,`c`.`Nama` AS `CustomerNama`,`a`.`CustomerPO` AS `CustomerPO`,concat(`d`.`Kode`,' - ',`d`.`Nama`) AS `ArticleNama`,`b`.`HargaJual` AS `HargaJual`,`b`.`Qty` AS `Qty`,`e`.`Nama` AS `SatuanNama`,`b`.`SubTotal` AS `SubTotal` from ((((`t11_jual` `a` left join `t12_jualdetail` `b` on((`a`.`id` = `b`.`JualID`))) left join `t03_customer` `c` on((`a`.`CustomerID` = `c`.`id`))) left join `t06_article` `d` on((`b`.`ArticleID` = `d`.`id`))) left join `t07_satuan` `e` on((`d`.`SatuanID` = `e`.`id`))) ;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `t01_company`
+--
+ALTER TABLE `t01_company`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `t02_vendor`
+--
+ALTER TABLE `t02_vendor`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `t03_customer`
+--
+ALTER TABLE `t03_customer`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `t04_maingroup`
+--
+ALTER TABLE `t04_maingroup`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `t05_subgroup`
+--
+ALTER TABLE `t05_subgroup`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `t06_article`
+--
+ALTER TABLE `t06_article`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `t07_satuan`
+--
+ALTER TABLE `t07_satuan`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `t08_beli`
+--
+ALTER TABLE `t08_beli`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `t09_hutang`
+--
+ALTER TABLE `t09_hutang`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `t10_hutangdetail`
+--
+ALTER TABLE `t10_hutangdetail`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `t11_jual`
+--
+ALTER TABLE `t11_jual`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `t12_jualdetail`
+--
+ALTER TABLE `t12_jualdetail`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `t96_employees`
+--
+ALTER TABLE `t96_employees`
+  ADD PRIMARY KEY (`EmployeeID`),
+  ADD UNIQUE KEY `Username` (`Username`);
+
+--
+-- Indexes for table `t97_userlevels`
+--
+ALTER TABLE `t97_userlevels`
+  ADD PRIMARY KEY (`userlevelid`);
+
+--
+-- Indexes for table `t98_userlevelpermissions`
+--
+ALTER TABLE `t98_userlevelpermissions`
+  ADD PRIMARY KEY (`userlevelid`,`tablename`);
+
+--
+-- Indexes for table `t99_audittrail`
+--
+ALTER TABLE `t99_audittrail`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `t01_company`
+--
+ALTER TABLE `t01_company`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `t02_vendor`
+--
+ALTER TABLE `t02_vendor`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `t03_customer`
+--
+ALTER TABLE `t03_customer`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `t04_maingroup`
+--
+ALTER TABLE `t04_maingroup`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `t05_subgroup`
+--
+ALTER TABLE `t05_subgroup`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `t06_article`
+--
+ALTER TABLE `t06_article`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `t07_satuan`
+--
+ALTER TABLE `t07_satuan`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `t08_beli`
+--
+ALTER TABLE `t08_beli`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `t09_hutang`
+--
+ALTER TABLE `t09_hutang`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `t10_hutangdetail`
+--
+ALTER TABLE `t10_hutangdetail`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `t11_jual`
+--
+ALTER TABLE `t11_jual`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `t12_jualdetail`
+--
+ALTER TABLE `t12_jualdetail`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `t96_employees`
+--
+ALTER TABLE `t96_employees`
+  MODIFY `EmployeeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `t99_audittrail`
+--
+ALTER TABLE `t99_audittrail`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=543;
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

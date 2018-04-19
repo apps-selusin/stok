@@ -918,10 +918,8 @@ class crr04_jual_summary extends crr04_jual {
 				$this->FirstRowData = array();
 				$this->FirstRowData['TglSO'] = ewr_Conv($rs->fields('TglSO'), 133);
 				$this->FirstRowData['NoSO'] = ewr_Conv($rs->fields('NoSO'), 200);
-				$this->FirstRowData['CustomerID'] = ewr_Conv($rs->fields('CustomerID'), 3);
 				$this->FirstRowData['CustomerNama'] = ewr_Conv($rs->fields('CustomerNama'), 200);
 				$this->FirstRowData['CustomerPO'] = ewr_Conv($rs->fields('CustomerPO'), 200);
-				$this->FirstRowData['ArticleID'] = ewr_Conv($rs->fields('ArticleID'), 3);
 				$this->FirstRowData['ArticleNama'] = ewr_Conv($rs->fields('ArticleNama'), 200);
 				$this->FirstRowData['HargaJual'] = ewr_Conv($rs->fields('HargaJual'), 4);
 				$this->FirstRowData['Qty'] = ewr_Conv($rs->fields('Qty'), 4);
@@ -939,10 +937,8 @@ class crr04_jual_summary extends crr04_jual {
 					$this->TglSO->setDbValue(ewr_GroupValue($this->TglSO, $rs->fields('TglSO')));
 			}
 			$this->NoSO->setDbValue($rs->fields('NoSO'));
-			$this->CustomerID->setDbValue($rs->fields('CustomerID'));
 			$this->CustomerNama->setDbValue($rs->fields('CustomerNama'));
 			$this->CustomerPO->setDbValue($rs->fields('CustomerPO'));
-			$this->ArticleID->setDbValue($rs->fields('ArticleID'));
 			$this->ArticleNama->setDbValue($rs->fields('ArticleNama'));
 			$this->HargaJual->setDbValue($rs->fields('HargaJual'));
 			$this->Qty->setDbValue($rs->fields('Qty'));
@@ -956,10 +952,8 @@ class crr04_jual_summary extends crr04_jual {
 		} else {
 			$this->TglSO->setDbValue("");
 			$this->NoSO->setDbValue("");
-			$this->CustomerID->setDbValue("");
 			$this->CustomerNama->setDbValue("");
 			$this->CustomerPO->setDbValue("");
-			$this->ArticleID->setDbValue("");
 			$this->ArticleNama->setDbValue("");
 			$this->HargaJual->setDbValue("");
 			$this->Qty->setDbValue("");
@@ -1857,11 +1851,11 @@ class crr04_jual_summary extends crr04_jual {
 		// Check if validation required
 		if (!EWR_SERVER_VALIDATE)
 			return ($grFormError == "");
-		if (!ewr_CheckEuroDate($this->TglSO->SearchValue)) {
+		if (!EURODATE($this->TglSO->SearchValue)) {
 			if ($grFormError <> "") $grFormError .= "<br>";
 			$grFormError .= $this->TglSO->FldErrMsg();
 		}
-		if (!ewr_CheckEuroDate($this->TglSO->SearchValue2)) {
+		if (!EURODATE($this->TglSO->SearchValue2)) {
 			if ($grFormError <> "") $grFormError .= "<br>";
 			$grFormError .= $this->TglSO->FldErrMsg();
 		}
@@ -2498,12 +2492,12 @@ fr04_jualsummary.Validate = function() {
 		return true; // Ignore validation
 	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
 	var elm = fobj.sv_TglSO;
-	if (elm && !ewr_CheckEuroDate(elm.value)) {
+	if (elm && typeof(EURODATE) == "function" && !EURODATE(elm.value)) {
 		if (!this.OnError(elm, "<?php echo ewr_JsEncode2($Page->TglSO->FldErrMsg()) ?>"))
 			return false;
 	}
 	var elm = fobj.sv2_TglSO;
-	if (elm && !ewr_CheckEuroDate(elm.value)) {
+	if (elm && typeof(EURODATE) == "function" && !EURODATE(elm.value)) {
 		if (!this.OnError(elm, "<?php echo ewr_JsEncode2($Page->TglSO->FldErrMsg()) ?>"))
 			return false;
 	}
@@ -2581,12 +2575,12 @@ if (!$Page->DrillDownInPanel) {
 	<span class="ewSearchOperator"><?php echo $ReportLanguage->Phrase("BETWEEN"); ?><input type="hidden" name="so_TglSO" id="so_TglSO" value="BETWEEN"></span>
 	<span class="control-group ewSearchField">
 <?php ewr_PrependClass($Page->TglSO->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="r04_jual" data-field="x_TglSO" id="sv_TglSO" name="sv_TglSO" placeholder="<?php echo $Page->TglSO->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->TglSO->SearchValue) ?>" data-calendar='true' data-options='{"ignoreReadonly":true,"useCurrent":false,"format":7}'<?php echo $Page->TglSO->EditAttributes() ?>>
+<input type="text" data-table="r04_jual" data-field="x_TglSO" id="sv_TglSO" name="sv_TglSO" placeholder="<?php echo $Page->TglSO->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->TglSO->SearchValue) ?>"<?php echo $Page->TglSO->EditAttributes() ?>>
 </span>
 	<span class="ewSearchCond btw1_TglSO"><?php echo $ReportLanguage->Phrase("AND") ?></span>
 	<span class="ewSearchField btw1_TglSO">
 <?php ewr_PrependClass($Page->TglSO->EditAttrs["class"], "form-control"); // PR8 ?>
-<input type="text" data-table="r04_jual" data-field="x_TglSO" id="sv2_TglSO" name="sv2_TglSO" placeholder="<?php echo $Page->TglSO->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->TglSO->SearchValue2) ?>" data-calendar='true' data-options='{"ignoreReadonly":true,"useCurrent":false,"format":7}'<?php echo $Page->TglSO->EditAttributes() ?>>
+<input type="text" data-table="r04_jual" data-field="x_TglSO" id="sv2_TglSO" name="sv2_TglSO" placeholder="<?php echo $Page->TglSO->PlaceHolder ?>" value="<?php echo ewr_HtmlEncode($Page->TglSO->SearchValue2) ?>"<?php echo $Page->TglSO->EditAttributes() ?>>
 </span>
 </div>
 </div>
@@ -3194,27 +3188,23 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		// Show Footers
 ?>
 <?php
-		if ($Page->ChkLvlBreak(4)) {
-			$cnt = count(@$Page->GrpIdx[$Page->GrpCount][$Page->GrpCounter[0]][$Page->GrpCounter[1]]);
-			$Page->GrpIdx[$Page->GrpCount][$Page->GrpCounter[0]][$Page->GrpCounter[1]][$cnt] = $Page->RecCount;
-		}
-		if ($Page->ChkLvlBreak(4) && $Page->CustomerPO->Visible) {
+		if ($Page->ChkLvlBreak(2) && $Page->NoSO->Visible) {
 ?>
 <?php
 			$Page->TglSO->Count = $Page->GetSummaryCount(1, FALSE);
 			$Page->NoSO->Count = $Page->GetSummaryCount(2, FALSE);
 			$Page->CustomerNama->Count = $Page->GetSummaryCount(3, FALSE);
 			$Page->CustomerPO->Count = $Page->GetSummaryCount(4, FALSE);
-			$Page->SubTotal->Count = $Page->Cnt[4][5];
-			$Page->SubTotal->SumValue = $Page->Smry[4][5]; // Load SUM
+			$Page->SubTotal->Count = $Page->Cnt[2][5];
+			$Page->SubTotal->SumValue = $Page->Smry[2][5]; // Load SUM
 			$Page->ResetAttrs();
 			$Page->RowType = EWR_ROWTYPE_TOTAL;
 			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
 			$Page->RowTotalSubType = EWR_ROWTOTAL_FOOTER;
-			$Page->RowGroupLevel = 4;
+			$Page->RowGroupLevel = 2;
 			$Page->RenderRow();
 ?>
-<?php if ($Page->CustomerPO->ShowCompactSummaryFooter) { ?>
+<?php if ($Page->NoSO->ShowCompactSummaryFooter) { ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->TglSO->Visible) { ?>
 		<td data-field="TglSO"<?php echo $Page->TglSO->CellAttributes() ?>>
@@ -3239,7 +3229,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		</td>
 <?php } ?>
 <?php if ($Page->CustomerNama->Visible) { ?>
-		<td data-field="CustomerNama"<?php echo $Page->CustomerNama->CellAttributes() ?>>
+		<td data-field="CustomerNama"<?php echo $Page->NoSO->CellAttributes() ?>>
 	<?php if ($Page->CustomerNama->ShowGroupHeaderAsRow) { ?>
 		&nbsp;
 	<?php } elseif ($Page->RowGroupLevel <> 3) { ?>
@@ -3250,7 +3240,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		</td>
 <?php } ?>
 <?php if ($Page->CustomerPO->Visible) { ?>
-		<td data-field="CustomerPO"<?php echo $Page->CustomerPO->CellAttributes() ?>>
+		<td data-field="CustomerPO"<?php echo $Page->NoSO->CellAttributes() ?>>
 	<?php if ($Page->CustomerPO->ShowGroupHeaderAsRow) { ?>
 		&nbsp;
 	<?php } elseif ($Page->RowGroupLevel <> 4) { ?>
@@ -3261,19 +3251,19 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		</td>
 <?php } ?>
 <?php if ($Page->ArticleNama->Visible) { ?>
-		<td data-field="ArticleNama"<?php echo $Page->CustomerPO->CellAttributes() ?>></td>
+		<td data-field="ArticleNama"<?php echo $Page->NoSO->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->HargaJual->Visible) { ?>
-		<td data-field="HargaJual"<?php echo $Page->CustomerPO->CellAttributes() ?>></td>
+		<td data-field="HargaJual"<?php echo $Page->NoSO->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->Qty->Visible) { ?>
-		<td data-field="Qty"<?php echo $Page->CustomerPO->CellAttributes() ?>></td>
+		<td data-field="Qty"<?php echo $Page->NoSO->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->SatuanNama->Visible) { ?>
-		<td data-field="SatuanNama"<?php echo $Page->CustomerPO->CellAttributes() ?>></td>
+		<td data-field="SatuanNama"<?php echo $Page->NoSO->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->SubTotal->Visible) { ?>
-		<td data-field="SubTotal"<?php echo $Page->CustomerPO->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span<?php echo $Page->SubTotal->ViewAttributes() ?>><?php echo $Page->SubTotal->SumViewValue ?></span></span></td>
+		<td data-field="SubTotal"<?php echo $Page->NoSO->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span<?php echo $Page->SubTotal->ViewAttributes() ?>><?php echo $Page->SubTotal->SumViewValue ?></span></span></td>
 <?php } ?>
 	</tr>
 <?php } else { ?>
@@ -3281,40 +3271,28 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->TglSO->Visible) { ?>
 		<td data-field="TglSO"<?php echo $Page->TglSO->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
-<?php if ($Page->NoSO->Visible) { ?>
-		<td data-field="NoSO"<?php echo $Page->NoSO->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->CustomerNama->Visible) { ?>
-		<td data-field="CustomerNama"<?php echo $Page->CustomerNama->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->SubGrpColumnCount + $Page->DtlColumnCount - 2 > 0) { ?>
-		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount - 2) ?>"<?php echo $Page->SubTotal->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->CustomerPO->GroupViewValue, $Page->CustomerPO->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[4][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+<?php if ($Page->SubGrpColumnCount + $Page->DtlColumnCount > 0) { ?>
+		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->SubTotal->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->NoSO->GroupViewValue, $Page->NoSO->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[2][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
 <?php } ?>
 	</tr>
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->TglSO->Visible) { ?>
 		<td data-field="TglSO"<?php echo $Page->TglSO->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
-<?php if ($Page->NoSO->Visible) { ?>
-		<td data-field="NoSO"<?php echo $Page->NoSO->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->CustomerNama->Visible) { ?>
-		<td data-field="CustomerNama"<?php echo $Page->CustomerNama->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
 <?php if ($Page->GrpColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->GrpColumnCount - 3) ?>"<?php echo $Page->CustomerPO->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+		<td colspan="<?php echo ($Page->GrpColumnCount - 1) ?>"<?php echo $Page->NoSO->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
 <?php } ?>
 <?php if ($Page->ArticleNama->Visible) { ?>
-		<td data-field="ArticleNama"<?php echo $Page->CustomerPO->CellAttributes() ?>>&nbsp;</td>
+		<td data-field="ArticleNama"<?php echo $Page->NoSO->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->HargaJual->Visible) { ?>
-		<td data-field="HargaJual"<?php echo $Page->CustomerPO->CellAttributes() ?>>&nbsp;</td>
+		<td data-field="HargaJual"<?php echo $Page->NoSO->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->Qty->Visible) { ?>
-		<td data-field="Qty"<?php echo $Page->CustomerPO->CellAttributes() ?>>&nbsp;</td>
+		<td data-field="Qty"<?php echo $Page->NoSO->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->SatuanNama->Visible) { ?>
-		<td data-field="SatuanNama"<?php echo $Page->CustomerPO->CellAttributes() ?>>&nbsp;</td>
+		<td data-field="SatuanNama"<?php echo $Page->NoSO->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->SubTotal->Visible) { ?>
 		<td data-field="SubTotal"<?php echo $Page->SubTotal->CellAttributes() ?>>
@@ -3324,141 +3302,16 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 <?php
 
-			// Reset level 4 summary
-			$Page->ResetLevelSummary(4);
+			// Reset level 2 summary
+			$Page->ResetLevelSummary(2);
 		} // End show footer check
-		if ($Page->ChkLvlBreak(4)) {
-			$Page->GrpCounter[2]++;
-		}
-?>
-<?php
-		if ($Page->ChkLvlBreak(3) && $Page->CustomerNama->Visible) {
-?>
-<?php
-			$Page->TglSO->Count = $Page->GetSummaryCount(1, FALSE);
-			$Page->NoSO->Count = $Page->GetSummaryCount(2, FALSE);
-			$Page->CustomerNama->Count = $Page->GetSummaryCount(3, FALSE);
-			$Page->CustomerPO->Count = $Page->GetSummaryCount(4, FALSE);
-			$Page->SubTotal->Count = $Page->Cnt[3][5];
-			$Page->SubTotal->SumValue = $Page->Smry[3][5]; // Load SUM
-			$Page->ResetAttrs();
-			$Page->RowType = EWR_ROWTYPE_TOTAL;
-			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
-			$Page->RowTotalSubType = EWR_ROWTOTAL_FOOTER;
-			$Page->RowGroupLevel = 3;
-			$Page->RenderRow();
-?>
-<?php if ($Page->CustomerNama->ShowCompactSummaryFooter) { ?>
-	<tr<?php echo $Page->RowAttributes(); ?>>
-<?php if ($Page->TglSO->Visible) { ?>
-		<td data-field="TglSO"<?php echo $Page->TglSO->CellAttributes() ?>>
-	<?php if ($Page->TglSO->ShowGroupHeaderAsRow) { ?>
-		&nbsp;
-	<?php } elseif ($Page->RowGroupLevel <> 1) { ?>
-		&nbsp;
-	<?php } else { ?>
-		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->TglSO->Count,0,-2,-2,-2) ?></span></span>
-	<?php } ?>
-		</td>
-<?php } ?>
-<?php if ($Page->NoSO->Visible) { ?>
-		<td data-field="NoSO"<?php echo $Page->NoSO->CellAttributes() ?>>
-	<?php if ($Page->NoSO->ShowGroupHeaderAsRow) { ?>
-		&nbsp;
-	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
-		&nbsp;
-	<?php } else { ?>
-		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->NoSO->Count,0,-2,-2,-2) ?></span></span>
-	<?php } ?>
-		</td>
-<?php } ?>
-<?php if ($Page->CustomerNama->Visible) { ?>
-		<td data-field="CustomerNama"<?php echo $Page->CustomerNama->CellAttributes() ?>>
-	<?php if ($Page->CustomerNama->ShowGroupHeaderAsRow) { ?>
-		&nbsp;
-	<?php } elseif ($Page->RowGroupLevel <> 3) { ?>
-		&nbsp;
-	<?php } else { ?>
-		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->CustomerNama->Count,0,-2,-2,-2) ?></span></span>
-	<?php } ?>
-		</td>
-<?php } ?>
-<?php if ($Page->CustomerPO->Visible) { ?>
-		<td data-field="CustomerPO"<?php echo $Page->CustomerNama->CellAttributes() ?>>
-	<?php if ($Page->CustomerPO->ShowGroupHeaderAsRow) { ?>
-		&nbsp;
-	<?php } elseif ($Page->RowGroupLevel <> 4) { ?>
-		&nbsp;
-	<?php } else { ?>
-		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->CustomerPO->Count,0,-2,-2,-2) ?></span></span>
-	<?php } ?>
-		</td>
-<?php } ?>
-<?php if ($Page->ArticleNama->Visible) { ?>
-		<td data-field="ArticleNama"<?php echo $Page->CustomerNama->CellAttributes() ?>></td>
-<?php } ?>
-<?php if ($Page->HargaJual->Visible) { ?>
-		<td data-field="HargaJual"<?php echo $Page->CustomerNama->CellAttributes() ?>></td>
-<?php } ?>
-<?php if ($Page->Qty->Visible) { ?>
-		<td data-field="Qty"<?php echo $Page->CustomerNama->CellAttributes() ?>></td>
-<?php } ?>
-<?php if ($Page->SatuanNama->Visible) { ?>
-		<td data-field="SatuanNama"<?php echo $Page->CustomerNama->CellAttributes() ?>></td>
-<?php } ?>
-<?php if ($Page->SubTotal->Visible) { ?>
-		<td data-field="SubTotal"<?php echo $Page->CustomerNama->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span<?php echo $Page->SubTotal->ViewAttributes() ?>><?php echo $Page->SubTotal->SumViewValue ?></span></span></td>
-<?php } ?>
-	</tr>
-<?php } else { ?>
-	<tr<?php echo $Page->RowAttributes(); ?>>
-<?php if ($Page->TglSO->Visible) { ?>
-		<td data-field="TglSO"<?php echo $Page->TglSO->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->NoSO->Visible) { ?>
-		<td data-field="NoSO"<?php echo $Page->NoSO->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->SubGrpColumnCount + $Page->DtlColumnCount - 1 > 0) { ?>
-		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount - 1) ?>"<?php echo $Page->SubTotal->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->CustomerNama->GroupViewValue, $Page->CustomerNama->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[3][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
-<?php } ?>
-	</tr>
-	<tr<?php echo $Page->RowAttributes(); ?>>
-<?php if ($Page->TglSO->Visible) { ?>
-		<td data-field="TglSO"<?php echo $Page->TglSO->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->NoSO->Visible) { ?>
-		<td data-field="NoSO"<?php echo $Page->NoSO->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->GrpColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->GrpColumnCount - 2) ?>"<?php echo $Page->CustomerNama->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
-<?php } ?>
-<?php if ($Page->ArticleNama->Visible) { ?>
-		<td data-field="ArticleNama"<?php echo $Page->CustomerNama->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->HargaJual->Visible) { ?>
-		<td data-field="HargaJual"<?php echo $Page->CustomerNama->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->Qty->Visible) { ?>
-		<td data-field="Qty"<?php echo $Page->CustomerNama->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->SatuanNama->Visible) { ?>
-		<td data-field="SatuanNama"<?php echo $Page->CustomerNama->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->SubTotal->Visible) { ?>
-		<td data-field="SubTotal"<?php echo $Page->SubTotal->CellAttributes() ?>>
-<span<?php echo $Page->SubTotal->ViewAttributes() ?>><?php echo $Page->SubTotal->SumViewValue ?></span></td>
-<?php } ?>
-	</tr>
-<?php } ?>
-<?php
-
-			// Reset level 3 summary
-			$Page->ResetLevelSummary(3);
-		} // End show footer check
-		if ($Page->ChkLvlBreak(3)) {
-			$Page->GrpCounter[1]++;
+		if ($Page->ChkLvlBreak(2)) {
+			$Page->GrpCounter[0]++;
 			if (!$rs->EOF)
-				$Page->GrpIdx[$Page->GrpCount][$Page->GrpCounter[1]] = array(-1);
+				$Page->GrpIdx[$Page->GrpCount][$Page->GrpCounter[0]] = array(-1);
+			$Page->GrpCounter[1] = 1;
+			if (!$rs->EOF)
+				$Page->GrpIdx[$Page->GrpCount][$Page->GrpCounter[0]][$Page->GrpCounter[1]] = array(-1);
 			$Page->GrpCounter[2] = 1;
 		}
 ?>
@@ -3500,7 +3353,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	$Page->RowAttrs["class"] = "ewRptGrandSummary";
 	$Page->RenderRow();
 ?>
-<?php if ($Page->CustomerNama->ShowCompactSummaryFooter) { ?>
+<?php if ($Page->NoSO->ShowCompactSummaryFooter) { ?>
 	<tr<?php echo $Page->RowAttributes() ?>><td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"><?php echo $ReportLanguage->Phrase("RptGrandSummary") ?> (<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->TotCount,0,-2,-2,-2) ?></span>)</td></tr>
 	<tr<?php echo $Page->RowAttributes() ?>>
 <?php if ($Page->GrpColumnCount > 0) { ?>
