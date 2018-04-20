@@ -462,6 +462,7 @@ class ct06_article_list extends ct06_article {
 		$this->SubGroupID->SetVisibility();
 		$this->Kode->SetVisibility();
 		$this->Nama->SetVisibility();
+		$this->Qty->SetVisibility();
 		$this->SatuanID->SetVisibility();
 		$this->Harga->SetVisibility();
 		$this->HargaJual->SetVisibility();
@@ -804,6 +805,7 @@ class ct06_article_list extends ct06_article {
 	// Exit inline mode
 	function ClearInlineMode() {
 		$this->setKey("id", ""); // Clear inline edit key
+		$this->Qty->FormValue = ""; // Clear form value
 		$this->Harga->FormValue = ""; // Clear form value
 		$this->HargaJual->FormValue = ""; // Clear form value
 		$this->LastAction = $this->CurrentAction; // Save last action
@@ -958,6 +960,7 @@ class ct06_article_list extends ct06_article {
 		$sFilterList = ew_Concat($sFilterList, $this->SubGroupID->AdvancedSearch->ToJson(), ","); // Field SubGroupID
 		$sFilterList = ew_Concat($sFilterList, $this->Kode->AdvancedSearch->ToJson(), ","); // Field Kode
 		$sFilterList = ew_Concat($sFilterList, $this->Nama->AdvancedSearch->ToJson(), ","); // Field Nama
+		$sFilterList = ew_Concat($sFilterList, $this->Qty->AdvancedSearch->ToJson(), ","); // Field Qty
 		$sFilterList = ew_Concat($sFilterList, $this->SatuanID->AdvancedSearch->ToJson(), ","); // Field SatuanID
 		$sFilterList = ew_Concat($sFilterList, $this->Harga->AdvancedSearch->ToJson(), ","); // Field Harga
 		$sFilterList = ew_Concat($sFilterList, $this->HargaJual->AdvancedSearch->ToJson(), ","); // Field HargaJual
@@ -1044,6 +1047,14 @@ class ct06_article_list extends ct06_article {
 		$this->Nama->AdvancedSearch->SearchValue2 = @$filter["y_Nama"];
 		$this->Nama->AdvancedSearch->SearchOperator2 = @$filter["w_Nama"];
 		$this->Nama->AdvancedSearch->Save();
+
+		// Field Qty
+		$this->Qty->AdvancedSearch->SearchValue = @$filter["x_Qty"];
+		$this->Qty->AdvancedSearch->SearchOperator = @$filter["z_Qty"];
+		$this->Qty->AdvancedSearch->SearchCondition = @$filter["v_Qty"];
+		$this->Qty->AdvancedSearch->SearchValue2 = @$filter["y_Qty"];
+		$this->Qty->AdvancedSearch->SearchOperator2 = @$filter["w_Qty"];
+		$this->Qty->AdvancedSearch->Save();
 
 		// Field SatuanID
 		$this->SatuanID->AdvancedSearch->SearchValue = @$filter["x_SatuanID"];
@@ -1231,6 +1242,7 @@ class ct06_article_list extends ct06_article {
 			$this->UpdateSort($this->SubGroupID, $bCtrl); // SubGroupID
 			$this->UpdateSort($this->Kode, $bCtrl); // Kode
 			$this->UpdateSort($this->Nama, $bCtrl); // Nama
+			$this->UpdateSort($this->Qty, $bCtrl); // Qty
 			$this->UpdateSort($this->SatuanID, $bCtrl); // SatuanID
 			$this->UpdateSort($this->Harga, $bCtrl); // Harga
 			$this->UpdateSort($this->HargaJual, $bCtrl); // HargaJual
@@ -1272,6 +1284,7 @@ class ct06_article_list extends ct06_article {
 				$this->SubGroupID->setSort("");
 				$this->Kode->setSort("");
 				$this->Nama->setSort("");
+				$this->Qty->setSort("");
 				$this->SatuanID->setSort("");
 				$this->Harga->setSort("");
 				$this->HargaJual->setSort("");
@@ -1696,6 +1709,7 @@ class ct06_article_list extends ct06_article {
 		$this->Kode->OldValue = $this->Kode->CurrentValue;
 		$this->Nama->CurrentValue = NULL;
 		$this->Nama->OldValue = $this->Nama->CurrentValue;
+		$this->Qty->CurrentValue = 0.00;
 		$this->SatuanID->CurrentValue = NULL;
 		$this->SatuanID->OldValue = $this->SatuanID->CurrentValue;
 		$this->Harga->CurrentValue = 0.00;
@@ -1726,6 +1740,9 @@ class ct06_article_list extends ct06_article {
 		if (!$this->Nama->FldIsDetailKey) {
 			$this->Nama->setFormValue($objForm->GetValue("x_Nama"));
 		}
+		if (!$this->Qty->FldIsDetailKey) {
+			$this->Qty->setFormValue($objForm->GetValue("x_Qty"));
+		}
 		if (!$this->SatuanID->FldIsDetailKey) {
 			$this->SatuanID->setFormValue($objForm->GetValue("x_SatuanID"));
 		}
@@ -1748,6 +1765,7 @@ class ct06_article_list extends ct06_article {
 		$this->SubGroupID->CurrentValue = $this->SubGroupID->FormValue;
 		$this->Kode->CurrentValue = $this->Kode->FormValue;
 		$this->Nama->CurrentValue = $this->Nama->FormValue;
+		$this->Qty->CurrentValue = $this->Qty->FormValue;
 		$this->SatuanID->CurrentValue = $this->SatuanID->FormValue;
 		$this->Harga->CurrentValue = $this->Harga->FormValue;
 		$this->HargaJual->CurrentValue = $this->HargaJual->FormValue;
@@ -1827,6 +1845,7 @@ class ct06_article_list extends ct06_article {
 		}
 		$this->Kode->setDbValue($row['Kode']);
 		$this->Nama->setDbValue($row['Nama']);
+		$this->Qty->setDbValue($row['Qty']);
 		$this->SatuanID->setDbValue($row['SatuanID']);
 		if (array_key_exists('EV__SatuanID', $rs->fields)) {
 			$this->SatuanID->VirtualValue = $rs->fields('EV__SatuanID'); // Set up virtual field value
@@ -1846,6 +1865,7 @@ class ct06_article_list extends ct06_article {
 		$row['SubGroupID'] = $this->SubGroupID->CurrentValue;
 		$row['Kode'] = $this->Kode->CurrentValue;
 		$row['Nama'] = $this->Nama->CurrentValue;
+		$row['Qty'] = $this->Qty->CurrentValue;
 		$row['SatuanID'] = $this->SatuanID->CurrentValue;
 		$row['Harga'] = $this->Harga->CurrentValue;
 		$row['HargaJual'] = $this->HargaJual->CurrentValue;
@@ -1862,6 +1882,7 @@ class ct06_article_list extends ct06_article {
 		$this->SubGroupID->DbValue = $row['SubGroupID'];
 		$this->Kode->DbValue = $row['Kode'];
 		$this->Nama->DbValue = $row['Nama'];
+		$this->Qty->DbValue = $row['Qty'];
 		$this->SatuanID->DbValue = $row['SatuanID'];
 		$this->Harga->DbValue = $row['Harga'];
 		$this->HargaJual->DbValue = $row['HargaJual'];
@@ -1902,6 +1923,10 @@ class ct06_article_list extends ct06_article {
 		$this->DeleteUrl = $this->GetDeleteUrl();
 
 		// Convert decimal values if posted back
+		if ($this->Qty->FormValue == $this->Qty->CurrentValue && is_numeric(ew_StrToFloat($this->Qty->CurrentValue)))
+			$this->Qty->CurrentValue = ew_StrToFloat($this->Qty->CurrentValue);
+
+		// Convert decimal values if posted back
 		if ($this->Harga->FormValue == $this->Harga->CurrentValue && is_numeric(ew_StrToFloat($this->Harga->CurrentValue)))
 			$this->Harga->CurrentValue = ew_StrToFloat($this->Harga->CurrentValue);
 
@@ -1918,6 +1943,7 @@ class ct06_article_list extends ct06_article {
 		// SubGroupID
 		// Kode
 		// Nama
+		// Qty
 		// SatuanID
 		// Harga
 		// HargaJual
@@ -1992,6 +2018,12 @@ class ct06_article_list extends ct06_article {
 		$this->Nama->ViewValue = $this->Nama->CurrentValue;
 		$this->Nama->ViewCustomAttributes = "";
 
+		// Qty
+		$this->Qty->ViewValue = $this->Qty->CurrentValue;
+		$this->Qty->ViewValue = ew_FormatNumber($this->Qty->ViewValue, 2, -2, -2, -2);
+		$this->Qty->CellCssStyle .= "text-align: right;";
+		$this->Qty->ViewCustomAttributes = "";
+
 		// SatuanID
 		if ($this->SatuanID->VirtualValue <> "") {
 			$this->SatuanID->ViewValue = $this->SatuanID->VirtualValue;
@@ -2050,6 +2082,11 @@ class ct06_article_list extends ct06_article {
 			$this->Nama->LinkCustomAttributes = "";
 			$this->Nama->HrefValue = "";
 			$this->Nama->TooltipValue = "";
+
+			// Qty
+			$this->Qty->LinkCustomAttributes = "";
+			$this->Qty->HrefValue = "";
+			$this->Qty->TooltipValue = "";
 
 			// SatuanID
 			$this->SatuanID->LinkCustomAttributes = "";
@@ -2131,6 +2168,13 @@ class ct06_article_list extends ct06_article {
 			$this->Nama->EditValue = ew_HtmlEncode($this->Nama->CurrentValue);
 			$this->Nama->PlaceHolder = ew_RemoveHtml($this->Nama->FldCaption());
 
+			// Qty
+			$this->Qty->EditAttrs["class"] = "form-control";
+			$this->Qty->EditCustomAttributes = "";
+			$this->Qty->EditValue = ew_HtmlEncode($this->Qty->CurrentValue);
+			$this->Qty->PlaceHolder = ew_RemoveHtml($this->Qty->FldCaption());
+			if (strval($this->Qty->EditValue) <> "" && is_numeric($this->Qty->EditValue)) $this->Qty->EditValue = ew_FormatNumber($this->Qty->EditValue, -2, -2, -2, -2);
+
 			// SatuanID
 			$this->SatuanID->EditCustomAttributes = "";
 			if (trim(strval($this->SatuanID->CurrentValue)) == "") {
@@ -2187,6 +2231,10 @@ class ct06_article_list extends ct06_article {
 			// Nama
 			$this->Nama->LinkCustomAttributes = "";
 			$this->Nama->HrefValue = "";
+
+			// Qty
+			$this->Qty->LinkCustomAttributes = "";
+			$this->Qty->HrefValue = "";
 
 			// SatuanID
 			$this->SatuanID->LinkCustomAttributes = "";
@@ -2265,6 +2313,13 @@ class ct06_article_list extends ct06_article {
 			$this->Nama->EditValue = ew_HtmlEncode($this->Nama->CurrentValue);
 			$this->Nama->PlaceHolder = ew_RemoveHtml($this->Nama->FldCaption());
 
+			// Qty
+			$this->Qty->EditAttrs["class"] = "form-control";
+			$this->Qty->EditCustomAttributes = "";
+			$this->Qty->EditValue = ew_HtmlEncode($this->Qty->CurrentValue);
+			$this->Qty->PlaceHolder = ew_RemoveHtml($this->Qty->FldCaption());
+			if (strval($this->Qty->EditValue) <> "" && is_numeric($this->Qty->EditValue)) $this->Qty->EditValue = ew_FormatNumber($this->Qty->EditValue, -2, -2, -2, -2);
+
 			// SatuanID
 			$this->SatuanID->EditCustomAttributes = "";
 			if (trim(strval($this->SatuanID->CurrentValue)) == "") {
@@ -2322,6 +2377,10 @@ class ct06_article_list extends ct06_article {
 			$this->Nama->LinkCustomAttributes = "";
 			$this->Nama->HrefValue = "";
 
+			// Qty
+			$this->Qty->LinkCustomAttributes = "";
+			$this->Qty->HrefValue = "";
+
 			// SatuanID
 			$this->SatuanID->LinkCustomAttributes = "";
 			$this->SatuanID->HrefValue = "";
@@ -2360,6 +2419,9 @@ class ct06_article_list extends ct06_article {
 		}
 		if (!$this->Nama->FldIsDetailKey && !is_null($this->Nama->FormValue) && $this->Nama->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->Nama->FldCaption(), $this->Nama->ReqErrMsg));
+		}
+		if (!ew_CheckNumber($this->Qty->FormValue)) {
+			ew_AddMessage($gsFormError, $this->Qty->FldErrMsg());
 		}
 		if (!$this->SatuanID->FldIsDetailKey && !is_null($this->SatuanID->FormValue) && $this->SatuanID->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->SatuanID->FldCaption(), $this->SatuanID->ReqErrMsg));
@@ -2456,6 +2518,9 @@ class ct06_article_list extends ct06_article {
 			// Nama
 			$this->Nama->SetDbValueDef($rsnew, $this->Nama->CurrentValue, "", $this->Nama->ReadOnly);
 
+			// Qty
+			$this->Qty->SetDbValueDef($rsnew, $this->Qty->CurrentValue, 0, $this->Qty->ReadOnly);
+
 			// SatuanID
 			$this->SatuanID->SetDbValueDef($rsnew, $this->SatuanID->CurrentValue, 0, $this->SatuanID->ReadOnly);
 
@@ -2541,6 +2606,9 @@ class ct06_article_list extends ct06_article {
 
 		// Nama
 		$this->Nama->SetDbValueDef($rsnew, $this->Nama->CurrentValue, "", FALSE);
+
+		// Qty
+		$this->Qty->SetDbValueDef($rsnew, $this->Qty->CurrentValue, 0, strval($this->Qty->CurrentValue) == "");
 
 		// SatuanID
 		$this->SatuanID->SetDbValueDef($rsnew, $this->SatuanID->CurrentValue, 0, FALSE);
@@ -3087,6 +3155,9 @@ ft06_articlelist.Validate = function() {
 			elm = this.GetElements("x" + infix + "_Nama");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_article->Nama->FldCaption(), $t06_article->Nama->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_Qty");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t06_article->Qty->FldErrMsg()) ?>");
 			elm = this.GetElements("x" + infix + "_SatuanID");
 			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
 				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t06_article->SatuanID->FldCaption(), $t06_article->SatuanID->ReqErrMsg)) ?>");
@@ -3345,6 +3416,15 @@ $t06_article_list->ListOptions->Render("header", "left");
 		</div></div></th>
 	<?php } ?>
 <?php } ?>
+<?php if ($t06_article->Qty->Visible) { // Qty ?>
+	<?php if ($t06_article->SortUrl($t06_article->Qty) == "") { ?>
+		<th data-name="Qty" class="<?php echo $t06_article->Qty->HeaderCellClass() ?>"><div id="elh_t06_article_Qty" class="t06_article_Qty"><div class="ewTableHeaderCaption"><?php echo $t06_article->Qty->FldCaption() ?></div></div></th>
+	<?php } else { ?>
+		<th data-name="Qty" class="<?php echo $t06_article->Qty->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t06_article->SortUrl($t06_article->Qty) ?>',2);"><div id="elh_t06_article_Qty" class="t06_article_Qty">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t06_article->Qty->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t06_article->Qty->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t06_article->Qty->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		</div></div></th>
+	<?php } ?>
+<?php } ?>
 <?php if ($t06_article->SatuanID->Visible) { // SatuanID ?>
 	<?php if ($t06_article->SortUrl($t06_article->SatuanID) == "") { ?>
 		<th data-name="SatuanID" class="<?php echo $t06_article->SatuanID->HeaderCellClass() ?>"><div id="elh_t06_article_SatuanID" class="t06_article_SatuanID"><div class="ewTableHeaderCaption"><?php echo $t06_article->SatuanID->FldCaption() ?></div></div></th>
@@ -3446,6 +3526,14 @@ $t06_article_list->ListOptions->Render("body", "left", $t06_article_list->RowCnt
 <input type="text" data-table="t06_article" data-field="x_Nama" name="x<?php echo $t06_article_list->RowIndex ?>_Nama" id="x<?php echo $t06_article_list->RowIndex ?>_Nama" size="15" maxlength="75" placeholder="<?php echo ew_HtmlEncode($t06_article->Nama->getPlaceHolder()) ?>" value="<?php echo $t06_article->Nama->EditValue ?>"<?php echo $t06_article->Nama->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t06_article" data-field="x_Nama" name="o<?php echo $t06_article_list->RowIndex ?>_Nama" id="o<?php echo $t06_article_list->RowIndex ?>_Nama" value="<?php echo ew_HtmlEncode($t06_article->Nama->OldValue) ?>">
+</td>
+	<?php } ?>
+	<?php if ($t06_article->Qty->Visible) { // Qty ?>
+		<td data-name="Qty">
+<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Qty" class="form-group t06_article_Qty">
+<input type="text" data-table="t06_article" data-field="x_Qty" name="x<?php echo $t06_article_list->RowIndex ?>_Qty" id="x<?php echo $t06_article_list->RowIndex ?>_Qty" size="2" placeholder="<?php echo ew_HtmlEncode($t06_article->Qty->getPlaceHolder()) ?>" value="<?php echo $t06_article->Qty->EditValue ?>"<?php echo $t06_article->Qty->EditAttributes() ?>>
+</span>
+<input type="hidden" data-table="t06_article" data-field="x_Qty" name="o<?php echo $t06_article_list->RowIndex ?>_Qty" id="o<?php echo $t06_article_list->RowIndex ?>_Qty" value="<?php echo ew_HtmlEncode($t06_article->Qty->OldValue) ?>">
 </td>
 	<?php } ?>
 	<?php if ($t06_article->SatuanID->Visible) { // SatuanID ?>
@@ -3640,6 +3728,21 @@ $t06_article_list->ListOptions->Render("body", "left", $t06_article_list->RowCnt
 <span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Nama" class="t06_article_Nama">
 <span<?php echo $t06_article->Nama->ViewAttributes() ?>>
 <?php echo $t06_article->Nama->ListViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+	<?php } ?>
+	<?php if ($t06_article->Qty->Visible) { // Qty ?>
+		<td data-name="Qty"<?php echo $t06_article->Qty->CellAttributes() ?>>
+<?php if ($t06_article->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Qty" class="form-group t06_article_Qty">
+<input type="text" data-table="t06_article" data-field="x_Qty" name="x<?php echo $t06_article_list->RowIndex ?>_Qty" id="x<?php echo $t06_article_list->RowIndex ?>_Qty" size="2" placeholder="<?php echo ew_HtmlEncode($t06_article->Qty->getPlaceHolder()) ?>" value="<?php echo $t06_article->Qty->EditValue ?>"<?php echo $t06_article->Qty->EditAttributes() ?>>
+</span>
+<?php } ?>
+<?php if ($t06_article->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Qty" class="t06_article_Qty">
+<span<?php echo $t06_article->Qty->ViewAttributes() ?>>
+<?php echo $t06_article->Qty->ListViewValue() ?></span>
 </span>
 <?php } ?>
 </td>

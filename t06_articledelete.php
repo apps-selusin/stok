@@ -330,6 +330,7 @@ class ct06_article_delete extends ct06_article {
 		$this->SubGroupID->SetVisibility();
 		$this->Kode->SetVisibility();
 		$this->Nama->SetVisibility();
+		$this->Qty->SetVisibility();
 		$this->SatuanID->SetVisibility();
 		$this->Harga->SetVisibility();
 		$this->HargaJual->SetVisibility();
@@ -527,6 +528,7 @@ class ct06_article_delete extends ct06_article {
 		}
 		$this->Kode->setDbValue($row['Kode']);
 		$this->Nama->setDbValue($row['Nama']);
+		$this->Qty->setDbValue($row['Qty']);
 		$this->SatuanID->setDbValue($row['SatuanID']);
 		if (array_key_exists('EV__SatuanID', $rs->fields)) {
 			$this->SatuanID->VirtualValue = $rs->fields('EV__SatuanID'); // Set up virtual field value
@@ -545,6 +547,7 @@ class ct06_article_delete extends ct06_article {
 		$row['SubGroupID'] = NULL;
 		$row['Kode'] = NULL;
 		$row['Nama'] = NULL;
+		$row['Qty'] = NULL;
 		$row['SatuanID'] = NULL;
 		$row['Harga'] = NULL;
 		$row['HargaJual'] = NULL;
@@ -561,6 +564,7 @@ class ct06_article_delete extends ct06_article {
 		$this->SubGroupID->DbValue = $row['SubGroupID'];
 		$this->Kode->DbValue = $row['Kode'];
 		$this->Nama->DbValue = $row['Nama'];
+		$this->Qty->DbValue = $row['Qty'];
 		$this->SatuanID->DbValue = $row['SatuanID'];
 		$this->Harga->DbValue = $row['Harga'];
 		$this->HargaJual->DbValue = $row['HargaJual'];
@@ -573,6 +577,10 @@ class ct06_article_delete extends ct06_article {
 		// Initialize URLs
 		// Convert decimal values if posted back
 
+		if ($this->Qty->FormValue == $this->Qty->CurrentValue && is_numeric(ew_StrToFloat($this->Qty->CurrentValue)))
+			$this->Qty->CurrentValue = ew_StrToFloat($this->Qty->CurrentValue);
+
+		// Convert decimal values if posted back
 		if ($this->Harga->FormValue == $this->Harga->CurrentValue && is_numeric(ew_StrToFloat($this->Harga->CurrentValue)))
 			$this->Harga->CurrentValue = ew_StrToFloat($this->Harga->CurrentValue);
 
@@ -589,6 +597,7 @@ class ct06_article_delete extends ct06_article {
 		// SubGroupID
 		// Kode
 		// Nama
+		// Qty
 		// SatuanID
 		// Harga
 		// HargaJual
@@ -663,6 +672,12 @@ class ct06_article_delete extends ct06_article {
 		$this->Nama->ViewValue = $this->Nama->CurrentValue;
 		$this->Nama->ViewCustomAttributes = "";
 
+		// Qty
+		$this->Qty->ViewValue = $this->Qty->CurrentValue;
+		$this->Qty->ViewValue = ew_FormatNumber($this->Qty->ViewValue, 2, -2, -2, -2);
+		$this->Qty->CellCssStyle .= "text-align: right;";
+		$this->Qty->ViewCustomAttributes = "";
+
 		// SatuanID
 		if ($this->SatuanID->VirtualValue <> "") {
 			$this->SatuanID->ViewValue = $this->SatuanID->VirtualValue;
@@ -721,6 +736,11 @@ class ct06_article_delete extends ct06_article {
 			$this->Nama->LinkCustomAttributes = "";
 			$this->Nama->HrefValue = "";
 			$this->Nama->TooltipValue = "";
+
+			// Qty
+			$this->Qty->LinkCustomAttributes = "";
+			$this->Qty->HrefValue = "";
+			$this->Qty->TooltipValue = "";
 
 			// SatuanID
 			$this->SatuanID->LinkCustomAttributes = "";
@@ -994,6 +1014,9 @@ $t06_article_delete->ShowMessage();
 <?php if ($t06_article->Nama->Visible) { // Nama ?>
 		<th class="<?php echo $t06_article->Nama->HeaderCellClass() ?>"><span id="elh_t06_article_Nama" class="t06_article_Nama"><?php echo $t06_article->Nama->FldCaption() ?></span></th>
 <?php } ?>
+<?php if ($t06_article->Qty->Visible) { // Qty ?>
+		<th class="<?php echo $t06_article->Qty->HeaderCellClass() ?>"><span id="elh_t06_article_Qty" class="t06_article_Qty"><?php echo $t06_article->Qty->FldCaption() ?></span></th>
+<?php } ?>
 <?php if ($t06_article->SatuanID->Visible) { // SatuanID ?>
 		<th class="<?php echo $t06_article->SatuanID->HeaderCellClass() ?>"><span id="elh_t06_article_SatuanID" class="t06_article_SatuanID"><?php echo $t06_article->SatuanID->FldCaption() ?></span></th>
 <?php } ?>
@@ -1053,6 +1076,14 @@ while (!$t06_article_delete->Recordset->EOF) {
 <span id="el<?php echo $t06_article_delete->RowCnt ?>_t06_article_Nama" class="t06_article_Nama">
 <span<?php echo $t06_article->Nama->ViewAttributes() ?>>
 <?php echo $t06_article->Nama->ListViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($t06_article->Qty->Visible) { // Qty ?>
+		<td<?php echo $t06_article->Qty->CellAttributes() ?>>
+<span id="el<?php echo $t06_article_delete->RowCnt ?>_t06_article_Qty" class="t06_article_Qty">
+<span<?php echo $t06_article->Qty->ViewAttributes() ?>>
+<?php echo $t06_article->Qty->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

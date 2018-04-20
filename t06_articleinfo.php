@@ -18,6 +18,7 @@ class ct06_article extends cTable {
 	var $SubGroupID;
 	var $Kode;
 	var $Nama;
+	var $Qty;
 	var $SatuanID;
 	var $Harga;
 	var $HargaJual;
@@ -86,6 +87,12 @@ class ct06_article extends cTable {
 		$this->Nama = new cField('t06_article', 't06_article', 'x_Nama', 'Nama', '`Nama`', '`Nama`', 200, -1, FALSE, '`Nama`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->Nama->Sortable = TRUE; // Allow sort
 		$this->fields['Nama'] = &$this->Nama;
+
+		// Qty
+		$this->Qty = new cField('t06_article', 't06_article', 'x_Qty', 'Qty', '`Qty`', '`Qty`', 4, -1, FALSE, '`Qty`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Qty->Sortable = TRUE; // Allow sort
+		$this->Qty->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['Qty'] = &$this->Qty;
 
 		// SatuanID
 		$this->SatuanID = new cField('t06_article', 't06_article', 'x_SatuanID', 'SatuanID', '`SatuanID`', '`SatuanID`', 3, -1, FALSE, '`EV__SatuanID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'SELECT');
@@ -736,6 +743,7 @@ class ct06_article extends cTable {
 		$this->SubGroupID->setDbValue($rs->fields('SubGroupID'));
 		$this->Kode->setDbValue($rs->fields('Kode'));
 		$this->Nama->setDbValue($rs->fields('Nama'));
+		$this->Qty->setDbValue($rs->fields('Qty'));
 		$this->SatuanID->setDbValue($rs->fields('SatuanID'));
 		$this->Harga->setDbValue($rs->fields('Harga'));
 		$this->HargaJual->setDbValue($rs->fields('HargaJual'));
@@ -754,6 +762,7 @@ class ct06_article extends cTable {
 		// SubGroupID
 		// Kode
 		// Nama
+		// Qty
 		// SatuanID
 		// Harga
 		// HargaJual
@@ -826,6 +835,12 @@ class ct06_article extends cTable {
 		$this->Nama->ViewValue = $this->Nama->CurrentValue;
 		$this->Nama->ViewCustomAttributes = "";
 
+		// Qty
+		$this->Qty->ViewValue = $this->Qty->CurrentValue;
+		$this->Qty->ViewValue = ew_FormatNumber($this->Qty->ViewValue, 2, -2, -2, -2);
+		$this->Qty->CellCssStyle .= "text-align: right;";
+		$this->Qty->ViewCustomAttributes = "";
+
 		// SatuanID
 		if ($this->SatuanID->VirtualValue <> "") {
 			$this->SatuanID->ViewValue = $this->SatuanID->VirtualValue;
@@ -890,6 +905,11 @@ class ct06_article extends cTable {
 		$this->Nama->HrefValue = "";
 		$this->Nama->TooltipValue = "";
 
+		// Qty
+		$this->Qty->LinkCustomAttributes = "";
+		$this->Qty->HrefValue = "";
+		$this->Qty->TooltipValue = "";
+
 		// SatuanID
 		$this->SatuanID->LinkCustomAttributes = "";
 		$this->SatuanID->HrefValue = "";
@@ -945,6 +965,13 @@ class ct06_article extends cTable {
 		$this->Nama->EditValue = $this->Nama->CurrentValue;
 		$this->Nama->PlaceHolder = ew_RemoveHtml($this->Nama->FldCaption());
 
+		// Qty
+		$this->Qty->EditAttrs["class"] = "form-control";
+		$this->Qty->EditCustomAttributes = "";
+		$this->Qty->EditValue = $this->Qty->CurrentValue;
+		$this->Qty->PlaceHolder = ew_RemoveHtml($this->Qty->FldCaption());
+		if (strval($this->Qty->EditValue) <> "" && is_numeric($this->Qty->EditValue)) $this->Qty->EditValue = ew_FormatNumber($this->Qty->EditValue, -2, -2, -2, -2);
+
 		// SatuanID
 		$this->SatuanID->EditAttrs["class"] = "form-control";
 		$this->SatuanID->EditCustomAttributes = "";
@@ -994,6 +1021,7 @@ class ct06_article extends cTable {
 					if ($this->SubGroupID->Exportable) $Doc->ExportCaption($this->SubGroupID);
 					if ($this->Kode->Exportable) $Doc->ExportCaption($this->Kode);
 					if ($this->Nama->Exportable) $Doc->ExportCaption($this->Nama);
+					if ($this->Qty->Exportable) $Doc->ExportCaption($this->Qty);
 					if ($this->SatuanID->Exportable) $Doc->ExportCaption($this->SatuanID);
 					if ($this->Harga->Exportable) $Doc->ExportCaption($this->Harga);
 					if ($this->HargaJual->Exportable) $Doc->ExportCaption($this->HargaJual);
@@ -1003,6 +1031,7 @@ class ct06_article extends cTable {
 					if ($this->SubGroupID->Exportable) $Doc->ExportCaption($this->SubGroupID);
 					if ($this->Kode->Exportable) $Doc->ExportCaption($this->Kode);
 					if ($this->Nama->Exportable) $Doc->ExportCaption($this->Nama);
+					if ($this->Qty->Exportable) $Doc->ExportCaption($this->Qty);
 					if ($this->SatuanID->Exportable) $Doc->ExportCaption($this->SatuanID);
 					if ($this->Harga->Exportable) $Doc->ExportCaption($this->Harga);
 					if ($this->HargaJual->Exportable) $Doc->ExportCaption($this->HargaJual);
@@ -1041,6 +1070,7 @@ class ct06_article extends cTable {
 						if ($this->SubGroupID->Exportable) $Doc->ExportField($this->SubGroupID);
 						if ($this->Kode->Exportable) $Doc->ExportField($this->Kode);
 						if ($this->Nama->Exportable) $Doc->ExportField($this->Nama);
+						if ($this->Qty->Exportable) $Doc->ExportField($this->Qty);
 						if ($this->SatuanID->Exportable) $Doc->ExportField($this->SatuanID);
 						if ($this->Harga->Exportable) $Doc->ExportField($this->Harga);
 						if ($this->HargaJual->Exportable) $Doc->ExportField($this->HargaJual);
@@ -1050,6 +1080,7 @@ class ct06_article extends cTable {
 						if ($this->SubGroupID->Exportable) $Doc->ExportField($this->SubGroupID);
 						if ($this->Kode->Exportable) $Doc->ExportField($this->Kode);
 						if ($this->Nama->Exportable) $Doc->ExportField($this->Nama);
+						if ($this->Qty->Exportable) $Doc->ExportField($this->Qty);
 						if ($this->SatuanID->Exportable) $Doc->ExportField($this->SatuanID);
 						if ($this->Harga->Exportable) $Doc->ExportField($this->Harga);
 						if ($this->HargaJual->Exportable) $Doc->ExportField($this->HargaJual);

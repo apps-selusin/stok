@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 20, 2018 at 02:40 AM
+-- Generation Time: Apr 20, 2018 at 08:18 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -142,6 +142,7 @@ CREATE TABLE `t06_article` (
   `SubGroupID` int(11) NOT NULL,
   `Kode` varchar(7) NOT NULL,
   `Nama` varchar(75) NOT NULL,
+  `Qty` float(15,2) NOT NULL DEFAULT '0.00',
   `SatuanID` int(11) NOT NULL,
   `Harga` float(15,2) NOT NULL DEFAULT '0.00',
   `HargaJual` float(15,2) NOT NULL DEFAULT '0.00'
@@ -151,8 +152,8 @@ CREATE TABLE `t06_article` (
 -- Dumping data for table `t06_article`
 --
 
-INSERT INTO `t06_article` (`id`, `SubGroupID`, `Kode`, `Nama`, `SatuanID`, `Harga`, `HargaJual`) VALUES
-(1, 1, '5501001', 'MEAT Has Luar Lokal', 1, 100000.00, 125000.00);
+INSERT INTO `t06_article` (`id`, `SubGroupID`, `Kode`, `Nama`, `Qty`, `SatuanID`, `Harga`, `HargaJual`) VALUES
+(1, 1, '5501001', 'MEAT Has Luar Lokal', 98.25, 1, 100000.00, 125000.00);
 
 -- --------------------------------------------------------
 
@@ -197,8 +198,17 @@ CREATE TABLE `t08_beli` (
 --
 
 INSERT INTO `t08_beli` (`id`, `TglPO`, `NoPO`, `VendorID`, `ArticleID`, `Harga`, `Qty`, `SubTotal`) VALUES
-(1, '2018-04-16', 'PO201804160001', 1, 1, 100000.00, 2.10, 210000.00),
-(2, '2018-04-17', 'PO201804170002', 2, 1, 125000.00, 3.20, 400000.00);
+(1, '2018-04-20', 'PO201804200001', 1, 1, 100000.00, 2.00, 200000.00);
+
+--
+-- Triggers `t08_beli`
+--
+DELIMITER $$
+CREATE TRIGGER `tg_updateqty_beli` AFTER INSERT ON `t08_beli` FOR EACH ROW BEGIN
+update t06_article set qty = qty + new.qty where id = new.articleid;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -219,8 +229,7 @@ CREATE TABLE `t09_hutang` (
 --
 
 INSERT INTO `t09_hutang` (`id`, `NoHutang`, `BeliID`, `JumlahHutang`, `JumlahBayar`) VALUES
-(1, 'HT000001', 1, 210000.00, 210000.00),
-(2, 'HT000002', 2, 400000.00, 100000.00);
+(1, 'HT000001', 1, 200000.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -235,17 +244,6 @@ CREATE TABLE `t10_hutangdetail` (
   `Tgl` date NOT NULL,
   `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `t10_hutangdetail`
---
-
-INSERT INTO `t10_hutangdetail` (`id`, `HutangID`, `NoBayar`, `Tgl`, `JumlahBayar`) VALUES
-(2, 1, 'HD000002', '2018-04-16', 60000.00),
-(3, 1, 'HD000003', '2018-04-16', 75000.00),
-(17, 1, 'HD000005', '2018-04-17', 25000.00),
-(19, 1, 'HD000006', '2018-04-17', 50000.00),
-(21, 2, 'HD000008', '2018-04-17', 100000.00);
 
 -- --------------------------------------------------------
 
@@ -267,7 +265,7 @@ CREATE TABLE `t11_jual` (
 --
 
 INSERT INTO `t11_jual` (`id`, `TglSO`, `NoSO`, `CustomerID`, `CustomerPO`, `Total`) VALUES
-(3, '2018-04-19', 'SO201804190001', 1, '--', 250000.00);
+(1, '2018-04-20', 'SO201804200001', 1, '-', 468750.00);
 
 -- --------------------------------------------------------
 
@@ -283,15 +281,6 @@ CREATE TABLE `t11_jual_old` (
   `CustomerPO` varchar(50) CHARACTER SET latin1 NOT NULL,
   `Total` float(15,2) NOT NULL DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `t11_jual_old`
---
-
-INSERT INTO `t11_jual_old` (`id`, `TglSO`, `NoSO`, `CustomerID`, `CustomerPO`, `Total`) VALUES
-(1, '2018-04-18', 'SO201804180001', 1, '-', 1500000.00),
-(2, '2018-04-18', 'SO201804180002', 1, '-', 362500.00),
-(3, '2018-04-19', 'SO201804190001', 1, '--', 250000.00);
 
 -- --------------------------------------------------------
 
@@ -313,7 +302,17 @@ CREATE TABLE `t12_jualdetail` (
 --
 
 INSERT INTO `t12_jualdetail` (`id`, `JualID`, `ArticleID`, `HargaJual`, `Qty`, `SubTotal`) VALUES
-(6, 3, 1, 125000.00, 2.00, 250000.00);
+(1, 1, 1, 125000.00, 3.75, 468750.00);
+
+--
+-- Triggers `t12_jualdetail`
+--
+DELIMITER $$
+CREATE TRIGGER `tg_updateqty_jual` AFTER INSERT ON `t12_jualdetail` FOR EACH ROW BEGIN
+update t06_article set qty = qty - new.qty where id = new.articleid;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -990,7 +989,33 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (554, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't12_jualdetail', 'SatuanID', '6', '', '1'),
 (555, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't12_jualdetail', 'SubTotal', '6', '', '250000'),
 (556, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't12_jualdetail', 'id', '6', '', '6'),
-(557, '2018-04-19 21:56:23', '/stok/t11_jualadd.php', '3', '*** Batch insert successful ***', 't12_jualdetail', '', '', '', '');
+(557, '2018-04-19 21:56:23', '/stok/t11_jualadd.php', '3', '*** Batch insert successful ***', 't12_jualdetail', '', '', '', ''),
+(558, '2018-04-20 12:58:38', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(559, '2018-04-20 13:07:03', '/stok/t06_articlelist.php', '1', 'U', 't06_article', 'Qty', '1', '0.00', '100'),
+(560, '2018-04-20 13:07:24', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '1', '', '2018-04-20'),
+(561, '2018-04-20 13:07:24', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '1', '', 'PO201804200001'),
+(562, '2018-04-20 13:07:24', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '1', '', '1'),
+(563, '2018-04-20 13:07:24', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '1', '', '1'),
+(564, '2018-04-20 13:07:24', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '1', '', '100000.00'),
+(565, '2018-04-20 13:07:24', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '1', '', '2'),
+(566, '2018-04-20 13:07:24', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '1', '', '1'),
+(567, '2018-04-20 13:07:24', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '1', '', '200000'),
+(568, '2018-04-20 13:07:24', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '1', '', '1'),
+(569, '2018-04-20 13:08:10', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'TglSO', '1', '', '2018-04-20'),
+(570, '2018-04-20 13:08:10', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'NoSO', '1', '', 'SO201804200001'),
+(571, '2018-04-20 13:08:10', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'CustomerID', '1', '', '1'),
+(572, '2018-04-20 13:08:10', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'CustomerPO', '1', '', '-'),
+(573, '2018-04-20 13:08:10', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'Total', '1', '', '0'),
+(574, '2018-04-20 13:08:10', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'id', '1', '', '1'),
+(575, '2018-04-20 13:08:11', '/stok/t11_jualadd.php', '1', '*** Batch insert begin ***', 't12_jualdetail', '', '', '', ''),
+(576, '2018-04-20 13:08:11', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'JualID', '1', '', '1'),
+(577, '2018-04-20 13:08:11', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'ArticleID', '1', '', '1'),
+(578, '2018-04-20 13:08:11', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'HargaJual', '1', '', '125000.00'),
+(579, '2018-04-20 13:08:11', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'Qty', '1', '', '3.75'),
+(580, '2018-04-20 13:08:11', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SatuanID', '1', '', '1'),
+(581, '2018-04-20 13:08:11', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SubTotal', '1', '', '468750'),
+(582, '2018-04-20 13:08:11', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'id', '1', '', '1'),
+(583, '2018-04-20 13:08:11', '/stok/t11_jualadd.php', '1', '*** Batch insert successful ***', 't12_jualdetail', '', '', '', '');
 
 -- --------------------------------------------------------
 
@@ -1242,31 +1267,31 @@ ALTER TABLE `t07_satuan`
 -- AUTO_INCREMENT for table `t08_beli`
 --
 ALTER TABLE `t08_beli`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `t09_hutang`
 --
 ALTER TABLE `t09_hutang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `t10_hutangdetail`
 --
 ALTER TABLE `t10_hutangdetail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `t11_jual`
 --
 ALTER TABLE `t11_jual`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `t12_jualdetail`
 --
 ALTER TABLE `t12_jualdetail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `t96_employees`
@@ -1278,7 +1303,7 @@ ALTER TABLE `t96_employees`
 -- AUTO_INCREMENT for table `t99_audittrail`
 --
 ALTER TABLE `t99_audittrail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=558;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=584;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
