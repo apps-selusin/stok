@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 19, 2018 at 02:56 AM
+-- Generation Time: Apr 20, 2018 at 02:40 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -267,8 +267,31 @@ CREATE TABLE `t11_jual` (
 --
 
 INSERT INTO `t11_jual` (`id`, `TglSO`, `NoSO`, `CustomerID`, `CustomerPO`, `Total`) VALUES
+(3, '2018-04-19', 'SO201804190001', 1, '--', 250000.00);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `t11_jual_old`
+--
+
+CREATE TABLE `t11_jual_old` (
+  `id` int(11) NOT NULL,
+  `TglSO` date NOT NULL,
+  `NoSO` varchar(14) CHARACTER SET latin1 NOT NULL,
+  `CustomerID` int(11) NOT NULL,
+  `CustomerPO` varchar(50) CHARACTER SET latin1 NOT NULL,
+  `Total` float(15,2) NOT NULL DEFAULT '0.00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `t11_jual_old`
+--
+
+INSERT INTO `t11_jual_old` (`id`, `TglSO`, `NoSO`, `CustomerID`, `CustomerPO`, `Total`) VALUES
 (1, '2018-04-18', 'SO201804180001', 1, '-', 1500000.00),
-(2, '2018-04-18', 'SO201804180002', 1, '-', 362500.00);
+(2, '2018-04-18', 'SO201804180002', 1, '-', 362500.00),
+(3, '2018-04-19', 'SO201804190001', 1, '--', 250000.00);
 
 -- --------------------------------------------------------
 
@@ -290,11 +313,7 @@ CREATE TABLE `t12_jualdetail` (
 --
 
 INSERT INTO `t12_jualdetail` (`id`, `JualID`, `ArticleID`, `HargaJual`, `Qty`, `SubTotal`) VALUES
-(1, 1, 1, 125000.00, 3.00, 375000.00),
-(2, 1, 1, 125000.00, 4.00, 500000.00),
-(3, 1, 1, 125000.00, 5.00, 625000.00),
-(4, 2, 1, 125000.00, 0.65, 81250.00),
-(5, 2, 1, 125000.00, 2.25, 281250.00);
+(6, 3, 1, 125000.00, 2.00, 250000.00);
 
 -- --------------------------------------------------------
 
@@ -956,7 +975,22 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (539, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SubTotal', '5', '', '281250'),
 (540, '2018-04-18 18:11:01', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'id', '5', '', '5'),
 (541, '2018-04-18 18:11:02', '/stok/t11_jualadd.php', '1', '*** Batch insert successful ***', 't12_jualdetail', '', '', '', ''),
-(542, '2018-04-18 22:42:37', '/stok/login.php', 'admin', 'login', '::1', '', '', '', '');
+(542, '2018-04-18 22:42:37', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(543, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't11_jual', 'TglSO', '3', '', '2018-04-19'),
+(544, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't11_jual', 'NoSO', '3', '', 'SO201804190001'),
+(545, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't11_jual', 'CustomerID', '3', '', '1'),
+(546, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't11_jual', 'CustomerPO', '3', '', '--'),
+(547, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't11_jual', 'Total', '3', '', '0'),
+(548, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't11_jual', 'id', '3', '', '3'),
+(549, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', '*** Batch insert begin ***', 't12_jualdetail', '', '', '', ''),
+(550, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't12_jualdetail', 'JualID', '6', '', '3'),
+(551, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't12_jualdetail', 'ArticleID', '6', '', '1'),
+(552, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't12_jualdetail', 'HargaJual', '6', '', '125000.00'),
+(553, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't12_jualdetail', 'Qty', '6', '', '2'),
+(554, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't12_jualdetail', 'SatuanID', '6', '', '1'),
+(555, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't12_jualdetail', 'SubTotal', '6', '', '250000'),
+(556, '2018-04-19 21:56:22', '/stok/t11_jualadd.php', '3', 'A', 't12_jualdetail', 'id', '6', '', '6'),
+(557, '2018-04-19 21:56:23', '/stok/t11_jualadd.php', '3', '*** Batch insert successful ***', 't12_jualdetail', '', '', '', '');
 
 -- --------------------------------------------------------
 
@@ -1226,13 +1260,13 @@ ALTER TABLE `t10_hutangdetail`
 -- AUTO_INCREMENT for table `t11_jual`
 --
 ALTER TABLE `t11_jual`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `t12_jualdetail`
 --
 ALTER TABLE `t12_jualdetail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `t96_employees`
@@ -1244,7 +1278,7 @@ ALTER TABLE `t96_employees`
 -- AUTO_INCREMENT for table `t99_audittrail`
 --
 ALTER TABLE `t99_audittrail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=543;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=558;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
