@@ -1,27 +1,26 @@
 <?php
 
 // Global variable for table object
-$t08_beli = NULL;
+$t95_homedetail = NULL;
 
 //
-// Table class for t08_beli
+// Table class for t95_homedetail
 //
-class ct08_beli extends cTable {
+class ct95_homedetail extends cTable {
 	var $AuditTrailOnAdd = TRUE;
 	var $AuditTrailOnEdit = TRUE;
 	var $AuditTrailOnDelete = TRUE;
 	var $AuditTrailOnView = FALSE;
 	var $AuditTrailOnViewData = FALSE;
 	var $AuditTrailOnSearch = FALSE;
-	var $id;
-	var $TglPO;
-	var $NoPO;
-	var $VendorID;
-	var $ArticleID;
-	var $Harga;
-	var $Qty;
-	var $SatuanID;
-	var $SubTotal;
+	var $home_id;
+	var $tgl;
+	var $kat;
+	var $no_jdl;
+	var $jdl;
+	var $no_ket;
+	var $ket;
+	var $done;
 
 	//
 	// Table class constructor
@@ -31,12 +30,12 @@ class ct08_beli extends cTable {
 
 		// Language object
 		if (!isset($Language)) $Language = new cLanguage();
-		$this->TableVar = 't08_beli';
-		$this->TableName = 't08_beli';
+		$this->TableVar = 't95_homedetail';
+		$this->TableName = 't95_homedetail';
 		$this->TableType = 'TABLE';
 
 		// Update Table
-		$this->UpdateTable = "`t08_beli`";
+		$this->UpdateTable = "`t95_homedetail`";
 		$this->DBID = 'DB';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -55,63 +54,53 @@ class ct08_beli extends cTable {
 		$this->UserIDAllowSecurity = 0; // User ID Allow
 		$this->BasicSearch = new cBasicSearch($this->TableVar);
 
-		// id
-		$this->id = new cField('t08_beli', 't08_beli', 'x_id', 'id', '`id`', '`id`', 3, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
-		$this->id->Sortable = TRUE; // Allow sort
-		$this->id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['id'] = &$this->id;
+		// home_id
+		$this->home_id = new cField('t95_homedetail', 't95_homedetail', 'x_home_id', 'home_id', '`home_id`', '`home_id`', 3, -1, FALSE, '`home_id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
+		$this->home_id->Sortable = TRUE; // Allow sort
+		$this->home_id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['home_id'] = &$this->home_id;
 
-		// TglPO
-		$this->TglPO = new cField('t08_beli', 't08_beli', 'x_TglPO', 'TglPO', '`TglPO`', ew_CastDateFieldForLike('`TglPO`', 7, "DB"), 133, 7, FALSE, '`TglPO`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->TglPO->Sortable = TRUE; // Allow sort
-		$this->TglPO->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
-		$this->fields['TglPO'] = &$this->TglPO;
+		// tgl
+		$this->tgl = new cField('t95_homedetail', 't95_homedetail', 'x_tgl', 'tgl', '`tgl`', ew_CastDateFieldForLike('`tgl`', 7, "DB"), 133, 7, FALSE, '`tgl`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->tgl->Sortable = TRUE; // Allow sort
+		$this->tgl->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
+		$this->fields['tgl'] = &$this->tgl;
 
-		// NoPO
-		$this->NoPO = new cField('t08_beli', 't08_beli', 'x_NoPO', 'NoPO', '`NoPO`', '`NoPO`', 200, -1, FALSE, '`NoPO`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->NoPO->Sortable = TRUE; // Allow sort
-		$this->fields['NoPO'] = &$this->NoPO;
+		// kat
+		$this->kat = new cField('t95_homedetail', 't95_homedetail', 'x_kat', 'kat', '`kat`', '`kat`', 200, -1, FALSE, '`kat`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'SELECT');
+		$this->kat->Sortable = TRUE; // Allow sort
+		$this->kat->UsePleaseSelect = TRUE; // Use PleaseSelect by default
+		$this->kat->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
+		$this->fields['kat'] = &$this->kat;
 
-		// VendorID
-		$this->VendorID = new cField('t08_beli', 't08_beli', 'x_VendorID', 'VendorID', '`VendorID`', '`VendorID`', 3, -1, FALSE, '`VendorID`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'SELECT');
-		$this->VendorID->Sortable = TRUE; // Allow sort
-		$this->VendorID->UsePleaseSelect = TRUE; // Use PleaseSelect by default
-		$this->VendorID->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
-		$this->VendorID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['VendorID'] = &$this->VendorID;
+		// no_jdl
+		$this->no_jdl = new cField('t95_homedetail', 't95_homedetail', 'x_no_jdl', 'no_jdl', '`no_jdl`', '`no_jdl`', 3, -1, FALSE, '`no_jdl`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->no_jdl->Sortable = TRUE; // Allow sort
+		$this->no_jdl->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['no_jdl'] = &$this->no_jdl;
 
-		// ArticleID
-		$this->ArticleID = new cField('t08_beli', 't08_beli', 'x_ArticleID', 'ArticleID', '`ArticleID`', '`ArticleID`', 3, -1, FALSE, '`EV__ArticleID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'SELECT');
-		$this->ArticleID->Sortable = TRUE; // Allow sort
-		$this->ArticleID->UsePleaseSelect = TRUE; // Use PleaseSelect by default
-		$this->ArticleID->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
-		$this->ArticleID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['ArticleID'] = &$this->ArticleID;
+		// jdl
+		$this->jdl = new cField('t95_homedetail', 't95_homedetail', 'x_jdl', 'jdl', '`jdl`', '`jdl`', 200, -1, FALSE, '`jdl`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->jdl->Sortable = TRUE; // Allow sort
+		$this->fields['jdl'] = &$this->jdl;
 
-		// Harga
-		$this->Harga = new cField('t08_beli', 't08_beli', 'x_Harga', 'Harga', '`Harga`', '`Harga`', 4, -1, FALSE, '`Harga`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->Harga->Sortable = TRUE; // Allow sort
-		$this->Harga->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
-		$this->fields['Harga'] = &$this->Harga;
+		// no_ket
+		$this->no_ket = new cField('t95_homedetail', 't95_homedetail', 'x_no_ket', 'no_ket', '`no_ket`', '`no_ket`', 3, -1, FALSE, '`no_ket`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->no_ket->Sortable = TRUE; // Allow sort
+		$this->no_ket->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['no_ket'] = &$this->no_ket;
 
-		// Qty
-		$this->Qty = new cField('t08_beli', 't08_beli', 'x_Qty', 'Qty', '`Qty`', '`Qty`', 4, -1, FALSE, '`Qty`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->Qty->Sortable = TRUE; // Allow sort
-		$this->Qty->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
-		$this->fields['Qty'] = &$this->Qty;
+		// ket
+		$this->ket = new cField('t95_homedetail', 't95_homedetail', 'x_ket', 'ket', '`ket`', '`ket`', 201, -1, FALSE, '`ket`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXTAREA');
+		$this->ket->Sortable = TRUE; // Allow sort
+		$this->fields['ket'] = &$this->ket;
 
-		// SatuanID
-		$this->SatuanID = new cField('t08_beli', 't08_beli', 'x_SatuanID', 'SatuanID', '(SELECT satuanid  FROM t06_article a where articleid = a.id)', '(SELECT satuanid  FROM t06_article a where articleid = a.id)', 3, -1, FALSE, '`EV__SatuanID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'TEXT');
-		$this->SatuanID->FldIsCustom = TRUE; // Custom field
-		$this->SatuanID->Sortable = TRUE; // Allow sort
-		$this->SatuanID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['SatuanID'] = &$this->SatuanID;
-
-		// SubTotal
-		$this->SubTotal = new cField('t08_beli', 't08_beli', 'x_SubTotal', 'SubTotal', '`SubTotal`', '`SubTotal`', 4, -1, FALSE, '`SubTotal`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->SubTotal->Sortable = TRUE; // Allow sort
-		$this->SubTotal->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
-		$this->fields['SubTotal'] = &$this->SubTotal;
+		// done
+		$this->done = new cField('t95_homedetail', 't95_homedetail', 'x_done', 'done', '`done`', '`done`', 16, -1, FALSE, '`done`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'CHECKBOX');
+		$this->done->Sortable = TRUE; // Allow sort
+		$this->done->OptionCount = 1;
+		$this->done->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['done'] = &$this->done;
 	}
 
 	// Field Visibility
@@ -157,38 +146,16 @@ class ct08_beli extends cTable {
 			} else {
 				$this->setSessionOrderBy($sSortField . " " . $sThisSort); // Save to Session
 			}
-			$sSortFieldList = ($ofld->FldVirtualExpression <> "") ? $ofld->FldVirtualExpression : $sSortField;
-			if ($ctrl) {
-				$sOrderByList = $this->getSessionOrderByList();
-				if (strpos($sOrderByList, $sSortFieldList . " " . $sLastSort) !== FALSE) {
-					$sOrderByList = str_replace($sSortFieldList . " " . $sLastSort, $sSortFieldList . " " . $sThisSort, $sOrderByList);
-				} else {
-					if ($sOrderByList <> "") $sOrderByList .= ", ";
-					$sOrderByList .= $sSortFieldList . " " . $sThisSort;
-				}
-				$this->setSessionOrderByList($sOrderByList); // Save to Session
-			} else {
-				$this->setSessionOrderByList($sSortFieldList . " " . $sThisSort); // Save to Session
-			}
 		} else {
 			if (!$ctrl) $ofld->setSort("");
 		}
-	}
-
-	// Session ORDER BY for List page
-	function getSessionOrderByList() {
-		return @$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST];
-	}
-
-	function setSessionOrderByList($v) {
-		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST] = $v;
 	}
 
 	// Table level SQL
 	var $_SqlFrom = "";
 
 	function getSqlFrom() { // From
-		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t08_beli`";
+		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t95_homedetail`";
 	}
 
 	function SqlFrom() { // For backward compatibility
@@ -201,7 +168,7 @@ class ct08_beli extends cTable {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() { // Select
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (SELECT satuanid  FROM t06_article a where articleid = a.id) AS `SatuanID` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT * FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -210,23 +177,6 @@ class ct08_beli extends cTable {
 
 	function setSqlSelect($v) {
 		$this->_SqlSelect = $v;
-	}
-	var $_SqlSelectList = "";
-
-	function getSqlSelectList() { // Select for List page
-		$select = "";
-		$select = "SELECT * FROM (" .
-			"SELECT *, (SELECT satuanid  FROM t06_article a where articleid = a.id) AS `SatuanID`, (SELECT CONCAT(COALESCE(`Kode`, ''),'" . ew_ValueSeparator(1, $this->ArticleID) . "',COALESCE(`Nama`,'')) FROM `t06_article` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t08_beli`.`ArticleID` LIMIT 1) AS `EV__ArticleID`, (SELECT `Nama` FROM `t07_satuan` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t08_beli`.`SatuanID` LIMIT 1) AS `EV__SatuanID` FROM `t08_beli`" .
-			") `EW_TMP_TABLE`";
-		return ($this->_SqlSelectList <> "") ? $this->_SqlSelectList : $select;
-	}
-
-	function SqlSelectList() { // For backward compatibility
-		return $this->getSqlSelectList();
-	}
-
-	function setSqlSelectList($v) {
-		$this->_SqlSelectList = $v;
 	}
 	var $_SqlWhere = "";
 
@@ -273,7 +223,7 @@ class ct08_beli extends cTable {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() { // Order By
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`TglPO` ASC,`NoPO` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`tgl` ASC,`kat` ASC,`no_jdl` ASC,`no_ket` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -339,44 +289,16 @@ class ct08_beli extends cTable {
 		ew_AddFilter($sFilter, $this->CurrentFilter);
 		$sFilter = $this->ApplyUserIDFilters($sFilter);
 		$this->Recordset_Selecting($sFilter);
-		if ($this->UseVirtualFields()) {
-			$sSelect = $this->getSqlSelectList();
-			$sSort = $this->UseSessionForListSQL ? $this->getSessionOrderByList() : "";
-		} else {
-			$sSelect = $this->getSqlSelect();
-			$sSort = $this->UseSessionForListSQL ? $this->getSessionOrderBy() : "";
-		}
+		$sSelect = $this->getSqlSelect();
+		$sSort = $this->UseSessionForListSQL ? $this->getSessionOrderBy() : "";
 		return ew_BuildSelectSql($sSelect, $this->getSqlWhere(), $this->getSqlGroupBy(),
 			$this->getSqlHaving(), $this->getSqlOrderBy(), $sFilter, $sSort);
 	}
 
 	// Get ORDER BY clause
 	function GetOrderBy() {
-		$sSort = ($this->UseVirtualFields()) ? $this->getSessionOrderByList() : $this->getSessionOrderBy();
+		$sSort = $this->getSessionOrderBy();
 		return ew_BuildSelectSql("", "", "", "", $this->getSqlOrderBy(), "", $sSort);
-	}
-
-	// Check if virtual fields is used in SQL
-	function UseVirtualFields() {
-		$sWhere = $this->UseSessionForListSQL ? $this->getSessionWhere() : $this->CurrentFilter;
-		$sOrderBy = $this->UseSessionForListSQL ? $this->getSessionOrderByList() : "";
-		if ($sWhere <> "")
-			$sWhere = " " . str_replace(array("(",")"), array("",""), $sWhere) . " ";
-		if ($sOrderBy <> "")
-			$sOrderBy = " " . str_replace(array("(",")"), array("",""), $sOrderBy) . " ";
-		if ($this->ArticleID->AdvancedSearch->SearchValue <> "" ||
-			$this->ArticleID->AdvancedSearch->SearchValue2 <> "" ||
-			strpos($sWhere, " " . $this->ArticleID->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		if (strpos($sOrderBy, " " . $this->ArticleID->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		if ($this->SatuanID->AdvancedSearch->SearchValue <> "" ||
-			$this->SatuanID->AdvancedSearch->SearchValue2 <> "" ||
-			strpos($sWhere, " " . $this->SatuanID->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		if (strpos($sOrderBy, " " . $this->SatuanID->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		return FALSE;
 	}
 
 	// Try to get record count
@@ -427,10 +349,7 @@ class ct08_beli extends cTable {
 		$select = $this->TableType == 'CUSTOMVIEW' ? $this->getSqlSelect() : "SELECT * FROM " . $this->getSqlFrom();
 		$groupBy = $this->TableType == 'CUSTOMVIEW' ? $this->getSqlGroupBy() : "";
 		$having = $this->TableType == 'CUSTOMVIEW' ? $this->getSqlHaving() : "";
-		if ($this->UseVirtualFields())
-			$sql = ew_BuildSelectSql($this->getSqlSelectList(), $this->getSqlWhere(), $groupBy, $having, "", $filter, "");
-		else
-			$sql = ew_BuildSelectSql($select, $this->getSqlWhere(), $groupBy, $having, "", $filter, "");
+		$sql = ew_BuildSelectSql($select, $this->getSqlWhere(), $groupBy, $having, "", $filter, "");
 		$cnt = $this->TryGetRecordCount($sql);
 		if ($cnt == -1) {
 			$conn = &$this->Connection();
@@ -464,8 +383,8 @@ class ct08_beli extends cTable {
 		if ($bInsert) {
 
 			// Get insert id if necessary
-			$this->id->setDbValue($conn->Insert_ID());
-			$rs['id'] = $this->id->DbValue;
+			$this->home_id->setDbValue($conn->Insert_ID());
+			$rs['home_id'] = $this->home_id->DbValue;
 			if ($this->AuditTrailOnAdd)
 				$this->WriteAuditTrailOnAdd($rs);
 		}
@@ -496,7 +415,7 @@ class ct08_beli extends cTable {
 		$bUpdate = $conn->Execute($this->UpdateSQL($rs, $where, $curfilter));
 		if ($bUpdate && $this->AuditTrailOnEdit) {
 			$rsaudit = $rs;
-			$fldname = 'id';
+			$fldname = 'home_id';
 			if (!array_key_exists($fldname, $rsaudit)) $rsaudit[$fldname] = $rsold[$fldname];
 			$this->WriteAuditTrailOnEdit($rsold, $rsaudit);
 		}
@@ -509,8 +428,8 @@ class ct08_beli extends cTable {
 		if (is_array($where))
 			$where = $this->ArrayToFilter($where);
 		if ($rs) {
-			if (array_key_exists('id', $rs))
-				ew_AddFilter($where, ew_QuotedName('id', $this->DBID) . '=' . ew_QuotedValue($rs['id'], $this->id->FldDataType, $this->DBID));
+			if (array_key_exists('home_id', $rs))
+				ew_AddFilter($where, ew_QuotedName('home_id', $this->DBID) . '=' . ew_QuotedValue($rs['home_id'], $this->home_id->FldDataType, $this->DBID));
 		}
 		$filter = ($curfilter) ? $this->CurrentFilter : "";
 		ew_AddFilter($filter, $where);
@@ -534,18 +453,18 @@ class ct08_beli extends cTable {
 
 	// Key filter WHERE clause
 	function SqlKeyFilter() {
-		return "`id` = @id@";
+		return "`home_id` = @home_id@";
 	}
 
 	// Key filter
 	function KeyFilter() {
 		$sKeyFilter = $this->SqlKeyFilter();
-		if (!is_numeric($this->id->CurrentValue))
+		if (!is_numeric($this->home_id->CurrentValue))
 			return "0=1"; // Invalid key
-		if (is_null($this->id->CurrentValue))
+		if (is_null($this->home_id->CurrentValue))
 			return "0=1"; // Invalid key
 		else
-			$sKeyFilter = str_replace("@id@", ew_AdjustSql($this->id->CurrentValue, $this->DBID), $sKeyFilter); // Replace key value
+			$sKeyFilter = str_replace("@home_id@", ew_AdjustSql($this->home_id->CurrentValue, $this->DBID), $sKeyFilter); // Replace key value
 		return $sKeyFilter;
 	}
 
@@ -559,7 +478,7 @@ class ct08_beli extends cTable {
 		if (@$_SESSION[$name] <> "") {
 			return $_SESSION[$name];
 		} else {
-			return "t08_belilist.php";
+			return "t95_homedetaillist.php";
 		}
 	}
 
@@ -570,11 +489,11 @@ class ct08_beli extends cTable {
 	// Get modal caption
 	function GetModalCaption($pageName) {
 		global $Language;
-		if ($pageName == "t08_beliview.php")
+		if ($pageName == "t95_homedetailview.php")
 			return $Language->Phrase("View");
-		elseif ($pageName == "t08_beliedit.php")
+		elseif ($pageName == "t95_homedetailedit.php")
 			return $Language->Phrase("Edit");
-		elseif ($pageName == "t08_beliadd.php")
+		elseif ($pageName == "t95_homedetailadd.php")
 			return $Language->Phrase("Add");
 		else
 			return "";
@@ -582,30 +501,30 @@ class ct08_beli extends cTable {
 
 	// List URL
 	function GetListUrl() {
-		return "t08_belilist.php";
+		return "t95_homedetaillist.php";
 	}
 
 	// View URL
 	function GetViewUrl($parm = "") {
 		if ($parm <> "")
-			$url = $this->KeyUrl("t08_beliview.php", $this->UrlParm($parm));
+			$url = $this->KeyUrl("t95_homedetailview.php", $this->UrlParm($parm));
 		else
-			$url = $this->KeyUrl("t08_beliview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+			$url = $this->KeyUrl("t95_homedetailview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
 		return $this->AddMasterUrl($url);
 	}
 
 	// Add URL
 	function GetAddUrl($parm = "") {
 		if ($parm <> "")
-			$url = "t08_beliadd.php?" . $this->UrlParm($parm);
+			$url = "t95_homedetailadd.php?" . $this->UrlParm($parm);
 		else
-			$url = "t08_beliadd.php";
+			$url = "t95_homedetailadd.php";
 		return $this->AddMasterUrl($url);
 	}
 
 	// Edit URL
 	function GetEditUrl($parm = "") {
-		$url = $this->KeyUrl("t08_beliedit.php", $this->UrlParm($parm));
+		$url = $this->KeyUrl("t95_homedetailedit.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -617,7 +536,7 @@ class ct08_beli extends cTable {
 
 	// Copy URL
 	function GetCopyUrl($parm = "") {
-		$url = $this->KeyUrl("t08_beliadd.php", $this->UrlParm($parm));
+		$url = $this->KeyUrl("t95_homedetailadd.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -629,7 +548,7 @@ class ct08_beli extends cTable {
 
 	// Delete URL
 	function GetDeleteUrl() {
-		return $this->KeyUrl("t08_belidelete.php", $this->UrlParm());
+		return $this->KeyUrl("t95_homedetaildelete.php", $this->UrlParm());
 	}
 
 	// Add master url
@@ -639,7 +558,7 @@ class ct08_beli extends cTable {
 
 	function KeyToJson() {
 		$json = "";
-		$json .= "id:" . ew_VarToJson($this->id->CurrentValue, "number", "'");
+		$json .= "home_id:" . ew_VarToJson($this->home_id->CurrentValue, "number", "'");
 		return "{" . $json . "}";
 	}
 
@@ -647,8 +566,8 @@ class ct08_beli extends cTable {
 	function KeyUrl($url, $parm = "") {
 		$sUrl = $url . "?";
 		if ($parm <> "") $sUrl .= $parm . "&";
-		if (!is_null($this->id->CurrentValue)) {
-			$sUrl .= "id=" . urlencode($this->id->CurrentValue);
+		if (!is_null($this->home_id->CurrentValue)) {
+			$sUrl .= "home_id=" . urlencode($this->home_id->CurrentValue);
 		} else {
 			return "javascript:ew_Alert(ewLanguage.Phrase('InvalidRecord'));";
 		}
@@ -681,10 +600,10 @@ class ct08_beli extends cTable {
 			$cnt = count($arKeys);
 		} elseif (!empty($_GET) || !empty($_POST)) {
 			$isPost = ew_IsPost();
-			if ($isPost && isset($_POST["id"]))
-				$arKeys[] = $_POST["id"];
-			elseif (isset($_GET["id"]))
-				$arKeys[] = $_GET["id"];
+			if ($isPost && isset($_POST["home_id"]))
+				$arKeys[] = $_POST["home_id"];
+			elseif (isset($_GET["home_id"]))
+				$arKeys[] = $_GET["home_id"];
 			else
 				$arKeys = NULL; // Do not setup
 
@@ -709,7 +628,7 @@ class ct08_beli extends cTable {
 		$sKeyFilter = "";
 		foreach ($arKeys as $key) {
 			if ($sKeyFilter <> "") $sKeyFilter .= " OR ";
-			$this->id->CurrentValue = $key;
+			$this->home_id->CurrentValue = $key;
 			$sKeyFilter .= "(" . $this->KeyFilter() . ")";
 		}
 		return $sKeyFilter;
@@ -730,15 +649,14 @@ class ct08_beli extends cTable {
 
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
-		$this->id->setDbValue($rs->fields('id'));
-		$this->TglPO->setDbValue($rs->fields('TglPO'));
-		$this->NoPO->setDbValue($rs->fields('NoPO'));
-		$this->VendorID->setDbValue($rs->fields('VendorID'));
-		$this->ArticleID->setDbValue($rs->fields('ArticleID'));
-		$this->Harga->setDbValue($rs->fields('Harga'));
-		$this->Qty->setDbValue($rs->fields('Qty'));
-		$this->SatuanID->setDbValue($rs->fields('SatuanID'));
-		$this->SubTotal->setDbValue($rs->fields('SubTotal'));
+		$this->home_id->setDbValue($rs->fields('home_id'));
+		$this->tgl->setDbValue($rs->fields('tgl'));
+		$this->kat->setDbValue($rs->fields('kat'));
+		$this->no_jdl->setDbValue($rs->fields('no_jdl'));
+		$this->jdl->setDbValue($rs->fields('jdl'));
+		$this->no_ket->setDbValue($rs->fields('no_ket'));
+		$this->ket->setDbValue($rs->fields('ket'));
+		$this->done->setDbValue($rs->fields('done'));
 	}
 
 	// Render list row values
@@ -749,170 +667,116 @@ class ct08_beli extends cTable {
 		$this->Row_Rendering();
 
 	// Common render codes
-		// id
-		// TglPO
-		// NoPO
-		// VendorID
-		// ArticleID
-		// Harga
-		// Qty
-		// SatuanID
-		// SubTotal
-		// id
+		// home_id
+		// tgl
+		// kat
+		// no_jdl
+		// jdl
+		// no_ket
+		// ket
+		// done
+		// home_id
 
-		$this->id->ViewValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
+		$this->home_id->ViewValue = $this->home_id->CurrentValue;
+		$this->home_id->ViewCustomAttributes = "";
 
-		// TglPO
-		$this->TglPO->ViewValue = $this->TglPO->CurrentValue;
-		$this->TglPO->ViewValue = ew_FormatDateTime($this->TglPO->ViewValue, 7);
-		$this->TglPO->ViewCustomAttributes = "";
+		// tgl
+		$this->tgl->ViewValue = $this->tgl->CurrentValue;
+		$this->tgl->ViewValue = ew_FormatDateTime($this->tgl->ViewValue, 7);
+		$this->tgl->ViewCustomAttributes = "";
 
-		// NoPO
-		$this->NoPO->ViewValue = $this->NoPO->CurrentValue;
-		$this->NoPO->ViewCustomAttributes = "";
-
-		// VendorID
-		if (strval($this->VendorID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->VendorID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t02_vendor`";
+		// kat
+		if (strval($this->kat->CurrentValue) <> "") {
+			$sFilterWrk = "`kode`" . ew_SearchString("=", $this->kat->CurrentValue, EW_DATATYPE_STRING, "");
+		$sSqlWrk = "SELECT `kode`, `kode` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t94_home`";
 		$sWhereWrk = "";
-		$this->VendorID->LookupFilters = array("dx1" => '`Nama`');
+		$this->kat->LookupFilters = array("dx1" => '`kode`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->VendorID, $sWhereWrk); // Call Lookup Selecting
+		$this->Lookup_Selecting($this->kat, $sWhereWrk); // Call Lookup Selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 			$rswrk = Conn()->Execute($sSqlWrk);
 			if ($rswrk && !$rswrk->EOF) { // Lookup values found
 				$arwrk = array();
 				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->VendorID->ViewValue = $this->VendorID->DisplayValue($arwrk);
+				$this->kat->ViewValue = $this->kat->DisplayValue($arwrk);
 				$rswrk->Close();
 			} else {
-				$this->VendorID->ViewValue = $this->VendorID->CurrentValue;
+				$this->kat->ViewValue = $this->kat->CurrentValue;
 			}
 		} else {
-			$this->VendorID->ViewValue = NULL;
+			$this->kat->ViewValue = NULL;
 		}
-		$this->VendorID->ViewCustomAttributes = "";
+		$this->kat->ViewCustomAttributes = "";
 
-		// ArticleID
-		if ($this->ArticleID->VirtualValue <> "") {
-			$this->ArticleID->ViewValue = $this->ArticleID->VirtualValue;
-		} else {
-		if (strval($this->ArticleID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->ArticleID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t06_article`";
-		$sWhereWrk = "";
-		$this->ArticleID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$this->ArticleID->ViewValue = $this->ArticleID->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->ArticleID->ViewValue = $this->ArticleID->CurrentValue;
+		// no_jdl
+		$this->no_jdl->ViewValue = $this->no_jdl->CurrentValue;
+		$this->no_jdl->ViewCustomAttributes = "";
+
+		// jdl
+		$this->jdl->ViewValue = $this->jdl->CurrentValue;
+		$this->jdl->ViewCustomAttributes = "";
+
+		// no_ket
+		$this->no_ket->ViewValue = $this->no_ket->CurrentValue;
+		$this->no_ket->ViewCustomAttributes = "";
+
+		// ket
+		$this->ket->ViewValue = $this->ket->CurrentValue;
+		$this->ket->ViewCustomAttributes = "";
+
+		// done
+		if (strval($this->done->CurrentValue) <> "") {
+			$this->done->ViewValue = "";
+			$arwrk = explode(",", strval($this->done->CurrentValue));
+			$cnt = count($arwrk);
+			for ($ari = 0; $ari < $cnt; $ari++) {
+				$this->done->ViewValue .= $this->done->OptionCaption(trim($arwrk[$ari]));
+				if ($ari < $cnt-1) $this->done->ViewValue .= ew_ViewOptionSeparator($ari);
 			}
 		} else {
-			$this->ArticleID->ViewValue = NULL;
+			$this->done->ViewValue = NULL;
 		}
-		}
-		$this->ArticleID->ViewCustomAttributes = "";
+		$this->done->ViewCustomAttributes = "";
 
-		// Harga
-		$this->Harga->ViewValue = $this->Harga->CurrentValue;
-		$this->Harga->ViewValue = ew_FormatNumber($this->Harga->ViewValue, 2, -2, -2, -2);
-		$this->Harga->CellCssStyle .= "text-align: right;";
-		$this->Harga->ViewCustomAttributes = "";
+		// home_id
+		$this->home_id->LinkCustomAttributes = "";
+		$this->home_id->HrefValue = "";
+		$this->home_id->TooltipValue = "";
 
-		// Qty
-		$this->Qty->ViewValue = $this->Qty->CurrentValue;
-		$this->Qty->ViewValue = ew_FormatNumber($this->Qty->ViewValue, 2, -2, -2, -2);
-		$this->Qty->CellCssStyle .= "text-align: right;";
-		$this->Qty->ViewCustomAttributes = "";
+		// tgl
+		$this->tgl->LinkCustomAttributes = "";
+		$this->tgl->HrefValue = "";
+		$this->tgl->TooltipValue = "";
 
-		// SatuanID
-		if ($this->SatuanID->VirtualValue <> "") {
-			$this->SatuanID->ViewValue = $this->SatuanID->VirtualValue;
-		} else {
-			$this->SatuanID->ViewValue = $this->SatuanID->CurrentValue;
-		if (strval($this->SatuanID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->SatuanID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_satuan`";
-		$sWhereWrk = "";
-		$this->SatuanID->LookupFilters = array("dx1" => '`Nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->SatuanID, $sWhereWrk); // Call Lookup Selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->SatuanID->ViewValue = $this->SatuanID->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->SatuanID->ViewValue = $this->SatuanID->CurrentValue;
-			}
-		} else {
-			$this->SatuanID->ViewValue = NULL;
-		}
-		}
-		$this->SatuanID->ViewCustomAttributes = "";
+		// kat
+		$this->kat->LinkCustomAttributes = "";
+		$this->kat->HrefValue = "";
+		$this->kat->TooltipValue = "";
 
-		// SubTotal
-		$this->SubTotal->ViewValue = $this->SubTotal->CurrentValue;
-		$this->SubTotal->ViewValue = ew_FormatNumber($this->SubTotal->ViewValue, 2, -2, -2, -2);
-		$this->SubTotal->CellCssStyle .= "text-align: right;";
-		$this->SubTotal->ViewCustomAttributes = "";
+		// no_jdl
+		$this->no_jdl->LinkCustomAttributes = "";
+		$this->no_jdl->HrefValue = "";
+		$this->no_jdl->TooltipValue = "";
 
-		// id
-		$this->id->LinkCustomAttributes = "";
-		$this->id->HrefValue = "";
-		$this->id->TooltipValue = "";
+		// jdl
+		$this->jdl->LinkCustomAttributes = "";
+		$this->jdl->HrefValue = "";
+		$this->jdl->TooltipValue = "";
 
-		// TglPO
-		$this->TglPO->LinkCustomAttributes = "";
-		$this->TglPO->HrefValue = "";
-		$this->TglPO->TooltipValue = "";
+		// no_ket
+		$this->no_ket->LinkCustomAttributes = "";
+		$this->no_ket->HrefValue = "";
+		$this->no_ket->TooltipValue = "";
 
-		// NoPO
-		$this->NoPO->LinkCustomAttributes = "";
-		$this->NoPO->HrefValue = "";
-		$this->NoPO->TooltipValue = "";
+		// ket
+		$this->ket->LinkCustomAttributes = "";
+		$this->ket->HrefValue = "";
+		$this->ket->TooltipValue = "";
 
-		// VendorID
-		$this->VendorID->LinkCustomAttributes = "";
-		$this->VendorID->HrefValue = "";
-		$this->VendorID->TooltipValue = "";
-
-		// ArticleID
-		$this->ArticleID->LinkCustomAttributes = "";
-		$this->ArticleID->HrefValue = "";
-		$this->ArticleID->TooltipValue = "";
-
-		// Harga
-		$this->Harga->LinkCustomAttributes = "";
-		$this->Harga->HrefValue = "";
-		$this->Harga->TooltipValue = "";
-
-		// Qty
-		$this->Qty->LinkCustomAttributes = "";
-		$this->Qty->HrefValue = "";
-		$this->Qty->TooltipValue = "";
-
-		// SatuanID
-		$this->SatuanID->LinkCustomAttributes = "";
-		$this->SatuanID->HrefValue = "";
-		$this->SatuanID->TooltipValue = "";
-
-		// SubTotal
-		$this->SubTotal->LinkCustomAttributes = "";
-		$this->SubTotal->HrefValue = "";
-		$this->SubTotal->TooltipValue = "";
+		// done
+		$this->done->LinkCustomAttributes = "";
+		$this->done->HrefValue = "";
+		$this->done->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -928,58 +792,49 @@ class ct08_beli extends cTable {
 		// Call Row Rendering event
 		$this->Row_Rendering();
 
-		// id
-		$this->id->EditAttrs["class"] = "form-control";
-		$this->id->EditCustomAttributes = "";
-		$this->id->EditValue = $this->id->CurrentValue;
-		$this->id->ViewCustomAttributes = "";
+		// home_id
+		$this->home_id->EditAttrs["class"] = "form-control";
+		$this->home_id->EditCustomAttributes = "";
+		$this->home_id->EditValue = $this->home_id->CurrentValue;
+		$this->home_id->ViewCustomAttributes = "";
 
-		// TglPO
-		$this->TglPO->EditAttrs["class"] = "form-control";
-		$this->TglPO->EditCustomAttributes = "";
-		$this->TglPO->EditValue = ew_FormatDateTime($this->TglPO->CurrentValue, 7);
-		$this->TglPO->PlaceHolder = ew_RemoveHtml($this->TglPO->FldCaption());
+		// tgl
+		$this->tgl->EditAttrs["class"] = "form-control";
+		$this->tgl->EditCustomAttributes = "";
+		$this->tgl->EditValue = ew_FormatDateTime($this->tgl->CurrentValue, 7);
+		$this->tgl->PlaceHolder = ew_RemoveHtml($this->tgl->FldCaption());
 
-		// NoPO
-		$this->NoPO->EditAttrs["class"] = "form-control";
-		$this->NoPO->EditCustomAttributes = "";
-		$this->NoPO->EditValue = $this->NoPO->CurrentValue;
-		$this->NoPO->PlaceHolder = ew_RemoveHtml($this->NoPO->FldCaption());
+		// kat
+		$this->kat->EditAttrs["class"] = "form-control";
+		$this->kat->EditCustomAttributes = "";
 
-		// VendorID
-		$this->VendorID->EditAttrs["class"] = "form-control";
-		$this->VendorID->EditCustomAttributes = "";
+		// no_jdl
+		$this->no_jdl->EditAttrs["class"] = "form-control";
+		$this->no_jdl->EditCustomAttributes = "";
+		$this->no_jdl->EditValue = $this->no_jdl->CurrentValue;
+		$this->no_jdl->PlaceHolder = ew_RemoveHtml($this->no_jdl->FldCaption());
 
-		// ArticleID
-		$this->ArticleID->EditAttrs["class"] = "form-control";
-		$this->ArticleID->EditCustomAttributes = "";
+		// jdl
+		$this->jdl->EditAttrs["class"] = "form-control";
+		$this->jdl->EditCustomAttributes = "";
+		$this->jdl->EditValue = $this->jdl->CurrentValue;
+		$this->jdl->PlaceHolder = ew_RemoveHtml($this->jdl->FldCaption());
 
-		// Harga
-		$this->Harga->EditAttrs["class"] = "form-control";
-		$this->Harga->EditCustomAttributes = "";
-		$this->Harga->EditValue = $this->Harga->CurrentValue;
-		$this->Harga->PlaceHolder = ew_RemoveHtml($this->Harga->FldCaption());
-		if (strval($this->Harga->EditValue) <> "" && is_numeric($this->Harga->EditValue)) $this->Harga->EditValue = ew_FormatNumber($this->Harga->EditValue, -2, -2, -2, -2);
+		// no_ket
+		$this->no_ket->EditAttrs["class"] = "form-control";
+		$this->no_ket->EditCustomAttributes = "";
+		$this->no_ket->EditValue = $this->no_ket->CurrentValue;
+		$this->no_ket->PlaceHolder = ew_RemoveHtml($this->no_ket->FldCaption());
 
-		// Qty
-		$this->Qty->EditAttrs["class"] = "form-control";
-		$this->Qty->EditCustomAttributes = "";
-		$this->Qty->EditValue = $this->Qty->CurrentValue;
-		$this->Qty->PlaceHolder = ew_RemoveHtml($this->Qty->FldCaption());
-		if (strval($this->Qty->EditValue) <> "" && is_numeric($this->Qty->EditValue)) $this->Qty->EditValue = ew_FormatNumber($this->Qty->EditValue, -2, -2, -2, -2);
+		// ket
+		$this->ket->EditAttrs["class"] = "form-control";
+		$this->ket->EditCustomAttributes = "";
+		$this->ket->EditValue = $this->ket->CurrentValue;
+		$this->ket->PlaceHolder = ew_RemoveHtml($this->ket->FldCaption());
 
-		// SatuanID
-		$this->SatuanID->EditAttrs["class"] = "form-control";
-		$this->SatuanID->EditCustomAttributes = "";
-		$this->SatuanID->EditValue = $this->SatuanID->CurrentValue;
-		$this->SatuanID->PlaceHolder = ew_RemoveHtml($this->SatuanID->FldCaption());
-
-		// SubTotal
-		$this->SubTotal->EditAttrs["class"] = "form-control";
-		$this->SubTotal->EditCustomAttributes = "";
-		$this->SubTotal->EditValue = $this->SubTotal->CurrentValue;
-		$this->SubTotal->PlaceHolder = ew_RemoveHtml($this->SubTotal->FldCaption());
-		if (strval($this->SubTotal->EditValue) <> "" && is_numeric($this->SubTotal->EditValue)) $this->SubTotal->EditValue = ew_FormatNumber($this->SubTotal->EditValue, -2, -2, -2, -2);
+		// done
+		$this->done->EditCustomAttributes = "";
+		$this->done->EditValue = $this->done->Options(FALSE);
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -1008,24 +863,22 @@ class ct08_beli extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
-					if ($this->TglPO->Exportable) $Doc->ExportCaption($this->TglPO);
-					if ($this->NoPO->Exportable) $Doc->ExportCaption($this->NoPO);
-					if ($this->VendorID->Exportable) $Doc->ExportCaption($this->VendorID);
-					if ($this->ArticleID->Exportable) $Doc->ExportCaption($this->ArticleID);
-					if ($this->Harga->Exportable) $Doc->ExportCaption($this->Harga);
-					if ($this->Qty->Exportable) $Doc->ExportCaption($this->Qty);
-					if ($this->SatuanID->Exportable) $Doc->ExportCaption($this->SatuanID);
-					if ($this->SubTotal->Exportable) $Doc->ExportCaption($this->SubTotal);
+					if ($this->tgl->Exportable) $Doc->ExportCaption($this->tgl);
+					if ($this->kat->Exportable) $Doc->ExportCaption($this->kat);
+					if ($this->no_jdl->Exportable) $Doc->ExportCaption($this->no_jdl);
+					if ($this->jdl->Exportable) $Doc->ExportCaption($this->jdl);
+					if ($this->no_ket->Exportable) $Doc->ExportCaption($this->no_ket);
+					if ($this->ket->Exportable) $Doc->ExportCaption($this->ket);
+					if ($this->done->Exportable) $Doc->ExportCaption($this->done);
 				} else {
-					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
-					if ($this->TglPO->Exportable) $Doc->ExportCaption($this->TglPO);
-					if ($this->NoPO->Exportable) $Doc->ExportCaption($this->NoPO);
-					if ($this->VendorID->Exportable) $Doc->ExportCaption($this->VendorID);
-					if ($this->ArticleID->Exportable) $Doc->ExportCaption($this->ArticleID);
-					if ($this->Harga->Exportable) $Doc->ExportCaption($this->Harga);
-					if ($this->Qty->Exportable) $Doc->ExportCaption($this->Qty);
-					if ($this->SatuanID->Exportable) $Doc->ExportCaption($this->SatuanID);
-					if ($this->SubTotal->Exportable) $Doc->ExportCaption($this->SubTotal);
+					if ($this->home_id->Exportable) $Doc->ExportCaption($this->home_id);
+					if ($this->tgl->Exportable) $Doc->ExportCaption($this->tgl);
+					if ($this->kat->Exportable) $Doc->ExportCaption($this->kat);
+					if ($this->no_jdl->Exportable) $Doc->ExportCaption($this->no_jdl);
+					if ($this->jdl->Exportable) $Doc->ExportCaption($this->jdl);
+					if ($this->no_ket->Exportable) $Doc->ExportCaption($this->no_ket);
+					if ($this->ket->Exportable) $Doc->ExportCaption($this->ket);
+					if ($this->done->Exportable) $Doc->ExportCaption($this->done);
 				}
 				$Doc->EndExportRow();
 			}
@@ -1057,24 +910,22 @@ class ct08_beli extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
-						if ($this->TglPO->Exportable) $Doc->ExportField($this->TglPO);
-						if ($this->NoPO->Exportable) $Doc->ExportField($this->NoPO);
-						if ($this->VendorID->Exportable) $Doc->ExportField($this->VendorID);
-						if ($this->ArticleID->Exportable) $Doc->ExportField($this->ArticleID);
-						if ($this->Harga->Exportable) $Doc->ExportField($this->Harga);
-						if ($this->Qty->Exportable) $Doc->ExportField($this->Qty);
-						if ($this->SatuanID->Exportable) $Doc->ExportField($this->SatuanID);
-						if ($this->SubTotal->Exportable) $Doc->ExportField($this->SubTotal);
+						if ($this->tgl->Exportable) $Doc->ExportField($this->tgl);
+						if ($this->kat->Exportable) $Doc->ExportField($this->kat);
+						if ($this->no_jdl->Exportable) $Doc->ExportField($this->no_jdl);
+						if ($this->jdl->Exportable) $Doc->ExportField($this->jdl);
+						if ($this->no_ket->Exportable) $Doc->ExportField($this->no_ket);
+						if ($this->ket->Exportable) $Doc->ExportField($this->ket);
+						if ($this->done->Exportable) $Doc->ExportField($this->done);
 					} else {
-						if ($this->id->Exportable) $Doc->ExportField($this->id);
-						if ($this->TglPO->Exportable) $Doc->ExportField($this->TglPO);
-						if ($this->NoPO->Exportable) $Doc->ExportField($this->NoPO);
-						if ($this->VendorID->Exportable) $Doc->ExportField($this->VendorID);
-						if ($this->ArticleID->Exportable) $Doc->ExportField($this->ArticleID);
-						if ($this->Harga->Exportable) $Doc->ExportField($this->Harga);
-						if ($this->Qty->Exportable) $Doc->ExportField($this->Qty);
-						if ($this->SatuanID->Exportable) $Doc->ExportField($this->SatuanID);
-						if ($this->SubTotal->Exportable) $Doc->ExportField($this->SubTotal);
+						if ($this->home_id->Exportable) $Doc->ExportField($this->home_id);
+						if ($this->tgl->Exportable) $Doc->ExportField($this->tgl);
+						if ($this->kat->Exportable) $Doc->ExportField($this->kat);
+						if ($this->no_jdl->Exportable) $Doc->ExportField($this->no_jdl);
+						if ($this->jdl->Exportable) $Doc->ExportField($this->jdl);
+						if ($this->no_ket->Exportable) $Doc->ExportField($this->no_ket);
+						if ($this->ket->Exportable) $Doc->ExportField($this->ket);
+						if ($this->done->Exportable) $Doc->ExportField($this->done);
 					}
 					$Doc->EndExportRow($RowCnt);
 				}
@@ -1094,29 +945,6 @@ class ct08_beli extends cTable {
 	function GetAutoFill($id, $val) {
 		$rsarr = array();
 		$rowcnt = 0;
-		if (preg_match('/^x(\d)*_ArticleID$/', $id)) {
-			$conn = &$this->Connection();
-			$sSqlWrk = "SELECT `Harga` AS FIELD0, `SatuanID` AS FIELD1 FROM `t06_article`";
-			$sWhereWrk = "(`id` = " . ew_QuotedValue($val, EW_DATATYPE_NUMBER, $this->DBID) . ")";
-			$this->ArticleID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-			$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($rs = ew_LoadRecordset($sSqlWrk, $conn)) {
-				while ($rs && !$rs->EOF) {
-					$ar = array();
-					$this->Harga->setDbValue($rs->fields[0]);
-					$this->SatuanID->setDbValue($rs->fields[1]);
-					$this->RowType == EW_ROWTYPE_EDIT;
-					$this->RenderEditRow();
-					$ar[] = ($this->Harga->AutoFillOriginalValue) ? $this->Harga->CurrentValue : $this->Harga->EditValue;
-					$ar[] = ($this->SatuanID->AutoFillOriginalValue) ? $this->SatuanID->CurrentValue : $this->SatuanID->EditValue;
-					$rowcnt += 1;
-					$rsarr[] = $ar;
-					$rs->MoveNext();
-				}
-				$rs->Close();
-			}
-		}
 
 		// Output
 		if (is_array($rsarr) && $rowcnt > 0) {
@@ -1141,7 +969,7 @@ class ct08_beli extends cTable {
 
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
-		$table = 't08_beli';
+		$table = 't95_homedetail';
 		$usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
@@ -1150,12 +978,12 @@ class ct08_beli extends cTable {
 	function WriteAuditTrailOnAdd(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnAdd) return;
-		$table = 't08_beli';
+		$table = 't95_homedetail';
 
 		// Get key value
 		$key = "";
 		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rs['id'];
+		$key .= $rs['home_id'];
 
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
@@ -1184,12 +1012,12 @@ class ct08_beli extends cTable {
 	function WriteAuditTrailOnEdit(&$rsold, &$rsnew) {
 		global $Language;
 		if (!$this->AuditTrailOnEdit) return;
-		$table = 't08_beli';
+		$table = 't95_homedetail';
 
 		// Get key value
 		$key = "";
 		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rsold['id'];
+		$key .= $rsold['home_id'];
 
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
@@ -1231,13 +1059,13 @@ class ct08_beli extends cTable {
 	function WriteAuditTrailOnDelete(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnDelete) return;
-		$table = 't08_beli';
+		$table = 't95_homedetail';
 
 		// Get key value
 		$key = "";
 		if ($key <> "")
 			$key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rs['id'];
+		$key .= $rs['home_id'];
 
 		// Write Audit Trail
 		$dt = ew_StdCurrentDateTime();
@@ -1306,9 +1134,7 @@ class ct08_beli extends cTable {
 
 		// Enter your code here
 		// To cancel, set return value to FALSE
-		// default nomor PO baru
 
-		$rsnew["NoPO"] = f_GetNextNoPO(); // mengantisipasi lebih satu user menginput data saat bersamaan
 		return TRUE;
 	}
 
@@ -1316,13 +1142,6 @@ class ct08_beli extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"
-		// setup nomor hutang baru
-
-		$NoHutang = f_GetNextNoHutang();
-
-		// insert ke tabel hutang dengan nomor PO baru
-		ew_Execute("insert into t09_hutang (nohutang, beliid, jumlahhutang) values
-		('".$NoHutang."', ".$rsnew["id"].", ".$rsnew["SubTotal"].")");
 	}
 
 	// Row Updating event
@@ -1338,12 +1157,6 @@ class ct08_beli extends cTable {
 	function Row_Updated($rsold, &$rsnew) {
 
 		//echo "Row Updated";
-		// update data di tabel hutang
-		// disesuaikan dengan data di tabel beli
-
-		$q = "update t09_hutang set jumlahhutang = ".$rsnew["SubTotal"]." ".
-			"where beliid = ".$rsold["id"]."";
-		ew_Execute($q);
 	}
 
 	// Row Update Conflict event
@@ -1398,18 +1211,6 @@ class ct08_beli extends cTable {
 	function Row_Deleted(&$rs) {
 
 		//echo "Row Deleted";
-		// cari nilai hutang_id berdasarkan $rs[id]
-
-		$q = "select id from t09_hutang where beliid = ".$rs["id"]."";
-		$HutangID = ew_ExecuteScalar($q);
-
-		// hapus data di tabel hutangdetail berdasarkan $HutangID
-		$q = "delete from t10_hutangdetail where hutangid = ".$HutangID."";
-		ew_Execute($q);
-
-		// hapus data di tabel hutang berdasarkan BeliID
-		$q = "delete from t09_hutang where beliid = ".$rs["id"]."";
-		ew_Execute($q);
 	}
 
 	// Email Sending event
@@ -1439,23 +1240,6 @@ class ct08_beli extends cTable {
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
 
-		$this->TglPO->ReadOnly = true;
-		$this->NoPO->ReadOnly = true;
-		$this->SatuanID->ReadOnly = true;
-		$this->SubTotal->ReadOnly = true;
-
-		// Kondisi saat form Tambah sedang terbuka (tidak dalam mode konfirmasi)
-		if (CurrentPageID() == "add" && $this->CurrentAction != "F") {
-			$this->NoPO->CurrentValue = f_GetNextNoPO(); // trik
-			$this->NoPO->EditValue = $this->NoPO->CurrentValue; // tampilkan
-
-			//$this->Kode->ReadOnly = TRUE; // supaya tidak bisa diubah
-		}
-
-		// Kondisi saat form Tambah sedang dalam mode konfirmasi
-		if ($this->CurrentAction == "add" && $this->CurrentAction == "F") {
-			$this->NoPO->ViewValue = $this->NoPO->CurrentValue; // ambil dari mode sebelumnya
-		}
 	}
 
 	// User ID Filtering event

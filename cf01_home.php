@@ -344,24 +344,162 @@ $cf01_home_php->Page_Main();
 Page_Rendering();
 ?>
 <?php include_once "header.php" ?>
-<!-- <div>
-7:56 AM 4/10/2018<br/>
-- check dengan komposisi kode terbaru yang hanya onchange nya ada di subgroup saja<br/>
-- agar nanti F2 di article benar benar membaca nilai subgroup yang ada di barisnya<br/>
-</div>
-<div>
-	<a href="t06_articlelist.php">Article</a>
-</div>
+<?php
+function show_table($r) {
+	$mDone = "<font color='red'><b>done</b></font>&nbsp;";
+	echo "<table border='0'>";
+	while (!$r->EOF) {
+		$tgl = $r->fields("tgl");
+		$tgl2 = date_create($tgl);
+		echo "<tr><td colspan='3'>".date_format($tgl2, "d-m-Y")."</td></tr>";
+		while ($tgl == $r->fields["tgl"]) {
+			$jdl = $r->fields["jdl"];
+			$mDone2 = "";
+			if ($r->fields["done"] == 1) {
+				$mDone2 = $mDone;
+			}
+			echo "<tr><td width='25'>&nbsp;</td><td colspan='2'><li>".$mDone2.$jdl."</li></td></tr>";
+			while ($jdl == $r->fields["jdl"]) {
+				if ($r->fields["ket"] != null or $r->fields["ket"] != "") {
+					$mDone2 = "";
+					if ($r->fields["done"] == 1) {
+						$mDone2 = $mDone;
+					}
+					echo "<tr><td width='25'>&nbsp;</td><td width='25'>&nbsp;</td><td><li>".$mDone2.$r->fields["ket"]."</li></td></tr>";
+				}
+				$r->MoveNext();
+			}
+		}
+		echo "<tr><td>&nbsp;</td></tr>";
+	}
+	echo "</table>";
+}
 
-<div>
-<p>setiap pembelian dianggap hutang</p>
-</div>
+function show_detail($kode) {
+	$q = "select flag from t94_home where kode = '".$kode."'";
+	$r = Conn()->Execute($q);
+	return ($r->fields["flag"] == 0 ? "" : "in");
+}
 
-<div>
-	<p>lanjutkan jual detail :: 1). readonly; 2). total head</p>
-</div>
+function if_collapsed($kode) {
+	$q = "select flag from t94_home where kode = '".$kode."'";
+	$r = Conn()->Execute($q);
+	return ($r->fields["flag"] == 0 ? "class='collapsed'" : "");
+}
+?>
 
--->
+<style>
+.panel-heading a{
+  display:block;
+}
+
+.panel-heading a.collapsed {
+  background: url(http://upload.wikimedia.org/wikipedia/commons/3/36/Vector_skin_right_arrow.png) center right no-repeat;
+}
+
+.panel-heading a {
+  background: url(http://www.useragentman.com/blog/wp-content/themes/useragentman/images/widgets/downArrow.png) center right no-repeat;
+}
+</style>
+
+<div class="row">
+
+	<div class="col-lg-6 col-md-6 col-sm-6">
+		<div class="panel panel-default">
+			<div class="panel-heading"><strong><a <?php echo if_collapsed('5log'); ?> data-toggle="collapse" href="#log">log</a></strong></div>
+			<div id="log" class="panel-collapse collapse <?php echo show_detail('5log'); ?>">
+			<div class="panel-body">
+			<?php
+			$sql = "SELECT tgl, jdl, ket, done FROM t95_homedetail where kat = '5log'
+				order by `tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC";
+			$r = Conn()->Execute($sql);
+			show_table($r);
+			?>
+			</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-lg-6 col-md-6 col-sm-6">
+		<div class="panel panel-default">
+			<div class="panel-heading"><strong><a <?php echo if_collapsed('0whats_new'); ?> data-toggle="collapse" href="#whatsnew">what's new</a></strong></div>
+			<div id="whatsnew" class="panel-collapse collapse <?php echo show_detail('0whats_new'); ?>">
+			<div class="panel-body">
+			<?php
+			$sql = "SELECT tgl, jdl, ket, done FROM t95_homedetail where kat = '0whats_new'
+				order by `tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC";
+			$r = Conn()->Execute($sql);
+			show_table($r);
+			?>
+			</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="col-lg-6 col-md-6 col-sm-6">
+		<div class="panel panel-default">
+			<div class="panel-heading"><strong><a <?php echo if_collapsed('1on_progress'); ?> data-toggle="collapse" href="#onprogress">on progress</a></strong></div>
+			<div id="onprogress" class="panel-collapse collapse <?php echo show_detail('1on_progress'); ?>">
+			<div class="panel-body">
+			<?php
+			$sql = "SELECT tgl, jdl, ket, done FROM t95_homedetail where kat = '1on_progress'
+				order by `tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC";
+			$r = Conn()->Execute($sql);
+			show_table($r);
+			?>
+			</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-lg-6 col-md-6 col-sm-6">
+		<div class="panel panel-default">
+			<div class="panel-heading"><strong><a <?php echo if_collapsed('2update'); ?> data-toggle="collapse" href="#update">update</a></strong></div>
+			<div id="update" class="panel-collapse collapse <?php echo show_detail('2update'); ?>">
+			<div class="panel-body">
+			<?php
+			$sql = "SELECT tgl, jdl, ket, done FROM t95_homedetail where kat = '2update'
+				order by `tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC";
+			$r = Conn()->Execute($sql);
+			show_table($r);
+			?>
+			</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-lg-6 col-md-6 col-sm-6">
+		<div class="panel panel-default">
+			<div class="panel-heading"><strong><a <?php echo if_collapsed('3pending'); ?> data-toggle="collapse" href="#pending">pending</a></strong></div>
+			<div id="pending" class="panel-collapse collapse <?php echo show_detail('3pending'); ?>">
+			<div class="panel-body">
+			<?php
+			$sql = "SELECT tgl, jdl, ket, done FROM t95_homedetail where kat = '3pending'
+				order by `tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC";
+			$r = Conn()->Execute($sql);
+			show_table($r);
+			?>
+			</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-lg-6 col-md-6 col-sm-6">
+		<div class="panel panel-default">
+			<div class="panel-heading"><strong><a <?php echo if_collapsed('4todo'); ?> data-toggle="collapse" href="#todo">to do</a></strong></div>
+			<div id="todo" class="panel-collapse collapse <?php echo show_detail('4todo'); ?>">
+			<div class="panel-body">
+			<?php
+			$sql = "SELECT tgl, jdl, ket, done FROM t95_homedetail where kat = '4todo'
+				order by `tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC";
+			$r = Conn()->Execute($sql);
+			show_table($r);
+			?>
+			</div>
+			</div>
+		</div>
+	</div>
+</div>
 <?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
 <?php include_once "footer.php" ?>
 <?php

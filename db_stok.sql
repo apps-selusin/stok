@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 20, 2018 at 08:18 AM
+-- Generation Time: Apr 23, 2018 at 08:35 PM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -153,7 +153,7 @@ CREATE TABLE `t06_article` (
 --
 
 INSERT INTO `t06_article` (`id`, `SubGroupID`, `Kode`, `Nama`, `Qty`, `SatuanID`, `Harga`, `HargaJual`) VALUES
-(1, 1, '5501001', 'MEAT Has Luar Lokal', 98.25, 1, 100000.00, 125000.00);
+(1, 1, '5501001', 'MEAT Has Luar Lokal', 164.25, 1, 100000.00, 125000.00);
 
 -- --------------------------------------------------------
 
@@ -193,23 +193,6 @@ CREATE TABLE `t08_beli` (
   `SubTotal` float(15,2) NOT NULL DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `t08_beli`
---
-
-INSERT INTO `t08_beli` (`id`, `TglPO`, `NoPO`, `VendorID`, `ArticleID`, `Harga`, `Qty`, `SubTotal`) VALUES
-(1, '2018-04-20', 'PO201804200001', 1, 1, 100000.00, 2.00, 200000.00);
-
---
--- Triggers `t08_beli`
---
-DELIMITER $$
-CREATE TRIGGER `tg_updateqty_beli` AFTER INSERT ON `t08_beli` FOR EACH ROW BEGIN
-update t06_article set qty = qty + new.qty where id = new.articleid;
-END
-$$
-DELIMITER ;
-
 -- --------------------------------------------------------
 
 --
@@ -223,13 +206,6 @@ CREATE TABLE `t09_hutang` (
   `JumlahHutang` float(15,2) NOT NULL DEFAULT '0.00',
   `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `t09_hutang`
---
-
-INSERT INTO `t09_hutang` (`id`, `NoHutang`, `BeliID`, `JumlahHutang`, `JumlahBayar`) VALUES
-(1, 'HT000001', 1, 200000.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -259,13 +235,6 @@ CREATE TABLE `t11_jual` (
   `CustomerPO` varchar(50) CHARACTER SET latin1 NOT NULL,
   `Total` float(15,2) NOT NULL DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `t11_jual`
---
-
-INSERT INTO `t11_jual` (`id`, `TglSO`, `NoSO`, `CustomerID`, `CustomerPO`, `Total`) VALUES
-(1, '2018-04-20', 'SO201804200001', 1, '-', 468750.00);
 
 -- --------------------------------------------------------
 
@@ -297,22 +266,108 @@ CREATE TABLE `t12_jualdetail` (
   `SubTotal` float(15,2) NOT NULL DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `t12_jualdetail`
---
-
-INSERT INTO `t12_jualdetail` (`id`, `JualID`, `ArticleID`, `HargaJual`, `Qty`, `SubTotal`) VALUES
-(1, 1, 1, 125000.00, 3.75, 468750.00);
+-- --------------------------------------------------------
 
 --
--- Triggers `t12_jualdetail`
+-- Table structure for table `t94_home`
 --
-DELIMITER $$
-CREATE TRIGGER `tg_updateqty_jual` AFTER INSERT ON `t12_jualdetail` FOR EACH ROW BEGIN
-update t06_article set qty = qty - new.qty where id = new.articleid;
-END
-$$
-DELIMITER ;
+
+CREATE TABLE `t94_home` (
+  `id` int(11) NOT NULL,
+  `kode` varchar(25) CHARACTER SET latin1 NOT NULL,
+  `flag` tinyint(4) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `t94_home`
+--
+
+INSERT INTO `t94_home` (`id`, `kode`, `flag`) VALUES
+(1, '0whats_new', 0),
+(2, '1on_progress', 0),
+(3, '2update', 0),
+(4, '3pending', 0),
+(5, '4todo', 1),
+(6, '5log', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `t95_homedetail`
+--
+
+CREATE TABLE `t95_homedetail` (
+  `home_id` int(11) NOT NULL,
+  `tgl` date DEFAULT NULL,
+  `kat` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
+  `no_jdl` int(11) DEFAULT NULL,
+  `jdl` varchar(100) CHARACTER SET latin1 DEFAULT NULL,
+  `no_ket` int(11) DEFAULT NULL,
+  `ket` text CHARACTER SET latin1,
+  `done` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `t95_homedetail`
+--
+
+INSERT INTO `t95_homedetail` (`home_id`, `tgl`, `kat`, `no_jdl`, `jdl`, `no_ket`, `ket`, `done`) VALUES
+(1, '2017-10-15', '2update', 1, 'Transaksi - Retur Penjualan', NULL, NULL, NULL),
+(2, '2017-10-11', '2update', 1, 'Laporan - Dead Stok', NULL, NULL, NULL),
+(3, '2017-10-11', '2update', 2, 'Laporan - Mutasi Detail', NULL, NULL, NULL),
+(4, '2017-10-07', '2update', 1, 'revisi Laporan - Stok: ditambah data dari transaksi \"Dead Stock\"', NULL, NULL, NULL),
+(5, '2017-10-07', '2update', 2, 'revisi Laporan - Nilai Stok: ditambah data dari transaksi \"Dead Stock\"', NULL, NULL, NULL),
+(6, '2017-10-07', '2update', 3, 'revisi Laporan - Mutasi: ditambah data dari transaksi \"Dead Stock\"', NULL, NULL, NULL),
+(7, '2017-10-07', '2update', 4, 'revisi Laporan - Laba / Rugi Kotor: ditambah data dari transaksi \"Dead Stock\"', NULL, NULL, NULL),
+(8, '2017-10-05', '2update', 1, 'Laporan - Laba / Rugi Kotor', NULL, NULL, NULL),
+(9, '2017-10-04', '2update', 1, 'Laporan - Nilai Stok sudah benar', NULL, NULL, NULL),
+(11, '2017-10-04', '2update', 2, 'alias nama item :', 1, 'nama item urutan pertama => untuk internal, urutan selanjutnya untuk eksternal', NULL),
+(12, '2017-10-04', '2update', 2, 'alias nama item :', 2, 'antar-urutan dipisahkan dengan tanda koma', NULL),
+(13, '2017-10-03', '2update', 1, 'Master - Customer', 1, 'by default : Customer menggunakan pilihan Nama Item urutan pertama, kecuali ada perubahan', NULL),
+(14, '2017-10-03', '2update', 2, 'Master - Item', 1, 'pemisahan urutan : dengan tanda koma', NULL),
+(15, '2017-09-28', '4todo', 1, '<strike>dead stok</strike>', NULL, NULL, NULL),
+(16, '2017-09-28', '4todo', 2, '<strike>retur penjualan</strike>', NULL, NULL, NULL),
+(17, '2017-09-28', '4todo', 3, '<strike>hak akses</strike>', NULL, NULL, NULL),
+(18, '2017-09-28', '4todo', 4, '<strike>invoice</strike>', NULL, NULL, NULL),
+(19, '2017-09-28', '4todo', 5, 'margin :: total per month, perlu menyertakan quantity', NULL, NULL, NULL),
+(20, '2017-09-28', '4todo', 6, 'konversi satuan', NULL, NULL, NULL),
+(21, '2017-09-28', '4todo', 7, 'stok opname', NULL, NULL, NULL),
+(22, '2017-09-28', '4todo', 8, 'closing', NULL, NULL, NULL),
+(23, '2017-09-28', '4todo', 9, 'backup', NULL, NULL, NULL),
+(24, '2017-09-28', '4todo', 10, 'restore', NULL, NULL, NULL),
+(25, '2017-10-19', '2update', 2, 'Laporan - Retur Penjualan', NULL, NULL, NULL),
+(26, '2017-10-19', '2update', 1, 'revisi Laporan - Stok: ditambah data dari transaksi \"Retur Penjualan\"', NULL, NULL, NULL),
+(28, '2017-10-20', '4todo', 1, 'history harga', NULL, NULL, NULL),
+(29, '2017-10-20', '4todo', 2, '<strike>history hutang (internal)</strike>', NULL, NULL, NULL),
+(30, '2017-10-20', '4todo', 3, '<strike>grouping kategori item</strike>', NULL, NULL, NULL),
+(31, '2017-10-20', '4todo', 4, '<strike>perhitungan piutang berdasarkan total invoice</strike>', NULL, NULL, NULL),
+(32, '2017-10-20', '4todo', 5, '<strike>harga jual otomatis tampil</strike>', NULL, NULL, NULL),
+(33, '2017-10-25', '2update', 2, '<a href=\"t_13kategorilist.php\">Master - Item Kategori</a>', NULL, NULL, NULL),
+(34, '2017-10-25', '2update', 1, '<a href=\"t_02itemlist.php\">Master - Item<a>', 1, 'menambahkan kolom KATEGORI;', NULL),
+(35, '2017-10-25', '2update', 1, '<a href=\"t_02itemlist.php\">Master - Item<a>', 2, 'menambahkan kolom satuan dan kolom harga jual;', NULL),
+(36, '2017-10-27', '2update', 1, 'Transaksi - Penjualan', 1, 'harga jual otomatis tampil;', NULL),
+(37, '2017-11-09', '2update', 1, 'Master - Hak Akses', NULL, NULL, NULL),
+(38, '2017-11-09', '2update', 2, 'Cetak - Invoice', NULL, NULL, NULL),
+(39, '2017-11-10', '2update', 1, 'Revisi Laporan Mutasi', 1, 'menambahkan perhitungan dari proses retur penjualan', NULL),
+(40, '2017-11-10', '2update', 2, 'Revisi Laporan Mutasi Detail', 1, 'menambahkan perhitungan dari proses retur penjualan', NULL),
+(41, '2017-11-10', '3pending', 1, 'input pembelian (branch assign)', 1, 'apakah perlu dibuatkan assign branch untuk proses pembelian ? mengingat branch bisa melakukan proses pembelian', NULL),
+(42, '2017-11-11', '2update', 1, 'Laporan - Drop Cash', NULL, NULL, NULL),
+(43, '2017-11-15', '2update', 1, 'update kolom SISA di proses drop cash', NULL, NULL, NULL),
+(44, '2017-11-11', '2update', 2, 'Laporan - Hutang Internal', NULL, NULL, NULL),
+(45, '2017-11-11', '3pending', 2, 'hutang internal -> branch-based', 1, 'apakah perlu di-assign untuk setiap proses yang memerlukan pengelompokkan berdasarkan branch ? misal :: hutang internal', NULL),
+(46, '2017-11-11', '3pending', 2, 'hutang internal -> branch-based', 2, 'misal :: hutang internal Bojonegoro akan beda dengan hutang internal Surabaya', NULL),
+(47, '2017-11-15', '1on_progress', 1, 'perhitungan piutang berdasarkan total invoice', NULL, NULL, NULL),
+(48, '2017-11-15', '3pending', 1, 'nilai invoice', 1, 'apakah nilai invoice pasti sama dengan nilai PO ?', NULL),
+(49, '2018-04-23', '4todo', 1, 'data tabel <b>beli</b> vs data tabel <b>hutang</b>', 2, 'setiap pembelian ostosmastis menjadi hutang, maka setiap perubahan pada tabel pembelian juga harus disesuaikan pada tabel hutang', NULL),
+(51, '2018-04-23', '5log', 1, 'update after-proses di tabel beli', 1, NULL, 1),
+(52, '2018-04-23', '5log', 2, 'hapus trigger di database', 2, 'hapus trigger di database untuk tabel beli, agar tidak ostosmastis mengupdate nilai stok di tabel article (master barang)', NULL),
+(53, '2018-04-23', '5log', 2, 'hapus trigger di database', 3, 'CREATE TRIGGER `tg_updateqty_beli` AFTER INSERT ON `t08_beli`\r\n FOR EACH ROW BEGIN\r\nupdate t06_article set qty = qty + new.qty where id = new.articleid;\r\nEND', NULL),
+(54, '2018-04-23', '5log', 2, 'hapus trigger di database', 4, 'CREATE TRIGGER `tg_updateqty_jual` AFTER INSERT ON `t12_jualdetail`\r\n FOR EACH ROW BEGIN\r\nupdate t06_article set qty = qty - new.qty where id = new.articleid;\r\nEND', NULL),
+(55, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 1, 'siapkan tabel mutasi, auto insert dari tabel article (master barang), auto insert dari tabel beli, dan auto insert dari tabel jual', NULL),
+(56, '2018-04-23', '5log', 4, 'siapkan tanggal periode aktif', NULL, NULL, NULL),
+(57, '2018-04-23', '5log', 2, 'hapus trigger di database', 1, NULL, 1),
+(58, '2018-04-23', '4todo', 1, 'data tabel <b>beli</b> vs data tabel <b>hutang</b>', 1, NULL, 1),
+(59, '2018-04-23', '5log', 1, 'update after-proses di tabel beli', 2, 'update after-proses di tabel beli agar setiap perubahan data di tabel beli juga berpengaruh di tabel hutang', NULL);
 
 -- --------------------------------------------------------
 
@@ -1015,7 +1070,247 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (580, '2018-04-20 13:08:11', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SatuanID', '1', '', '1'),
 (581, '2018-04-20 13:08:11', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SubTotal', '1', '', '468750'),
 (582, '2018-04-20 13:08:11', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'id', '1', '', '1'),
-(583, '2018-04-20 13:08:11', '/stok/t11_jualadd.php', '1', '*** Batch insert successful ***', 't12_jualdetail', '', '', '', '');
+(583, '2018-04-20 13:08:11', '/stok/t11_jualadd.php', '1', '*** Batch insert successful ***', 't12_jualdetail', '', '', '', ''),
+(584, '2018-04-23 16:50:22', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(585, '2018-04-23 16:50:49', '/stok/t08_belidelete.php', '1', '*** Batch delete begin ***', 't08_beli', '', '', '', ''),
+(586, '2018-04-23 16:50:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'id', '1', '1', ''),
+(587, '2018-04-23 16:50:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'TglPO', '1', '2018-04-20', ''),
+(588, '2018-04-23 16:50:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'NoPO', '1', 'PO201804200001', ''),
+(589, '2018-04-23 16:50:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'VendorID', '1', '1', ''),
+(590, '2018-04-23 16:50:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'ArticleID', '1', '1', ''),
+(591, '2018-04-23 16:50:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'Harga', '1', '100000.00', ''),
+(592, '2018-04-23 16:50:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'Qty', '1', '2.00', ''),
+(593, '2018-04-23 16:50:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'SubTotal', '1', '200000.00', ''),
+(594, '2018-04-23 16:50:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'SatuanID', '1', '1', ''),
+(595, '2018-04-23 16:50:49', '/stok/t08_belidelete.php', '1', '*** Batch delete successful ***', 't08_beli', '', '', '', ''),
+(596, '2018-04-23 18:01:40', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '49', '', '2018-04-23'),
+(597, '2018-04-23 18:01:40', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '49', '', '4todo'),
+(598, '2018-04-23 18:01:40', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '49', '', '1'),
+(599, '2018-04-23 18:01:40', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '49', '', 'insert - update - delete'),
+(600, '2018-04-23 18:01:40', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '49', '', NULL),
+(601, '2018-04-23 18:01:40', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '49', '', '49'),
+(602, '2018-04-23 18:08:37', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'jdl', '49', 'insert - update - delete', '<b>beli</b> insert - update - delete'),
+(603, '2018-04-23 18:08:37', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'no_ket', '49', NULL, '1'),
+(604, '2018-04-23 18:22:15', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'jdl', '49', '<b>beli</b> insert - update - delete', 'data <b>beli</b> insert - update - delete harus sama dengan data tabel <b>hutang</b>'),
+(605, '2018-04-23 18:31:22', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'jdl', '49', 'data <b>beli</b> insert - update - delete harus sama dengan data tabel <b>hutang</b>', 'data tabel <b>beli</b> insert - update - delete harus sama dengan data tabel <b>hutang</b>'),
+(606, '2018-04-23 18:34:14', '/stok/t94_homelist.php', '1', '*** Batch update begin ***', 't94_home', '', '', '', ''),
+(607, '2018-04-23 18:34:14', '/stok/t94_homelist.php', '1', 'U', 't94_home', 'flag', '2', '1', '0'),
+(608, '2018-04-23 18:34:14', '/stok/t94_homelist.php', '1', 'U', 't94_home', 'flag', '3', '1', '0'),
+(609, '2018-04-23 18:34:14', '/stok/t94_homelist.php', '1', 'U', 't94_home', 'flag', '4', '1', '0'),
+(610, '2018-04-23 18:34:14', '/stok/t94_homelist.php', '1', '*** Batch update successful ***', 't94_home', '', '', '', ''),
+(611, '2018-04-23 18:37:13', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'jdl', '49', 'data tabel <b>beli</b> insert - update - delete harus sama dengan data tabel <b>hutang</b>', 'data tabel <b>beli</b> vs data tabel <b>hutang</b>'),
+(612, '2018-04-23 18:37:13', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '49', NULL, 'setiap entry pembelian ostosmastis menjadi hutang, maka ::'),
+(613, '2018-04-23 18:38:20', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '50', '', '2018-04-23'),
+(614, '2018-04-23 18:38:20', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '50', '', '4todo'),
+(615, '2018-04-23 18:38:20', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '50', '', '1'),
+(616, '2018-04-23 18:38:20', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '50', '', NULL),
+(617, '2018-04-23 18:38:20', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '50', '', '2'),
+(618, '2018-04-23 18:38:20', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '50', '', 'setiap insert - update - delete data tabel pembelian maka data tabel hutang juga harus disesuaikan'),
+(619, '2018-04-23 18:38:20', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '50', '', '50'),
+(620, '2018-04-23 18:38:56', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'jdl', '50', NULL, 'data tabel beli vs data tabel hutang'),
+(621, '2018-04-23 18:39:54', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'jdl', '50', 'data tabel beli vs data tabel hutang', 'data tabel <b>beli</b> vs data tabel <b>hutang</b>'),
+(622, '2018-04-23 18:45:35', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '50', 'setiap insert - update - delete data tabel pembelian maka data tabel hutang juga harus disesuaikan', 'perubahan pada tabel pembelian juga harus disesuaikan pada tabel hutang'),
+(623, '2018-04-23 18:56:24', '/stok/t94_homelist.php', '1', 'A', 't94_home', 'kode', '6', '', '5log'),
+(624, '2018-04-23 18:56:24', '/stok/t94_homelist.php', '1', 'A', 't94_home', 'flag', '6', '', '1'),
+(625, '2018-04-23 18:56:24', '/stok/t94_homelist.php', '1', 'A', 't94_home', 'id', '6', '', '6'),
+(626, '2018-04-23 19:02:04', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '51', '', '2018-04-23'),
+(627, '2018-04-23 19:02:04', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '51', '', '5log'),
+(628, '2018-04-23 19:02:04', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '51', '', '1'),
+(629, '2018-04-23 19:02:04', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '51', '', 'update after-proses di tabel beli'),
+(630, '2018-04-23 19:02:04', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '51', '', '1'),
+(631, '2018-04-23 19:02:04', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '51', '', 'update after-proses di tabel beli agar perubahan data juga berpengaruh di tabel hutang'),
+(632, '2018-04-23 19:02:04', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '51', '', '51'),
+(633, '2018-04-23 19:11:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '1', '', '2018-04-23'),
+(634, '2018-04-23 19:11:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '1', '', 'PO201804230001'),
+(635, '2018-04-23 19:11:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '1', '', '1'),
+(636, '2018-04-23 19:11:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '1', '', '1'),
+(637, '2018-04-23 19:11:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '1', '', '100000.00'),
+(638, '2018-04-23 19:11:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '1', '', '35'),
+(639, '2018-04-23 19:11:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '1', '', '1'),
+(640, '2018-04-23 19:11:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '1', '', '3500000'),
+(641, '2018-04-23 19:11:35', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '1', '', '1'),
+(642, '2018-04-23 19:18:13', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '1', '35.00', '34'),
+(643, '2018-04-23 19:18:13', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '1', '3500000.00', '3400000'),
+(644, '2018-04-23 19:20:15', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '1', '34.00', '36'),
+(645, '2018-04-23 19:20:15', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '1', '3400000.00', '3600000'),
+(646, '2018-04-23 19:21:36', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '1', '36.00', '37'),
+(647, '2018-04-23 19:21:36', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '1', '3600000.00', '3700000'),
+(648, '2018-04-23 19:22:58', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '1', '37.00', '34'),
+(649, '2018-04-23 19:22:58', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '1', '3700000.00', '3400000'),
+(650, '2018-04-23 19:24:33', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '1', '34.00', '33'),
+(651, '2018-04-23 19:24:33', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '1', '3400000.00', '3300000'),
+(652, '2018-04-23 19:49:45', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '1', '', 'HD000001'),
+(653, '2018-04-23 19:49:45', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '1', '', '2018-04-23'),
+(654, '2018-04-23 19:49:45', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '1', '', '1000000'),
+(655, '2018-04-23 19:49:45', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '1', '', '1'),
+(656, '2018-04-23 19:49:45', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '1', '', '1'),
+(657, '2018-04-23 19:50:16', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '1', '33.00', '32'),
+(658, '2018-04-23 19:50:16', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '1', '3300000.00', '3200000'),
+(659, '2018-04-23 19:50:53', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '2', '', 'HD000002'),
+(660, '2018-04-23 19:50:53', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '2', '', '2018-04-23'),
+(661, '2018-04-23 19:50:53', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '2', '', '500000'),
+(662, '2018-04-23 19:50:53', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '2', '', '1'),
+(663, '2018-04-23 19:50:53', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '2', '', '2'),
+(664, '2018-04-23 20:19:49', '/stok/t08_belidelete.php', '1', '*** Batch delete begin ***', 't08_beli', '', '', '', ''),
+(665, '2018-04-23 20:19:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'id', '1', '1', ''),
+(666, '2018-04-23 20:19:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'TglPO', '1', '2018-04-23', ''),
+(667, '2018-04-23 20:19:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'NoPO', '1', 'PO201804230001', ''),
+(668, '2018-04-23 20:19:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'VendorID', '1', '1', ''),
+(669, '2018-04-23 20:19:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'ArticleID', '1', '1', ''),
+(670, '2018-04-23 20:19:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'Harga', '1', '100000.00', ''),
+(671, '2018-04-23 20:19:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'Qty', '1', '32.00', ''),
+(672, '2018-04-23 20:19:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'SubTotal', '1', '3200000.00', ''),
+(673, '2018-04-23 20:19:49', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'SatuanID', '1', '1', ''),
+(674, '2018-04-23 20:19:50', '/stok/t08_belidelete.php', '1', '*** Batch delete successful ***', 't08_beli', '', '', '', ''),
+(675, '2018-04-23 20:23:45', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '2', '', '2018-04-23'),
+(676, '2018-04-23 20:23:45', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '2', '', 'PO201804230001'),
+(677, '2018-04-23 20:23:45', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '2', '', '1'),
+(678, '2018-04-23 20:23:45', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '2', '', '1'),
+(679, '2018-04-23 20:23:45', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '2', '', '100000.00'),
+(680, '2018-04-23 20:23:45', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '2', '', '31'),
+(681, '2018-04-23 20:23:45', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '2', '', '1'),
+(682, '2018-04-23 20:23:45', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '2', '', '3100000'),
+(683, '2018-04-23 20:23:45', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '2', '', '2'),
+(684, '2018-04-23 20:24:04', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '1', '', 'HD000001'),
+(685, '2018-04-23 20:24:04', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '1', '', '2018-04-23'),
+(686, '2018-04-23 20:24:04', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '1', '', '500000'),
+(687, '2018-04-23 20:24:04', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '1', '', '1'),
+(688, '2018-04-23 20:24:04', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '1', '', '1'),
+(689, '2018-04-23 20:24:23', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '2', '31.00', '30'),
+(690, '2018-04-23 20:24:23', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '2', '3100000.00', '3000000'),
+(691, '2018-04-23 20:24:41', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'NoBayar', '2', '', 'HD000002'),
+(692, '2018-04-23 20:24:41', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'Tgl', '2', '', '2018-04-23'),
+(693, '2018-04-23 20:24:41', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'JumlahBayar', '2', '', '750000'),
+(694, '2018-04-23 20:24:41', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'HutangID', '2', '', '1'),
+(695, '2018-04-23 20:24:41', '/stok/t10_hutangdetaillist.php', '1', 'A', 't10_hutangdetail', 'id', '2', '', '2'),
+(696, '2018-04-23 20:24:52', '/stok/t08_belidelete.php', '1', '*** Batch delete begin ***', 't08_beli', '', '', '', ''),
+(697, '2018-04-23 20:24:52', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'id', '2', '2', ''),
+(698, '2018-04-23 20:24:52', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'TglPO', '2', '2018-04-23', ''),
+(699, '2018-04-23 20:24:52', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'NoPO', '2', 'PO201804230001', ''),
+(700, '2018-04-23 20:24:52', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'VendorID', '2', '1', ''),
+(701, '2018-04-23 20:24:52', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'ArticleID', '2', '1', ''),
+(702, '2018-04-23 20:24:52', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'Harga', '2', '100000.00', ''),
+(703, '2018-04-23 20:24:52', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'Qty', '2', '30.00', ''),
+(704, '2018-04-23 20:24:52', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'SubTotal', '2', '3000000.00', ''),
+(705, '2018-04-23 20:24:52', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'SatuanID', '2', '1', ''),
+(706, '2018-04-23 20:24:53', '/stok/t08_belidelete.php', '1', '*** Batch delete successful ***', 't08_beli', '', '', '', ''),
+(707, '2018-04-23 20:28:45', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'jdl', '49', 'data tabel <b>beli</b> vs data tabel <b>hutang</b>', '<font color=red><b>done</b></font> data tabel <b>beli</b> vs data tabel <b>hutang</b>'),
+(708, '2018-04-23 20:28:57', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'jdl', '50', 'data tabel <b>beli</b> vs data tabel <b>hutang</b>', '<font color=red><b>done</b></font> data tabel <b>beli</b> vs data tabel <b>hutang</b>'),
+(709, '2018-04-23 20:34:27', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '52', '', '2018-04-23'),
+(710, '2018-04-23 20:34:27', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '52', '', '5log'),
+(711, '2018-04-23 20:34:27', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '52', '', '2'),
+(712, '2018-04-23 20:34:27', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '52', '', 'hapus trigger di database'),
+(713, '2018-04-23 20:34:27', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '52', '', '1'),
+(714, '2018-04-23 20:34:27', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '52', '', 'hapus trigger di database untuk tabel beli, agar tidak ostosmastis mengupdate nilai stok di tabel article (master barang)'),
+(715, '2018-04-23 20:34:27', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '52', '', '52'),
+(716, '2018-04-23 20:46:30', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '53', '', '2018-04-23'),
+(717, '2018-04-23 20:46:30', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '53', '', '5log'),
+(718, '2018-04-23 20:46:30', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '53', '', '2'),
+(719, '2018-04-23 20:46:30', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '53', '', 'hapus trigger di database'),
+(720, '2018-04-23 20:46:30', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '53', '', '2'),
+(721, '2018-04-23 20:46:30', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '53', '', 'CREATE TRIGGER `tg_updateqty_beli` AFTER INSERT ON `t08_beli`\r\n FOR EACH ROW BEGIN\r\nupdate t06_article set qty = qty + new.qty where id = new.articleid;\r\nEND'),
+(722, '2018-04-23 20:46:30', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '53', '', '53'),
+(723, '2018-04-23 20:47:15', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '54', '', '2018-04-23'),
+(724, '2018-04-23 20:47:15', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '54', '', '5log'),
+(725, '2018-04-23 20:47:15', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '54', '', '2'),
+(726, '2018-04-23 20:47:15', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '54', '', 'hapus trigger di database'),
+(727, '2018-04-23 20:47:15', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '54', '', '2'),
+(728, '2018-04-23 20:47:15', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '54', '', 'CREATE TRIGGER `tg_updateqty_jual` AFTER INSERT ON `t12_jualdetail`\r\n FOR EACH ROW BEGIN\r\nupdate t06_article set qty = qty - new.qty where id = new.articleid;\r\nEND'),
+(729, '2018-04-23 20:47:15', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '54', '', '54'),
+(730, '2018-04-23 21:31:27', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '55', '', '2018-04-23'),
+(731, '2018-04-23 21:31:27', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '55', '', '5log'),
+(732, '2018-04-23 21:31:27', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '55', '', '3'),
+(733, '2018-04-23 21:31:27', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '55', '', 'siapkan tabel mutasi'),
+(734, '2018-04-23 21:31:27', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '55', '', '1'),
+(735, '2018-04-23 21:31:27', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '55', '', 'siapkan tabel mutasi, auto insert dari tabel article (master barang), auto insert dari tabel beli, dan auto insert dari tabel jual'),
+(736, '2018-04-23 21:31:27', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '55', '', '55'),
+(737, '2018-04-23 21:33:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '56', '', '2018-04-23'),
+(738, '2018-04-23 21:33:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '56', '', '5log'),
+(739, '2018-04-23 21:33:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '56', '', '4'),
+(740, '2018-04-23 21:33:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '56', '', 'siapkan tanggal periode aktif'),
+(741, '2018-04-23 21:33:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '56', '', NULL),
+(742, '2018-04-23 21:33:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '56', '', NULL),
+(743, '2018-04-23 21:33:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '56', '', '56'),
+(744, '2018-04-23 21:43:15', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', '0', '1'),
+(745, '2018-04-23 22:05:36', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', '1', '0'),
+(746, '2018-04-23 22:08:51', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', '0', '1'),
+(747, '2018-04-23 22:10:00', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'jdl', '49', '<font color=red><b>done</b></font> data tabel <b>beli</b> vs data tabel <b>hutang</b>', 'data tabel <b>beli</b> vs data tabel <b>hutang</b>'),
+(748, '2018-04-23 22:10:00', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '49', '0', '1'),
+(749, '2018-04-23 22:10:17', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'jdl', '50', '<font color=red><b>done</b></font> data tabel <b>beli</b> vs data tabel <b>hutang</b>', 'data tabel <b>beli</b> vs data tabel <b>hutang</b>'),
+(750, '2018-04-23 22:10:17', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '50', '0', '1'),
+(751, '2018-04-23 22:11:02', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '50', '1', '0'),
+(752, '2018-04-23 22:12:29', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', '1', '0'),
+(753, '2018-04-23 22:13:47', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', '0', '1'),
+(754, '2018-04-23 22:17:35', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', '1', '0'),
+(755, '2018-04-23 22:43:59', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', '0', '1'),
+(756, '2018-04-23 22:45:05', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', '1', '0'),
+(757, '2018-04-23 22:45:19', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', '0', '1'),
+(758, '2018-04-23 22:47:14', '/stok/t95_homedetailedit.php', '1', 'U', 't95_homedetail', 'done', '56', '1', '0'),
+(759, '2018-04-23 22:47:25', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', '0', '1'),
+(760, '2018-04-23 22:47:48', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', '1', '0'),
+(761, '2018-04-23 22:53:44', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '53', '0', '1'),
+(762, '2018-04-23 22:54:23', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '53', '1', '0'),
+(763, '2018-04-23 22:54:47', '/stok/t95_homedetaillist.php', '1', '*** Batch update begin ***', 't95_homedetail', '', '', '', ''),
+(764, '2018-04-23 22:54:47', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '52', '0', '1'),
+(765, '2018-04-23 22:54:47', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '54', '0', '1'),
+(766, '2018-04-23 22:54:48', '/stok/t95_homedetaillist.php', '1', '*** Batch update successful ***', 't95_homedetail', '', '', '', ''),
+(767, '2018-04-23 22:55:31', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '53', '0', '1'),
+(768, '2018-04-23 22:58:31', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', NULL, '1'),
+(769, '2018-04-23 22:58:50', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', '1', NULL),
+(770, '2018-04-23 23:00:53', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '53', NULL, '1'),
+(771, '2018-04-23 23:01:17', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '53', '1', NULL),
+(772, '2018-04-23 23:01:29', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '52', NULL, '1'),
+(773, '2018-04-23 23:02:26', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '52', '1', NULL),
+(774, '2018-04-23 23:48:38', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '57', '', '2018-04-23'),
+(775, '2018-04-23 23:48:38', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '57', '', '5log'),
+(776, '2018-04-23 23:48:38', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '57', '', '2'),
+(777, '2018-04-23 23:48:38', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '57', '', 'hapus trigger di database'),
+(778, '2018-04-23 23:48:38', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '57', '', '1'),
+(779, '2018-04-23 23:48:38', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '57', '', NULL),
+(780, '2018-04-23 23:48:38', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'done', '57', '', NULL),
+(781, '2018-04-23 23:48:38', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '57', '', '57'),
+(782, '2018-04-23 23:49:03', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'no_ket', '54', '2', '4'),
+(783, '2018-04-23 23:49:24', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'no_ket', '53', '2', '3'),
+(784, '2018-04-23 23:49:37', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'no_ket', '52', '1', '2'),
+(785, '2018-04-23 23:50:16', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '57', NULL, '1'),
+(786, '2018-04-23 23:56:58', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '58', '', '2018-04-23'),
+(787, '2018-04-23 23:56:58', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '58', '', '4todo'),
+(788, '2018-04-23 23:56:58', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '58', '', '1'),
+(789, '2018-04-23 23:56:58', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '58', '', 'data tabel <b>beli</b> vs data tabel <b>hutang</b>'),
+(790, '2018-04-23 23:56:58', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '58', '', '1'),
+(791, '2018-04-23 23:56:58', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '58', '', NULL),
+(792, '2018-04-23 23:56:58', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'done', '58', '', '1'),
+(793, '2018-04-23 23:56:58', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '58', '', '58'),
+(794, '2018-04-23 23:57:13', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'no_ket', '50', '2', '3'),
+(795, '2018-04-23 23:57:28', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'no_ket', '49', '1', '2'),
+(796, '2018-04-24 00:05:06', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '51', NULL, '1'),
+(797, '2018-04-24 00:05:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '59', '', '2018-04-23'),
+(798, '2018-04-24 00:05:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '59', '', '5log'),
+(799, '2018-04-24 00:05:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '59', '', '1'),
+(800, '2018-04-24 00:05:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '59', '', 'update after-proses di tabel beli'),
+(801, '2018-04-24 00:05:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '59', '', '2'),
+(802, '2018-04-24 00:05:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '59', '', 'update after-proses di tabel beli agar perubahan data juga berpengaruh di tabel hutang'),
+(803, '2018-04-24 00:05:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'done', '59', '', NULL),
+(804, '2018-04-24 00:05:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'DoneAll', '59', '', NULL),
+(805, '2018-04-24 00:05:49', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '59', '', '59'),
+(806, '2018-04-24 00:06:07', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '51', 'update after-proses di tabel beli agar perubahan data juga berpengaruh di tabel hutang', NULL),
+(807, '2018-04-24 00:11:19', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '49', 'setiap entry pembelian ostosmastis menjadi hutang, maka ::', 'setiap entry pembelian ostosmastis menjadi hutang, maka ::\r\n- perubahan pada tabel pembelian juga harus disesuaikan pada tabel hutang'),
+(808, '2018-04-24 00:11:36', '/stok/t95_homedetaildelete.php', '1', '*** Batch delete begin ***', 't95_homedetail', '', '', '', ''),
+(809, '2018-04-24 00:11:36', '/stok/t95_homedetaildelete.php', '1', 'D', 't95_homedetail', 'home_id', '50', '50', ''),
+(810, '2018-04-24 00:11:36', '/stok/t95_homedetaildelete.php', '1', 'D', 't95_homedetail', 'tgl', '50', '2018-04-23', ''),
+(811, '2018-04-24 00:11:36', '/stok/t95_homedetaildelete.php', '1', 'D', 't95_homedetail', 'kat', '50', '4todo', ''),
+(812, '2018-04-24 00:11:36', '/stok/t95_homedetaildelete.php', '1', 'D', 't95_homedetail', 'no_jdl', '50', '1', ''),
+(813, '2018-04-24 00:11:36', '/stok/t95_homedetaildelete.php', '1', 'D', 't95_homedetail', 'jdl', '50', 'data tabel <b>beli</b> vs data tabel <b>hutang</b>', ''),
+(814, '2018-04-24 00:11:36', '/stok/t95_homedetaildelete.php', '1', 'D', 't95_homedetail', 'no_ket', '50', '3', ''),
+(815, '2018-04-24 00:11:36', '/stok/t95_homedetaildelete.php', '1', 'D', 't95_homedetail', 'ket', '50', 'perubahan pada tabel pembelian juga harus disesuaikan pada tabel hutang', ''),
+(816, '2018-04-24 00:11:36', '/stok/t95_homedetaildelete.php', '1', 'D', 't95_homedetail', 'done', '50', NULL, ''),
+(817, '2018-04-24 00:11:37', '/stok/t95_homedetaildelete.php', '1', '*** Batch delete successful ***', 't95_homedetail', '', '', '', ''),
+(818, '2018-04-24 00:14:04', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '49', 'setiap entry pembelian ostosmastis menjadi hutang, maka ::\r\n- perubahan pada tabel pembelian juga harus disesuaikan pada tabel hutang', 'setiap pembelian ostosmastis menjadi hutang, maka setiap perubahan pada tabel pembelian juga harus disesuaikan pada tabel hutang'),
+(819, '2018-04-24 00:15:08', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '59', 'update after-proses di tabel beli agar perubahan data juga berpengaruh di tabel hutang', 'update after-proses di tabel beli agar setiap perubahan data di tabel beli juga berpengaruh di tabel hutang'),
+(820, '2018-04-24 01:20:03', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '49', NULL, '1'),
+(821, '2018-04-24 01:20:37', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '58', '1', NULL),
+(822, '2018-04-24 01:21:03', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '58', NULL, '1'),
+(823, '2018-04-24 01:21:20', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '49', '1', NULL);
 
 -- --------------------------------------------------------
 
@@ -1193,6 +1488,18 @@ ALTER TABLE `t12_jualdetail`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `t94_home`
+--
+ALTER TABLE `t94_home`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `t95_homedetail`
+--
+ALTER TABLE `t95_homedetail`
+  ADD PRIMARY KEY (`home_id`);
+
+--
 -- Indexes for table `t96_employees`
 --
 ALTER TABLE `t96_employees`
@@ -1267,7 +1574,7 @@ ALTER TABLE `t07_satuan`
 -- AUTO_INCREMENT for table `t08_beli`
 --
 ALTER TABLE `t08_beli`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `t09_hutang`
@@ -1279,19 +1586,31 @@ ALTER TABLE `t09_hutang`
 -- AUTO_INCREMENT for table `t10_hutangdetail`
 --
 ALTER TABLE `t10_hutangdetail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `t11_jual`
 --
 ALTER TABLE `t11_jual`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `t12_jualdetail`
 --
 ALTER TABLE `t12_jualdetail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `t94_home`
+--
+ALTER TABLE `t94_home`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `t95_homedetail`
+--
+ALTER TABLE `t95_homedetail`
+  MODIFY `home_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT for table `t96_employees`
@@ -1303,7 +1622,7 @@ ALTER TABLE `t96_employees`
 -- AUTO_INCREMENT for table `t99_audittrail`
 --
 ALTER TABLE `t99_audittrail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=584;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=824;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

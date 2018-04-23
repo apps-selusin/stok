@@ -329,6 +329,10 @@ class cdefault {
 			$this->Page_Terminate("t11_juallist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't12_jualdetail'))
 			$this->Page_Terminate("t12_jualdetaillist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't94_home'))
+			$this->Page_Terminate("t94_homelist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't95_homedetail'))
+			$this->Page_Terminate("t95_homedetaillist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't96_employees'))
 			$this->Page_Terminate("t96_employeeslist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't97_userlevels'))
