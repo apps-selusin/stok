@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 24, 2018 at 07:03 AM
+-- Generation Time: Apr 24, 2018 at 09:01 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -396,11 +396,14 @@ INSERT INTO `t95_homedetail` (`home_id`, `tgl`, `kat`, `no_jdl`, `jdl`, `no_ket`
 (52, '2018-04-23', '5log', 2, 'hapus trigger di database', 2, 'hapus trigger di database untuk tabel beli, agar tidak ostosmastis mengupdate nilai stok di tabel article (master barang)', NULL),
 (53, '2018-04-23', '5log', 2, 'hapus trigger di database', 3, 'CREATE TRIGGER `tg_updateqty_beli` AFTER INSERT ON `t08_beli`\r\n FOR EACH ROW BEGIN\r\nupdate t06_article set qty = qty + new.qty where id = new.articleid;\r\nEND', NULL),
 (54, '2018-04-23', '5log', 2, 'hapus trigger di database', 4, 'CREATE TRIGGER `tg_updateqty_jual` AFTER INSERT ON `t12_jualdetail`\r\n FOR EACH ROW BEGIN\r\nupdate t06_article set qty = qty - new.qty where id = new.articleid;\r\nEND', NULL),
-(55, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 1, 'siapkan tabel mutasi, auto insert dari tabel article (master barang), auto insert dari tabel beli, dan auto insert dari tabel jual', NULL),
+(55, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 1, NULL, NULL),
 (56, '2018-04-23', '5log', 4, 'siapkan tanggal periode aktif', NULL, NULL, 1),
 (57, '2018-04-23', '5log', 2, 'hapus trigger di database', 1, NULL, 1),
 (58, '2018-04-23', '4todo', 1, 'data tabel <b>beli</b> vs data tabel <b>hutang</b>', 1, NULL, 1),
-(59, '2018-04-23', '5log', 1, 'update after-proses di tabel beli', 2, 'update after-proses di tabel beli agar setiap perubahan data di tabel beli juga berpengaruh di tabel hutang', NULL);
+(59, '2018-04-23', '5log', 1, 'update after-proses di tabel beli', 2, 'update after-proses di tabel beli agar setiap perubahan data di tabel beli juga berpengaruh di tabel hutang', NULL),
+(60, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 2, 'auto insert dari tabel article (master barang)', NULL),
+(61, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 3, 'auto insert dari tabel beli', NULL),
+(62, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 4, 'auto insert dari tabel jual', NULL);
 
 -- --------------------------------------------------------
 
@@ -1358,7 +1361,36 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (835, '2018-04-24 11:24:31', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '3', '', '1'),
 (836, '2018-04-24 11:24:31', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '3', '', '350000'),
 (837, '2018-04-24 11:24:31', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '3', '', '3'),
-(838, '2018-04-24 11:25:35', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', NULL, '1');
+(838, '2018-04-24 11:25:35', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', NULL, '1'),
+(839, '2018-04-24 12:25:14', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(840, '2018-04-24 13:17:42', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '60', '', '2018-04-23'),
+(841, '2018-04-24 13:17:42', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '60', '', '5log'),
+(842, '2018-04-24 13:17:42', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '60', '', '3'),
+(843, '2018-04-24 13:17:42', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '60', '', 'siapkan tabel mutasi'),
+(844, '2018-04-24 13:17:42', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '60', '', '2'),
+(845, '2018-04-24 13:17:42', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '60', '', 'auto insert dari tabel article (master barang), auto insert dari tabel beli, dan auto insert dari tabel jual'),
+(846, '2018-04-24 13:17:42', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'done', '60', '', NULL),
+(847, '2018-04-24 13:17:42', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '60', '', '60'),
+(848, '2018-04-24 13:18:05', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '61', '', '2018-04-23'),
+(849, '2018-04-24 13:18:05', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '61', '', '5log'),
+(850, '2018-04-24 13:18:05', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '61', '', '3'),
+(851, '2018-04-24 13:18:05', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '61', '', 'siapkan tabel mutasi'),
+(852, '2018-04-24 13:18:05', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '61', '', '3'),
+(853, '2018-04-24 13:18:05', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '61', '', 'auto insert dari tabel beli, dan auto insert dari tabel jual'),
+(854, '2018-04-24 13:18:05', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'done', '61', '', NULL);
+INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `table`, `field`, `keyvalue`, `oldvalue`, `newvalue`) VALUES
+(855, '2018-04-24 13:18:05', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '61', '', '61'),
+(856, '2018-04-24 13:18:23', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '62', '', '2018-04-23'),
+(857, '2018-04-24 13:18:23', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '62', '', '5log'),
+(858, '2018-04-24 13:18:23', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '62', '', '3'),
+(859, '2018-04-24 13:18:23', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '62', '', 'siapkan tabel mutasi'),
+(860, '2018-04-24 13:18:23', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '62', '', '4'),
+(861, '2018-04-24 13:18:23', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '62', '', 'auto insert dari tabel jual'),
+(862, '2018-04-24 13:18:23', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'done', '62', '', NULL),
+(863, '2018-04-24 13:18:23', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '62', '', '62'),
+(864, '2018-04-24 13:18:38', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '55', 'siapkan tabel mutasi, auto insert dari tabel article (master barang), auto insert dari tabel beli, dan auto insert dari tabel jual', NULL),
+(865, '2018-04-24 13:19:05', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '60', 'auto insert dari tabel article (master barang), auto insert dari tabel beli, dan auto insert dari tabel jual', 'auto insert dari tabel article (master barang)'),
+(866, '2018-04-24 13:19:23', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '61', 'auto insert dari tabel beli, dan auto insert dari tabel jual', 'auto insert dari tabel beli');
 
 -- --------------------------------------------------------
 
@@ -1670,7 +1702,7 @@ ALTER TABLE `t94_home`
 -- AUTO_INCREMENT for table `t95_homedetail`
 --
 ALTER TABLE `t95_homedetail`
-  MODIFY `home_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+  MODIFY `home_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT for table `t96_employees`
@@ -1682,7 +1714,7 @@ ALTER TABLE `t96_employees`
 -- AUTO_INCREMENT for table `t99_audittrail`
 --
 ALTER TABLE `t99_audittrail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=839;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=867;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
