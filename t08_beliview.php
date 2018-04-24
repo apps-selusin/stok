@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg14.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql14.php") ?>
 <?php include_once "phpfn14.php" ?>
-<?php include_once "t06_articleinfo.php" ?>
+<?php include_once "t08_beliinfo.php" ?>
 <?php include_once "t96_employeesinfo.php" ?>
 <?php include_once "userfn14.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t06_article_view = NULL; // Initialize page object first
+$t08_beli_view = NULL; // Initialize page object first
 
-class ct06_article_view extends ct06_article {
+class ct08_beli_view extends ct08_beli {
 
 	// Page ID
 	var $PageID = 'view';
@@ -25,10 +25,10 @@ class ct06_article_view extends ct06_article {
 	var $ProjectID = '{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}';
 
 	// Table name
-	var $TableName = 't06_article';
+	var $TableName = 't08_beli';
 
 	// Page object name
-	var $PageObjName = 't06_article_view';
+	var $PageObjName = 't08_beli_view';
 
 	// Page headings
 	var $Heading = '';
@@ -288,10 +288,10 @@ class ct06_article_view extends ct06_article {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t06_article)
-		if (!isset($GLOBALS["t06_article"]) || get_class($GLOBALS["t06_article"]) == "ct06_article") {
-			$GLOBALS["t06_article"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t06_article"];
+		// Table object (t08_beli)
+		if (!isset($GLOBALS["t08_beli"]) || get_class($GLOBALS["t08_beli"]) == "ct08_beli") {
+			$GLOBALS["t08_beli"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t08_beli"];
 		}
 		$KeyUrl = "";
 		if (@$_GET["id"] <> "") {
@@ -315,7 +315,7 @@ class ct06_article_view extends ct06_article {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't06_article', TRUE);
+			define("EW_TABLE_NAME", 't08_beli', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"]))
@@ -370,7 +370,7 @@ class ct06_article_view extends ct06_article {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
 			if ($Security->CanList())
-				$this->Page_Terminate(ew_GetUrl("t06_articlelist.php"));
+				$this->Page_Terminate(ew_GetUrl("t08_belilist.php"));
 			else
 				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
@@ -431,14 +431,14 @@ class ct06_article_view extends ct06_article {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->MainGroupID->SetVisibility();
-		$this->SubGroupID->SetVisibility();
-		$this->Kode->SetVisibility();
-		$this->Nama->SetVisibility();
+		$this->TglPO->SetVisibility();
+		$this->NoPO->SetVisibility();
+		$this->VendorID->SetVisibility();
+		$this->ArticleID->SetVisibility();
+		$this->Harga->SetVisibility();
 		$this->Qty->SetVisibility();
 		$this->SatuanID->SetVisibility();
-		$this->Harga->SetVisibility();
-		$this->HargaJual->SetVisibility();
+		$this->SubTotal->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -470,13 +470,13 @@ class ct06_article_view extends ct06_article {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t06_article;
+		global $EW_EXPORT, $t08_beli;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t06_article);
+				$doc = new $class($t08_beli);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -502,7 +502,7 @@ class ct06_article_view extends ct06_article {
 				$pageName = ew_GetPageName($url);
 				if ($pageName != $this->GetListUrl()) { // Not List page
 					$row["caption"] = $this->GetModalCaption($pageName);
-					if ($pageName == "t06_articleview.php")
+					if ($pageName == "t08_beliview.php")
 						$row["view"] = "1";
 				} else { // List page should not be shown as modal => error
 					$row["error"] = $this->getFailureMessage();
@@ -568,7 +568,7 @@ class ct06_article_view extends ct06_article {
 					if ($this->TotalRecs <= 0) { // No record found
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$this->Page_Terminate("t06_articlelist.php"); // Return to list page
+						$this->Page_Terminate("t08_belilist.php"); // Return to list page
 					} elseif ($bLoadCurrentRecord) { // Load current record position
 						$this->SetupStartRec(); // Set up start record position
 
@@ -592,7 +592,7 @@ class ct06_article_view extends ct06_article {
 					if (!$bMatchRecord) {
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$sReturnUrl = "t06_articlelist.php"; // No matching record, return to list
+						$sReturnUrl = "t08_belilist.php"; // No matching record, return to list
 					} else {
 						$this->LoadRowValues($this->Recordset); // Load row values
 					}
@@ -605,7 +605,7 @@ class ct06_article_view extends ct06_article {
 				exit();
 			}
 		} else {
-			$sReturnUrl = "t06_articlelist.php"; // Not page request, return to list
+			$sReturnUrl = "t08_belilist.php"; // Not page request, return to list
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
@@ -742,20 +742,16 @@ class ct06_article_view extends ct06_article {
 			return;
 		if ($this->AuditTrailOnView) $this->WriteAuditTrailOnView($row);
 		$this->id->setDbValue($row['id']);
-		$this->MainGroupID->setDbValue($row['MainGroupID']);
-		if (array_key_exists('EV__MainGroupID', $rs->fields)) {
-			$this->MainGroupID->VirtualValue = $rs->fields('EV__MainGroupID'); // Set up virtual field value
+		$this->TglPO->setDbValue($row['TglPO']);
+		$this->NoPO->setDbValue($row['NoPO']);
+		$this->VendorID->setDbValue($row['VendorID']);
+		$this->ArticleID->setDbValue($row['ArticleID']);
+		if (array_key_exists('EV__ArticleID', $rs->fields)) {
+			$this->ArticleID->VirtualValue = $rs->fields('EV__ArticleID'); // Set up virtual field value
 		} else {
-			$this->MainGroupID->VirtualValue = ""; // Clear value
+			$this->ArticleID->VirtualValue = ""; // Clear value
 		}
-		$this->SubGroupID->setDbValue($row['SubGroupID']);
-		if (array_key_exists('EV__SubGroupID', $rs->fields)) {
-			$this->SubGroupID->VirtualValue = $rs->fields('EV__SubGroupID'); // Set up virtual field value
-		} else {
-			$this->SubGroupID->VirtualValue = ""; // Clear value
-		}
-		$this->Kode->setDbValue($row['Kode']);
-		$this->Nama->setDbValue($row['Nama']);
+		$this->Harga->setDbValue($row['Harga']);
 		$this->Qty->setDbValue($row['Qty']);
 		$this->SatuanID->setDbValue($row['SatuanID']);
 		if (array_key_exists('EV__SatuanID', $rs->fields)) {
@@ -763,22 +759,21 @@ class ct06_article_view extends ct06_article {
 		} else {
 			$this->SatuanID->VirtualValue = ""; // Clear value
 		}
-		$this->Harga->setDbValue($row['Harga']);
-		$this->HargaJual->setDbValue($row['HargaJual']);
+		$this->SubTotal->setDbValue($row['SubTotal']);
 	}
 
 	// Return a row with default values
 	function NewRow() {
 		$row = array();
 		$row['id'] = NULL;
-		$row['MainGroupID'] = NULL;
-		$row['SubGroupID'] = NULL;
-		$row['Kode'] = NULL;
-		$row['Nama'] = NULL;
+		$row['TglPO'] = NULL;
+		$row['NoPO'] = NULL;
+		$row['VendorID'] = NULL;
+		$row['ArticleID'] = NULL;
+		$row['Harga'] = NULL;
 		$row['Qty'] = NULL;
 		$row['SatuanID'] = NULL;
-		$row['Harga'] = NULL;
-		$row['HargaJual'] = NULL;
+		$row['SubTotal'] = NULL;
 		return $row;
 	}
 
@@ -788,14 +783,14 @@ class ct06_article_view extends ct06_article {
 			return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
-		$this->MainGroupID->DbValue = $row['MainGroupID'];
-		$this->SubGroupID->DbValue = $row['SubGroupID'];
-		$this->Kode->DbValue = $row['Kode'];
-		$this->Nama->DbValue = $row['Nama'];
+		$this->TglPO->DbValue = $row['TglPO'];
+		$this->NoPO->DbValue = $row['NoPO'];
+		$this->VendorID->DbValue = $row['VendorID'];
+		$this->ArticleID->DbValue = $row['ArticleID'];
+		$this->Harga->DbValue = $row['Harga'];
 		$this->Qty->DbValue = $row['Qty'];
 		$this->SatuanID->DbValue = $row['SatuanID'];
-		$this->Harga->DbValue = $row['Harga'];
-		$this->HargaJual->DbValue = $row['HargaJual'];
+		$this->SubTotal->DbValue = $row['SubTotal'];
 	}
 
 	// Render row values based on field settings
@@ -811,30 +806,30 @@ class ct06_article_view extends ct06_article {
 		$this->SetupOtherOptions();
 
 		// Convert decimal values if posted back
-		if ($this->Qty->FormValue == $this->Qty->CurrentValue && is_numeric(ew_StrToFloat($this->Qty->CurrentValue)))
-			$this->Qty->CurrentValue = ew_StrToFloat($this->Qty->CurrentValue);
-
-		// Convert decimal values if posted back
 		if ($this->Harga->FormValue == $this->Harga->CurrentValue && is_numeric(ew_StrToFloat($this->Harga->CurrentValue)))
 			$this->Harga->CurrentValue = ew_StrToFloat($this->Harga->CurrentValue);
 
 		// Convert decimal values if posted back
-		if ($this->HargaJual->FormValue == $this->HargaJual->CurrentValue && is_numeric(ew_StrToFloat($this->HargaJual->CurrentValue)))
-			$this->HargaJual->CurrentValue = ew_StrToFloat($this->HargaJual->CurrentValue);
+		if ($this->Qty->FormValue == $this->Qty->CurrentValue && is_numeric(ew_StrToFloat($this->Qty->CurrentValue)))
+			$this->Qty->CurrentValue = ew_StrToFloat($this->Qty->CurrentValue);
+
+		// Convert decimal values if posted back
+		if ($this->SubTotal->FormValue == $this->SubTotal->CurrentValue && is_numeric(ew_StrToFloat($this->SubTotal->CurrentValue)))
+			$this->SubTotal->CurrentValue = ew_StrToFloat($this->SubTotal->CurrentValue);
 
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
 		// id
-		// MainGroupID
-		// SubGroupID
-		// Kode
-		// Nama
+		// TglPO
+		// NoPO
+		// VendorID
+		// ArticleID
+		// Harga
 		// Qty
 		// SatuanID
-		// Harga
-		// HargaJual
+		// SubTotal
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -842,69 +837,71 @@ class ct06_article_view extends ct06_article {
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// MainGroupID
-		if ($this->MainGroupID->VirtualValue <> "") {
-			$this->MainGroupID->ViewValue = $this->MainGroupID->VirtualValue;
-		} else {
-		if (strval($this->MainGroupID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->MainGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t04_maingroup`";
+		// TglPO
+		$this->TglPO->ViewValue = $this->TglPO->CurrentValue;
+		$this->TglPO->ViewValue = ew_FormatDateTime($this->TglPO->ViewValue, 7);
+		$this->TglPO->ViewCustomAttributes = "";
+
+		// NoPO
+		$this->NoPO->ViewValue = $this->NoPO->CurrentValue;
+		$this->NoPO->ViewCustomAttributes = "";
+
+		// VendorID
+		if (strval($this->VendorID->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->VendorID->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t02_vendor`";
 		$sWhereWrk = "";
-		$this->MainGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
+		$this->VendorID->LookupFilters = array("dx1" => '`Nama`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->MainGroupID, $sWhereWrk); // Call Lookup Selecting
+		$this->Lookup_Selecting($this->VendorID, $sWhereWrk); // Call Lookup Selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->VendorID->ViewValue = $this->VendorID->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->VendorID->ViewValue = $this->VendorID->CurrentValue;
+			}
+		} else {
+			$this->VendorID->ViewValue = NULL;
+		}
+		$this->VendorID->ViewCustomAttributes = "";
+
+		// ArticleID
+		if ($this->ArticleID->VirtualValue <> "") {
+			$this->ArticleID->ViewValue = $this->ArticleID->VirtualValue;
+		} else {
+		if (strval($this->ArticleID->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->ArticleID->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t06_article`";
+		$sWhereWrk = "";
+		$this->ArticleID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 			$rswrk = Conn()->Execute($sSqlWrk);
 			if ($rswrk && !$rswrk->EOF) { // Lookup values found
 				$arwrk = array();
 				$arwrk[1] = $rswrk->fields('DispFld');
 				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$this->MainGroupID->ViewValue = $this->MainGroupID->DisplayValue($arwrk);
+				$this->ArticleID->ViewValue = $this->ArticleID->DisplayValue($arwrk);
 				$rswrk->Close();
 			} else {
-				$this->MainGroupID->ViewValue = $this->MainGroupID->CurrentValue;
+				$this->ArticleID->ViewValue = $this->ArticleID->CurrentValue;
 			}
 		} else {
-			$this->MainGroupID->ViewValue = NULL;
+			$this->ArticleID->ViewValue = NULL;
 		}
 		}
-		$this->MainGroupID->ViewCustomAttributes = "";
+		$this->ArticleID->ViewCustomAttributes = "";
 
-		// SubGroupID
-		if ($this->SubGroupID->VirtualValue <> "") {
-			$this->SubGroupID->ViewValue = $this->SubGroupID->VirtualValue;
-		} else {
-		if (strval($this->SubGroupID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->SubGroupID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t05_subgroup`";
-		$sWhereWrk = "";
-		$this->SubGroupID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->SubGroupID, $sWhereWrk); // Call Lookup Selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$this->SubGroupID->ViewValue = $this->SubGroupID->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->SubGroupID->ViewValue = $this->SubGroupID->CurrentValue;
-			}
-		} else {
-			$this->SubGroupID->ViewValue = NULL;
-		}
-		}
-		$this->SubGroupID->ViewCustomAttributes = "";
-
-		// Kode
-		$this->Kode->ViewValue = $this->Kode->CurrentValue;
-		$this->Kode->ViewCustomAttributes = "";
-
-		// Nama
-		$this->Nama->ViewValue = $this->Nama->CurrentValue;
-		$this->Nama->ViewCustomAttributes = "";
+		// Harga
+		$this->Harga->ViewValue = $this->Harga->CurrentValue;
+		$this->Harga->ViewValue = ew_FormatNumber($this->Harga->ViewValue, 2, -2, -2, -2);
+		$this->Harga->CellCssStyle .= "text-align: right;";
+		$this->Harga->ViewCustomAttributes = "";
 
 		// Qty
 		$this->Qty->ViewValue = $this->Qty->CurrentValue;
@@ -916,6 +913,7 @@ class ct06_article_view extends ct06_article {
 		if ($this->SatuanID->VirtualValue <> "") {
 			$this->SatuanID->ViewValue = $this->SatuanID->VirtualValue;
 		} else {
+			$this->SatuanID->ViewValue = $this->SatuanID->CurrentValue;
 		if (strval($this->SatuanID->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->SatuanID->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_satuan`";
@@ -939,37 +937,36 @@ class ct06_article_view extends ct06_article {
 		}
 		$this->SatuanID->ViewCustomAttributes = "";
 
-		// Harga
-		$this->Harga->ViewValue = $this->Harga->CurrentValue;
-		$this->Harga->ViewValue = ew_FormatNumber($this->Harga->ViewValue, 2, -2, -2, -2);
-		$this->Harga->CellCssStyle .= "text-align: right;";
-		$this->Harga->ViewCustomAttributes = "";
+		// SubTotal
+		$this->SubTotal->ViewValue = $this->SubTotal->CurrentValue;
+		$this->SubTotal->ViewValue = ew_FormatNumber($this->SubTotal->ViewValue, 2, -2, -2, -2);
+		$this->SubTotal->CellCssStyle .= "text-align: right;";
+		$this->SubTotal->ViewCustomAttributes = "";
 
-		// HargaJual
-		$this->HargaJual->ViewValue = $this->HargaJual->CurrentValue;
-		$this->HargaJual->ViewValue = ew_FormatNumber($this->HargaJual->ViewValue, 2, -2, -2, -2);
-		$this->HargaJual->CellCssStyle .= "text-align: right;";
-		$this->HargaJual->ViewCustomAttributes = "";
+			// TglPO
+			$this->TglPO->LinkCustomAttributes = "";
+			$this->TglPO->HrefValue = "";
+			$this->TglPO->TooltipValue = "";
 
-			// MainGroupID
-			$this->MainGroupID->LinkCustomAttributes = "";
-			$this->MainGroupID->HrefValue = "";
-			$this->MainGroupID->TooltipValue = "";
+			// NoPO
+			$this->NoPO->LinkCustomAttributes = "";
+			$this->NoPO->HrefValue = "";
+			$this->NoPO->TooltipValue = "";
 
-			// SubGroupID
-			$this->SubGroupID->LinkCustomAttributes = "";
-			$this->SubGroupID->HrefValue = "";
-			$this->SubGroupID->TooltipValue = "";
+			// VendorID
+			$this->VendorID->LinkCustomAttributes = "";
+			$this->VendorID->HrefValue = "";
+			$this->VendorID->TooltipValue = "";
 
-			// Kode
-			$this->Kode->LinkCustomAttributes = "";
-			$this->Kode->HrefValue = "";
-			$this->Kode->TooltipValue = "";
+			// ArticleID
+			$this->ArticleID->LinkCustomAttributes = "";
+			$this->ArticleID->HrefValue = "";
+			$this->ArticleID->TooltipValue = "";
 
-			// Nama
-			$this->Nama->LinkCustomAttributes = "";
-			$this->Nama->HrefValue = "";
-			$this->Nama->TooltipValue = "";
+			// Harga
+			$this->Harga->LinkCustomAttributes = "";
+			$this->Harga->HrefValue = "";
+			$this->Harga->TooltipValue = "";
 
 			// Qty
 			$this->Qty->LinkCustomAttributes = "";
@@ -981,15 +978,10 @@ class ct06_article_view extends ct06_article {
 			$this->SatuanID->HrefValue = "";
 			$this->SatuanID->TooltipValue = "";
 
-			// Harga
-			$this->Harga->LinkCustomAttributes = "";
-			$this->Harga->HrefValue = "";
-			$this->Harga->TooltipValue = "";
-
-			// HargaJual
-			$this->HargaJual->LinkCustomAttributes = "";
-			$this->HargaJual->HrefValue = "";
-			$this->HargaJual->TooltipValue = "";
+			// SubTotal
+			$this->SubTotal->LinkCustomAttributes = "";
+			$this->SubTotal->HrefValue = "";
+			$this->SubTotal->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1039,7 +1031,7 @@ class ct06_article_view extends ct06_article {
 		// Export to Email
 		$item = &$this->ExportOptions->Add("email");
 		$url = "";
-		$item->Body = "<button id=\"emf_t06_article\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_t06_article',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ft06_articleview,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
+		$item->Body = "<button id=\"emf_t08_beli\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_t08_beli',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ft08_beliview,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
 		$item->Visible = TRUE;
 
 		// Drop down button for export
@@ -1240,7 +1232,7 @@ class ct06_article_view extends ct06_article {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t06_articlelist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t08_belilist.php"), "", $this->TableVar, TRUE);
 		$PageId = "view";
 		$Breadcrumb->Add("view", $PageId, $url);
 	}
@@ -1352,30 +1344,30 @@ class ct06_article_view extends ct06_article {
 <?php
 
 // Create page object
-if (!isset($t06_article_view)) $t06_article_view = new ct06_article_view();
+if (!isset($t08_beli_view)) $t08_beli_view = new ct08_beli_view();
 
 // Page init
-$t06_article_view->Page_Init();
+$t08_beli_view->Page_Init();
 
 // Page main
-$t06_article_view->Page_Main();
+$t08_beli_view->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t06_article_view->Page_Render();
+$t08_beli_view->Page_Render();
 ?>
 <?php include_once "header.php" ?>
-<?php if ($t06_article->Export == "") { ?>
+<?php if ($t08_beli->Export == "") { ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "view";
-var CurrentForm = ft06_articleview = new ew_Form("ft06_articleview", "view");
+var CurrentForm = ft08_beliview = new ew_Form("ft08_beliview", "view");
 
 // Form_CustomValidate event
-ft06_articleview.Form_CustomValidate = 
+ft08_beliview.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid.
@@ -1383,15 +1375,16 @@ ft06_articleview.Form_CustomValidate =
  }
 
 // Use JavaScript validation or not
-ft06_articleview.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
+ft08_beliview.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
 
 // Dynamic selection lists
-ft06_articleview.Lists["x_MainGroupID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kode","x_Nama","",""],"ParentFields":[],"ChildFields":["x_SubGroupID"],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t04_maingroup"};
-ft06_articleview.Lists["x_MainGroupID"].Data = "<?php echo $t06_article_view->MainGroupID->LookupFilterQuery(FALSE, "view") ?>";
-ft06_articleview.Lists["x_SubGroupID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kode","x_Nama","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t05_subgroup"};
-ft06_articleview.Lists["x_SubGroupID"].Data = "<?php echo $t06_article_view->SubGroupID->LookupFilterQuery(FALSE, "view") ?>";
-ft06_articleview.Lists["x_SatuanID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_satuan"};
-ft06_articleview.Lists["x_SatuanID"].Data = "<?php echo $t06_article_view->SatuanID->LookupFilterQuery(FALSE, "view") ?>";
+ft08_beliview.Lists["x_VendorID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t02_vendor"};
+ft08_beliview.Lists["x_VendorID"].Data = "<?php echo $t08_beli_view->VendorID->LookupFilterQuery(FALSE, "view") ?>";
+ft08_beliview.Lists["x_ArticleID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kode","x_Nama","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t06_article"};
+ft08_beliview.Lists["x_ArticleID"].Data = "<?php echo $t08_beli_view->ArticleID->LookupFilterQuery(FALSE, "view") ?>";
+ft08_beliview.Lists["x_SatuanID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_satuan"};
+ft08_beliview.Lists["x_SatuanID"].Data = "<?php echo $t08_beli_view->SatuanID->LookupFilterQuery(FALSE, "view") ?>";
+ft08_beliview.AutoSuggests["x_SatuanID"] = <?php echo json_encode(array("data" => "ajax=autosuggest&" . $t08_beli_view->SatuanID->LookupFilterQuery(TRUE, "view"))) ?>;
 
 // Form object for search
 </script>
@@ -1400,220 +1393,220 @@ ft06_articleview.Lists["x_SatuanID"].Data = "<?php echo $t06_article_view->Satua
 // Write your client script here, no need to add script tags.
 </script>
 <?php } ?>
-<?php if ($t06_article->Export == "") { ?>
+<?php if ($t08_beli->Export == "") { ?>
 <div class="ewToolbar">
-<?php $t06_article_view->ExportOptions->Render("body") ?>
+<?php $t08_beli_view->ExportOptions->Render("body") ?>
 <?php
-	foreach ($t06_article_view->OtherOptions as &$option)
+	foreach ($t08_beli_view->OtherOptions as &$option)
 		$option->Render("body");
 ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<?php $t06_article_view->ShowPageHeader(); ?>
+<?php $t08_beli_view->ShowPageHeader(); ?>
 <?php
-$t06_article_view->ShowMessage();
+$t08_beli_view->ShowMessage();
 ?>
-<?php if (!$t06_article_view->IsModal) { ?>
-<?php if ($t06_article->Export == "") { ?>
+<?php if (!$t08_beli_view->IsModal) { ?>
+<?php if ($t08_beli->Export == "") { ?>
 <form name="ewPagerForm" class="form-inline ewForm ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
-<?php if (!isset($t06_article_view->Pager)) $t06_article_view->Pager = new cPrevNextPager($t06_article_view->StartRec, $t06_article_view->DisplayRecs, $t06_article_view->TotalRecs, $t06_article_view->AutoHidePager) ?>
-<?php if ($t06_article_view->Pager->RecordCount > 0 && $t06_article_view->Pager->Visible) { ?>
+<?php if (!isset($t08_beli_view->Pager)) $t08_beli_view->Pager = new cPrevNextPager($t08_beli_view->StartRec, $t08_beli_view->DisplayRecs, $t08_beli_view->TotalRecs, $t08_beli_view->AutoHidePager) ?>
+<?php if ($t08_beli_view->Pager->RecordCount > 0 && $t08_beli_view->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t06_article_view->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t06_article_view->PageUrl() ?>start=<?php echo $t06_article_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t08_beli_view->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t08_beli_view->PageUrl() ?>start=<?php echo $t08_beli_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t06_article_view->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t06_article_view->PageUrl() ?>start=<?php echo $t06_article_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t08_beli_view->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t08_beli_view->PageUrl() ?>start=<?php echo $t08_beli_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t06_article_view->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t08_beli_view->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t06_article_view->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t06_article_view->PageUrl() ?>start=<?php echo $t06_article_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t08_beli_view->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t08_beli_view->PageUrl() ?>start=<?php echo $t08_beli_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t06_article_view->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t06_article_view->PageUrl() ?>start=<?php echo $t06_article_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t08_beli_view->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t08_beli_view->PageUrl() ?>start=<?php echo $t08_beli_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t06_article_view->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t08_beli_view->Pager->PageCount ?></span>
 </div>
 <?php } ?>
 <div class="clearfix"></div>
 </form>
 <?php } ?>
 <?php } ?>
-<form name="ft06_articleview" id="ft06_articleview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t06_article_view->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t06_article_view->Token ?>">
+<form name="ft08_beliview" id="ft08_beliview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t08_beli_view->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t08_beli_view->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t06_article">
-<input type="hidden" name="modal" value="<?php echo intval($t06_article_view->IsModal) ?>">
+<input type="hidden" name="t" value="t08_beli">
+<input type="hidden" name="modal" value="<?php echo intval($t08_beli_view->IsModal) ?>">
 <table class="table table-striped table-bordered table-hover table-condensed ewViewTable">
-<?php if ($t06_article->MainGroupID->Visible) { // MainGroupID ?>
-	<tr id="r_MainGroupID">
-		<td class="col-sm-2"><span id="elh_t06_article_MainGroupID"><?php echo $t06_article->MainGroupID->FldCaption() ?></span></td>
-		<td data-name="MainGroupID"<?php echo $t06_article->MainGroupID->CellAttributes() ?>>
-<span id="el_t06_article_MainGroupID">
-<span<?php echo $t06_article->MainGroupID->ViewAttributes() ?>>
-<?php echo $t06_article->MainGroupID->ViewValue ?></span>
+<?php if ($t08_beli->TglPO->Visible) { // TglPO ?>
+	<tr id="r_TglPO">
+		<td class="col-sm-2"><span id="elh_t08_beli_TglPO"><?php echo $t08_beli->TglPO->FldCaption() ?></span></td>
+		<td data-name="TglPO"<?php echo $t08_beli->TglPO->CellAttributes() ?>>
+<span id="el_t08_beli_TglPO">
+<span<?php echo $t08_beli->TglPO->ViewAttributes() ?>>
+<?php echo $t08_beli->TglPO->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($t06_article->SubGroupID->Visible) { // SubGroupID ?>
-	<tr id="r_SubGroupID">
-		<td class="col-sm-2"><span id="elh_t06_article_SubGroupID"><?php echo $t06_article->SubGroupID->FldCaption() ?></span></td>
-		<td data-name="SubGroupID"<?php echo $t06_article->SubGroupID->CellAttributes() ?>>
-<span id="el_t06_article_SubGroupID">
-<span<?php echo $t06_article->SubGroupID->ViewAttributes() ?>>
-<?php echo $t06_article->SubGroupID->ViewValue ?></span>
+<?php if ($t08_beli->NoPO->Visible) { // NoPO ?>
+	<tr id="r_NoPO">
+		<td class="col-sm-2"><span id="elh_t08_beli_NoPO"><?php echo $t08_beli->NoPO->FldCaption() ?></span></td>
+		<td data-name="NoPO"<?php echo $t08_beli->NoPO->CellAttributes() ?>>
+<span id="el_t08_beli_NoPO">
+<span<?php echo $t08_beli->NoPO->ViewAttributes() ?>>
+<?php echo $t08_beli->NoPO->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($t06_article->Kode->Visible) { // Kode ?>
-	<tr id="r_Kode">
-		<td class="col-sm-2"><span id="elh_t06_article_Kode"><?php echo $t06_article->Kode->FldCaption() ?></span></td>
-		<td data-name="Kode"<?php echo $t06_article->Kode->CellAttributes() ?>>
-<span id="el_t06_article_Kode">
-<span<?php echo $t06_article->Kode->ViewAttributes() ?>>
-<?php echo $t06_article->Kode->ViewValue ?></span>
+<?php if ($t08_beli->VendorID->Visible) { // VendorID ?>
+	<tr id="r_VendorID">
+		<td class="col-sm-2"><span id="elh_t08_beli_VendorID"><?php echo $t08_beli->VendorID->FldCaption() ?></span></td>
+		<td data-name="VendorID"<?php echo $t08_beli->VendorID->CellAttributes() ?>>
+<span id="el_t08_beli_VendorID">
+<span<?php echo $t08_beli->VendorID->ViewAttributes() ?>>
+<?php echo $t08_beli->VendorID->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($t06_article->Nama->Visible) { // Nama ?>
-	<tr id="r_Nama">
-		<td class="col-sm-2"><span id="elh_t06_article_Nama"><?php echo $t06_article->Nama->FldCaption() ?></span></td>
-		<td data-name="Nama"<?php echo $t06_article->Nama->CellAttributes() ?>>
-<span id="el_t06_article_Nama">
-<span<?php echo $t06_article->Nama->ViewAttributes() ?>>
-<?php echo $t06_article->Nama->ViewValue ?></span>
+<?php if ($t08_beli->ArticleID->Visible) { // ArticleID ?>
+	<tr id="r_ArticleID">
+		<td class="col-sm-2"><span id="elh_t08_beli_ArticleID"><?php echo $t08_beli->ArticleID->FldCaption() ?></span></td>
+		<td data-name="ArticleID"<?php echo $t08_beli->ArticleID->CellAttributes() ?>>
+<span id="el_t08_beli_ArticleID">
+<span<?php echo $t08_beli->ArticleID->ViewAttributes() ?>>
+<?php echo $t08_beli->ArticleID->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($t06_article->Qty->Visible) { // Qty ?>
-	<tr id="r_Qty">
-		<td class="col-sm-2"><span id="elh_t06_article_Qty"><?php echo $t06_article->Qty->FldCaption() ?></span></td>
-		<td data-name="Qty"<?php echo $t06_article->Qty->CellAttributes() ?>>
-<span id="el_t06_article_Qty">
-<span<?php echo $t06_article->Qty->ViewAttributes() ?>>
-<?php echo $t06_article->Qty->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($t06_article->SatuanID->Visible) { // SatuanID ?>
-	<tr id="r_SatuanID">
-		<td class="col-sm-2"><span id="elh_t06_article_SatuanID"><?php echo $t06_article->SatuanID->FldCaption() ?></span></td>
-		<td data-name="SatuanID"<?php echo $t06_article->SatuanID->CellAttributes() ?>>
-<span id="el_t06_article_SatuanID">
-<span<?php echo $t06_article->SatuanID->ViewAttributes() ?>>
-<?php echo $t06_article->SatuanID->ViewValue ?></span>
-</span>
-</td>
-	</tr>
-<?php } ?>
-<?php if ($t06_article->Harga->Visible) { // Harga ?>
+<?php if ($t08_beli->Harga->Visible) { // Harga ?>
 	<tr id="r_Harga">
-		<td class="col-sm-2"><span id="elh_t06_article_Harga"><?php echo $t06_article->Harga->FldCaption() ?></span></td>
-		<td data-name="Harga"<?php echo $t06_article->Harga->CellAttributes() ?>>
-<span id="el_t06_article_Harga">
-<span<?php echo $t06_article->Harga->ViewAttributes() ?>>
-<?php echo $t06_article->Harga->ViewValue ?></span>
+		<td class="col-sm-2"><span id="elh_t08_beli_Harga"><?php echo $t08_beli->Harga->FldCaption() ?></span></td>
+		<td data-name="Harga"<?php echo $t08_beli->Harga->CellAttributes() ?>>
+<span id="el_t08_beli_Harga">
+<span<?php echo $t08_beli->Harga->ViewAttributes() ?>>
+<?php echo $t08_beli->Harga->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($t06_article->HargaJual->Visible) { // HargaJual ?>
-	<tr id="r_HargaJual">
-		<td class="col-sm-2"><span id="elh_t06_article_HargaJual"><?php echo $t06_article->HargaJual->FldCaption() ?></span></td>
-		<td data-name="HargaJual"<?php echo $t06_article->HargaJual->CellAttributes() ?>>
-<span id="el_t06_article_HargaJual">
-<span<?php echo $t06_article->HargaJual->ViewAttributes() ?>>
-<?php echo $t06_article->HargaJual->ViewValue ?></span>
+<?php if ($t08_beli->Qty->Visible) { // Qty ?>
+	<tr id="r_Qty">
+		<td class="col-sm-2"><span id="elh_t08_beli_Qty"><?php echo $t08_beli->Qty->FldCaption() ?></span></td>
+		<td data-name="Qty"<?php echo $t08_beli->Qty->CellAttributes() ?>>
+<span id="el_t08_beli_Qty">
+<span<?php echo $t08_beli->Qty->ViewAttributes() ?>>
+<?php echo $t08_beli->Qty->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t08_beli->SatuanID->Visible) { // SatuanID ?>
+	<tr id="r_SatuanID">
+		<td class="col-sm-2"><span id="elh_t08_beli_SatuanID"><?php echo $t08_beli->SatuanID->FldCaption() ?></span></td>
+		<td data-name="SatuanID"<?php echo $t08_beli->SatuanID->CellAttributes() ?>>
+<span id="el_t08_beli_SatuanID">
+<span<?php echo $t08_beli->SatuanID->ViewAttributes() ?>>
+<?php echo $t08_beli->SatuanID->ViewValue ?></span>
+</span>
+</td>
+	</tr>
+<?php } ?>
+<?php if ($t08_beli->SubTotal->Visible) { // SubTotal ?>
+	<tr id="r_SubTotal">
+		<td class="col-sm-2"><span id="elh_t08_beli_SubTotal"><?php echo $t08_beli->SubTotal->FldCaption() ?></span></td>
+		<td data-name="SubTotal"<?php echo $t08_beli->SubTotal->CellAttributes() ?>>
+<span id="el_t08_beli_SubTotal">
+<span<?php echo $t08_beli->SubTotal->ViewAttributes() ?>>
+<?php echo $t08_beli->SubTotal->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
 </table>
-<?php if (!$t06_article_view->IsModal) { ?>
-<?php if ($t06_article->Export == "") { ?>
-<?php if (!isset($t06_article_view->Pager)) $t06_article_view->Pager = new cPrevNextPager($t06_article_view->StartRec, $t06_article_view->DisplayRecs, $t06_article_view->TotalRecs, $t06_article_view->AutoHidePager) ?>
-<?php if ($t06_article_view->Pager->RecordCount > 0 && $t06_article_view->Pager->Visible) { ?>
+<?php if (!$t08_beli_view->IsModal) { ?>
+<?php if ($t08_beli->Export == "") { ?>
+<?php if (!isset($t08_beli_view->Pager)) $t08_beli_view->Pager = new cPrevNextPager($t08_beli_view->StartRec, $t08_beli_view->DisplayRecs, $t08_beli_view->TotalRecs, $t08_beli_view->AutoHidePager) ?>
+<?php if ($t08_beli_view->Pager->RecordCount > 0 && $t08_beli_view->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t06_article_view->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t06_article_view->PageUrl() ?>start=<?php echo $t06_article_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t08_beli_view->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t08_beli_view->PageUrl() ?>start=<?php echo $t08_beli_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t06_article_view->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t06_article_view->PageUrl() ?>start=<?php echo $t06_article_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t08_beli_view->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t08_beli_view->PageUrl() ?>start=<?php echo $t08_beli_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t06_article_view->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t08_beli_view->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t06_article_view->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t06_article_view->PageUrl() ?>start=<?php echo $t06_article_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t08_beli_view->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t08_beli_view->PageUrl() ?>start=<?php echo $t08_beli_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t06_article_view->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t06_article_view->PageUrl() ?>start=<?php echo $t06_article_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t08_beli_view->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t08_beli_view->PageUrl() ?>start=<?php echo $t08_beli_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t06_article_view->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t08_beli_view->Pager->PageCount ?></span>
 </div>
 <?php } ?>
 <div class="clearfix"></div>
 <?php } ?>
 <?php } ?>
 </form>
-<?php if ($t06_article->Export == "") { ?>
+<?php if ($t08_beli->Export == "") { ?>
 <script type="text/javascript">
-ft06_articleview.Init();
+ft08_beliview.Init();
 </script>
 <?php } ?>
 <?php
-$t06_article_view->ShowPageFooter();
+$t08_beli_view->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
-<?php if ($t06_article->Export == "") { ?>
+<?php if ($t08_beli->Export == "") { ?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
@@ -1623,5 +1616,5 @@ if (EW_DEBUG_ENABLED)
 <?php } ?>
 <?php include_once "footer.php" ?>
 <?php
-$t06_article_view->Page_Terminate();
+$t08_beli_view->Page_Terminate();
 ?>

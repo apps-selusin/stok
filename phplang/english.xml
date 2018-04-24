@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/4/24" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/4/25" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -618,6 +618,9 @@
   <project>
     <phrase id="bodytitle" value="STOK Apps." />
     <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
+    <menu id="10087">
+      <phrase id="menutext" value="Mutasi" />
+    </menu>
     <menu id="10034">
       <phrase id="menutext" value="v 04 jual" />
     </menu>
@@ -1006,6 +1009,45 @@
       </field>
       <field id="subtotal">
         <phrase id="fldcaption" value="Sub Total" />
+      </field>
+    </table>
+    <table id="t13_mutasi">
+      <phrase id="tblcaption" value="Mutasi" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="url">
+        <phrase id="fldcaption" value="Url" />
+      </field>
+      <field id="articleid">
+        <phrase id="fldcaption" value="Article ID" />
+      </field>
+      <field id="nourut">
+        <phrase id="fldcaption" value="No Urut" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="Tgl" />
+      </field>
+      <field id="keterangan">
+        <phrase id="fldcaption" value="Keterangan" />
+      </field>
+      <field id="masukqty">
+        <phrase id="fldcaption" value="Masuk" />
+      </field>
+      <field id="keluarqty">
+        <phrase id="fldcaption" value="Keluar" />
+      </field>
+      <field id="saldoqty">
+        <phrase id="fldcaption" value="Saldo" />
+      </field>
+      <field id="masukharga">
+        <phrase id="fldcaption" value="Masuk Harga" />
+      </field>
+      <field id="keluarharga">
+        <phrase id="fldcaption" value="Keluar Harga" />
+      </field>
+      <field id="saldoharga">
+        <phrase id="fldcaption" value="Saldo Harga" />
       </field>
     </table>
     <table id="t93_parameter">

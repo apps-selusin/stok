@@ -1323,6 +1323,28 @@ class ct08_beli extends cTable {
 		// insert ke tabel hutang dengan nomor PO baru
 		ew_Execute("insert into t09_hutang (nohutang, beliid, jumlahhutang) values
 		('".$NoHutang."', ".$rsnew["id"].", ".$rsnew["SubTotal"].")");
+
+		// cari nomor urut terbaru di tabel mutasi
+		$NoUrut = f_GetNextNoUrut($rsnew["ArticleID"]);
+
+		// tambah data otomatis ke tabel mutasi
+		$q = "insert into t13_mutasi (
+			TabelID, Url, ArticleID, NoUrut, Tgl, Jam, Keterangan,
+			MasukQty, MasukHarga, SaldoQty, SaldoHarga
+			) values (
+			".$rsnew["id"].",
+			't08_beliview.php?showdetail=&id=".$rsnew["id"]."',
+			".$rsnew["ArticleID"].",
+			".$NoUrut.",
+			'".$rsnew["TglPO"]."',
+			'".date("H:i")."',
+			'Beli',
+			".$rsnew["Qty"].",
+			".$rsnew["Harga"].",
+			".$rsnew["Qty"].",
+			".$rsnew["Qty"] * $rsnew["Harga"]."
+			)";
+		ew_Execute($q);
 	}
 
 	// Row Updating event
@@ -1343,6 +1365,17 @@ class ct08_beli extends cTable {
 
 		$q = "update t09_hutang set jumlahhutang = ".$rsnew["SubTotal"]." ".
 			"where beliid = ".$rsold["id"]."";
+		ew_Execute($q);
+
+		// update data otomatis di tabel mutasi berdasarkan keterangan dan tabelid
+		$q = "update t13_mutasi set
+			MasukQty = ".$rsnew["Qty"].",
+			MasukHarga = ".$rsnew["Harga"].",
+			SaldoQty = ".$rsnew["Qty"].",
+			SaldoHarga = ".$rsnew["Qty"] * $rsnew["Harga"]."
+			where
+			Keterangan = 'Beli'
+			and TabelID = ".$rsold["id"]."";
 		ew_Execute($q);
 	}
 
@@ -1409,6 +1442,12 @@ class ct08_beli extends cTable {
 
 		// hapus data di tabel hutang berdasarkan BeliID
 		$q = "delete from t09_hutang where beliid = ".$rs["id"]."";
+		ew_Execute($q);
+
+		// delete data otomatis di tabel mutasi berdasarkan keterangan dan tabelid
+		$q = "delete from t13_mutasi where
+			Keterangan = 'Beli'
+			and TabelID = ".$rs["id"]."";
 		ew_Execute($q);
 	}
 

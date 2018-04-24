@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 24, 2018 at 09:01 AM
+-- Generation Time: Apr 24, 2018 at 08:57 PM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -153,7 +153,7 @@ CREATE TABLE `t06_article` (
 --
 
 INSERT INTO `t06_article` (`id`, `SubGroupID`, `Kode`, `Nama`, `Qty`, `SatuanID`, `Harga`, `HargaJual`) VALUES
-(1, 1, '5501001', 'MEAT Has Luar Lokal', 100.00, 1, 100000.00, 125000.00);
+(1, 1, '5501001', 'Meat 1', 20.00, 1, 95000.00, 125000.00);
 
 -- --------------------------------------------------------
 
@@ -198,7 +198,7 @@ CREATE TABLE `t08_beli` (
 --
 
 INSERT INTO `t08_beli` (`id`, `TglPO`, `NoPO`, `VendorID`, `ArticleID`, `Harga`, `Qty`, `SubTotal`) VALUES
-(3, '2018-04-24', 'PO201804240001', 1, 1, 100000.00, 3.50, 350000.00);
+(2, '2018-04-25', 'PO201804250002', 2, 1, 95000.00, 6.20, 589000.00);
 
 -- --------------------------------------------------------
 
@@ -219,7 +219,7 @@ CREATE TABLE `t09_hutang` (
 --
 
 INSERT INTO `t09_hutang` (`id`, `NoHutang`, `BeliID`, `JumlahHutang`, `JumlahBayar`) VALUES
-(2, 'HT000001', 3, 350000.00, 0.00);
+(2, 'HT000002', 2, 589000.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -283,21 +283,52 @@ CREATE TABLE `t12_jualdetail` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `t13_mutasi`
+--
+
+CREATE TABLE `t13_mutasi` (
+  `id` int(11) NOT NULL,
+  `TabelID` int(11) NOT NULL DEFAULT '0',
+  `Url` varchar(100) CHARACTER SET latin1 NOT NULL,
+  `ArticleID` int(11) NOT NULL,
+  `NoUrut` tinyint(4) NOT NULL,
+  `Tgl` date NOT NULL,
+  `Jam` time NOT NULL DEFAULT '00:00:00',
+  `Keterangan` varchar(50) CHARACTER SET latin1 NOT NULL,
+  `MasukQty` float(15,2) NOT NULL DEFAULT '0.00',
+  `MasukHarga` float(15,2) NOT NULL DEFAULT '0.00',
+  `KeluarQty` float(15,2) NOT NULL DEFAULT '0.00',
+  `KeluarHarga` float(15,2) NOT NULL DEFAULT '0.00',
+  `SaldoQty` float(15,2) NOT NULL DEFAULT '0.00',
+  `SaldoHarga` float(15,2) NOT NULL DEFAULT '0.00'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `t13_mutasi`
+--
+
+INSERT INTO `t13_mutasi` (`id`, `TabelID`, `Url`, `ArticleID`, `NoUrut`, `Tgl`, `Jam`, `Keterangan`, `MasukQty`, `MasukHarga`, `KeluarQty`, `KeluarHarga`, `SaldoQty`, `SaldoHarga`) VALUES
+(1, 1, 't06_articleview.php?showdetail=&id=1', 1, 0, '2018-04-01', '00:00:00', 'Stok Awal', 20.00, 95000.00, 0.00, 0.00, 20.00, 1900000.00),
+(3, 2, 't08_beliview.php?showdetail=&id=2', 1, 2, '2018-04-25', '01:49:00', 'Beli', 6.20, 95000.00, 0.00, 0.00, 6.20, 589000.00);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `t93_parameter`
 --
 
 CREATE TABLE `t93_parameter` (
   `id` int(11) NOT NULL,
-  `Nama` varchar(50) NOT NULL,
-  `Nilai` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `Nama` varchar(50) CHARACTER SET latin1 NOT NULL,
+  `Nilai` varchar(50) CHARACTER SET latin1 NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `t93_parameter`
 --
 
 INSERT INTO `t93_parameter` (`id`, `Nama`, `Nilai`) VALUES
-(1, 'Periode', '01-04-2018');
+(1, 'Periode', '2018-04-01');
 
 -- --------------------------------------------------------
 
@@ -401,9 +432,10 @@ INSERT INTO `t95_homedetail` (`home_id`, `tgl`, `kat`, `no_jdl`, `jdl`, `no_ket`
 (57, '2018-04-23', '5log', 2, 'hapus trigger di database', 1, NULL, 1),
 (58, '2018-04-23', '4todo', 1, 'data tabel <b>beli</b> vs data tabel <b>hutang</b>', 1, NULL, 1),
 (59, '2018-04-23', '5log', 1, 'update after-proses di tabel beli', 2, 'update after-proses di tabel beli agar setiap perubahan data di tabel beli juga berpengaruh di tabel hutang', NULL),
-(60, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 2, 'auto insert dari tabel article (master barang)', NULL),
-(61, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 3, 'auto insert dari tabel beli', NULL),
-(62, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 4, 'auto insert dari tabel jual', NULL);
+(60, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 2, 'auto insert - update - delete dari tabel article (master barang)', 1),
+(61, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 3, 'auto insert - update - delete dari tabel beli', 1),
+(62, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 4, 'auto insert dari tabel jual', NULL),
+(63, '2018-04-25', '5log', 1, 'siapkan laporan mutasi', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1390,7 +1422,119 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (863, '2018-04-24 13:18:23', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '62', '', '62'),
 (864, '2018-04-24 13:18:38', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '55', 'siapkan tabel mutasi, auto insert dari tabel article (master barang), auto insert dari tabel beli, dan auto insert dari tabel jual', NULL),
 (865, '2018-04-24 13:19:05', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '60', 'auto insert dari tabel article (master barang), auto insert dari tabel beli, dan auto insert dari tabel jual', 'auto insert dari tabel article (master barang)'),
-(866, '2018-04-24 13:19:23', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '61', 'auto insert dari tabel beli, dan auto insert dari tabel jual', 'auto insert dari tabel beli');
+(866, '2018-04-24 13:19:23', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '61', 'auto insert dari tabel beli, dan auto insert dari tabel jual', 'auto insert dari tabel beli'),
+(867, '2018-04-24 18:04:30', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(868, '2018-04-24 20:08:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'MainGroupID', '2', '', '1'),
+(869, '2018-04-24 20:08:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SubGroupID', '2', '', '1'),
+(870, '2018-04-24 20:08:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Kode', '2', '', '5501002'),
+(871, '2018-04-24 20:08:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Nama', '2', '', 'MEAT Has Dalam Lokal'),
+(872, '2018-04-24 20:08:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Qty', '2', '', '50'),
+(873, '2018-04-24 20:08:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SatuanID', '2', '', '1'),
+(874, '2018-04-24 20:08:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Harga', '2', '', '75000'),
+(875, '2018-04-24 20:08:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'HargaJual', '2', '', '85000'),
+(876, '2018-04-24 20:08:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'id', '2', '', '2'),
+(877, '2018-04-24 20:15:12', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'MainGroupID', '3', '', '1'),
+(878, '2018-04-24 20:15:12', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SubGroupID', '3', '', '1'),
+(879, '2018-04-24 20:15:12', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Kode', '3', '', '5501003'),
+(880, '2018-04-24 20:15:12', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Nama', '3', '', 'MEAT Has Luar AUS'),
+(881, '2018-04-24 20:15:12', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Qty', '3', '', '25'),
+(882, '2018-04-24 20:15:12', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SatuanID', '3', '', '1'),
+(883, '2018-04-24 20:15:12', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Harga', '3', '', '125000'),
+(884, '2018-04-24 20:15:12', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'HargaJual', '3', '', '135000'),
+(885, '2018-04-24 20:15:12', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'id', '3', '', '3'),
+(886, '2018-04-24 20:38:17', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'MainGroupID', '4', '', '1'),
+(887, '2018-04-24 20:38:17', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SubGroupID', '4', '', '1'),
+(888, '2018-04-24 20:38:17', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Kode', '4', '', '5501004'),
+(889, '2018-04-24 20:38:17', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Nama', '4', '', 'MEAT Has Dalam AUS'),
+(890, '2018-04-24 20:38:17', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Qty', '4', '', '15'),
+(891, '2018-04-24 20:38:17', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SatuanID', '4', '', '1'),
+(892, '2018-04-24 20:38:17', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Harga', '4', '', '179000'),
+(893, '2018-04-24 20:38:17', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'HargaJual', '4', '', '200000'),
+(894, '2018-04-24 20:38:17', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'id', '4', '', '4'),
+(895, '2018-04-24 21:46:49', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'MainGroupID', '5', '', '1'),
+(896, '2018-04-24 21:46:49', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SubGroupID', '5', '', '5'),
+(897, '2018-04-24 21:46:49', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Kode', '5', '', '5504001'),
+(898, '2018-04-24 21:46:49', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Nama', '5', '', 'Nanas'),
+(899, '2018-04-24 21:46:49', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Qty', '5', '', '5'),
+(900, '2018-04-24 21:46:49', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SatuanID', '5', '', '1'),
+(901, '2018-04-24 21:46:49', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Harga', '5', '', '5000'),
+(902, '2018-04-24 21:46:49', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'HargaJual', '5', '', '6000'),
+(903, '2018-04-24 21:46:49', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'id', '5', '', '5'),
+(904, '2018-04-24 21:55:44', '/stok/t06_articlelist.php', '1', 'U', 't06_article', 'Qty', '5', '5.00', '6'),
+(905, '2018-04-24 21:59:48', '/stok/t06_articledelete.php', '1', '*** Batch delete begin ***', 't06_article', '', '', '', ''),
+(906, '2018-04-24 21:59:48', '/stok/t06_articledelete.php', '1', 'D', 't06_article', 'id', '5', '5', ''),
+(907, '2018-04-24 21:59:48', '/stok/t06_articledelete.php', '1', 'D', 't06_article', 'SubGroupID', '5', '5', ''),
+(908, '2018-04-24 21:59:48', '/stok/t06_articledelete.php', '1', 'D', 't06_article', 'Kode', '5', '5504001', ''),
+(909, '2018-04-24 21:59:48', '/stok/t06_articledelete.php', '1', 'D', 't06_article', 'Nama', '5', 'Nanas', ''),
+(910, '2018-04-24 21:59:48', '/stok/t06_articledelete.php', '1', 'D', 't06_article', 'Qty', '5', '6.00', ''),
+(911, '2018-04-24 21:59:48', '/stok/t06_articledelete.php', '1', 'D', 't06_article', 'SatuanID', '5', '1', ''),
+(912, '2018-04-24 21:59:48', '/stok/t06_articledelete.php', '1', 'D', 't06_article', 'Harga', '5', '5000.00', ''),
+(913, '2018-04-24 21:59:48', '/stok/t06_articledelete.php', '1', 'D', 't06_article', 'HargaJual', '5', '6000.00', ''),
+(914, '2018-04-24 21:59:48', '/stok/t06_articledelete.php', '1', 'D', 't06_article', 'MainGroupID', '5', '1', ''),
+(915, '2018-04-24 21:59:48', '/stok/t06_articledelete.php', '1', '*** Batch delete successful ***', 't06_article', '', '', '', ''),
+(916, '2018-04-24 22:02:16', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '60', 'auto insert dari tabel article (master barang)', 'auto insert - update - delete dari tabel article (master barang)'),
+(917, '2018-04-24 22:02:16', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '60', NULL, '1'),
+(918, '2018-04-25 01:14:34', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '4', '', '2018-04-25'),
+(919, '2018-04-25 01:14:34', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '4', '', 'PO201804250002'),
+(920, '2018-04-25 01:14:34', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '4', '', '2'),
+(921, '2018-04-25 01:14:34', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '4', '', '4'),
+(922, '2018-04-25 01:14:34', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '4', '', '179000.00'),
+(923, '2018-04-25 01:14:34', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '4', '', '1.2'),
+(924, '2018-04-25 01:14:34', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '4', '', '1'),
+(925, '2018-04-25 01:14:34', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '4', '', '214800'),
+(926, '2018-04-25 01:14:34', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '4', '', '4'),
+(927, '2018-04-25 01:46:26', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'MainGroupID', '1', '', '1'),
+(928, '2018-04-25 01:46:26', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SubGroupID', '1', '', '1'),
+(929, '2018-04-25 01:46:26', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Kode', '1', '', '5501001'),
+(930, '2018-04-25 01:46:26', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Nama', '1', '', 'Meat 1'),
+(931, '2018-04-25 01:46:26', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Qty', '1', '', '20'),
+(932, '2018-04-25 01:46:26', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SatuanID', '1', '', '1'),
+(933, '2018-04-25 01:46:26', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Harga', '1', '', '95000'),
+(934, '2018-04-25 01:46:26', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'HargaJual', '1', '', '125000'),
+(935, '2018-04-25 01:46:26', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'id', '1', '', '1'),
+(936, '2018-04-25 01:47:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '1', '', '2018-04-25'),
+(937, '2018-04-25 01:47:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '1', '', 'PO201804250001'),
+(938, '2018-04-25 01:47:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '1', '', '1'),
+(939, '2018-04-25 01:47:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '1', '', '1'),
+(940, '2018-04-25 01:47:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '1', '', '95000.00'),
+(941, '2018-04-25 01:47:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '1', '', '3'),
+(942, '2018-04-25 01:47:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '1', '', '1'),
+(943, '2018-04-25 01:47:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '1', '', '285000'),
+(944, '2018-04-25 01:47:36', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '1', '', '1'),
+(945, '2018-04-25 01:49:09', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '2', '', '2018-04-25'),
+(946, '2018-04-25 01:49:09', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '2', '', 'PO201804250002'),
+(947, '2018-04-25 01:49:09', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '2', '', '2'),
+(948, '2018-04-25 01:49:09', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '2', '', '1'),
+(949, '2018-04-25 01:49:09', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '2', '', '95000.00'),
+(950, '2018-04-25 01:49:09', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '2', '', '6'),
+(951, '2018-04-25 01:49:09', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '2', '', '1'),
+(952, '2018-04-25 01:49:09', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '2', '', '570000'),
+(953, '2018-04-25 01:49:09', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '2', '', '2'),
+(954, '2018-04-25 01:49:53', '/stok/t08_belidelete.php', '1', '*** Batch delete begin ***', 't08_beli', '', '', '', ''),
+(955, '2018-04-25 01:49:53', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'id', '1', '1', ''),
+(956, '2018-04-25 01:49:53', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'TglPO', '1', '2018-04-25', ''),
+(957, '2018-04-25 01:49:53', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'NoPO', '1', 'PO201804250001', ''),
+(958, '2018-04-25 01:49:53', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'VendorID', '1', '1', ''),
+(959, '2018-04-25 01:49:53', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'ArticleID', '1', '1', ''),
+(960, '2018-04-25 01:49:53', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'Harga', '1', '95000.00', ''),
+(961, '2018-04-25 01:49:53', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'Qty', '1', '3.00', ''),
+(962, '2018-04-25 01:49:53', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'SubTotal', '1', '285000.00', ''),
+(963, '2018-04-25 01:49:53', '/stok/t08_belidelete.php', '1', 'D', 't08_beli', 'SatuanID', '1', '1', ''),
+(964, '2018-04-25 01:49:54', '/stok/t08_belidelete.php', '1', '*** Batch delete successful ***', 't08_beli', '', '', '', ''),
+(965, '2018-04-25 01:50:25', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '2', '6.00', '6.1'),
+(966, '2018-04-25 01:50:25', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '2', '570000.00', '579500'),
+(967, '2018-04-25 01:52:53', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'Qty', '2', '6.10', '6.2'),
+(968, '2018-04-25 01:52:53', '/stok/t08_belilist.php', '1', 'U', 't08_beli', 'SubTotal', '2', '579500.00', '589000'),
+(969, '2018-04-25 01:56:01', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '61', 'auto insert dari tabel beli', 'auto insert - update - delete dari tabel beli'),
+(970, '2018-04-25 01:56:01', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '61', NULL, '1'),
+(971, '2018-04-25 01:56:48', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'tgl', '63', '', '2018-04-25'),
+(972, '2018-04-25 01:56:48', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'kat', '63', '', '5log'),
+(973, '2018-04-25 01:56:48', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_jdl', '63', '', '1'),
+(974, '2018-04-25 01:56:48', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'jdl', '63', '', 'siapkan laporan mutasi'),
+(975, '2018-04-25 01:56:48', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '63', '', NULL),
+(976, '2018-04-25 01:56:48', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '63', '', NULL),
+(977, '2018-04-25 01:56:48', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'done', '63', '', NULL),
+(978, '2018-04-25 01:56:48', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '63', '', '63');
 
 -- --------------------------------------------------------
 
@@ -1568,6 +1712,12 @@ ALTER TABLE `t12_jualdetail`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `t13_mutasi`
+--
+ALTER TABLE `t13_mutasi`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `t93_parameter`
 --
 ALTER TABLE `t93_parameter`
@@ -1660,7 +1810,7 @@ ALTER TABLE `t07_satuan`
 -- AUTO_INCREMENT for table `t08_beli`
 --
 ALTER TABLE `t08_beli`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `t09_hutang`
@@ -1672,7 +1822,7 @@ ALTER TABLE `t09_hutang`
 -- AUTO_INCREMENT for table `t10_hutangdetail`
 --
 ALTER TABLE `t10_hutangdetail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `t11_jual`
@@ -1685,6 +1835,12 @@ ALTER TABLE `t11_jual`
 --
 ALTER TABLE `t12_jualdetail`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `t13_mutasi`
+--
+ALTER TABLE `t13_mutasi`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `t93_parameter`
@@ -1702,7 +1858,7 @@ ALTER TABLE `t94_home`
 -- AUTO_INCREMENT for table `t95_homedetail`
 --
 ALTER TABLE `t95_homedetail`
-  MODIFY `home_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `home_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `t96_employees`
@@ -1714,7 +1870,7 @@ ALTER TABLE `t96_employees`
 -- AUTO_INCREMENT for table `t99_audittrail`
 --
 ALTER TABLE `t99_audittrail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=867;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=979;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -18,6 +18,13 @@ function Page_Unloaded() {
 
 	//echo "Page Unloaded";
 }
+$_SESSION["Periode"] = f_GetParameter('Periode');
+
+function f_GetParameter($mparam1) {
+	$q = "select Nilai from t93_parameter where Nama = '".$mparam1."'";
+	$mNilai = ew_ExecuteScalar($q);
+	return $mNilai;
+}
 
 function f_GetNextNoPO() {
 	$m_NextNoPO = "";
@@ -94,6 +101,21 @@ function f_GetNextNoSO() {
 	}
 	else { // jika belum ada, gunakan kode yang pertama
 		$m_NextNo = "SO" . date("Ymd") . "0001";
+	}
+	return $m_NextNo;
+}
+
+function f_GetNextNoUrut($ArticleID) {
+	$m_NextNo = "";
+	$m_LastNo = "";
+	$m_No = ew_ExecuteScalar("select NoUrut from t13_mutasi where ArticleID = ".$ArticleID." order by NoUrut desc");
+	if ($m_No != "") { // jika sudah ada, langsung ambil dan proses...
+		$m_LastNo = intval($m_No); // ambil 4 digit terakhir
+		$m_LastNo = intval($m_LastNo) + 1; // konversi ke integer, lalu tambahkan satu
+		$m_NextNo = $m_LastNo; // format hasilnya dan tambahkan prefix
+	}
+	else { // jika belum ada, gunakan kode yang pertama
+		$m_NextNo = 1;
 	}
 	return $m_NextNo;
 }

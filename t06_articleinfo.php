@@ -1300,6 +1300,25 @@ class ct06_article extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"
+		// tambah data otomatis ke tabel mutasi
+
+		$q = "insert into t13_mutasi (
+			TabelID, Url, ArticleID, NoUrut, Tgl, Jam,
+			Keterangan, MasukQty, MasukHarga, SaldoQty, SaldoHarga
+			) values (
+			".$rsnew["id"].",
+			't06_articleview.php?showdetail=&id=".$rsnew["id"]."',
+			".$rsnew["id"].",
+			0,
+			'".$_SESSION["Periode"]."',
+			'00:00',
+			'Stok Awal',
+			".$rsnew["Qty"].",
+			".$rsnew["Harga"].",
+			".$rsnew["Qty"].",
+			".$rsnew["Qty"] * $rsnew["Harga"]."
+			)";
+		ew_Execute($q);
 	}
 
 	// Row Updating event
@@ -1315,6 +1334,17 @@ class ct06_article extends cTable {
 	function Row_Updated($rsold, &$rsnew) {
 
 		//echo "Row Updated";
+		// update data otomatis di tabel mutasi berdasarkan keterangan dan tabelid
+
+		$q = "update t13_mutasi set
+			MasukQty = ".$rsnew["Qty"].",
+			MasukHarga = ".$rsnew["Harga"].",
+			SaldoQty = ".$rsnew["Qty"].",
+			SaldoHarga = ".$rsnew["Qty"] * $rsnew["Harga"]."
+			where
+			Keterangan = 'Stok Awal'
+			and TabelID = ".$rsold["id"]."";
+		ew_Execute($q);
 	}
 
 	// Row Update Conflict event
@@ -1369,6 +1399,12 @@ class ct06_article extends cTable {
 	function Row_Deleted(&$rs) {
 
 		//echo "Row Deleted";
+		// delete data otomatis di tabel mutasi berdasarkan keterangan dan tabelid
+
+		$q = "delete from t13_mutasi where
+			Keterangan = 'Stok Awal'
+			and TabelID = ".$rs["id"]."";
+		ew_Execute($q);
 	}
 
 	// Email Sending event
