@@ -3531,7 +3531,7 @@ $t06_article_list->ListOptions->Render("body", "left", $t06_article_list->RowCnt
 	<?php if ($t06_article->Qty->Visible) { // Qty ?>
 		<td data-name="Qty">
 <span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Qty" class="form-group t06_article_Qty">
-<input type="text" data-table="t06_article" data-field="x_Qty" name="x<?php echo $t06_article_list->RowIndex ?>_Qty" id="x<?php echo $t06_article_list->RowIndex ?>_Qty" size="2" placeholder="<?php echo ew_HtmlEncode($t06_article->Qty->getPlaceHolder()) ?>" value="<?php echo $t06_article->Qty->EditValue ?>"<?php echo $t06_article->Qty->EditAttributes() ?>>
+<input type="text" data-table="t06_article" data-field="x_Qty" name="x<?php echo $t06_article_list->RowIndex ?>_Qty" id="x<?php echo $t06_article_list->RowIndex ?>_Qty" size="4" placeholder="<?php echo ew_HtmlEncode($t06_article->Qty->getPlaceHolder()) ?>" value="<?php echo $t06_article->Qty->EditValue ?>"<?php echo $t06_article->Qty->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t06_article" data-field="x_Qty" name="o<?php echo $t06_article_list->RowIndex ?>_Qty" id="o<?php echo $t06_article_list->RowIndex ?>_Qty" value="<?php echo ew_HtmlEncode($t06_article->Qty->OldValue) ?>">
 </td>
@@ -3736,7 +3736,7 @@ $t06_article_list->ListOptions->Render("body", "left", $t06_article_list->RowCnt
 		<td data-name="Qty"<?php echo $t06_article->Qty->CellAttributes() ?>>
 <?php if ($t06_article->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t06_article_list->RowCnt ?>_t06_article_Qty" class="form-group t06_article_Qty">
-<input type="text" data-table="t06_article" data-field="x_Qty" name="x<?php echo $t06_article_list->RowIndex ?>_Qty" id="x<?php echo $t06_article_list->RowIndex ?>_Qty" size="2" placeholder="<?php echo ew_HtmlEncode($t06_article->Qty->getPlaceHolder()) ?>" value="<?php echo $t06_article->Qty->EditValue ?>"<?php echo $t06_article->Qty->EditAttributes() ?>>
+<input type="text" data-table="t06_article" data-field="x_Qty" name="x<?php echo $t06_article_list->RowIndex ?>_Qty" id="x<?php echo $t06_article_list->RowIndex ?>_Qty" size="4" placeholder="<?php echo ew_HtmlEncode($t06_article->Qty->getPlaceHolder()) ?>" value="<?php echo $t06_article->Qty->EditValue ?>"<?php echo $t06_article->Qty->EditAttributes() ?>>
 </span>
 <?php } ?>
 <?php if ($t06_article->RowType == EW_ROWTYPE_VIEW) { // View record ?>

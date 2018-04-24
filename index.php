@@ -329,6 +329,8 @@ class cdefault {
 			$this->Page_Terminate("t11_juallist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't12_jualdetail'))
 			$this->Page_Terminate("t12_jualdetaillist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't93_parameter'))
+			$this->Page_Terminate("t93_parameterlist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't94_home'))
 			$this->Page_Terminate("t94_homelist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't95_homedetail'))

@@ -15,6 +15,7 @@ $RootMenu->AddMenuItem(6, "mci_Setup", $Language->MenuPhrase("6", "MenuText"), "
 $RootMenu->AddMenuItem(10085, "mci_Home", $Language->MenuPhrase("10085", "MenuText"), "", 6, "", TRUE, FALSE, TRUE, "");
 $RootMenu->AddMenuItem(10036, "mi_t94_home", $Language->MenuPhrase("10036", "MenuText"), "t94_homelist.php", 10085, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t94_home'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(10037, "mi_t95_homedetail", $Language->MenuPhrase("10037", "MenuText"), "t95_homedetaillist.php", 10085, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t95_homedetail'), FALSE, FALSE, "");
+$RootMenu->AddMenuItem(10086, "mi_t93_parameter", $Language->MenuPhrase("10086", "MenuText"), "t93_parameterlist.php", 6, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t93_parameter'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(7, "mi_t01_company", $Language->MenuPhrase("7", "MenuText"), "t01_companylist.php", 6, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t01_company'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(8, "mi_t02_vendor", $Language->MenuPhrase("8", "MenuText"), "t02_vendorlist.php", 6, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t02_vendor'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(9, "mi_t03_customer", $Language->MenuPhrase("9", "MenuText"), "t03_customerlist.php", 6, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t03_customer'), FALSE, FALSE, "");

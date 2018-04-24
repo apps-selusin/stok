@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 23, 2018 at 08:35 PM
+-- Generation Time: Apr 24, 2018 at 07:03 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -153,7 +153,7 @@ CREATE TABLE `t06_article` (
 --
 
 INSERT INTO `t06_article` (`id`, `SubGroupID`, `Kode`, `Nama`, `Qty`, `SatuanID`, `Harga`, `HargaJual`) VALUES
-(1, 1, '5501001', 'MEAT Has Luar Lokal', 164.25, 1, 100000.00, 125000.00);
+(1, 1, '5501001', 'MEAT Has Luar Lokal', 100.00, 1, 100000.00, 125000.00);
 
 -- --------------------------------------------------------
 
@@ -193,6 +193,13 @@ CREATE TABLE `t08_beli` (
   `SubTotal` float(15,2) NOT NULL DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `t08_beli`
+--
+
+INSERT INTO `t08_beli` (`id`, `TglPO`, `NoPO`, `VendorID`, `ArticleID`, `Harga`, `Qty`, `SubTotal`) VALUES
+(3, '2018-04-24', 'PO201804240001', 1, 1, 100000.00, 3.50, 350000.00);
+
 -- --------------------------------------------------------
 
 --
@@ -206,6 +213,13 @@ CREATE TABLE `t09_hutang` (
   `JumlahHutang` float(15,2) NOT NULL DEFAULT '0.00',
   `JumlahBayar` float(15,2) NOT NULL DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `t09_hutang`
+--
+
+INSERT INTO `t09_hutang` (`id`, `NoHutang`, `BeliID`, `JumlahHutang`, `JumlahBayar`) VALUES
+(2, 'HT000001', 3, 350000.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -265,6 +279,25 @@ CREATE TABLE `t12_jualdetail` (
   `Qty` float(15,2) NOT NULL DEFAULT '0.00',
   `SubTotal` float(15,2) NOT NULL DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `t93_parameter`
+--
+
+CREATE TABLE `t93_parameter` (
+  `id` int(11) NOT NULL,
+  `Nama` varchar(50) NOT NULL,
+  `Nilai` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `t93_parameter`
+--
+
+INSERT INTO `t93_parameter` (`id`, `Nama`, `Nilai`) VALUES
+(1, 'Periode', '01-04-2018');
 
 -- --------------------------------------------------------
 
@@ -364,7 +397,7 @@ INSERT INTO `t95_homedetail` (`home_id`, `tgl`, `kat`, `no_jdl`, `jdl`, `no_ket`
 (53, '2018-04-23', '5log', 2, 'hapus trigger di database', 3, 'CREATE TRIGGER `tg_updateqty_beli` AFTER INSERT ON `t08_beli`\r\n FOR EACH ROW BEGIN\r\nupdate t06_article set qty = qty + new.qty where id = new.articleid;\r\nEND', NULL),
 (54, '2018-04-23', '5log', 2, 'hapus trigger di database', 4, 'CREATE TRIGGER `tg_updateqty_jual` AFTER INSERT ON `t12_jualdetail`\r\n FOR EACH ROW BEGIN\r\nupdate t06_article set qty = qty - new.qty where id = new.articleid;\r\nEND', NULL),
 (55, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 1, 'siapkan tabel mutasi, auto insert dari tabel article (master barang), auto insert dari tabel beli, dan auto insert dari tabel jual', NULL),
-(56, '2018-04-23', '5log', 4, 'siapkan tanggal periode aktif', NULL, NULL, NULL),
+(56, '2018-04-23', '5log', 4, 'siapkan tanggal periode aktif', NULL, NULL, 1),
 (57, '2018-04-23', '5log', 2, 'hapus trigger di database', 1, NULL, 1),
 (58, '2018-04-23', '4todo', 1, 'data tabel <b>beli</b> vs data tabel <b>hutang</b>', 1, NULL, 1),
 (59, '2018-04-23', '5log', 1, 'update after-proses di tabel beli', 2, 'update after-proses di tabel beli agar setiap perubahan data di tabel beli juga berpengaruh di tabel hutang', NULL);
@@ -1310,7 +1343,22 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (820, '2018-04-24 01:20:03', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '49', NULL, '1'),
 (821, '2018-04-24 01:20:37', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '58', '1', NULL),
 (822, '2018-04-24 01:21:03', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '58', NULL, '1'),
-(823, '2018-04-24 01:21:20', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '49', '1', NULL);
+(823, '2018-04-24 01:21:20', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '49', '1', NULL),
+(824, '2018-04-24 11:02:42', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(825, '2018-04-24 11:21:46', '/stok/t93_parameterlist.php', '1', 'A', 't93_parameter', 'Nama', '1', '', 'Periode'),
+(826, '2018-04-24 11:21:46', '/stok/t93_parameterlist.php', '1', 'A', 't93_parameter', 'Nilai', '1', '', '01-04-2018'),
+(827, '2018-04-24 11:21:46', '/stok/t93_parameterlist.php', '1', 'A', 't93_parameter', 'id', '1', '', '1'),
+(828, '2018-04-24 11:23:53', '/stok/t06_articlelist.php', '1', 'U', 't06_article', 'Qty', '1', '164.25', '100'),
+(829, '2018-04-24 11:24:31', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '3', '', '2018-04-24'),
+(830, '2018-04-24 11:24:31', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '3', '', 'PO201804240001'),
+(831, '2018-04-24 11:24:31', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '3', '', '1'),
+(832, '2018-04-24 11:24:31', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '3', '', '1'),
+(833, '2018-04-24 11:24:31', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '3', '', '100000.00'),
+(834, '2018-04-24 11:24:31', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '3', '', '3.5'),
+(835, '2018-04-24 11:24:31', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '3', '', '1'),
+(836, '2018-04-24 11:24:31', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '3', '', '350000'),
+(837, '2018-04-24 11:24:31', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '3', '', '3'),
+(838, '2018-04-24 11:25:35', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '56', NULL, '1');
 
 -- --------------------------------------------------------
 
@@ -1488,6 +1536,12 @@ ALTER TABLE `t12_jualdetail`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `t93_parameter`
+--
+ALTER TABLE `t93_parameter`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `t94_home`
 --
 ALTER TABLE `t94_home`
@@ -1574,13 +1628,13 @@ ALTER TABLE `t07_satuan`
 -- AUTO_INCREMENT for table `t08_beli`
 --
 ALTER TABLE `t08_beli`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `t09_hutang`
 --
 ALTER TABLE `t09_hutang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `t10_hutangdetail`
@@ -1599,6 +1653,12 @@ ALTER TABLE `t11_jual`
 --
 ALTER TABLE `t12_jualdetail`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `t93_parameter`
+--
+ALTER TABLE `t93_parameter`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `t94_home`
@@ -1622,7 +1682,7 @@ ALTER TABLE `t96_employees`
 -- AUTO_INCREMENT for table `t99_audittrail`
 --
 ALTER TABLE `t99_audittrail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=824;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=839;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
