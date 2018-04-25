@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 25, 2018 at 08:19 AM
+-- Generation Time: Apr 25, 2018 at 11:26 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -153,7 +153,12 @@ CREATE TABLE `t06_article` (
 --
 
 INSERT INTO `t06_article` (`id`, `SubGroupID`, `Kode`, `Nama`, `Qty`, `SatuanID`, `Harga`, `HargaJual`) VALUES
-(1, 1, '5501001', 'Meat 1', 20.00, 1, 95000.00, 125000.00);
+(1, 1, '5501001', 'Meat 1', 19.00, 1, 95000.00, 125000.00),
+(2, 4, '6601001', 'MW 1', 24.00, 3, 14500.00, 18000.00),
+(3, 5, '5504001', 'Apel', 4.00, 1, 37500.00, 50000.00),
+(4, 8, '5507001', 'Veg 1', 13.00, 1, 1500.00, 7500.00),
+(5, 10, '6602001', 'Heineken 1', 5.00, 3, 75000.00, 100000.00),
+(6, 13, '6605001', 'SYRP 1', 3.00, 3, 75000.00, 200000.00);
 
 -- --------------------------------------------------------
 
@@ -198,7 +203,9 @@ CREATE TABLE `t08_beli` (
 --
 
 INSERT INTO `t08_beli` (`id`, `TglPO`, `NoPO`, `VendorID`, `ArticleID`, `Harga`, `Qty`, `SubTotal`) VALUES
-(2, '2018-04-25', 'PO201804250002', 2, 1, 95000.00, 6.20, 589000.00);
+(2, '2018-04-25', 'PO201804250002', 2, 1, 95000.00, 6.20, 589000.00),
+(3, '2018-04-25', 'PO201804250003', 2, 6, 75000.00, 1.00, 75000.00),
+(4, '2018-04-25', 'PO201804250004', 2, 6, 75000.00, 7.00, 525000.00);
 
 -- --------------------------------------------------------
 
@@ -219,7 +226,9 @@ CREATE TABLE `t09_hutang` (
 --
 
 INSERT INTO `t09_hutang` (`id`, `NoHutang`, `BeliID`, `JumlahHutang`, `JumlahBayar`) VALUES
-(2, 'HT000002', 2, 589000.00, 0.00);
+(2, 'HT000002', 2, 589000.00, 0.00),
+(3, 'HT000003', 3, 75000.00, 0.00),
+(4, 'HT000004', 4, 525000.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -255,7 +264,8 @@ CREATE TABLE `t11_jual` (
 --
 
 INSERT INTO `t11_jual` (`id`, `TglSO`, `NoSO`, `CustomerID`, `CustomerPO`, `Total`) VALUES
-(1, '2018-04-25', 'SO201804250001', 2, 'xxx', 625000.00);
+(1, '2018-04-25', 'SO201804250001', 2, 'xxx', 625000.00),
+(2, '2018-04-25', 'SO201804250002', 2, 'xxx', 1000000.00);
 
 -- --------------------------------------------------------
 
@@ -292,7 +302,8 @@ CREATE TABLE `t12_jualdetail` (
 --
 
 INSERT INTO `t12_jualdetail` (`id`, `JualID`, `ArticleID`, `HargaJual`, `Qty`, `SubTotal`) VALUES
-(2, 1, 1, 125000.00, 5.00, 625000.00);
+(2, 1, 1, 125000.00, 5.00, 625000.00),
+(3, 2, 6, 200000.00, 5.00, 1000000.00);
 
 -- --------------------------------------------------------
 
@@ -322,9 +333,17 @@ CREATE TABLE `t13_mutasi` (
 --
 
 INSERT INTO `t13_mutasi` (`id`, `TabelID`, `Url`, `ArticleID`, `NoUrut`, `Tgl`, `Jam`, `Keterangan`, `MasukQty`, `MasukHarga`, `KeluarQty`, `KeluarHarga`, `SaldoQty`, `SaldoHarga`) VALUES
-(1, 1, 't06_articleview.php?showdetail=&id=1', 1, 0, '2018-04-01', '00:00:00', 'Stok Awal', 20.00, 95000.00, 0.00, 0.00, 20.00, 1900000.00),
-(3, 2, 't08_beliview.php?showdetail=&id=2', 1, 2, '2018-04-25', '01:49:00', 'Beli', 6.20, 95000.00, 0.00, 0.00, 6.20, 589000.00),
-(5, 2, 't12_jualdetailview.php?showdetail=&id=2', 1, 4, '2018-04-25', '13:15:00', 'Jual', 0.00, 0.00, 5.00, 0.00, -5.00, 0.00);
+(1, 1, 't06_articleview.php?showdetail=&id=1', 1, 0, '2018-04-01', '00:00:00', 'Stok Awal', 19.00, 95000.00, 0.00, 0.00, 19.00, 1805000.00),
+(3, 2, 't08_beliview.php?showdetail=&id=2', 1, 2, '2018-04-25', '01:49:00', 'Beli', 6.20, 95000.00, 0.00, 0.00, 25.20, 589000.00),
+(5, 2, 't12_jualdetailview.php?showdetail=&id=2', 1, 4, '2018-04-25', '13:15:00', 'Jual', 0.00, 0.00, 5.00, 0.00, 20.20, 0.00),
+(6, 2, 't06_articleview.php?showdetail=&id=2', 2, 0, '2018-04-01', '00:00:00', 'Stok Awal', 24.00, 14500.00, 0.00, 0.00, 24.00, 348000.00),
+(7, 3, 't06_articleview.php?showdetail=&id=3', 3, 0, '2018-04-01', '00:00:00', 'Stok Awal', 4.00, 37500.00, 0.00, 0.00, 4.00, 150000.00),
+(8, 4, 't06_articleview.php?showdetail=&id=4', 4, 0, '2018-04-01', '00:00:00', 'Stok Awal', 13.00, 1500.00, 0.00, 0.00, 13.00, 19500.00),
+(9, 5, 't06_articleview.php?showdetail=&id=5', 5, 0, '2018-04-01', '00:00:00', 'Stok Awal', 5.00, 75000.00, 0.00, 0.00, 5.00, 375000.00),
+(10, 6, 't06_articleview.php?showdetail=&id=6', 6, 0, '2018-04-01', '00:00:00', 'Stok Awal', 3.00, 75000.00, 0.00, 0.00, 3.00, 225000.00),
+(11, 3, 't08_beliview.php?showdetail=&id=3', 6, 1, '2018-04-25', '15:12:00', 'Beli', 1.00, 75000.00, 0.00, 0.00, 4.00, 75000.00),
+(12, 4, 't08_beliview.php?showdetail=&id=4', 6, 2, '2018-04-25', '15:13:00', 'Beli', 7.00, 75000.00, 0.00, 0.00, 11.00, 525000.00),
+(13, 3, 't12_jualdetailview.php?showdetail=&id=3', 6, 3, '2018-04-25', '15:18:00', 'Jual', 0.00, 0.00, 5.00, 0.00, 6.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -1602,7 +1621,87 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (1028, '2018-04-25 13:17:19', '/stok/t12_jualdetaildelete.php', '1', 'D', 't12_jualdetail', 'SatuanID', '1', '1', ''),
 (1029, '2018-04-25 13:17:19', '/stok/t12_jualdetaildelete.php', '1', '*** Batch delete successful ***', 't12_jualdetail', '', '', '', ''),
 (1030, '2018-04-25 13:18:37', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '62', 'auto insert dari tabel jual', 'auto insert - update - delete dari tabel jual'),
-(1031, '2018-04-25 13:18:37', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '62', NULL, '1');
+(1031, '2018-04-25 13:18:37', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '62', NULL, '1'),
+(1032, '2018-04-25 13:49:39', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(1033, '2018-04-25 14:52:09', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'MainGroupID', '2', '', '2'),
+(1034, '2018-04-25 14:52:09', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SubGroupID', '2', '', '4'),
+(1035, '2018-04-25 14:52:09', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Kode', '2', '', '6601001'),
+(1036, '2018-04-25 14:52:09', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Nama', '2', '', 'MW 1'),
+(1037, '2018-04-25 14:52:09', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Qty', '2', '', '24'),
+(1038, '2018-04-25 14:52:09', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SatuanID', '2', '', '3'),
+(1039, '2018-04-25 14:52:09', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Harga', '2', '', '14500'),
+(1040, '2018-04-25 14:52:09', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'HargaJual', '2', '', '18000'),
+(1041, '2018-04-25 14:52:09', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'id', '2', '', '2'),
+(1042, '2018-04-25 14:54:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'MainGroupID', '3', '', '1'),
+(1043, '2018-04-25 14:54:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SubGroupID', '3', '', '5'),
+(1044, '2018-04-25 14:54:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Kode', '3', '', '5504001'),
+(1045, '2018-04-25 14:54:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Nama', '3', '', 'Apel'),
+(1046, '2018-04-25 14:54:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Qty', '3', '', '4'),
+(1047, '2018-04-25 14:54:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SatuanID', '3', '', '1'),
+(1048, '2018-04-25 14:54:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Harga', '3', '', '37500'),
+(1049, '2018-04-25 14:54:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'HargaJual', '3', '', '50000'),
+(1050, '2018-04-25 14:54:21', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'id', '3', '', '3'),
+(1051, '2018-04-25 14:57:58', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'MainGroupID', '4', '', '1'),
+(1052, '2018-04-25 14:57:58', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SubGroupID', '4', '', '8'),
+(1053, '2018-04-25 14:57:58', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Kode', '4', '', '5507001'),
+(1054, '2018-04-25 14:57:58', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Nama', '4', '', 'Veg 1'),
+(1055, '2018-04-25 14:57:58', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Qty', '4', '', '13'),
+(1056, '2018-04-25 14:57:58', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SatuanID', '4', '', '1'),
+(1057, '2018-04-25 14:57:58', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Harga', '4', '', '1500'),
+(1058, '2018-04-25 14:57:58', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'HargaJual', '4', '', '7500'),
+(1059, '2018-04-25 14:57:58', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'id', '4', '', '4'),
+(1060, '2018-04-25 15:06:39', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'MainGroupID', '5', '', '2'),
+(1061, '2018-04-25 15:06:39', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SubGroupID', '5', '', '10'),
+(1062, '2018-04-25 15:06:39', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Kode', '5', '', '6602001'),
+(1063, '2018-04-25 15:06:39', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Nama', '5', '', 'Heineken 1'),
+(1064, '2018-04-25 15:06:39', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Qty', '5', '', '5'),
+(1065, '2018-04-25 15:06:39', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SatuanID', '5', '', '3'),
+(1066, '2018-04-25 15:06:39', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Harga', '5', '', '75000'),
+(1067, '2018-04-25 15:06:39', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'HargaJual', '5', '', '100000'),
+(1068, '2018-04-25 15:06:39', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'id', '5', '', '5'),
+(1069, '2018-04-25 15:11:54', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'MainGroupID', '6', '', '2'),
+(1070, '2018-04-25 15:11:54', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SubGroupID', '6', '', '13'),
+(1071, '2018-04-25 15:11:54', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Kode', '6', '', '6605001'),
+(1072, '2018-04-25 15:11:54', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Nama', '6', '', 'SYRP 1'),
+(1073, '2018-04-25 15:11:54', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Qty', '6', '', '3'),
+(1074, '2018-04-25 15:11:54', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'SatuanID', '6', '', '3'),
+(1075, '2018-04-25 15:11:54', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'Harga', '6', '', '75000'),
+(1076, '2018-04-25 15:11:54', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'HargaJual', '6', '', '200000'),
+(1077, '2018-04-25 15:11:54', '/stok/t06_articlelist.php', '1', 'A', 't06_article', 'id', '6', '', '6'),
+(1078, '2018-04-25 15:12:50', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '3', '', '2018-04-25'),
+(1079, '2018-04-25 15:12:50', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '3', '', 'PO201804250003'),
+(1080, '2018-04-25 15:12:50', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '3', '', '2'),
+(1081, '2018-04-25 15:12:50', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '3', '', '6'),
+(1082, '2018-04-25 15:12:50', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '3', '', '75000.00'),
+(1083, '2018-04-25 15:12:50', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '3', '', '1'),
+(1084, '2018-04-25 15:12:50', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '3', '', '3'),
+(1085, '2018-04-25 15:12:50', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '3', '', '75000'),
+(1086, '2018-04-25 15:12:50', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '3', '', '3'),
+(1087, '2018-04-25 15:13:48', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'TglPO', '4', '', '2018-04-25'),
+(1088, '2018-04-25 15:13:48', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'NoPO', '4', '', 'PO201804250004'),
+(1089, '2018-04-25 15:13:48', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'VendorID', '4', '', '2'),
+(1090, '2018-04-25 15:13:48', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'ArticleID', '4', '', '6'),
+(1091, '2018-04-25 15:13:48', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Harga', '4', '', '75000.00'),
+(1092, '2018-04-25 15:13:48', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'Qty', '4', '', '7'),
+(1093, '2018-04-25 15:13:48', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SatuanID', '4', '', '3'),
+(1094, '2018-04-25 15:13:48', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'SubTotal', '4', '', '525000'),
+(1095, '2018-04-25 15:13:48', '/stok/t08_belilist.php', '1', 'A', 't08_beli', 'id', '4', '', '4'),
+(1096, '2018-04-25 15:14:47', '/stok/t06_articlelist.php', '1', 'U', 't06_article', 'Qty', '1', '20.00', '19'),
+(1097, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'TglSO', '2', '', '2018-04-25'),
+(1098, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'NoSO', '2', '', 'SO201804250002'),
+(1099, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'CustomerID', '2', '', '2'),
+(1100, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'CustomerPO', '2', '', 'xxx'),
+(1101, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'Total', '2', '', '0'),
+(1102, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'id', '2', '', '2'),
+(1103, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', '*** Batch insert begin ***', 't12_jualdetail', '', '', '', ''),
+(1104, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'JualID', '3', '', '2'),
+(1105, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'ArticleID', '3', '', '6'),
+(1106, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'HargaJual', '3', '', '200000.00'),
+(1107, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'Qty', '3', '', '5'),
+(1108, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SatuanID', '3', '', '3'),
+(1109, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SubTotal', '3', '', '1000000'),
+(1110, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'id', '3', '', '3'),
+(1111, '2018-04-25 15:18:53', '/stok/t11_jualadd.php', '1', '*** Batch insert successful ***', 't12_jualdetail', '', '', '', '');
 
 -- --------------------------------------------------------
 
@@ -1866,7 +1965,7 @@ ALTER TABLE `t05_subgroup`
 -- AUTO_INCREMENT for table `t06_article`
 --
 ALTER TABLE `t06_article`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `t07_satuan`
@@ -1878,13 +1977,13 @@ ALTER TABLE `t07_satuan`
 -- AUTO_INCREMENT for table `t08_beli`
 --
 ALTER TABLE `t08_beli`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `t09_hutang`
 --
 ALTER TABLE `t09_hutang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `t10_hutangdetail`
@@ -1896,19 +1995,19 @@ ALTER TABLE `t10_hutangdetail`
 -- AUTO_INCREMENT for table `t11_jual`
 --
 ALTER TABLE `t11_jual`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `t12_jualdetail`
 --
 ALTER TABLE `t12_jualdetail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `t13_mutasi`
 --
 ALTER TABLE `t13_mutasi`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `t93_parameter`
@@ -1938,7 +2037,7 @@ ALTER TABLE `t96_employees`
 -- AUTO_INCREMENT for table `t99_audittrail`
 --
 ALTER TABLE `t99_audittrail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1032;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1112;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

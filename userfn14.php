@@ -18,13 +18,6 @@ function Page_Unloaded() {
 
 	//echo "Page Unloaded";
 }
-$_SESSION["Periode"] = f_GetParameter('Periode');
-
-function f_GetParameter($mparam1) {
-	$q = "select Nilai from t93_parameter where Nama = '".$mparam1."'";
-	$mNilai = ew_ExecuteScalar($q);
-	return $mNilai;
-}
 
 function f_GetNextNoPO() {
 	$m_NextNoPO = "";
@@ -118,5 +111,25 @@ function f_GetNextNoUrut($ArticleID) {
 		$m_NextNo = 1;
 	}
 	return $m_NextNo;
+}
+$_SESSION["Periode"] = f_GetParameter('Periode');
+
+function f_GetParameter($mparam1) {
+	$q = "select Nilai from t93_parameter where Nama = '".$mparam1."'";
+	$mNilai = ew_ExecuteScalar($q);
+	return $mNilai;
+}
+
+function f_UpdateSaldo($ArticleID) {
+	$q = "select * from t13_mutasi where ArticleID = ".$ArticleID." order by
+		Tgl, Jam, NoUrut";
+	$rs = Conn()->Execute($q);
+	$mSaldo = 0;
+	while (!$rs->EOF) {
+		$mSaldo += $rs->fields["MasukQty"] - $rs->fields["KeluarQty"];
+		$q = "update t13_mutasi set SaldoQty = ".$mSaldo." where id = ".$rs->fields["id"]."";
+		ew_Execute($q);
+		$rs->MoveNext();
+	}
 }
 ?>

@@ -1327,6 +1327,7 @@ class ct12_jualdetail extends cTable {
 			".-1 * $rsnew["Qty"]."
 			)";
 		ew_Execute($q);
+		f_UpdateSaldo($rsnew["ArticleID"]);
 	}
 
 	// Row Updating event
@@ -1355,6 +1356,7 @@ class ct12_jualdetail extends cTable {
 			Keterangan = 'Jual'
 			and TabelID = ".$rsold["id"]."";
 		ew_Execute($q);
+		f_UpdateSaldo($rsold["ArticleID"]);
 	}
 
 	// Row Update Conflict event
@@ -1425,6 +1427,7 @@ class ct12_jualdetail extends cTable {
 			Keterangan = 'Jual'
 			and TabelID = ".$rs["id"]."";
 		ew_Execute($q);
+		f_UpdateSaldo($rs["ArticleID"]);
 	}
 
 	// Email Sending event

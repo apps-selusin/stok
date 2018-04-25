@@ -1303,8 +1303,17 @@ class ct06_article extends cTable {
 		// tambah data otomatis ke tabel mutasi
 
 		$q = "insert into t13_mutasi (
-			TabelID, Url, ArticleID, NoUrut, Tgl, Jam,
-			Keterangan, MasukQty, MasukHarga, SaldoQty, SaldoHarga
+			TabelID,
+			Url,
+			ArticleID,
+			NoUrut,
+			Tgl,
+			Jam,
+			Keterangan,
+			MasukQty,
+			MasukHarga,
+			SaldoQty,
+			SaldoHarga
 			) values (
 			".$rsnew["id"].",
 			't06_articleview.php?showdetail=&id=".$rsnew["id"]."',
@@ -1319,6 +1328,7 @@ class ct06_article extends cTable {
 			".$rsnew["Qty"] * $rsnew["Harga"]."
 			)";
 		ew_Execute($q);
+		f_UpdateSaldo($rsnew["id"]);
 	}
 
 	// Row Updating event
@@ -1345,6 +1355,7 @@ class ct06_article extends cTable {
 			Keterangan = 'Stok Awal'
 			and TabelID = ".$rsold["id"]."";
 		ew_Execute($q);
+		f_UpdateSaldo($rsold["id"]);
 	}
 
 	// Row Update Conflict event
@@ -1405,6 +1416,7 @@ class ct06_article extends cTable {
 			Keterangan = 'Stok Awal'
 			and TabelID = ".$rs["id"]."";
 		ew_Execute($q);
+		f_UpdateSaldo($rs["id"]);
 	}
 
 	// Email Sending event

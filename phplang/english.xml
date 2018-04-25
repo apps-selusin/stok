@@ -618,20 +618,14 @@
   <project>
     <phrase id="bodytitle" value="STOK Apps." />
     <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
-    <menu id="10087">
-      <phrase id="menutext" value="Mutasi" />
+    <menu id="1">
+      <phrase id="menutext" value="Home" />
     </menu>
     <menu id="10034">
       <phrase id="menutext" value="v 04 jual" />
     </menu>
-    <menu id="1">
-      <phrase id="menutext" value="Home" />
-    </menu>
     <menu id="19">
       <phrase id="menutext" value="Pembelian" />
-    </menu>
-    <menu id="10035">
-      <phrase id="menutext" value="t 11 jual old" />
     </menu>
     <menu id="10021">
       <phrase id="menutext" value="Hutang" />
@@ -639,11 +633,17 @@
     <menu id="10027">
       <phrase id="menutext" value="Penjualan" />
     </menu>
+    <menu id="10035">
+      <phrase id="menutext" value="t 11 jual old" />
+    </menu>
     <menu id="10013">
       <phrase id="menutext" value="Laporan" />
     </menu>
     <menu id="10017">
       <phrase id="menutext" value="Stok" />
+    </menu>
+    <menu id="10030">
+      <phrase id="menutext" value="Mutasi" />
     </menu>
     <menu id="10014">
       <phrase id="menutext" value="Pembelian" />
@@ -708,26 +708,41 @@
     <menu id="10024">
       <phrase id="menutext" value="v 01 beli" />
     </menu>
+    <menu id="10088">
+      <phrase id="menutext" value="t 11 jual" />
+    </menu>
+    <menu id="10089">
+      <phrase id="menutext" value="t 09 hutang" />
+    </menu>
+    <menu id="10090">
+      <phrase id="menutext" value="v 01 beli" />
+    </menu>
+    <menu id="10023">
+      <phrase id="menutext" value="v 04 jual" />
+    </menu>
     <menu id="10025">
-      <phrase id="menutext" value="v 02 stok" />
+      <phrase id="menutext" value="t 11 jual old" />
     </menu>
     <menu id="10026">
-      <phrase id="menutext" value="v 03 hutang" />
+      <phrase id="menutext" value="t 94 home" />
+    </menu>
+    <menu id="10087">
+      <phrase id="menutext" value="t 95 homedetail" />
     </menu>
     <menu id="10028">
-      <phrase id="menutext" value="Penjualan Detail" />
+      <phrase id="menutext" value="t 93 parameter" />
+    </menu>
+    <menu id="10029">
+      <phrase id="menutext" value="t 13 mutasi" />
     </menu>
     <menu id="10022">
-      <phrase id="menutext" value="Hutang Detail" />
+      <phrase id="menutext" value="t 12 jualdetail" />
     </menu>
     <menu id="10018">
       <phrase id="menutext" value="t 10 hutangdetail" />
     </menu>
     <menu id="10019">
       <phrase id="menutext" value="Hutang" />
-    </menu>
-    <menu id="10023">
-      <phrase id="menutext" value="v 01 beli" />
     </menu>
     <menu id="10015">
       <phrase id="menutext" value="v 02 stok" />
@@ -767,18 +782,6 @@
     </menu>
     <menu id="10012">
       <phrase id="menutext" value="t 99 audittrail" />
-    </menu>
-    <menu id="10029">
-      <phrase id="menutext" value="t 11 jual" />
-    </menu>
-    <menu id="10030">
-      <phrase id="menutext" value="t 12 jualdetail" />
-    </menu>
-    <menu id="10031">
-      <phrase id="menutext" value="v 04 jual" />
-    </menu>
-    <menu id="10033">
-      <phrase id="menutext" value="t 09 hutang" />
     </menu>
     <table id="cf01_home_php">
       <phrase id="tblcaption" value="Home" />
@@ -1048,6 +1051,12 @@
       </field>
       <field id="saldoharga">
         <phrase id="fldcaption" value="Saldo Harga" />
+      </field>
+      <field id="jam">
+        <phrase id="fldcaption" value="Jam" />
+      </field>
+      <field id="tabelid">
+        <phrase id="fldcaption" value="Tabel ID" />
       </field>
     </table>
     <table id="t93_parameter">
