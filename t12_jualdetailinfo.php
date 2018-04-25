@@ -1300,6 +1300,33 @@ class ct12_jualdetail extends cTable {
 
 		$tot_det = ew_ExecuteScalar("SELECT SUM(subtotal) FROM t12_jualdetail WHERE jualid = ".$rsnew["JualID"]."");
 		ew_Execute("UPDATE t11_jual SET total = ".$tot_det." WHERE id = ".$rsnew["JualID"]."");
+
+		// cari nomor urut terbaru di tabel mutasi
+		$NoUrut = f_GetNextNoUrut($rsnew["ArticleID"]);
+
+		// tambah data otomatis ke tabel mutasi
+		$q = "insert into t13_mutasi (
+			TabelID,
+			Url,
+			ArticleID,
+			NoUrut,
+			Tgl,
+			Jam,
+			Keterangan,
+			KeluarQty,
+			SaldoQty
+			) values (
+			".$rsnew["id"].",
+			't12_jualdetailview.php?showdetail=&id=".$rsnew["id"]."',
+			".$rsnew["ArticleID"].",
+			".$NoUrut.",
+			'".date("Y-m-d")."',
+			'".date("H:i")."',
+			'Jual',
+			".$rsnew["Qty"].",
+			".-1 * $rsnew["Qty"]."
+			)";
+		ew_Execute($q);
 	}
 
 	// Row Updating event
@@ -1319,6 +1346,15 @@ class ct12_jualdetail extends cTable {
 
 		$tot_det = ew_ExecuteScalar("SELECT SUM(subtotal) FROM t12_jualdetail WHERE jualid = ".$rsold["JualID"]."");
 		ew_Execute("UPDATE t11_jual SET total = ".$tot_det." WHERE id = ".$rsold["JualID"]."");
+
+		// update data otomatis di tabel mutasi berdasarkan keterangan dan tabelid
+		$q = "update t13_mutasi set
+			KeluarQty = ".$rsnew["Qty"].",
+			SaldoQty = ".-1 * $rsnew["Qty"]."
+			where
+			Keterangan = 'Jual'
+			and TabelID = ".$rsold["id"]."";
+		ew_Execute($q);
 	}
 
 	// Row Update Conflict event
@@ -1383,6 +1419,12 @@ class ct12_jualdetail extends cTable {
 		else {
 			ew_Execute("UPDATE t11_jual SET total = 0 WHERE id = ".$rs["JualID"]."");
 		}
+
+		// delete data otomatis di tabel mutasi berdasarkan keterangan dan tabelid
+		$q = "delete from t13_mutasi where
+			Keterangan = 'Jual'
+			and TabelID = ".$rs["id"]."";
+		ew_Execute($q);
 	}
 
 	// Email Sending event

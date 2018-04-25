@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 24, 2018 at 08:57 PM
+-- Generation Time: Apr 25, 2018 at 08:19 AM
 -- Server version: 5.6.14
 -- PHP Version: 5.5.6
 
@@ -250,6 +250,13 @@ CREATE TABLE `t11_jual` (
   `Total` float(15,2) NOT NULL DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `t11_jual`
+--
+
+INSERT INTO `t11_jual` (`id`, `TglSO`, `NoSO`, `CustomerID`, `CustomerPO`, `Total`) VALUES
+(1, '2018-04-25', 'SO201804250001', 2, 'xxx', 625000.00);
+
 -- --------------------------------------------------------
 
 --
@@ -280,6 +287,13 @@ CREATE TABLE `t12_jualdetail` (
   `SubTotal` float(15,2) NOT NULL DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `t12_jualdetail`
+--
+
+INSERT INTO `t12_jualdetail` (`id`, `JualID`, `ArticleID`, `HargaJual`, `Qty`, `SubTotal`) VALUES
+(2, 1, 1, 125000.00, 5.00, 625000.00);
+
 -- --------------------------------------------------------
 
 --
@@ -309,7 +323,8 @@ CREATE TABLE `t13_mutasi` (
 
 INSERT INTO `t13_mutasi` (`id`, `TabelID`, `Url`, `ArticleID`, `NoUrut`, `Tgl`, `Jam`, `Keterangan`, `MasukQty`, `MasukHarga`, `KeluarQty`, `KeluarHarga`, `SaldoQty`, `SaldoHarga`) VALUES
 (1, 1, 't06_articleview.php?showdetail=&id=1', 1, 0, '2018-04-01', '00:00:00', 'Stok Awal', 20.00, 95000.00, 0.00, 0.00, 20.00, 1900000.00),
-(3, 2, 't08_beliview.php?showdetail=&id=2', 1, 2, '2018-04-25', '01:49:00', 'Beli', 6.20, 95000.00, 0.00, 0.00, 6.20, 589000.00);
+(3, 2, 't08_beliview.php?showdetail=&id=2', 1, 2, '2018-04-25', '01:49:00', 'Beli', 6.20, 95000.00, 0.00, 0.00, 6.20, 589000.00),
+(5, 2, 't12_jualdetailview.php?showdetail=&id=2', 1, 4, '2018-04-25', '13:15:00', 'Jual', 0.00, 0.00, 5.00, 0.00, -5.00, 0.00);
 
 -- --------------------------------------------------------
 
@@ -434,7 +449,7 @@ INSERT INTO `t95_homedetail` (`home_id`, `tgl`, `kat`, `no_jdl`, `jdl`, `no_ket`
 (59, '2018-04-23', '5log', 1, 'update after-proses di tabel beli', 2, 'update after-proses di tabel beli agar setiap perubahan data di tabel beli juga berpengaruh di tabel hutang', NULL),
 (60, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 2, 'auto insert - update - delete dari tabel article (master barang)', 1),
 (61, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 3, 'auto insert - update - delete dari tabel beli', 1),
-(62, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 4, 'auto insert dari tabel jual', NULL),
+(62, '2018-04-23', '5log', 3, 'siapkan tabel mutasi', 4, 'auto insert - update - delete dari tabel jual', 1),
 (63, '2018-04-25', '5log', 1, 'siapkan laporan mutasi', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
@@ -1534,7 +1549,60 @@ INSERT INTO `t99_audittrail` (`id`, `datetime`, `script`, `user`, `action`, `tab
 (975, '2018-04-25 01:56:48', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'no_ket', '63', '', NULL),
 (976, '2018-04-25 01:56:48', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'ket', '63', '', NULL),
 (977, '2018-04-25 01:56:48', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'done', '63', '', NULL),
-(978, '2018-04-25 01:56:48', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '63', '', '63');
+(978, '2018-04-25 01:56:48', '/stok/t95_homedetaillist.php', '1', 'A', 't95_homedetail', 'home_id', '63', '', '63'),
+(979, '2018-04-25 12:48:40', '/stok/login.php', 'admin', 'login', '::1', '', '', '', ''),
+(980, '2018-04-25 13:03:23', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'TglSO', '1', '', '2018-04-25'),
+(981, '2018-04-25 13:03:23', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'NoSO', '1', '', 'SO201804250001'),
+(982, '2018-04-25 13:03:23', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'CustomerID', '1', '', '1'),
+(983, '2018-04-25 13:03:23', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'CustomerPO', '1', '', 'PO99'),
+(984, '2018-04-25 13:03:23', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'Total', '1', '', '0'),
+(985, '2018-04-25 13:03:23', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'id', '1', '', '1'),
+(986, '2018-04-25 13:03:24', '/stok/t11_jualadd.php', '1', '*** Batch insert begin ***', 't12_jualdetail', '', '', '', ''),
+(987, '2018-04-25 13:03:24', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'JualID', '1', '', '1'),
+(988, '2018-04-25 13:03:24', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'ArticleID', '1', '', '1'),
+(989, '2018-04-25 13:03:24', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'HargaJual', '1', '', '125000.00'),
+(990, '2018-04-25 13:03:24', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'Qty', '1', '', '3'),
+(991, '2018-04-25 13:03:24', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SatuanID', '1', '', '1'),
+(992, '2018-04-25 13:03:24', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SubTotal', '1', '', '375000'),
+(993, '2018-04-25 13:03:24', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'id', '1', '', '1'),
+(994, '2018-04-25 13:03:24', '/stok/t11_jualadd.php', '1', '*** Batch insert successful ***', 't12_jualdetail', '', '', '', ''),
+(995, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'TglSO', '1', '', '2018-04-25'),
+(996, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'NoSO', '1', '', 'SO201804250001'),
+(997, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'CustomerID', '1', '', '2'),
+(998, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'CustomerPO', '1', '', 'xxx'),
+(999, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'Total', '1', '', '0'),
+(1000, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', 'A', 't11_jual', 'id', '1', '', '1'),
+(1001, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', '*** Batch insert begin ***', 't12_jualdetail', '', '', '', ''),
+(1002, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'JualID', '1', '', '1'),
+(1003, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'ArticleID', '1', '', '1'),
+(1004, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'HargaJual', '1', '', '125000.00'),
+(1005, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'Qty', '1', '', '4'),
+(1006, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SatuanID', '1', '', '1'),
+(1007, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'SubTotal', '1', '', '500000'),
+(1008, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', 'A', 't12_jualdetail', 'id', '1', '', '1'),
+(1009, '2018-04-25 13:13:40', '/stok/t11_jualadd.php', '1', '*** Batch insert successful ***', 't12_jualdetail', '', '', '', ''),
+(1010, '2018-04-25 13:15:10', '/stok/t12_jualdetailedit.php', '1', 'U', 't12_jualdetail', 'Qty', '1', '4.00', '4.5'),
+(1011, '2018-04-25 13:15:10', '/stok/t12_jualdetailedit.php', '1', 'U', 't12_jualdetail', 'SubTotal', '1', '500000.00', '562500'),
+(1012, '2018-04-25 13:15:36', '/stok/t12_jualdetailadd.php', '1', 'A', 't12_jualdetail', 'JualID', '2', '', '1'),
+(1013, '2018-04-25 13:15:36', '/stok/t12_jualdetailadd.php', '1', 'A', 't12_jualdetail', 'ArticleID', '2', '', '1'),
+(1014, '2018-04-25 13:15:36', '/stok/t12_jualdetailadd.php', '1', 'A', 't12_jualdetail', 'HargaJual', '2', '', '125000.00'),
+(1015, '2018-04-25 13:15:36', '/stok/t12_jualdetailadd.php', '1', 'A', 't12_jualdetail', 'Qty', '2', '', '5'),
+(1016, '2018-04-25 13:15:36', '/stok/t12_jualdetailadd.php', '1', 'A', 't12_jualdetail', 'SatuanID', '2', '', '1'),
+(1017, '2018-04-25 13:15:36', '/stok/t12_jualdetailadd.php', '1', 'A', 't12_jualdetail', 'SubTotal', '2', '', '625000'),
+(1018, '2018-04-25 13:15:36', '/stok/t12_jualdetailadd.php', '1', 'A', 't12_jualdetail', 'id', '2', '', '2'),
+(1019, '2018-04-25 13:16:44', '/stok/t12_jualdetailedit.php', '1', 'U', 't12_jualdetail', 'Qty', '1', '4.50', '4.75'),
+(1020, '2018-04-25 13:16:44', '/stok/t12_jualdetailedit.php', '1', 'U', 't12_jualdetail', 'SubTotal', '1', '562500.00', '593750'),
+(1021, '2018-04-25 13:17:18', '/stok/t12_jualdetaildelete.php', '1', '*** Batch delete begin ***', 't12_jualdetail', '', '', '', ''),
+(1022, '2018-04-25 13:17:19', '/stok/t12_jualdetaildelete.php', '1', 'D', 't12_jualdetail', 'id', '1', '1', ''),
+(1023, '2018-04-25 13:17:19', '/stok/t12_jualdetaildelete.php', '1', 'D', 't12_jualdetail', 'JualID', '1', '1', ''),
+(1024, '2018-04-25 13:17:19', '/stok/t12_jualdetaildelete.php', '1', 'D', 't12_jualdetail', 'ArticleID', '1', '1', ''),
+(1025, '2018-04-25 13:17:19', '/stok/t12_jualdetaildelete.php', '1', 'D', 't12_jualdetail', 'HargaJual', '1', '125000.00', ''),
+(1026, '2018-04-25 13:17:19', '/stok/t12_jualdetaildelete.php', '1', 'D', 't12_jualdetail', 'Qty', '1', '4.75', ''),
+(1027, '2018-04-25 13:17:19', '/stok/t12_jualdetaildelete.php', '1', 'D', 't12_jualdetail', 'SubTotal', '1', '593750.00', ''),
+(1028, '2018-04-25 13:17:19', '/stok/t12_jualdetaildelete.php', '1', 'D', 't12_jualdetail', 'SatuanID', '1', '1', ''),
+(1029, '2018-04-25 13:17:19', '/stok/t12_jualdetaildelete.php', '1', '*** Batch delete successful ***', 't12_jualdetail', '', '', '', ''),
+(1030, '2018-04-25 13:18:37', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'ket', '62', 'auto insert dari tabel jual', 'auto insert - update - delete dari tabel jual'),
+(1031, '2018-04-25 13:18:37', '/stok/t95_homedetaillist.php', '1', 'U', 't95_homedetail', 'done', '62', NULL, '1');
 
 -- --------------------------------------------------------
 
@@ -1828,19 +1896,19 @@ ALTER TABLE `t10_hutangdetail`
 -- AUTO_INCREMENT for table `t11_jual`
 --
 ALTER TABLE `t11_jual`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `t12_jualdetail`
 --
 ALTER TABLE `t12_jualdetail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `t13_mutasi`
 --
 ALTER TABLE `t13_mutasi`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `t93_parameter`
@@ -1870,7 +1938,7 @@ ALTER TABLE `t96_employees`
 -- AUTO_INCREMENT for table `t99_audittrail`
 --
 ALTER TABLE `t99_audittrail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=979;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1032;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
