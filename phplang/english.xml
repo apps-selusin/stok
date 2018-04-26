@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/4/25" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/4/26" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -618,6 +618,21 @@
   <project>
     <phrase id="bodytitle" value="STOK Apps." />
     <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
+    <menu id="10091">
+      <phrase id="menutext" value="Hutang Detail" />
+    </menu>
+    <menu id="10092">
+      <phrase id="menutext" value="Penjualan Detail" />
+    </menu>
+    <menu id="10093">
+      <phrase id="menutext" value="Mutasi" />
+    </menu>
+    <menu id="10094">
+      <phrase id="menutext" value="v 02 stok" />
+    </menu>
+    <menu id="10095">
+      <phrase id="menutext" value="v 03 hutang" />
+    </menu>
     <menu id="1">
       <phrase id="menutext" value="Home" />
     </menu>
@@ -1057,6 +1072,12 @@
       </field>
       <field id="tabelid">
         <phrase id="fldcaption" value="Tabel ID" />
+      </field>
+      <field id="noref">
+        <phrase id="fldcaption" value="No Ref" />
+      </field>
+      <field id="kode">
+        <phrase id="fldcaption" value="Kode" />
       </field>
     </table>
     <table id="t93_parameter">
