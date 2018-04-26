@@ -574,8 +574,10 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		global $grDashboardReport;
 
 		// Set field visibility for detail fields
+		$this->No->SetVisibility();
 		$this->Tgl->SetVisibility();
 		$this->Keterangan->SetVisibility();
+		$this->NoRef->SetVisibility();
 		$this->MasukQty->SetVisibility();
 		$this->KeluarQty->SetVisibility();
 		$this->SaldoQty->SetVisibility();
@@ -584,8 +586,8 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 6;
-		$nGrps = 3;
+		$nDtls = 8;
+		$nGrps = 4;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
 		$this->Smry = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -597,7 +599,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(FALSE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(FALSE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -695,6 +697,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		$cnt = 0;
 		foreach ($this->DetailRows as $row) {
 			$wrkArticleID = $row["ArticleID"];
+			$wrkKode = $row["Kode"];
 			$wrkArticleNama = $row["ArticleNama"];
 			if ($lvl >= 1) {
 				$val = $curValue ? $this->ArticleID->CurrentValue : $this->ArticleID->OldValue;
@@ -704,6 +707,13 @@ class crr05_mutasi_summary extends crr05_mutasi {
 				continue;
 			}
 			if ($lvl >= 2) {
+				$val = $curValue ? $this->Kode->CurrentValue : $this->Kode->OldValue;
+				$grpval = $curValue ? $this->Kode->GroupValue() : $this->Kode->GroupOldValue();
+				if (is_null($val) && !is_null($wrkKode) || !is_null($val) && is_null($wrkKode) ||
+					$grpval <> $this->Kode->getGroupValueBase($wrkKode))
+				continue;
+			}
+			if ($lvl >= 3) {
 				$val = $curValue ? $this->ArticleNama->CurrentValue : $this->ArticleNama->OldValue;
 				$grpval = $curValue ? $this->ArticleNama->GroupValue() : $this->ArticleNama->GroupOldValue();
 				if (is_null($val) && !is_null($wrkArticleNama) || !is_null($val) && is_null($wrkArticleNama) ||
@@ -723,9 +733,13 @@ class crr05_mutasi_summary extends crr05_mutasi {
 					(!is_null($this->ArticleID->CurrentValue) && is_null($this->ArticleID->OldValue)) ||
 					($this->ArticleID->GroupValue() <> $this->ArticleID->GroupOldValue());
 			case 2:
+				return (is_null($this->Kode->CurrentValue) && !is_null($this->Kode->OldValue)) ||
+					(!is_null($this->Kode->CurrentValue) && is_null($this->Kode->OldValue)) ||
+					($this->Kode->GroupValue() <> $this->Kode->GroupOldValue()) || $this->ChkLvlBreak(1); // Recurse upper level
+			case 3:
 				return (is_null($this->ArticleNama->CurrentValue) && !is_null($this->ArticleNama->OldValue)) ||
 					(!is_null($this->ArticleNama->CurrentValue) && is_null($this->ArticleNama->OldValue)) ||
-					($this->ArticleNama->GroupValue() <> $this->ArticleNama->GroupOldValue()) || $this->ChkLvlBreak(1); // Recurse upper level
+					($this->ArticleNama->GroupValue() <> $this->ArticleNama->GroupOldValue()) || $this->ChkLvlBreak(2); // Recurse upper level
 		}
 	}
 
@@ -883,18 +897,21 @@ class crr05_mutasi_summary extends crr05_mutasi {
 				$this->FirstRowData['id'] = ewr_Conv($rs->fields('id'), 3);
 				$this->FirstRowData['TabelID'] = ewr_Conv($rs->fields('TabelID'), 3);
 				$this->FirstRowData['Url'] = ewr_Conv($rs->fields('Url'), 200);
+				$this->FirstRowData['No'] = ewr_Conv($rs->fields('No'), 20);
 				$this->FirstRowData['ArticleID'] = ewr_Conv($rs->fields('ArticleID'), 3);
 				$this->FirstRowData['ArticleNama'] = ewr_Conv($rs->fields('ArticleNama'), 200);
 				$this->FirstRowData['NoUrut'] = ewr_Conv($rs->fields('NoUrut'), 16);
 				$this->FirstRowData['Tgl'] = ewr_Conv($rs->fields('Tgl'), 133);
 				$this->FirstRowData['Jam'] = ewr_Conv($rs->fields('Jam'), 134);
 				$this->FirstRowData['Keterangan'] = ewr_Conv($rs->fields('Keterangan'), 200);
+				$this->FirstRowData['NoRef'] = ewr_Conv($rs->fields('NoRef'), 200);
 				$this->FirstRowData['MasukQty'] = ewr_Conv($rs->fields('MasukQty'), 4);
 				$this->FirstRowData['MasukHarga'] = ewr_Conv($rs->fields('MasukHarga'), 4);
 				$this->FirstRowData['KeluarQty'] = ewr_Conv($rs->fields('KeluarQty'), 4);
 				$this->FirstRowData['KeluarHarga'] = ewr_Conv($rs->fields('KeluarHarga'), 4);
 				$this->FirstRowData['SaldoQty'] = ewr_Conv($rs->fields('SaldoQty'), 4);
 				$this->FirstRowData['SaldoHarga'] = ewr_Conv($rs->fields('SaldoHarga'), 4);
+				$this->FirstRowData['Kode'] = ewr_Conv($rs->fields('Kode'), 200);
 			}
 		} else { // Get next row
 			$rs->MoveNext();
@@ -903,6 +920,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->id->setDbValue($rs->fields('id'));
 			$this->TabelID->setDbValue($rs->fields('TabelID'));
 			$this->Url->setDbValue($rs->fields('Url'));
+			$this->No->setDbValue($rs->fields('No'));
 			if ($opt <> 1) {
 				if (is_array($this->ArticleID->GroupDbValues))
 					$this->ArticleID->setDbValue(@$this->ArticleID->GroupDbValues[$rs->fields('ArticleID')]);
@@ -914,33 +932,40 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->Tgl->setDbValue($rs->fields('Tgl'));
 			$this->Jam->setDbValue($rs->fields('Jam'));
 			$this->Keterangan->setDbValue($rs->fields('Keterangan'));
+			$this->NoRef->setDbValue($rs->fields('NoRef'));
 			$this->MasukQty->setDbValue($rs->fields('MasukQty'));
 			$this->MasukHarga->setDbValue($rs->fields('MasukHarga'));
 			$this->KeluarQty->setDbValue($rs->fields('KeluarQty'));
 			$this->KeluarHarga->setDbValue($rs->fields('KeluarHarga'));
 			$this->SaldoQty->setDbValue($rs->fields('SaldoQty'));
 			$this->SaldoHarga->setDbValue($rs->fields('SaldoHarga'));
-			$this->Val[1] = $this->Tgl->CurrentValue;
-			$this->Val[2] = $this->Keterangan->CurrentValue;
-			$this->Val[3] = $this->MasukQty->CurrentValue;
-			$this->Val[4] = $this->KeluarQty->CurrentValue;
-			$this->Val[5] = $this->SaldoQty->CurrentValue;
+			$this->Kode->setDbValue($rs->fields('Kode'));
+			$this->Val[1] = $this->No->CurrentValue;
+			$this->Val[2] = $this->Tgl->CurrentValue;
+			$this->Val[3] = $this->Keterangan->CurrentValue;
+			$this->Val[4] = $this->NoRef->CurrentValue;
+			$this->Val[5] = $this->MasukQty->CurrentValue;
+			$this->Val[6] = $this->KeluarQty->CurrentValue;
+			$this->Val[7] = $this->SaldoQty->CurrentValue;
 		} else {
 			$this->id->setDbValue("");
 			$this->TabelID->setDbValue("");
 			$this->Url->setDbValue("");
+			$this->No->setDbValue("");
 			$this->ArticleID->setDbValue("");
 			$this->ArticleNama->setDbValue("");
 			$this->NoUrut->setDbValue("");
 			$this->Tgl->setDbValue("");
 			$this->Jam->setDbValue("");
 			$this->Keterangan->setDbValue("");
+			$this->NoRef->setDbValue("");
 			$this->MasukQty->setDbValue("");
 			$this->MasukHarga->setDbValue("");
 			$this->KeluarQty->setDbValue("");
 			$this->KeluarHarga->setDbValue("");
 			$this->SaldoQty->setDbValue("");
 			$this->SaldoHarga->setDbValue("");
+			$this->Kode->setDbValue("");
 		}
 	}
 
@@ -1109,10 +1134,12 @@ class crr05_mutasi_summary extends crr05_mutasi {
 				$this->GrandCnt[1] = $this->TotCount;
 				$this->GrandCnt[2] = $this->TotCount;
 				$this->GrandCnt[3] = $this->TotCount;
-				$this->GrandSmry[3] = $rsagg->fields("sum_masukqty");
 				$this->GrandCnt[4] = $this->TotCount;
-				$this->GrandSmry[4] = $rsagg->fields("sum_keluarqty");
 				$this->GrandCnt[5] = $this->TotCount;
+				$this->GrandSmry[5] = $rsagg->fields("sum_masukqty");
+				$this->GrandCnt[6] = $this->TotCount;
+				$this->GrandSmry[6] = $rsagg->fields("sum_keluarqty");
+				$this->GrandCnt[7] = $this->TotCount;
 				$rsagg->Close();
 				$bGotSummary = TRUE;
 			}
@@ -1143,7 +1170,8 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		if ($this->RowType == EWR_ROWTYPE_TOTAL && !($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER)) { // Summary row
 			ewr_PrependClass($this->RowAttrs["class"], ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : ""); // Set up row class
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP) $this->RowAttrs["data-group"] = $this->ArticleID->GroupOldValue(); // Set up group attribute
-			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->ArticleNama->GroupOldValue(); // Set up group attribute 2
+			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->Kode->GroupOldValue(); // Set up group attribute 2
+			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowGroupLevel >= 3) $this->RowAttrs["data-group-3"] = $this->ArticleNama->GroupOldValue(); // Set up group attribute 3
 
 			// ArticleID
 			$this->ArticleID->GroupViewValue = $this->ArticleID->GroupOldValue();
@@ -1153,9 +1181,17 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->ArticleID->GroupSummaryValue = $this->ArticleID->GroupViewValue;
 			$this->ArticleID->GroupSummaryViewValue = ($this->ArticleID->GroupSummaryOldValue <> $this->ArticleID->GroupSummaryValue) ? $this->ArticleID->GroupSummaryValue : "&nbsp;";
 
+			// Kode
+			$this->Kode->GroupViewValue = $this->Kode->GroupOldValue();
+			$this->Kode->CellAttrs["class"] = ($this->RowGroupLevel == 2) ? "ewRptGrpSummary2" : "ewRptGrpField2";
+			$this->Kode->GroupViewValue = ewr_DisplayGroupValue($this->Kode, $this->Kode->GroupViewValue);
+			$this->Kode->GroupSummaryOldValue = $this->Kode->GroupSummaryValue;
+			$this->Kode->GroupSummaryValue = $this->Kode->GroupViewValue;
+			$this->Kode->GroupSummaryViewValue = ($this->Kode->GroupSummaryOldValue <> $this->Kode->GroupSummaryValue) ? $this->Kode->GroupSummaryValue : "&nbsp;";
+
 			// ArticleNama
 			$this->ArticleNama->GroupViewValue = $this->ArticleNama->GroupOldValue();
-			$this->ArticleNama->CellAttrs["class"] = ($this->RowGroupLevel == 2) ? "ewRptGrpSummary2" : "ewRptGrpField2";
+			$this->ArticleNama->CellAttrs["class"] = ($this->RowGroupLevel == 3) ? "ewRptGrpSummary3" : "ewRptGrpField3";
 			$this->ArticleNama->GroupViewValue = ewr_DisplayGroupValue($this->ArticleNama, $this->ArticleNama->GroupViewValue);
 			$this->ArticleNama->GroupSummaryOldValue = $this->ArticleNama->GroupSummaryValue;
 			$this->ArticleNama->GroupSummaryValue = $this->ArticleNama->GroupViewValue;
@@ -1176,14 +1212,23 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			// ArticleID
 			$this->ArticleID->HrefValue = "";
 
+			// Kode
+			$this->Kode->HrefValue = "";
+
 			// ArticleNama
 			$this->ArticleNama->HrefValue = "";
+
+			// No
+			$this->No->HrefValue = "";
 
 			// Tgl
 			$this->Tgl->HrefValue = "";
 
 			// Keterangan
 			$this->Keterangan->HrefValue = "";
+
+			// NoRef
+			$this->NoRef->HrefValue = "";
 
 			// MasukQty
 			$this->MasukQty->HrefValue = "";
@@ -1196,10 +1241,12 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		} else {
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER) {
 			$this->RowAttrs["data-group"] = $this->ArticleID->GroupValue(); // Set up group attribute
-			if ($this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->ArticleNama->GroupValue(); // Set up group attribute 2
+			if ($this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->Kode->GroupValue(); // Set up group attribute 2
+			if ($this->RowGroupLevel >= 3) $this->RowAttrs["data-group-3"] = $this->ArticleNama->GroupValue(); // Set up group attribute 3
 			} else {
 			$this->RowAttrs["data-group"] = $this->ArticleID->GroupValue(); // Set up group attribute
-			$this->RowAttrs["data-group-2"] = $this->ArticleNama->GroupValue(); // Set up group attribute 2
+			$this->RowAttrs["data-group-2"] = $this->Kode->GroupValue(); // Set up group attribute 2
+			$this->RowAttrs["data-group-3"] = $this->ArticleNama->GroupValue(); // Set up group attribute 3
 			}
 
 			// ArticleID
@@ -1209,12 +1256,23 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			if ($this->ArticleID->GroupValue() == $this->ArticleID->GroupOldValue() && !$this->ChkLvlBreak(1))
 				$this->ArticleID->GroupViewValue = "&nbsp;";
 
+			// Kode
+			$this->Kode->GroupViewValue = $this->Kode->GroupValue();
+			$this->Kode->CellAttrs["class"] = "ewRptGrpField2";
+			$this->Kode->GroupViewValue = ewr_DisplayGroupValue($this->Kode, $this->Kode->GroupViewValue);
+			if ($this->Kode->GroupValue() == $this->Kode->GroupOldValue() && !$this->ChkLvlBreak(2))
+				$this->Kode->GroupViewValue = "&nbsp;";
+
 			// ArticleNama
 			$this->ArticleNama->GroupViewValue = $this->ArticleNama->GroupValue();
-			$this->ArticleNama->CellAttrs["class"] = "ewRptGrpField2";
+			$this->ArticleNama->CellAttrs["class"] = "ewRptGrpField3";
 			$this->ArticleNama->GroupViewValue = ewr_DisplayGroupValue($this->ArticleNama, $this->ArticleNama->GroupViewValue);
-			if ($this->ArticleNama->GroupValue() == $this->ArticleNama->GroupOldValue() && !$this->ChkLvlBreak(2))
+			if ($this->ArticleNama->GroupValue() == $this->ArticleNama->GroupOldValue() && !$this->ChkLvlBreak(3))
 				$this->ArticleNama->GroupViewValue = "&nbsp;";
+
+			// No
+			$this->No->ViewValue = $this->No->CurrentValue;
+			$this->No->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 
 			// Tgl
 			$this->Tgl->ViewValue = $this->Tgl->CurrentValue;
@@ -1224,6 +1282,10 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			// Keterangan
 			$this->Keterangan->ViewValue = $this->Keterangan->CurrentValue;
 			$this->Keterangan->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
+			// NoRef
+			$this->NoRef->ViewValue = $this->NoRef->CurrentValue;
+			$this->NoRef->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 
 			// MasukQty
 			$this->MasukQty->ViewValue = $this->MasukQty->CurrentValue;
@@ -1246,14 +1308,23 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			// ArticleID
 			$this->ArticleID->HrefValue = "";
 
+			// Kode
+			$this->Kode->HrefValue = "";
+
 			// ArticleNama
 			$this->ArticleNama->HrefValue = "";
+
+			// No
+			$this->No->HrefValue = "";
 
 			// Tgl
 			$this->Tgl->HrefValue = "";
 
 			// Keterangan
 			$this->Keterangan->HrefValue = "";
+
+			// NoRef
+			$this->NoRef->HrefValue = "";
 
 			// MasukQty
 			$this->MasukQty->HrefValue = "";
@@ -1276,6 +1347,15 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$HrefValue = &$this->ArticleID->HrefValue;
 			$LinkAttrs = &$this->ArticleID->LinkAttrs;
 			$this->Cell_Rendered($this->ArticleID, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// Kode
+			$CurrentValue = $this->Kode->GroupViewValue;
+			$ViewValue = &$this->Kode->GroupViewValue;
+			$ViewAttrs = &$this->Kode->ViewAttrs;
+			$CellAttrs = &$this->Kode->CellAttrs;
+			$HrefValue = &$this->Kode->HrefValue;
+			$LinkAttrs = &$this->Kode->LinkAttrs;
+			$this->Cell_Rendered($this->Kode, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// ArticleNama
 			$CurrentValue = $this->ArticleNama->GroupViewValue;
@@ -1314,6 +1394,15 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$LinkAttrs = &$this->ArticleID->LinkAttrs;
 			$this->Cell_Rendered($this->ArticleID, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
+			// Kode
+			$CurrentValue = $this->Kode->GroupValue();
+			$ViewValue = &$this->Kode->GroupViewValue;
+			$ViewAttrs = &$this->Kode->ViewAttrs;
+			$CellAttrs = &$this->Kode->CellAttrs;
+			$HrefValue = &$this->Kode->HrefValue;
+			$LinkAttrs = &$this->Kode->LinkAttrs;
+			$this->Cell_Rendered($this->Kode, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
 			// ArticleNama
 			$CurrentValue = $this->ArticleNama->GroupValue();
 			$ViewValue = &$this->ArticleNama->GroupViewValue;
@@ -1322,6 +1411,15 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$HrefValue = &$this->ArticleNama->HrefValue;
 			$LinkAttrs = &$this->ArticleNama->LinkAttrs;
 			$this->Cell_Rendered($this->ArticleNama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// No
+			$CurrentValue = $this->No->CurrentValue;
+			$ViewValue = &$this->No->ViewValue;
+			$ViewAttrs = &$this->No->ViewAttrs;
+			$CellAttrs = &$this->No->CellAttrs;
+			$HrefValue = &$this->No->HrefValue;
+			$LinkAttrs = &$this->No->LinkAttrs;
+			$this->Cell_Rendered($this->No, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// Tgl
 			$CurrentValue = $this->Tgl->CurrentValue;
@@ -1340,6 +1438,15 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$HrefValue = &$this->Keterangan->HrefValue;
 			$LinkAttrs = &$this->Keterangan->LinkAttrs;
 			$this->Cell_Rendered($this->Keterangan, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// NoRef
+			$CurrentValue = $this->NoRef->CurrentValue;
+			$ViewValue = &$this->NoRef->ViewValue;
+			$ViewAttrs = &$this->NoRef->ViewAttrs;
+			$CellAttrs = &$this->NoRef->CellAttrs;
+			$HrefValue = &$this->NoRef->HrefValue;
+			$LinkAttrs = &$this->NoRef->LinkAttrs;
+			$this->Cell_Rendered($this->NoRef, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// MasukQty
 			$CurrentValue = $this->MasukQty->CurrentValue;
@@ -1380,9 +1487,12 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		$this->SubGrpColumnCount = 0;
 		$this->DtlColumnCount = 0;
 		if ($this->ArticleID->Visible) $this->GrpColumnCount += 1;
+		if ($this->Kode->Visible) { $this->GrpColumnCount += 1; $this->SubGrpColumnCount += 1; }
 		if ($this->ArticleNama->Visible) { $this->GrpColumnCount += 1; $this->SubGrpColumnCount += 1; }
+		if ($this->No->Visible) $this->DtlColumnCount += 1;
 		if ($this->Tgl->Visible) $this->DtlColumnCount += 1;
 		if ($this->Keterangan->Visible) $this->DtlColumnCount += 1;
+		if ($this->NoRef->Visible) $this->DtlColumnCount += 1;
 		if ($this->MasukQty->Visible) $this->DtlColumnCount += 1;
 		if ($this->KeluarQty->Visible) $this->DtlColumnCount += 1;
 		if ($this->SaldoQty->Visible) $this->DtlColumnCount += 1;
@@ -1421,7 +1531,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 	// Get sort parameters based on sort links clicked
 	function GetSort($options = array()) {
 		if ($this->DrillDown)
-			return "`Tgl` ASC, `Jam` ASC, `NoUrut` ASC";
+			return "`Tgl` ASC";
 		$bResetSort = @$options["resetsort"] == "1" || @$_GET["cmd"] == "resetsort";
 		$orderBy = (@$options["order"] <> "") ? @$options["order"] : @$_GET["order"];
 		$orderType = (@$options["ordertype"] <> "") ? @$options["ordertype"] : @$_GET["ordertype"];
@@ -1434,9 +1544,12 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->setOrderBy("");
 			$this->setStartGroup(1);
 			$this->ArticleID->setSort("");
+			$this->Kode->setSort("");
 			$this->ArticleNama->setSort("");
+			$this->No->setSort("");
 			$this->Tgl->setSort("");
 			$this->Keterangan->setSort("");
+			$this->NoRef->setSort("");
 			$this->MasukQty->setSort("");
 			$this->KeluarQty->setSort("");
 			$this->SaldoQty->setSort("");
@@ -1446,9 +1559,12 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->CurrentOrder = $orderBy;
 			$this->CurrentOrderType = $orderType;
 			$this->UpdateSort($this->ArticleID, $bCtrl); // ArticleID
+			$this->UpdateSort($this->Kode, $bCtrl); // Kode
 			$this->UpdateSort($this->ArticleNama, $bCtrl); // ArticleNama
+			$this->UpdateSort($this->No, $bCtrl); // No
 			$this->UpdateSort($this->Tgl, $bCtrl); // Tgl
 			$this->UpdateSort($this->Keterangan, $bCtrl); // Keterangan
+			$this->UpdateSort($this->NoRef, $bCtrl); // NoRef
 			$this->UpdateSort($this->MasukQty, $bCtrl); // MasukQty
 			$this->UpdateSort($this->KeluarQty, $bCtrl); // KeluarQty
 			$this->UpdateSort($this->SaldoQty, $bCtrl); // SaldoQty
@@ -1459,10 +1575,8 @@ class crr05_mutasi_summary extends crr05_mutasi {
 
 		// Set up default sort
 		if ($this->getOrderBy() == "") {
-			$this->setOrderBy("`Tgl` ASC, `Jam` ASC, `NoUrut` ASC");
+			$this->setOrderBy("`Tgl` ASC");
 			$this->Tgl->setSort("ASC");
-			$this->Jam->setSort("ASC");
-			$this->NoUrut->setSort("ASC");
 		}
 		return $this->getOrderBy();
 	}
@@ -1730,7 +1844,8 @@ class crr05_mutasi_summary extends crr05_mutasi {
 	function Page_Render() {
 
 		//echo "Page Render";
-		$this->ArticleID->Visible = false;
+		// $this->ArticleID->Visible = false;
+
 	}
 
 	// Page Data Rendering event
@@ -1851,6 +1966,7 @@ $Page->RecIndex = 0;
 if ($Page->TotalGrps > 0) {
 	$Page->GetGrpRow(1);
 	$Page->GrpCounter[0] = 1;
+	$Page->GrpCounter[1] = 1;
 	$Page->GrpCount = 1;
 }
 $Page->GrpIdx = ewr_InitArray($Page->StopGrp - $Page->StartGrp + 1, -1);
@@ -1923,6 +2039,28 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 	<?php } ?>
 <?php } ?>
+<?php if ($Page->Kode->Visible) { ?>
+	<?php if ($Page->Kode->ShowGroupHeaderAsRow) { ?>
+	<td data-field="Kode">&nbsp;</td>
+	<?php } else { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="Kode"><div class="r05_mutasi_Kode"><span class="ewTableHeaderCaption"><?php echo $Page->Kode->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="Kode">
+<?php if ($Page->SortUrl($Page->Kode) == "") { ?>
+		<div class="ewTableHeaderBtn r05_mutasi_Kode">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Kode->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r05_mutasi_Kode" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Kode) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Kode->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->Kode->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Kode->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+	<?php } ?>
+<?php } ?>
 <?php if ($Page->ArticleNama->Visible) { ?>
 	<?php if ($Page->ArticleNama->ShowGroupHeaderAsRow) { ?>
 	<td data-field="ArticleNama">&nbsp;</td>
@@ -1944,6 +2082,24 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	</td>
 <?php } ?>
 	<?php } ?>
+<?php } ?>
+<?php if ($Page->No->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="No"><div class="r05_mutasi_No"><span class="ewTableHeaderCaption"><?php echo $Page->No->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="No">
+<?php if ($Page->SortUrl($Page->No) == "") { ?>
+		<div class="ewTableHeaderBtn r05_mutasi_No">
+			<span class="ewTableHeaderCaption"><?php echo $Page->No->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r05_mutasi_No" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->No) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->No->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->No->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->No->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
 <?php } ?>
 <?php if ($Page->Tgl->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
@@ -1976,6 +2132,24 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<div class="ewTableHeaderBtn ewPointer r05_mutasi_Keterangan" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Keterangan) ?>',2);">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Keterangan->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->Keterangan->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Keterangan->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
+<?php if ($Page->NoRef->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="NoRef"><div class="r05_mutasi_NoRef"><span class="ewTableHeaderCaption"><?php echo $Page->NoRef->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="NoRef">
+<?php if ($Page->SortUrl($Page->NoRef) == "") { ?>
+		<div class="ewTableHeaderBtn r05_mutasi_NoRef">
+			<span class="ewTableHeaderCaption"><?php echo $Page->NoRef->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r05_mutasi_NoRef" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->NoRef) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->NoRef->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->NoRef->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->NoRef->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
 <?php } ?>
 	</td>
@@ -2055,6 +2229,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	if ($rsdtlcnt > 0)
 		$Page->GetRow(1);
 	$Page->GrpIdx[$Page->GrpCount] = array(-1);
+	$Page->GrpIdx[$Page->GrpCount][] = array(-1);
 	while ($rs && !$rs->EOF) { // Loop detail records
 		$Page->RecCount++;
 		$Page->RecIndex++;
@@ -2096,7 +2271,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		</td>
 	</tr>
 <?php } ?>
-<?php if ($Page->ArticleNama->Visible && $Page->ChkLvlBreak(2) && $Page->ArticleNama->ShowGroupHeaderAsRow) { ?>
+<?php if ($Page->Kode->Visible && $Page->ChkLvlBreak(2) && $Page->Kode->ShowGroupHeaderAsRow) { ?>
 <?php
 
 		// Render header row
@@ -2105,17 +2280,60 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
 		$Page->RowTotalSubType = EWR_ROWTOTAL_HEADER;
 		$Page->RowGroupLevel = 2;
-		$Page->ArticleNama->Count = $Page->GetSummaryCount(2);
+		$Page->Kode->Count = $Page->GetSummaryCount(2);
 		$Page->RenderRow();
 ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->ArticleID->Visible) { ?>
 		<td data-field="ArticleID"<?php echo $Page->ArticleID->CellAttributes(); ?>></td>
 <?php } ?>
+<?php if ($Page->Kode->Visible) { ?>
+		<td data-field="Kode"<?php echo $Page->Kode->CellAttributes(); ?>><span class="ewGroupToggle icon-collapse"></span></td>
+<?php } ?>
+		<td data-field="Kode" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 2) ?>"<?php echo $Page->Kode->CellAttributes() ?>>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+		<span class="ewSummaryCaption r05_mutasi_Kode"><span class="ewTableHeaderCaption"><?php echo $Page->Kode->FldCaption() ?></span></span>
+<?php } else { ?>
+	<?php if ($Page->SortUrl($Page->Kode) == "") { ?>
+		<span class="ewSummaryCaption r05_mutasi_Kode">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Kode->FldCaption() ?></span>
+		</span>
+	<?php } else { ?>
+		<span class="ewTableHeaderBtn ewPointer ewSummaryCaption r05_mutasi_Kode" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Kode) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Kode->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->Kode->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Kode->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</span>
+	<?php } ?>
+<?php } ?>
+		<?php echo $ReportLanguage->Phrase("SummaryColon") ?>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r05_mutasi_Kode"<?php echo $Page->Kode->ViewAttributes() ?>><?php echo $Page->Kode->GroupViewValue ?></span>
+		<span class="ewSummaryCount">(<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->Kode->Count,0,-2,-2,-2) ?></span>)</span>
+		</td>
+	</tr>
+<?php } ?>
+<?php if ($Page->ArticleNama->Visible && $Page->ChkLvlBreak(3) && $Page->ArticleNama->ShowGroupHeaderAsRow) { ?>
+<?php
+
+		// Render header row
+		$Page->ResetAttrs();
+		$Page->RowType = EWR_ROWTYPE_TOTAL;
+		$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
+		$Page->RowTotalSubType = EWR_ROWTOTAL_HEADER;
+		$Page->RowGroupLevel = 3;
+		$Page->ArticleNama->Count = $Page->GetSummaryCount(3);
+		$Page->RenderRow();
+?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->ArticleID->Visible) { ?>
+		<td data-field="ArticleID"<?php echo $Page->ArticleID->CellAttributes(); ?>></td>
+<?php } ?>
+<?php if ($Page->Kode->Visible) { ?>
+		<td data-field="Kode"<?php echo $Page->Kode->CellAttributes(); ?>></td>
+<?php } ?>
 <?php if ($Page->ArticleNama->Visible) { ?>
 		<td data-field="ArticleNama"<?php echo $Page->ArticleNama->CellAttributes(); ?>><span class="ewGroupToggle icon-collapse"></span></td>
 <?php } ?>
-		<td data-field="ArticleNama" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 2) ?>"<?php echo $Page->ArticleNama->CellAttributes() ?>>
+		<td data-field="ArticleNama" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 3) ?>"<?php echo $Page->ArticleNama->CellAttributes() ?>>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
 		<span class="ewSummaryCaption r05_mutasi_ArticleNama"><span class="ewTableHeaderCaption"><?php echo $Page->ArticleNama->FldCaption() ?></span></span>
 <?php } else { ?>
@@ -2131,7 +2349,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<?php } ?>
 <?php } ?>
 		<?php echo $ReportLanguage->Phrase("SummaryColon") ?>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r05_mutasi_ArticleNama"<?php echo $Page->ArticleNama->ViewAttributes() ?>><?php echo $Page->ArticleNama->GroupViewValue ?></span>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r05_mutasi_ArticleNama"<?php echo $Page->ArticleNama->ViewAttributes() ?>><?php echo $Page->ArticleNama->GroupViewValue ?></span>
 		<span class="ewSummaryCount">(<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->ArticleNama->Count,0,-2,-2,-2) ?></span>)</span>
 		</td>
 	</tr>
@@ -2152,13 +2370,25 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <span data-class="tpx<?php echo $Page->GrpCount ?>_r05_mutasi_ArticleID"<?php echo $Page->ArticleID->ViewAttributes() ?>><?php echo $Page->ArticleID->GroupViewValue ?></span></td>
 	<?php } ?>
 <?php } ?>
+<?php if ($Page->Kode->Visible) { ?>
+	<?php if ($Page->Kode->ShowGroupHeaderAsRow) { ?>
+		<td data-field="Kode"<?php echo $Page->Kode->CellAttributes(); ?>>&nbsp;</td>
+	<?php } else { ?>
+		<td data-field="Kode"<?php echo $Page->Kode->CellAttributes(); ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r05_mutasi_Kode"<?php echo $Page->Kode->ViewAttributes() ?>><?php echo $Page->Kode->GroupViewValue ?></span></td>
+	<?php } ?>
+<?php } ?>
 <?php if ($Page->ArticleNama->Visible) { ?>
 	<?php if ($Page->ArticleNama->ShowGroupHeaderAsRow) { ?>
 		<td data-field="ArticleNama"<?php echo $Page->ArticleNama->CellAttributes(); ?>>&nbsp;</td>
 	<?php } else { ?>
 		<td data-field="ArticleNama"<?php echo $Page->ArticleNama->CellAttributes(); ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r05_mutasi_ArticleNama"<?php echo $Page->ArticleNama->ViewAttributes() ?>><?php echo $Page->ArticleNama->GroupViewValue ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r05_mutasi_ArticleNama"<?php echo $Page->ArticleNama->ViewAttributes() ?>><?php echo $Page->ArticleNama->GroupViewValue ?></span></td>
 	<?php } ?>
+<?php } ?>
+<?php if ($Page->No->Visible) { ?>
+		<td data-field="No"<?php echo $Page->No->CellAttributes() ?>>
+<span<?php echo $Page->No->ViewAttributes() ?>><?php echo $Page->No->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->Tgl->Visible) { ?>
 		<td data-field="Tgl"<?php echo $Page->Tgl->CellAttributes() ?>>
@@ -2167,6 +2397,10 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->Keterangan->Visible) { ?>
 		<td data-field="Keterangan"<?php echo $Page->Keterangan->CellAttributes() ?>>
 <span<?php echo $Page->Keterangan->ViewAttributes() ?>><?php echo $Page->Keterangan->ListViewValue() ?></span></td>
+<?php } ?>
+<?php if ($Page->NoRef->Visible) { ?>
+		<td data-field="NoRef"<?php echo $Page->NoRef->CellAttributes() ?>>
+<span<?php echo $Page->NoRef->ViewAttributes() ?>><?php echo $Page->NoRef->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->MasukQty->Visible) { ?>
 		<td data-field="MasukQty"<?php echo $Page->MasukQty->CellAttributes() ?>>
@@ -2192,24 +2426,25 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		// Show Footers
 ?>
 <?php
-		if ($Page->ChkLvlBreak(2)) {
-			$cnt = count(@$Page->GrpIdx[$Page->GrpCount]);
-			$Page->GrpIdx[$Page->GrpCount][$cnt] = $Page->RecCount;
+		if ($Page->ChkLvlBreak(3)) {
+			$cnt = count(@$Page->GrpIdx[$Page->GrpCount][$Page->GrpCounter[0]]);
+			$Page->GrpIdx[$Page->GrpCount][$Page->GrpCounter[0]][$cnt] = $Page->RecCount;
 		}
-		if ($Page->ChkLvlBreak(2) && $Page->ArticleNama->Visible) {
+		if ($Page->ChkLvlBreak(3) && $Page->ArticleNama->Visible) {
 ?>
 <?php
 			$Page->ArticleID->Count = $Page->GetSummaryCount(1, FALSE);
-			$Page->ArticleNama->Count = $Page->GetSummaryCount(2, FALSE);
-			$Page->MasukQty->Count = $Page->Cnt[2][3];
-			$Page->MasukQty->SumValue = $Page->Smry[2][3]; // Load SUM
-			$Page->KeluarQty->Count = $Page->Cnt[2][4];
-			$Page->KeluarQty->SumValue = $Page->Smry[2][4]; // Load SUM
+			$Page->Kode->Count = $Page->GetSummaryCount(2, FALSE);
+			$Page->ArticleNama->Count = $Page->GetSummaryCount(3, FALSE);
+			$Page->MasukQty->Count = $Page->Cnt[3][5];
+			$Page->MasukQty->SumValue = $Page->Smry[3][5]; // Load SUM
+			$Page->KeluarQty->Count = $Page->Cnt[3][6];
+			$Page->KeluarQty->SumValue = $Page->Smry[3][6]; // Load SUM
 			$Page->ResetAttrs();
 			$Page->RowType = EWR_ROWTYPE_TOTAL;
 			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
 			$Page->RowTotalSubType = EWR_ROWTOTAL_FOOTER;
-			$Page->RowGroupLevel = 2;
+			$Page->RowGroupLevel = 3;
 			$Page->RenderRow();
 ?>
 <?php if ($Page->ArticleNama->ShowCompactSummaryFooter) { ?>
@@ -2225,22 +2460,39 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<?php } ?>
 		</td>
 <?php } ?>
+<?php if ($Page->Kode->Visible) { ?>
+		<td data-field="Kode"<?php echo $Page->Kode->CellAttributes() ?>>
+	<?php if ($Page->Kode->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->Kode->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
 <?php if ($Page->ArticleNama->Visible) { ?>
 		<td data-field="ArticleNama"<?php echo $Page->ArticleNama->CellAttributes() ?>>
 	<?php if ($Page->ArticleNama->ShowGroupHeaderAsRow) { ?>
 		&nbsp;
-	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
+	<?php } elseif ($Page->RowGroupLevel <> 3) { ?>
 		&nbsp;
 	<?php } else { ?>
 		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->ArticleNama->Count,0,-2,-2,-2) ?></span></span>
 	<?php } ?>
 		</td>
 <?php } ?>
+<?php if ($Page->No->Visible) { ?>
+		<td data-field="No"<?php echo $Page->ArticleNama->CellAttributes() ?>></td>
+<?php } ?>
 <?php if ($Page->Tgl->Visible) { ?>
 		<td data-field="Tgl"<?php echo $Page->ArticleNama->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->Keterangan->Visible) { ?>
 		<td data-field="Keterangan"<?php echo $Page->ArticleNama->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->NoRef->Visible) { ?>
+		<td data-field="NoRef"<?php echo $Page->ArticleNama->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->MasukQty->Visible) { ?>
 		<td data-field="MasukQty"<?php echo $Page->ArticleNama->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span<?php echo $Page->MasukQty->ViewAttributes() ?>><?php echo $Page->MasukQty->SumViewValue ?></span></span></td>
@@ -2257,22 +2509,34 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->ArticleID->Visible) { ?>
 		<td data-field="ArticleID"<?php echo $Page->ArticleID->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
-<?php if ($Page->SubGrpColumnCount + $Page->DtlColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->SaldoQty->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->ArticleNama->GroupViewValue, $Page->ArticleNama->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[2][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+<?php if ($Page->Kode->Visible) { ?>
+		<td data-field="Kode"<?php echo $Page->Kode->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->SubGrpColumnCount + $Page->DtlColumnCount - 1 > 0) { ?>
+		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount - 1) ?>"<?php echo $Page->SaldoQty->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->ArticleNama->GroupViewValue, $Page->ArticleNama->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[3][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
 <?php } ?>
 	</tr>
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->ArticleID->Visible) { ?>
 		<td data-field="ArticleID"<?php echo $Page->ArticleID->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
+<?php if ($Page->Kode->Visible) { ?>
+		<td data-field="Kode"<?php echo $Page->Kode->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
 <?php if ($Page->GrpColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->GrpColumnCount - 1) ?>"<?php echo $Page->ArticleNama->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+		<td colspan="<?php echo ($Page->GrpColumnCount - 2) ?>"<?php echo $Page->ArticleNama->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+<?php } ?>
+<?php if ($Page->No->Visible) { ?>
+		<td data-field="No"<?php echo $Page->ArticleNama->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->Tgl->Visible) { ?>
 		<td data-field="Tgl"<?php echo $Page->ArticleNama->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->Keterangan->Visible) { ?>
 		<td data-field="Keterangan"<?php echo $Page->ArticleNama->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->NoRef->Visible) { ?>
+		<td data-field="NoRef"<?php echo $Page->ArticleNama->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->MasukQty->Visible) { ?>
 		<td data-field="MasukQty"<?php echo $Page->SaldoQty->CellAttributes() ?>>
@@ -2289,11 +2553,11 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 <?php
 
-			// Reset level 2 summary
-			$Page->ResetLevelSummary(2);
+			// Reset level 3 summary
+			$Page->ResetLevelSummary(3);
 		} // End show footer check
-		if ($Page->ChkLvlBreak(2)) {
-			$Page->GrpCounter[0]++;
+		if ($Page->ChkLvlBreak(3)) {
+			$Page->GrpCounter[1]++;
 		}
 ?>
 <?php
@@ -2312,6 +2576,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	if ($Page->ShowHeader)
 		$Page->Page_Breaking($Page->ShowHeader, $Page->PageBreakContent);
 	$Page->GrpCount++;
+	$Page->GrpCounter[1] = 1;
 	$Page->GrpCounter[0] = 1;
 
 	// Handle EOF

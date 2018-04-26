@@ -22,6 +22,9 @@ function GetStartsWithAFilter($FldExpression, $dbid) {
 function Page_Loading() {
 
 	//echo "Page Loading";
+	$_SESSION["r05_No"] = 0;
+	$_SESSION["r05_No_Simpan"] = 0;
+	$_SESSION["r05_Flag"] = 0;
 }
 
 // Page Rendering event

@@ -846,6 +846,12 @@
       <field id="saldoharga">
         <phrase id="fldcaption" value="Saldo Harga" />
       </field>
+      <field id="noref">
+        <phrase id="fldcaption" value="No Ref" />
+      </field>
+      <field id="no">
+        <phrase id="fldcaption" value="No." />
+      </field>
     </table>
     <table id="t93_parameter">
       <phrase id="tblcaption" value="t 93 parameter" />
@@ -1137,6 +1143,9 @@
       <field id="nourut">
         <phrase id="fldcaption" value="No Urut" />
       </field>
+      <field id="no">
+        <phrase id="fldcaption" value="No." />
+      </field>
       <field id="tgl">
         <phrase id="fldcaption" value="Tgl" />
       </field>
@@ -1145,6 +1154,9 @@
       </field>
       <field id="keterangan">
         <phrase id="fldcaption" value="Keterangan" />
+      </field>
+      <field id="noref">
+        <phrase id="fldcaption" value="No Ref" />
       </field>
       <field id="masukqty">
         <phrase id="fldcaption" value="Masuk" />

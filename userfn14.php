@@ -132,4 +132,10 @@ function f_UpdateSaldo($ArticleID) {
 		$rs->MoveNext();
 	}
 }
+
+function f_GetNoSO($JualID) {
+	$q = "select NoSO from t11_jual where id = '".$JualID."'";
+	$mNilai = ew_ExecuteScalar($q);
+	return $mNilai;
+}
 ?>

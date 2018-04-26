@@ -1304,6 +1304,9 @@ class ct12_jualdetail extends cTable {
 		// cari nomor urut terbaru di tabel mutasi
 		$NoUrut = f_GetNextNoUrut($rsnew["ArticleID"]);
 
+		// cari nomor so berdasarkan jualid
+		$NoSO = f_GetNoSO($rsnew["JualID"]);
+
 		// tambah data otomatis ke tabel mutasi
 		$q = "insert into t13_mutasi (
 			TabelID,
@@ -1313,6 +1316,7 @@ class ct12_jualdetail extends cTable {
 			Tgl,
 			Jam,
 			Keterangan,
+			NoRef,
 			KeluarQty,
 			SaldoQty
 			) values (
@@ -1323,6 +1327,7 @@ class ct12_jualdetail extends cTable {
 			'".date("Y-m-d")."',
 			'".date("H:i")."',
 			'Jual',
+			'".$NoSO."',
 			".$rsnew["Qty"].",
 			".-1 * $rsnew["Qty"]."
 			)";
