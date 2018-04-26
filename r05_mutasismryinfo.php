@@ -14,6 +14,7 @@ class crr05_mutasi extends crTableBase {
 	var $Url;
 	var $No;
 	var $ArticleID;
+	var $Kode;
 	var $ArticleNama;
 	var $NoUrut;
 	var $Tgl;
@@ -26,7 +27,6 @@ class crr05_mutasi extends crTableBase {
 	var $KeluarHarga;
 	var $SaldoQty;
 	var $SaldoHarga;
-	var $Kode;
 
 	//
 	// Table class constructor
@@ -80,22 +80,30 @@ class crr05_mutasi extends crTableBase {
 		// ArticleID
 		$this->ArticleID = new crField('r05_mutasi', 'r05_mutasi', 'x_ArticleID', 'ArticleID', '`ArticleID`', 3, EWR_DATATYPE_NUMBER, -1);
 		$this->ArticleID->Sortable = TRUE; // Allow sort
-		$this->ArticleID->GroupingFieldId = 1;
-		$this->ArticleID->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
-		$this->ArticleID->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
 		$this->ArticleID->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
 		$this->ArticleID->DateFilter = "";
 		$this->ArticleID->SqlSelect = "";
 		$this->ArticleID->SqlOrderBy = "";
-		$this->ArticleID->FldGroupByType = "";
-		$this->ArticleID->FldGroupInt = "0";
-		$this->ArticleID->FldGroupSql = "";
 		$this->fields['ArticleID'] = &$this->ArticleID;
+
+		// Kode
+		$this->Kode = new crField('r05_mutasi', 'r05_mutasi', 'x_Kode', 'Kode', '`Kode`', 200, EWR_DATATYPE_STRING, -1);
+		$this->Kode->Sortable = TRUE; // Allow sort
+		$this->Kode->GroupingFieldId = 1;
+		$this->Kode->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
+		$this->Kode->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
+		$this->Kode->DateFilter = "";
+		$this->Kode->SqlSelect = "";
+		$this->Kode->SqlOrderBy = "";
+		$this->Kode->FldGroupByType = "";
+		$this->Kode->FldGroupInt = "0";
+		$this->Kode->FldGroupSql = "";
+		$this->fields['Kode'] = &$this->Kode;
 
 		// ArticleNama
 		$this->ArticleNama = new crField('r05_mutasi', 'r05_mutasi', 'x_ArticleNama', 'ArticleNama', '`ArticleNama`', 200, EWR_DATATYPE_STRING, -1);
 		$this->ArticleNama->Sortable = TRUE; // Allow sort
-		$this->ArticleNama->GroupingFieldId = 3;
+		$this->ArticleNama->GroupingFieldId = 2;
 		$this->ArticleNama->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
 		$this->ArticleNama->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
 		$this->ArticleNama->DateFilter = "";
@@ -202,21 +210,6 @@ class crr05_mutasi extends crTableBase {
 		$this->SaldoHarga->SqlSelect = "";
 		$this->SaldoHarga->SqlOrderBy = "";
 		$this->fields['SaldoHarga'] = &$this->SaldoHarga;
-
-		// Kode
-		$this->Kode = new crField('r05_mutasi', 'r05_mutasi', 'x_Kode', 'Kode', '`Kode`', 200, EWR_DATATYPE_STRING, -1);
-		$this->Kode->Sortable = TRUE; // Allow sort
-		$this->Kode->GroupingFieldId = 2;
-		$this->Kode->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
-		$this->Kode->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
-		$this->Kode->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
-		$this->Kode->DateFilter = "";
-		$this->Kode->SqlSelect = "";
-		$this->Kode->SqlOrderBy = "";
-		$this->Kode->FldGroupByType = "";
-		$this->Kode->FldGroupInt = "0";
-		$this->Kode->FldGroupSql = "";
-		$this->fields['Kode'] = &$this->Kode;
 	}
 
 	// Set Field Visibility
@@ -303,7 +296,7 @@ class crr05_mutasi extends crTableBase {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() {
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (select concat(kode, ' - ', nama) from t06_article where id = articleid) AS `ArticleNama`, 0 AS `No`, (select kode from t06_article where id = articleid) AS `Kode` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (select nama from t06_article where id = articleid) AS `ArticleNama`, 0 AS `No` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -364,7 +357,7 @@ class crr05_mutasi extends crTableBase {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() {
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`ArticleID` ASC, `Kode` ASC, `ArticleNama` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`Kode` ASC, `ArticleNama` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -381,7 +374,7 @@ class crr05_mutasi extends crTableBase {
 	var $_SqlFirstGroupField = "";
 
 	function getSqlFirstGroupField() {
-		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`ArticleID`";
+		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`Kode`";
 	}
 
 	function SqlFirstGroupField() { // For backward compatibility
@@ -411,7 +404,7 @@ class crr05_mutasi extends crTableBase {
 	var $_SqlOrderByGroup = "";
 
 	function getSqlOrderByGroup() {
-		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`ArticleID` ASC";
+		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`Kode` ASC";
 	}
 
 	function SqlOrderByGroup() { // For backward compatibility
@@ -502,6 +495,17 @@ class crr05_mutasi extends crTableBase {
 	function SetupLookupFilters($fld) {
 		global $grLanguage;
 		switch ($fld->FldVar) {
+		case "x_Kode":
+			$fld->LookupFilters = array("d" => "DB", "f0" => '`Kode` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter), "af" => json_encode($fld->AdvancedFilters));
+		$sWhereWrk = "";
+		$fld->LookupFilters += array(
+			"select" => "SELECT DISTINCT `Kode`, `Kode` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `t13_mutasi`",
+			"where" => $sWhereWrk,
+			"orderby" => "`Kode` ASC"
+		);
+		$this->Lookup_Selecting($fld, $fld->LookupFilters["where"]); // Call Lookup selecting
+		$fld->LookupFilters["s"] = ewr_BuildReportSql($fld->LookupFilters["select"], $fld->LookupFilters["where"], "", "", $fld->LookupFilters["orderby"], "", "");
+			break;
 		}
 	}
 
@@ -532,7 +536,7 @@ class crr05_mutasi extends crTableBase {
 	function Row_Rendering() {
 
 		// Enter your code here
-		if ($_SESSION["r05_Flag"] == 0) {
+		/*if ($_SESSION["r05_Flag"] == 0) {
 			$_SESSION["r05_Flag"] = 1;
 			$_SESSION["r05_ArticleID"] = $this->ArticleID->DbValue;
 			$mPertama = 1;
@@ -556,7 +560,7 @@ class crr05_mutasi extends crTableBase {
 			//$_SESSION["r05_ArticleID"] = $this->ArticleID->DbValue;
 			//$_SESSION["r05_No"] = "";
 
-		}
+		}*/
 	}
 
 	// Cell Rendered event
@@ -582,7 +586,9 @@ class crr05_mutasi extends crTableBase {
 
 		// $this->Keterangan->ViewValue = "<a href='./".$this->Url->CurrentValue."'>".$this->Keterangan->CurrentValue."</a>";
 		$this->NoRef->ViewValue = "<a href='./".$this->Url->CurrentValue."'>".$this->NoRef->CurrentValue."</a>";
-		$this->No->ViewValue = $_SESSION["r05_No"] . "." . $this->RecCount . ".";
+
+		// $this->No->ViewValue = $_SESSION["r05_No"] . "." . $this->RecCount . ".";
+		$this->No->ViewValue = $this->RecCount . ".";
 	}
 
 	// User ID Filtering event

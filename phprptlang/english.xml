@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/4/25" version="11.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/4/26" version="11.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -852,6 +852,9 @@
       <field id="no">
         <phrase id="fldcaption" value="No." />
       </field>
+      <field id="kode">
+        <phrase id="fldcaption" value="Kode" />
+      </field>
     </table>
     <table id="t93_parameter">
       <phrase id="tblcaption" value="t 93 parameter" />
@@ -1134,20 +1137,23 @@
       <field id="url">
         <phrase id="fldcaption" value="Url" />
       </field>
+      <field id="no">
+        <phrase id="fldcaption" value="#" />
+      </field>
       <field id="articleid">
         <phrase id="fldcaption" value="Article ID" />
       </field>
+      <field id="kode">
+        <phrase id="fldcaption" value="Article No." />
+      </field>
       <field id="articlenama">
-        <phrase id="fldcaption" value="Article" />
+        <phrase id="fldcaption" value="Description" />
       </field>
       <field id="nourut">
         <phrase id="fldcaption" value="No Urut" />
       </field>
-      <field id="no">
-        <phrase id="fldcaption" value="No." />
-      </field>
       <field id="tgl">
-        <phrase id="fldcaption" value="Tgl" />
+        <phrase id="fldcaption" value="Tgl." />
       </field>
       <field id="jam">
         <phrase id="fldcaption" value="Jam" />
@@ -1156,7 +1162,7 @@
         <phrase id="fldcaption" value="Keterangan" />
       </field>
       <field id="noref">
-        <phrase id="fldcaption" value="No Ref" />
+        <phrase id="fldcaption" value="No. Ref." />
       </field>
       <field id="masukqty">
         <phrase id="fldcaption" value="Masuk" />

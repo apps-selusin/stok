@@ -131,11 +131,23 @@ function f_UpdateSaldo($ArticleID) {
 		ew_Execute($q);
 		$rs->MoveNext();
 	}
+
+	// update field kode
+	f_UpdateKode($ArticleID);
 }
 
 function f_GetNoSO($JualID) {
 	$q = "select NoSO from t11_jual where id = '".$JualID."'";
 	$mNilai = ew_ExecuteScalar($q);
 	return $mNilai;
+}
+
+function f_UpdateKode($ArticleID) {
+
+	// cari nilai Kode berdasarkan $ArticleID
+	$q = "select Kode from t06_article where id = ".$ArticleID."";
+	$mKode = ew_ExecuteScalar($q);
+	$q = "update t13_mutasi set Kode = '".$mKode."' where ArticleID = ".$ArticleID."";
+	ew_Execute($q);
 }
 ?>
