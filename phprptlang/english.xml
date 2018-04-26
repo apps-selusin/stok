@@ -374,7 +374,7 @@
       <phrase id="menutext" value="v 04 jual" />
     </menu>
     <menu id="24">
-      <phrase id="menutext" value="r 04 jual" />
+      <phrase id="menutext" value="Penjualan" />
     </menu>
     <menu id="25">
       <phrase id="menutext" value="t 11 jual old" />
@@ -545,7 +545,7 @@
       </field>
     </table>
     <table id="r04_jual">
-      <phrase id="tblcaption" value="r 04 jual" />
+      <phrase id="tblcaption" value="Penjualan" />
       <field id="tglso">
         <phrase id="fldcaption" value="Tgl SO" />
       </field>

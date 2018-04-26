@@ -2,8 +2,6 @@
 
 // Menu
 $RootMenu = new cMenu("RootMenu", TRUE);
-$RootMenu->AddMenuItem(10091, "mi_t10_hutangdetail", $Language->MenuPhrase("10091", "MenuText"), "t10_hutangdetaillist.php?cmd=resetall", -1, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t10_hutangdetail'), FALSE, FALSE, "");
-$RootMenu->AddMenuItem(10092, "mi_t12_jualdetail", $Language->MenuPhrase("10092", "MenuText"), "t12_jualdetaillist.php?cmd=resetall", -1, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t12_jualdetail'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(1, "mi_cf01_home_php", $Language->MenuPhrase("1", "MenuText"), "cf01_home.php", -1, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}cf01_home.php'), FALSE, TRUE, "");
 $RootMenu->AddMenuItem(19, "mi_t08_beli", $Language->MenuPhrase("19", "MenuText"), "t08_belilist.php", -1, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t08_beli'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(10021, "mi_t09_hutang", $Language->MenuPhrase("10021", "MenuText"), "t09_hutanglist.php", -1, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t09_hutang'), FALSE, FALSE, "");
