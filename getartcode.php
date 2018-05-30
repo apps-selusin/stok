@@ -12,7 +12,11 @@ if ($SubGroupID) {
 	// ambil data di tabel sub group terlebih dahulu
 	$q = mysql_query("select * from t05_subgroup where id = ".$SubGroupID."");
 	while ($rs = mysql_fetch_array($q)) {
-		$maingroup = substr($rs["Kode"], 0, 1);
+		//$maingroup = substr($rs["Kode"], 0, 1);
+		$MainGroupID = $rs["MainGroupID"];
+		$qMainGroup = mysql_query("select Kode from t04_maingroup where id = ".$MainGroupID."");
+		$rsMainGroup = mysql_fetch_array($qMainGroup);
+		$maingroup = $rsMainGroup["Kode"];
 		$subgroup = $rs["Kode"];
 	}
 	
