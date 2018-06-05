@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <configuration date="2018/06/05" author="e.World Technology Ltd.">
-  <project id="{A2EF3792-3541-4459-9D68-D8F1DBA083C2}" file="C:\xampp\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="11.0" datetime="2018/06/05 23:46:09" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
+  <project id="{A2EF3792-3541-4459-9D68-D8F1DBA083C2}" file="C:\xampp\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="11.0" datetime="2018/06/05 23:52:13" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
     <table id="r01_beli" name="r01_beli" caption="Pembelian" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="r02_stok" name="r02_stok" caption="Stok" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="r03_hutang" name="r03_hutang" caption="Hutang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />

@@ -2311,6 +2311,7 @@ class crr02_stok_summary extends crr02_stok {
 	function Page_Load() {
 
 		//echo "Page Load";
+		$this->namaarticle->Visible = FALSE;
 	}
 
 	// Page Unload event
