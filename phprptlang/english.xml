@@ -519,6 +519,9 @@
       <field id="subtotal">
         <phrase id="fldcaption" value="Sub Total" />
       </field>
+      <field id="namaarticle">
+        <phrase id="fldcaption" value="namaarticle" />
+      </field>
     </table>
     <table id="r03_hutang">
       <phrase id="tblcaption" value="Hutang" />
@@ -1070,6 +1073,9 @@
       </field>
       <field id="article">
         <phrase id="fldcaption" value="Article" />
+      </field>
+      <field id="namaarticle">
+        <phrase id="fldcaption" value="namaarticle" />
       </field>
     </table>
     <table id="v03_hutang">

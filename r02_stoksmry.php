@@ -579,12 +579,13 @@ class crr02_stok_summary extends crr02_stok {
 		$this->Satuan->SetVisibility();
 		$this->AvgHarga->SetVisibility();
 		$this->SubTotal->SetVisibility();
+		$this->namaarticle->SetVisibility();
 
 		// Aggregate variables
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 6;
+		$nDtls = 7;
 		$nGrps = 3;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -597,7 +598,7 @@ class crr02_stok_summary extends crr02_stok {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(FALSE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -898,6 +899,7 @@ class crr02_stok_summary extends crr02_stok {
 				$this->FirstRowData['Satuan'] = ewr_Conv($rs->fields('Satuan'), 200);
 				$this->FirstRowData['AvgHarga'] = ewr_Conv($rs->fields('AvgHarga'), 5);
 				$this->FirstRowData['SubTotal'] = ewr_Conv($rs->fields('SubTotal'), 5);
+				$this->FirstRowData['namaarticle'] = ewr_Conv($rs->fields('namaarticle'), 200);
 			}
 		} else { // Get next row
 			$rs->MoveNext();
@@ -915,11 +917,13 @@ class crr02_stok_summary extends crr02_stok {
 			$this->Satuan->setDbValue($rs->fields('Satuan'));
 			$this->AvgHarga->setDbValue($rs->fields('AvgHarga'));
 			$this->SubTotal->setDbValue($rs->fields('SubTotal'));
+			$this->namaarticle->setDbValue($rs->fields('namaarticle'));
 			$this->Val[1] = $this->Article->CurrentValue;
 			$this->Val[2] = $this->SumQty->CurrentValue;
 			$this->Val[3] = $this->Satuan->CurrentValue;
 			$this->Val[4] = $this->AvgHarga->CurrentValue;
 			$this->Val[5] = $this->SubTotal->CurrentValue;
+			$this->Val[6] = $this->namaarticle->CurrentValue;
 		} else {
 			$this->MainGroup->setDbValue("");
 			$this->SubGroup->setDbValue("");
@@ -928,6 +932,7 @@ class crr02_stok_summary extends crr02_stok {
 			$this->Satuan->setDbValue("");
 			$this->AvgHarga->setDbValue("");
 			$this->SubTotal->setDbValue("");
+			$this->namaarticle->setDbValue("");
 		}
 	}
 
@@ -1107,6 +1112,7 @@ class crr02_stok_summary extends crr02_stok {
 				$this->GrandCnt[4] = $this->TotCount;
 				$this->GrandCnt[5] = $this->TotCount;
 				$this->GrandSmry[5] = $rsagg->fields("sum_subtotal");
+				$this->GrandCnt[6] = $this->TotCount;
 				$rsagg->Close();
 				$bGotSummary = TRUE;
 			}
@@ -1187,6 +1193,9 @@ class crr02_stok_summary extends crr02_stok {
 
 			// SubTotal
 			$this->SubTotal->HrefValue = "";
+
+			// namaarticle
+			$this->namaarticle->HrefValue = "";
 		} else {
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER) {
 			$this->RowAttrs["data-group"] = $this->MainGroup->GroupValue(); // Set up group attribute
@@ -1236,6 +1245,10 @@ class crr02_stok_summary extends crr02_stok {
 			$this->SubTotal->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 			$this->SubTotal->CellAttrs["style"] = "text-align:right;";
 
+			// namaarticle
+			$this->namaarticle->ViewValue = $this->namaarticle->CurrentValue;
+			$this->namaarticle->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
 			// MainGroup
 			$this->MainGroup->HrefValue = "";
 
@@ -1256,6 +1269,9 @@ class crr02_stok_summary extends crr02_stok {
 
 			// SubTotal
 			$this->SubTotal->HrefValue = "";
+
+			// namaarticle
+			$this->namaarticle->HrefValue = "";
 		}
 
 		// Call Cell_Rendered event
@@ -1360,6 +1376,15 @@ class crr02_stok_summary extends crr02_stok {
 			$HrefValue = &$this->SubTotal->HrefValue;
 			$LinkAttrs = &$this->SubTotal->LinkAttrs;
 			$this->Cell_Rendered($this->SubTotal, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// namaarticle
+			$CurrentValue = $this->namaarticle->CurrentValue;
+			$ViewValue = &$this->namaarticle->ViewValue;
+			$ViewAttrs = &$this->namaarticle->ViewAttrs;
+			$CellAttrs = &$this->namaarticle->CellAttrs;
+			$HrefValue = &$this->namaarticle->HrefValue;
+			$LinkAttrs = &$this->namaarticle->LinkAttrs;
+			$this->Cell_Rendered($this->namaarticle, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 		}
 
 		// Call Row_Rendered event
@@ -1379,6 +1404,7 @@ class crr02_stok_summary extends crr02_stok {
 		if ($this->Satuan->Visible) $this->DtlColumnCount += 1;
 		if ($this->AvgHarga->Visible) $this->DtlColumnCount += 1;
 		if ($this->SubTotal->Visible) $this->DtlColumnCount += 1;
+		if ($this->namaarticle->Visible) $this->DtlColumnCount += 1;
 	}
 
 	// Set up Breadcrumb
@@ -2006,7 +2032,7 @@ class crr02_stok_summary extends crr02_stok {
 	// Get sort parameters based on sort links clicked
 	function GetSort($options = array()) {
 		if ($this->DrillDown)
-			return "";
+			return "`namaarticle` ASC";
 		$bResetSort = @$options["resetsort"] == "1" || @$_GET["cmd"] == "resetsort";
 		$orderBy = (@$options["order"] <> "") ? @$options["order"] : @$_GET["order"];
 		$orderType = (@$options["ordertype"] <> "") ? @$options["ordertype"] : @$_GET["ordertype"];
@@ -2025,6 +2051,7 @@ class crr02_stok_summary extends crr02_stok {
 			$this->Satuan->setSort("");
 			$this->AvgHarga->setSort("");
 			$this->SubTotal->setSort("");
+			$this->namaarticle->setSort("");
 
 		// Check for an Order parameter
 		} elseif ($orderBy <> "") {
@@ -2037,9 +2064,16 @@ class crr02_stok_summary extends crr02_stok {
 			$this->UpdateSort($this->Satuan, $bCtrl); // Satuan
 			$this->UpdateSort($this->AvgHarga, $bCtrl); // AvgHarga
 			$this->UpdateSort($this->SubTotal, $bCtrl); // SubTotal
+			$this->UpdateSort($this->namaarticle, $bCtrl); // namaarticle
 			$sSortSql = $this->SortSql();
 			$this->setOrderBy($sSortSql);
 			$this->setStartGroup(1);
+		}
+
+		// Set up default sort
+		if ($this->getOrderBy() == "") {
+			$this->setOrderBy("`namaarticle` ASC");
+			$this->namaarticle->setSort("ASC");
 		}
 		return $this->getOrderBy();
 	}
@@ -2715,6 +2749,24 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	</td>
 <?php } ?>
 <?php } ?>
+<?php if ($Page->namaarticle->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="namaarticle"><div class="r02_stok_namaarticle"><span class="ewTableHeaderCaption"><?php echo $Page->namaarticle->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="namaarticle">
+<?php if ($Page->SortUrl($Page->namaarticle) == "") { ?>
+		<div class="ewTableHeaderBtn r02_stok_namaarticle">
+			<span class="ewTableHeaderCaption"><?php echo $Page->namaarticle->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r02_stok_namaarticle" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->namaarticle) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->namaarticle->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->namaarticle->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->namaarticle->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
 	</tr>
 </thead>
 <tbody>
@@ -2860,6 +2912,10 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="SubTotal"<?php echo $Page->SubTotal->CellAttributes() ?>>
 <span<?php echo $Page->SubTotal->ViewAttributes() ?>><?php echo $Page->SubTotal->ListViewValue() ?></span></td>
 <?php } ?>
+<?php if ($Page->namaarticle->Visible) { ?>
+		<td data-field="namaarticle"<?php echo $Page->namaarticle->CellAttributes() ?>>
+<span<?php echo $Page->namaarticle->ViewAttributes() ?>><?php echo $Page->namaarticle->ListViewValue() ?></span></td>
+<?php } ?>
 	</tr>
 <?php
 
@@ -2931,6 +2987,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->SubTotal->Visible) { ?>
 		<td data-field="SubTotal"<?php echo $Page->SubGroup->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span<?php echo $Page->SubTotal->ViewAttributes() ?>><?php echo $Page->SubTotal->SumViewValue ?></span></span></td>
 <?php } ?>
+<?php if ($Page->namaarticle->Visible) { ?>
+		<td data-field="namaarticle"<?php echo $Page->SubGroup->CellAttributes() ?>></td>
+<?php } ?>
 	</tr>
 <?php } else { ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
@@ -2938,7 +2997,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->SubGrpColumnCount + $Page->DtlColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->SubTotal->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->SubGroup->GroupViewValue, $Page->SubGroup->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[2][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->namaarticle->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->SubGroup->GroupViewValue, $Page->SubGroup->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[2][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
 <?php } ?>
 	</tr>
 	<tr<?php echo $Page->RowAttributes(); ?>>
@@ -2952,7 +3011,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="Article"<?php echo $Page->SubGroup->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->SumQty->Visible) { ?>
-		<td data-field="SumQty"<?php echo $Page->SubTotal->CellAttributes() ?>>
+		<td data-field="SumQty"<?php echo $Page->namaarticle->CellAttributes() ?>>
 <span<?php echo $Page->SumQty->ViewAttributes() ?>><?php echo $Page->SumQty->SumViewValue ?></span></td>
 <?php } ?>
 <?php if ($Page->Satuan->Visible) { ?>
@@ -2962,8 +3021,11 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="AvgHarga"<?php echo $Page->SubGroup->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->SubTotal->Visible) { ?>
-		<td data-field="SubTotal"<?php echo $Page->SubTotal->CellAttributes() ?>>
+		<td data-field="SubTotal"<?php echo $Page->namaarticle->CellAttributes() ?>>
 <span<?php echo $Page->SubTotal->ViewAttributes() ?>><?php echo $Page->SubTotal->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->namaarticle->Visible) { ?>
+		<td data-field="namaarticle"<?php echo $Page->SubGroup->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 	</tr>
 <?php } ?>
@@ -3035,11 +3097,14 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->SubTotal->Visible) { ?>
 		<td data-field="SubTotal"<?php echo $Page->MainGroup->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span<?php echo $Page->SubTotal->ViewAttributes() ?>><?php echo $Page->SubTotal->SumViewValue ?></span></span></td>
 <?php } ?>
+<?php if ($Page->namaarticle->Visible) { ?>
+		<td data-field="namaarticle"<?php echo $Page->MainGroup->CellAttributes() ?>></td>
+<?php } ?>
 	</tr>
 <?php } else { ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->GrpColumnCount + $Page->DtlColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->SubTotal->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->MainGroup->GroupViewValue, $Page->MainGroup->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[1][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+		<td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->namaarticle->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->MainGroup->GroupViewValue, $Page->MainGroup->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[1][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
 <?php } ?>
 	</tr>
 	<tr<?php echo $Page->RowAttributes(); ?>>
@@ -3050,7 +3115,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="Article"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->SumQty->Visible) { ?>
-		<td data-field="SumQty"<?php echo $Page->SubTotal->CellAttributes() ?>>
+		<td data-field="SumQty"<?php echo $Page->namaarticle->CellAttributes() ?>>
 <span<?php echo $Page->SumQty->ViewAttributes() ?>><?php echo $Page->SumQty->SumViewValue ?></span></td>
 <?php } ?>
 <?php if ($Page->Satuan->Visible) { ?>
@@ -3060,8 +3125,11 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="AvgHarga"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->SubTotal->Visible) { ?>
-		<td data-field="SubTotal"<?php echo $Page->SubTotal->CellAttributes() ?>>
+		<td data-field="SubTotal"<?php echo $Page->namaarticle->CellAttributes() ?>>
 <span<?php echo $Page->SubTotal->ViewAttributes() ?>><?php echo $Page->SubTotal->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->namaarticle->Visible) { ?>
+		<td data-field="namaarticle"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 	</tr>
 <?php } ?>

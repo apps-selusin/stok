@@ -16,6 +16,7 @@ class crr02_stok extends crTableBase {
 	var $Satuan;
 	var $AvgHarga;
 	var $SubTotal;
+	var $namaarticle;
 
 	//
 	// Table class constructor
@@ -101,6 +102,14 @@ class crr02_stok extends crTableBase {
 		$this->SubTotal->SqlSelect = "";
 		$this->SubTotal->SqlOrderBy = "";
 		$this->fields['SubTotal'] = &$this->SubTotal;
+
+		// namaarticle
+		$this->namaarticle = new crField('r02_stok', 'r02_stok', 'x_namaarticle', 'namaarticle', '`namaarticle`', 200, EWR_DATATYPE_STRING, -1);
+		$this->namaarticle->Sortable = TRUE; // Allow sort
+		$this->namaarticle->DateFilter = "";
+		$this->namaarticle->SqlSelect = "";
+		$this->namaarticle->SqlOrderBy = "";
+		$this->fields['namaarticle'] = &$this->namaarticle;
 	}
 
 	// Set Field Visibility
