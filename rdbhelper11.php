@@ -90,6 +90,17 @@ function Database_Connecting(&$info) {
 	// $info["db"] = "production_db";
 	// }
 
+	if (ewr_CurrentUserIP () == "127.0.0.1"  || ewr_CurrentUserIP () == "::1"  || ewr_CurrentHost () == "localhost" ) { // testing on local PC
+		$info["host"] = "localhost";
+		$info["user"] = "root"; // sesuaikan dengan username database di komputer localhost
+		$info["pass"] = "admin"; // sesuaikan dengan password database di komputer localhost
+		$info["db"] = "db_stok"; // sesuaikan dengan nama database di komputer localhost
+	} elseif (ewr_CurrentHost () == "stok2.aimpglobal.com") { // setting koneksi database untuk komputer server
+		$info["host"] = "mysql.idhostinger.com";  // sesuaikan dengan ip address atau hostname komputer server
+		$info["user"] = "u197022578_stok2"; // sesuaikan dengan username database di komputer server
+		$info["pass"] = "M457r1P 81"; // sesuaikan deengan password database di komputer server
+		$info["db"] = "u197022578_stok2"; // sesuaikan dengan nama database di komputer server
+	}
 }
 }
 if (!function_exists("Database_Connected")) {
