@@ -273,7 +273,7 @@ class ct06_article extends cTable {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() { // Order By
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`Kode` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`Nama` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
