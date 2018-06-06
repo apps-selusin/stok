@@ -555,6 +555,12 @@ function Database_Connecting(&$info) {
 	return ewr_ServerVar("HTTP_HOST");
 }
 ]]></CustomScript>
+  <CustomScript ScriptType="Server" ScriptCodeType="Table" ScriptName="Page_Load" ScriptCtrlID="summary" ScriptL1Key="r02_stok" ScriptL2Key=""><![CDATA[// Page Load event
+function Page_Load() {
+	//echo "Page Load";
+	$this->namaarticle->Visible = FALSE;
+}
+]]></CustomScript>
   <Menu MenuID="23" MenuText="v 04 jual" MenuParentID="-1" MenuGroup="0" MenuSource="" MenuExtUrl="" MenuAnonymous="0" MenuSecurity="" MenuUrl="v04_jual" MenuType="Table" MenuCustomUrl="0" MenuLevel="0" MenuShow="0" MenuDisplayOrder="100" MenuIconClass="" />
   <Menu MenuID="24" MenuText="Penjualan" MenuParentID="-1" MenuGroup="0" MenuSource="" MenuExtUrl="" MenuAnonymous="0" MenuSecurity="" MenuUrl="r04_jual" MenuType="Table" MenuCustomUrl="0" MenuLevel="0" MenuShow="1" MenuDisplayOrder="200" MenuIconClass="" />
   <Menu MenuID="25" MenuText="t 11 jual old" MenuParentID="-1" MenuGroup="0" MenuSource="" MenuExtUrl="" MenuAnonymous="0" MenuSecurity="" MenuUrl="t11_jual_old" MenuType="Table" MenuCustomUrl="0" MenuLevel="0" MenuShow="0" MenuDisplayOrder="300" MenuIconClass="" />

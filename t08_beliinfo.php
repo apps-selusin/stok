@@ -807,6 +807,7 @@ class ct08_beli extends cTable {
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
 		$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+		$sSqlWrk .= " ORDER BY `Nama` ASC";
 			$rswrk = Conn()->Execute($sSqlWrk);
 			if ($rswrk && !$rswrk->EOF) { // Lookup values found
 				$arwrk = array();
@@ -1101,6 +1102,7 @@ class ct08_beli extends cTable {
 			$this->ArticleID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
 			$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$sSqlWrk .= " ORDER BY `Nama` ASC";
 			if ($rs = ew_LoadRecordset($sSqlWrk, $conn)) {
 				while ($rs && !$rs->EOF) {
 					$ar = array();
