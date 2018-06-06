@@ -3,6 +3,7 @@ if (session_id() == "") session_start(); // Init session data
 ob_start(); // Turn on output buffering
 ?>
 <?php include_once "ewcfg14.php" ?>
+<?php $EW_ROOT_RELATIVE_PATH = ""; ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql14.php") ?>
 <?php include_once "phpfn14.php" ?>
 <?php include_once "t96_employeesinfo.php" ?>
@@ -13,18 +14,21 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$default = NULL; // Initialize page object first
+$cf02_home_php = NULL; // Initialize page object first
 
-class cdefault {
+class ccf02_home_php {
 
 	// Page ID
-	var $PageID = 'default';
+	var $PageID = 'custom';
 
 	// Project ID
 	var $ProjectID = '{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}';
 
+	// Table name
+	var $TableName = 'cf02_home.php';
+
 	// Page object name
-	var $PageObjName = 'default';
+	var $PageObjName = 'cf02_home_php';
 
 	// Page headings
 	var $Heading = '';
@@ -209,7 +213,11 @@ class cdefault {
 
 		// Page ID
 		if (!defined("EW_PAGE_ID"))
-			define("EW_PAGE_ID", 'default', TRUE);
+			define("EW_PAGE_ID", 'custom', TRUE);
+
+		// Table name (for backward compatibility)
+		if (!defined("EW_TABLE_NAME"))
+			define("EW_TABLE_NAME", 'cf02_home.php', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"]))
@@ -240,17 +248,31 @@ class cdefault {
 
 		// Security
 		$Security = new cAdvancedSecurity();
+		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loading();
+		$Security->LoadCurrentUserLevel($this->ProjectID . $this->TableName);
+		if ($Security->IsLoggedIn()) $Security->TablePermission_Loaded();
+		if (!$Security->CanReport()) {
+			$Security->SaveLastUrl();
+			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
+			$this->Page_Terminate(ew_GetUrl("index.php"));
+		}
+		if ($Security->IsLoggedIn()) {
+			$Security->UserID_Loading();
+			$Security->LoadUserID();
+			$Security->UserID_Loaded();
+		}
 
 		// NOTE: Security object may be needed in other part of the script, skip set to Nothing
 		// 
 		// Security = null;
 		// 
+
+		if (@$_GET["export"] <> "")
+			$gsExport = $_GET["export"]; // Get export parameter, used in header
+
 		// Global Page Loading event (in userfn*.php)
-
 		Page_Loading();
-
-		// Page Load event
-		$this->Page_Load();
 
 		// Check token
 		if (!$this->ValidPost()) {
@@ -269,16 +291,12 @@ class cdefault {
 	function Page_Terminate($url = "") {
 		global $gsExportFile, $gTmpImages;
 
-		// Page Unload event
-		$this->Page_Unload();
-
 		// Global Page Unloaded event (in userfn*.php)
 		Page_Unloaded();
 
 		// Export
-		$this->Page_Redirecting($url);
-
 		// Close connection
+
 		ew_CloseConn();
 
 		// Go to URL if specified
@@ -295,94 +313,18 @@ class cdefault {
 	// Page main
 	//
 	function Page_Main() {
-		global $Security, $Language, $Breadcrumb;
+
+		// Set up Breadcrumb
+		$this->SetupBreadcrumb();
+	}
+
+	// Set up Breadcrumb
+	function SetupBreadcrumb() {
+		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
-
-		// If session expired, show session expired message
-		if (@$_GET["expired"] == "1")
-			$this->setFailureMessage($Language->Phrase("SessionExpired"));
-		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
-		$Security->LoadUserLevel(); // Load User Level
-		if ($Security->AllowList(CurrentProjectID() . 'cf01_home.php'))
-		$this->Page_Terminate("cf01_home.php"); // Exit and go to default page
-		if ($Security->AllowList(CurrentProjectID() . 't01_company'))
-			$this->Page_Terminate("t01_companylist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't02_vendor'))
-			$this->Page_Terminate("t02_vendorlist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't03_customer'))
-			$this->Page_Terminate("t03_customerlist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't04_maingroup'))
-			$this->Page_Terminate("t04_maingrouplist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't05_subgroup'))
-			$this->Page_Terminate("t05_subgrouplist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't06_article'))
-			$this->Page_Terminate("t06_articlelist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't07_satuan'))
-			$this->Page_Terminate("t07_satuanlist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't08_beli'))
-			$this->Page_Terminate("t08_belilist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't09_hutang'))
-			$this->Page_Terminate("t09_hutanglist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't10_hutangdetail'))
-			$this->Page_Terminate("t10_hutangdetaillist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't11_jual'))
-			$this->Page_Terminate("t11_juallist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't12_jualdetail'))
-			$this->Page_Terminate("t12_jualdetaillist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't91_log_status'))
-			$this->Page_Terminate("t91_log_statuslist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't92_log'))
-			$this->Page_Terminate("t92_loglist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't93_parameter'))
-			$this->Page_Terminate("t93_parameterlist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't94_home'))
-			$this->Page_Terminate("t94_homelist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't95_homedetail'))
-			$this->Page_Terminate("t95_homedetaillist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't96_employees'))
-			$this->Page_Terminate("t96_employeeslist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't97_userlevels'))
-			$this->Page_Terminate("t97_userlevelslist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't98_userlevelpermissions'))
-			$this->Page_Terminate("t98_userlevelpermissionslist.php");
-		if ($Security->AllowList(CurrentProjectID() . 't99_audittrail'))
-			$this->Page_Terminate("t99_audittraillist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'cf02_home.php'))
-			$this->Page_Terminate("cf02_home.php");
-		if ($Security->IsLoggedIn()) {
-			$this->setFailureMessage(ew_DeniedMsg() . "<br><br><a href=\"logout.php\">" . $Language->Phrase("BackToLogin") . "</a>");
-		} else {
-			$this->Page_Terminate("login.php"); // Exit and go to login page
-		}
-	}
-
-	// Page Load event
-	function Page_Load() {
-
-		//echo "Page Load";
-	}
-
-	// Page Unload event
-	function Page_Unload() {
-
-		//echo "Page Unload";
-	}
-
-	// Page Redirecting event
-	function Page_Redirecting(&$url) {
-
-		// Example:
-		//$url = "your URL";
-
-	}
-
-	// Message Showing event
-	// $type = ''|'success'|'failure'
-	function Message_Showing(&$msg, $type) {
-
-		// Example:
-		//if ($type == 'success') $msg = "your success message";
-
+		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
+		$Breadcrumb->Add("custom", "cf02_home_php", $url, "", "cf02_home_php", TRUE);
+		$this->Heading = $Language->TablePhrase("cf02_home_php", "TblCaption"); 
 	}
 }
 ?>
@@ -390,19 +332,95 @@ class cdefault {
 <?php
 
 // Create page object
-if (!isset($default)) $default = new cdefault();
+if (!isset($cf02_home_php)) $cf02_home_php = new ccf02_home_php();
 
 // Page init
-$default->Page_Init();
+$cf02_home_php->Page_Init();
 
 // Page main
-$default->Page_Main();
+$cf02_home_php->Page_Main();
+
+// Global Page Rendering event (in userfn*.php)
+Page_Rendering();
 ?>
 <?php include_once "header.php" ?>
 <?php
-$default->ShowMessage();
+
+$db =& DbHelper(); 
+
+function show_table($r) {
+	echo "<table border='0'>";
+	while (!$r->EOF) {
+		$no = $r->fields["No"];
+		echo "<tr><td>".$no.".</td><td colspan='3'>".$r->fields["Keterangan"]."</td></tr>";
+		echo "<tr><td>&nbsp;</td><td>";
+		echo "<table border='1'>";
+		while ($no == $r->fields["No"]) {
+			echo "
+			<tr>
+				<td>&nbsp;</td>
+				<td>".$r->fields["TanggalJam"]."</td>
+				<td>".$r->fields["Status2"]."</td>
+				<td>".$r->fields["Keterangan2"]."</td>
+			</tr>";
+			$r->MoveNext();
+		}
+		echo "</table></td></tr>";
+		echo "<tr><td>&nbsp;</td></tr>";
+	}
+	echo "</table>";
+}
 ?>
+
+<style>
+.panel-heading a{
+  display:block;
+}
+
+.panel-heading a.collapsed {
+  background: url(http://upload.wikimedia.org/wikipedia/commons/3/36/Vector_skin_right_arrow.png) center right no-repeat;
+}
+
+.panel-heading a {
+  background: url(http://www.useragentman.com/blog/wp-content/themes/useragentman/images/widgets/downArrow.png) center right no-repeat;
+}
+</style>
+
+<div class="row">
+
+	<div class="col-lg-12 col-md-12 col-sm-12">
+	<div class="panel panel-default">
+		<div class="panel-heading"><strong><a data-toggle="collapse" href="#log">Log</a></strong></div>
+		<div class="panel-body">
+			<?php
+			// $sql = "SELECT tgl, jdl, ket, done FROM t95_homedetail where kat = '5log'
+			// 	order by `tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC";
+			// $r = Conn()->Execute($sql);
+			// show_table($r);
+			$q = "
+				select distinct
+					a.No,
+					a.Keterangan,
+					a.TanggalJam,
+					b.Status as Status2
+				from
+					t92_log a
+					left join t91_log_status b on a.Status = b.id
+				order by
+					no desc,
+					tanggaljam asc";
+			$r = Conn()->Execute($q);
+			// show_table($r);
+			// echo $db->ExecuteHtml($sql, ["fieldcaption" => TRUE, "tablename" => ["products", "categories"]]);
+			echo $db->ExecuteHtml($q, ["fieldcaption" => TRUE, "tablename" => ["t92_log", "t91_log_status"]]); 
+			?>
+		</div>
+	</div>
+	</div>
+
+</div>
+<?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
 <?php include_once "footer.php" ?>
 <?php
-$default->Page_Terminate();
+$cf02_home_php->Page_Terminate();
 ?>

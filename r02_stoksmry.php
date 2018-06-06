@@ -529,7 +529,7 @@ class crr02_stok_summary extends crr02_stok {
 	var $TotalGrps = 0; // Total groups
 	var $GrpCount = 0; // Group count
 	var $GrpCounter = array(); // Group counter
-	var $DisplayGrps = 10; // Groups per page
+	var $DisplayGrps = 50; // Groups per page
 	var $GrpRange = 10;
 	var $Sort = "";
 	var $Filter = "";
@@ -1064,7 +1064,7 @@ class crr02_stok_summary extends crr02_stok {
 				if (strtoupper($sWrk) == "ALL") { // Display all groups
 					$this->DisplayGrps = -1;
 				} else {
-					$this->DisplayGrps = 10; // Non-numeric, load default
+					$this->DisplayGrps = 50; // Non-numeric, load default
 				}
 			}
 			$this->setGroupPerPage($this->DisplayGrps); // Save to session
@@ -1076,7 +1076,7 @@ class crr02_stok_summary extends crr02_stok {
 			if ($this->getGroupPerPage() <> "") {
 				$this->DisplayGrps = $this->getGroupPerPage(); // Restore from session
 			} else {
-				$this->DisplayGrps = 10; // Load default
+				$this->DisplayGrps = 50; // Load default
 			}
 		}
 	}

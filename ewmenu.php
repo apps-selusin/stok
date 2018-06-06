@@ -2,6 +2,7 @@
 
 // Menu
 $RootMenu = new cMenu("RootMenu", TRUE);
+$RootMenu->AddMenuItem(10098, "mi_cf02_home_php", $Language->MenuPhrase("10098", "MenuText"), "cf02_home.php", -1, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}cf02_home.php'), FALSE, TRUE, "");
 $RootMenu->AddMenuItem(1, "mi_cf01_home_php", $Language->MenuPhrase("1", "MenuText"), "cf01_home.php", -1, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}cf01_home.php'), FALSE, TRUE, "");
 $RootMenu->AddMenuItem(19, "mi_t08_beli", $Language->MenuPhrase("19", "MenuText"), "t08_belilist.php", -1, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t08_beli'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(10021, "mi_t09_hutang", $Language->MenuPhrase("10021", "MenuText"), "t09_hutanglist.php", -1, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t09_hutang'), FALSE, FALSE, "");
@@ -14,6 +15,8 @@ $RootMenu->AddMenuItem(10020, "mri_r035fhutang", $Language->MenuPhrase("10020", 
 $RootMenu->AddMenuItem(10032, "mri_r045fjual", $Language->MenuPhrase("10032", "MenuText"), "r04_jualsmry.php", 10013, "{A2EF3792-3541-4459-9D68-D8F1DBA083C2}", AllowListMenu('{A2EF3792-3541-4459-9D68-D8F1DBA083C2}r04_jual'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(6, "mci_Setup", $Language->MenuPhrase("6", "MenuText"), "", -1, "", TRUE, FALSE, TRUE, "");
 $RootMenu->AddMenuItem(10085, "mci_Home", $Language->MenuPhrase("10085", "MenuText"), "", 6, "", TRUE, FALSE, TRUE, "");
+$RootMenu->AddMenuItem(10097, "mi_t92_log", $Language->MenuPhrase("10097", "MenuText"), "t92_loglist.php", 10085, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t92_log'), FALSE, FALSE, "");
+$RootMenu->AddMenuItem(10096, "mi_t91_log_status", $Language->MenuPhrase("10096", "MenuText"), "t91_log_statuslist.php", 10085, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t91_log_status'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(10036, "mi_t94_home", $Language->MenuPhrase("10036", "MenuText"), "t94_homelist.php", 10085, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t94_home'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(10037, "mi_t95_homedetail", $Language->MenuPhrase("10037", "MenuText"), "t95_homedetaillist.php", 10085, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t95_homedetail'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(10086, "mi_t93_parameter", $Language->MenuPhrase("10086", "MenuText"), "t93_parameterlist.php", 6, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t93_parameter'), FALSE, FALSE, "");

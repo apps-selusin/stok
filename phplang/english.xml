@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/6/6" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/6/7" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -618,38 +618,32 @@
   <project>
     <phrase id="bodytitle" value="STOK Apps." />
     <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
-    <menu id="10091">
-      <phrase id="menutext" value="Hutang Detail" />
-    </menu>
-    <menu id="10092">
-      <phrase id="menutext" value="Penjualan Detail" />
-    </menu>
-    <menu id="10093">
-      <phrase id="menutext" value="Mutasi" />
-    </menu>
-    <menu id="10094">
-      <phrase id="menutext" value="v 02 stok" />
-    </menu>
-    <menu id="10095">
-      <phrase id="menutext" value="v 03 hutang" />
+    <menu id="10098">
+      <phrase id="menutext" value="Home" />
     </menu>
     <menu id="1">
       <phrase id="menutext" value="Home" />
     </menu>
-    <menu id="10034">
-      <phrase id="menutext" value="v 04 jual" />
+    <menu id="10091">
+      <phrase id="menutext" value="Hutang Detail" />
     </menu>
     <menu id="19">
       <phrase id="menutext" value="Pembelian" />
     </menu>
+    <menu id="10092">
+      <phrase id="menutext" value="Penjualan Detail" />
+    </menu>
     <menu id="10021">
       <phrase id="menutext" value="Hutang" />
+    </menu>
+    <menu id="10093">
+      <phrase id="menutext" value="Mutasi" />
     </menu>
     <menu id="10027">
       <phrase id="menutext" value="Penjualan" />
     </menu>
-    <menu id="10035">
-      <phrase id="menutext" value="t 11 jual old" />
+    <menu id="10094">
+      <phrase id="menutext" value="v 02 stok" />
     </menu>
     <menu id="10013">
       <phrase id="menutext" value="Laporan" />
@@ -669,11 +663,20 @@
     <menu id="10032">
       <phrase id="menutext" value="Penjualan" />
     </menu>
+    <menu id="10095">
+      <phrase id="menutext" value="v 03 hutang" />
+    </menu>
     <menu id="6">
       <phrase id="menutext" value="Setup" />
     </menu>
     <menu id="10085">
       <phrase id="menutext" value="Home" />
+    </menu>
+    <menu id="10097">
+      <phrase id="menutext" value="Log" />
+    </menu>
+    <menu id="10096">
+      <phrase id="menutext" value="Log Status" />
     </menu>
     <menu id="10036">
       <phrase id="menutext" value="Head" />
@@ -719,6 +722,12 @@
     </menu>
     <menu id="5">
       <phrase id="menutext" value="Activity Log" />
+    </menu>
+    <menu id="10034">
+      <phrase id="menutext" value="v 04 jual" />
+    </menu>
+    <menu id="10035">
+      <phrase id="menutext" value="t 11 jual old" />
     </menu>
     <menu id="10024">
       <phrase id="menutext" value="v 01 beli" />
@@ -1080,6 +1089,36 @@
         <phrase id="fldcaption" value="Kode" />
       </field>
     </table>
+    <table id="t91_log_status">
+      <phrase id="tblcaption" value="Log Status" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
+      </field>
+    </table>
+    <table id="t92_log">
+      <phrase id="tblcaption" value="Log" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="no">
+        <phrase id="fldcaption" value="No" />
+      </field>
+      <field id="keterangan">
+        <phrase id="fldcaption" value="Keterangan" />
+      </field>
+      <field id="keterangan2">
+        <phrase id="fldcaption" value="Keterangan 2" />
+      </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
+      </field>
+      <field id="tanggaljam">
+        <phrase id="fldcaption" value="Tanggal Jam" />
+      </field>
+    </table>
     <table id="t93_parameter">
       <phrase id="tblcaption" value="Parameter" />
       <field id="id">
@@ -1362,6 +1401,9 @@
       <field id="satuannama">
         <phrase id="fldcaption" value="Satuan Nama" />
       </field>
+    </table>
+    <table id="cf02_home_php">
+      <phrase id="tblcaption" value="Home" />
     </table>
   </project>
 </ew-language>

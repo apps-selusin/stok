@@ -5,9 +5,8 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg14.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql14.php") ?>
 <?php include_once "phpfn14.php" ?>
-<?php include_once "t09_hutanginfo.php" ?>
+<?php include_once "t92_loginfo.php" ?>
 <?php include_once "t96_employeesinfo.php" ?>
-<?php include_once "t10_hutangdetailgridcls.php" ?>
 <?php include_once "userfn14.php" ?>
 <?php
 
@@ -15,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t09_hutang_list = NULL; // Initialize page object first
+$t92_log_list = NULL; // Initialize page object first
 
-class ct09_hutang_list extends ct09_hutang {
+class ct92_log_list extends ct92_log {
 
 	// Page ID
 	var $PageID = 'list';
@@ -26,13 +25,13 @@ class ct09_hutang_list extends ct09_hutang {
 	var $ProjectID = '{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}';
 
 	// Table name
-	var $TableName = 't09_hutang';
+	var $TableName = 't92_log';
 
 	// Page object name
-	var $PageObjName = 't09_hutang_list';
+	var $PageObjName = 't92_log_list';
 
 	// Grid form hidden field names
-	var $FormName = 'ft09_hutanglist';
+	var $FormName = 'ft92_loglist';
 	var $FormActionName = 'k_action';
 	var $FormKeyName = 'k_key';
 	var $FormOldKeyName = 'k_oldkey';
@@ -297,10 +296,10 @@ class ct09_hutang_list extends ct09_hutang {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t09_hutang)
-		if (!isset($GLOBALS["t09_hutang"]) || get_class($GLOBALS["t09_hutang"]) == "ct09_hutang") {
-			$GLOBALS["t09_hutang"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t09_hutang"];
+		// Table object (t92_log)
+		if (!isset($GLOBALS["t92_log"]) || get_class($GLOBALS["t92_log"]) == "ct92_log") {
+			$GLOBALS["t92_log"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t92_log"];
 		}
 
 		// Initialize URLs
@@ -311,12 +310,12 @@ class ct09_hutang_list extends ct09_hutang {
 		$this->ExportXmlUrl = $this->PageUrl() . "export=xml";
 		$this->ExportCsvUrl = $this->PageUrl() . "export=csv";
 		$this->ExportPdfUrl = $this->PageUrl() . "export=pdf";
-		$this->AddUrl = "t09_hutangadd.php?" . EW_TABLE_SHOW_DETAIL . "=";
+		$this->AddUrl = "t92_logadd.php";
 		$this->InlineAddUrl = $this->PageUrl() . "a=add";
 		$this->GridAddUrl = $this->PageUrl() . "a=gridadd";
 		$this->GridEditUrl = $this->PageUrl() . "a=gridedit";
-		$this->MultiDeleteUrl = "t09_hutangdelete.php";
-		$this->MultiUpdateUrl = "t09_hutangupdate.php";
+		$this->MultiDeleteUrl = "t92_logdelete.php";
+		$this->MultiUpdateUrl = "t92_logupdate.php";
 
 		// Table object (t96_employees)
 		if (!isset($GLOBALS['t96_employees'])) $GLOBALS['t96_employees'] = new ct96_employees();
@@ -327,7 +326,7 @@ class ct09_hutang_list extends ct09_hutang {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't09_hutang', TRUE);
+			define("EW_TABLE_NAME", 't92_log', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"]))
@@ -369,7 +368,7 @@ class ct09_hutang_list extends ct09_hutang {
 		// Filter options
 		$this->FilterOptions = new cListOptions();
 		$this->FilterOptions->Tag = "div";
-		$this->FilterOptions->TagClassName = "ewFilterOption ft09_hutanglistsrch";
+		$this->FilterOptions->TagClassName = "ewFilterOption ft92_loglistsrch";
 
 		// List actions
 		$this->ListActions = new cListActions();
@@ -456,11 +455,11 @@ class ct09_hutang_list extends ct09_hutang {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->NoHutang->SetVisibility();
-		$this->BeliID->SetVisibility();
-		$this->JumlahHutang->SetVisibility();
-		$this->JumlahBayar->SetVisibility();
-		$this->SaldoHutang->SetVisibility();
+		$this->No->SetVisibility();
+		$this->Keterangan->SetVisibility();
+		$this->Keterangan2->SetVisibility();
+		$this->Status->SetVisibility();
+		$this->TanggalJam->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -477,22 +476,6 @@ class ct09_hutang_list extends ct09_hutang {
 
 		// Process auto fill
 		if (@$_POST["ajax"] == "autofill") {
-
-			// Get the keys for master table
-			$sDetailTblVar = $this->getCurrentDetailTable();
-			if ($sDetailTblVar <> "") {
-				$DetailTblVar = explode(",", $sDetailTblVar);
-				if (in_array("t10_hutangdetail", $DetailTblVar)) {
-
-					// Process auto fill for detail table 't10_hutangdetail'
-					if (preg_match('/^ft10_hutangdetail(grid|add|addopt|edit|update|search)$/', @$_POST["form"])) {
-						if (!isset($GLOBALS["t10_hutangdetail_grid"])) $GLOBALS["t10_hutangdetail_grid"] = new ct10_hutangdetail_grid;
-						$GLOBALS["t10_hutangdetail_grid"]->Page_Init();
-						$this->Page_Terminate();
-						exit();
-					}
-				}
-			}
 			$results = $this->GetAutoFill(@$_POST["name"], @$_POST["q"]);
 			if ($results) {
 
@@ -537,13 +520,13 @@ class ct09_hutang_list extends ct09_hutang {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t09_hutang;
+		global $EW_EXPORT, $t92_log;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t09_hutang);
+				$doc = new $class($t92_log);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -830,11 +813,11 @@ class ct09_hutang_list extends ct09_hutang {
 		$sFilterList = "";
 		$sSavedFilterList = "";
 		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJson(), ","); // Field id
-		$sFilterList = ew_Concat($sFilterList, $this->NoHutang->AdvancedSearch->ToJson(), ","); // Field NoHutang
-		$sFilterList = ew_Concat($sFilterList, $this->BeliID->AdvancedSearch->ToJson(), ","); // Field BeliID
-		$sFilterList = ew_Concat($sFilterList, $this->JumlahHutang->AdvancedSearch->ToJson(), ","); // Field JumlahHutang
-		$sFilterList = ew_Concat($sFilterList, $this->JumlahBayar->AdvancedSearch->ToJson(), ","); // Field JumlahBayar
-		$sFilterList = ew_Concat($sFilterList, $this->SaldoHutang->AdvancedSearch->ToJson(), ","); // Field SaldoHutang
+		$sFilterList = ew_Concat($sFilterList, $this->No->AdvancedSearch->ToJson(), ","); // Field No
+		$sFilterList = ew_Concat($sFilterList, $this->Keterangan->AdvancedSearch->ToJson(), ","); // Field Keterangan
+		$sFilterList = ew_Concat($sFilterList, $this->Keterangan2->AdvancedSearch->ToJson(), ","); // Field Keterangan2
+		$sFilterList = ew_Concat($sFilterList, $this->Status->AdvancedSearch->ToJson(), ","); // Field Status
+		$sFilterList = ew_Concat($sFilterList, $this->TanggalJam->AdvancedSearch->ToJson(), ","); // Field TanggalJam
 		if ($this->BasicSearch->Keyword <> "") {
 			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
 			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
@@ -857,7 +840,7 @@ class ct09_hutang_list extends ct09_hutang {
 		global $UserProfile;
 		if (@$_POST["ajax"] == "savefilters") { // Save filter request (Ajax)
 			$filters = @$_POST["filters"];
-			$UserProfile->SetSearchFilters(CurrentUserName(), "ft09_hutanglistsrch", $filters);
+			$UserProfile->SetSearchFilters(CurrentUserName(), "ft92_loglistsrch", $filters);
 
 			// Clean output buffer
 			if (!EW_DEBUG_ENABLED && ob_get_length())
@@ -887,45 +870,45 @@ class ct09_hutang_list extends ct09_hutang {
 		$this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
 		$this->id->AdvancedSearch->Save();
 
-		// Field NoHutang
-		$this->NoHutang->AdvancedSearch->SearchValue = @$filter["x_NoHutang"];
-		$this->NoHutang->AdvancedSearch->SearchOperator = @$filter["z_NoHutang"];
-		$this->NoHutang->AdvancedSearch->SearchCondition = @$filter["v_NoHutang"];
-		$this->NoHutang->AdvancedSearch->SearchValue2 = @$filter["y_NoHutang"];
-		$this->NoHutang->AdvancedSearch->SearchOperator2 = @$filter["w_NoHutang"];
-		$this->NoHutang->AdvancedSearch->Save();
+		// Field No
+		$this->No->AdvancedSearch->SearchValue = @$filter["x_No"];
+		$this->No->AdvancedSearch->SearchOperator = @$filter["z_No"];
+		$this->No->AdvancedSearch->SearchCondition = @$filter["v_No"];
+		$this->No->AdvancedSearch->SearchValue2 = @$filter["y_No"];
+		$this->No->AdvancedSearch->SearchOperator2 = @$filter["w_No"];
+		$this->No->AdvancedSearch->Save();
 
-		// Field BeliID
-		$this->BeliID->AdvancedSearch->SearchValue = @$filter["x_BeliID"];
-		$this->BeliID->AdvancedSearch->SearchOperator = @$filter["z_BeliID"];
-		$this->BeliID->AdvancedSearch->SearchCondition = @$filter["v_BeliID"];
-		$this->BeliID->AdvancedSearch->SearchValue2 = @$filter["y_BeliID"];
-		$this->BeliID->AdvancedSearch->SearchOperator2 = @$filter["w_BeliID"];
-		$this->BeliID->AdvancedSearch->Save();
+		// Field Keterangan
+		$this->Keterangan->AdvancedSearch->SearchValue = @$filter["x_Keterangan"];
+		$this->Keterangan->AdvancedSearch->SearchOperator = @$filter["z_Keterangan"];
+		$this->Keterangan->AdvancedSearch->SearchCondition = @$filter["v_Keterangan"];
+		$this->Keterangan->AdvancedSearch->SearchValue2 = @$filter["y_Keterangan"];
+		$this->Keterangan->AdvancedSearch->SearchOperator2 = @$filter["w_Keterangan"];
+		$this->Keterangan->AdvancedSearch->Save();
 
-		// Field JumlahHutang
-		$this->JumlahHutang->AdvancedSearch->SearchValue = @$filter["x_JumlahHutang"];
-		$this->JumlahHutang->AdvancedSearch->SearchOperator = @$filter["z_JumlahHutang"];
-		$this->JumlahHutang->AdvancedSearch->SearchCondition = @$filter["v_JumlahHutang"];
-		$this->JumlahHutang->AdvancedSearch->SearchValue2 = @$filter["y_JumlahHutang"];
-		$this->JumlahHutang->AdvancedSearch->SearchOperator2 = @$filter["w_JumlahHutang"];
-		$this->JumlahHutang->AdvancedSearch->Save();
+		// Field Keterangan2
+		$this->Keterangan2->AdvancedSearch->SearchValue = @$filter["x_Keterangan2"];
+		$this->Keterangan2->AdvancedSearch->SearchOperator = @$filter["z_Keterangan2"];
+		$this->Keterangan2->AdvancedSearch->SearchCondition = @$filter["v_Keterangan2"];
+		$this->Keterangan2->AdvancedSearch->SearchValue2 = @$filter["y_Keterangan2"];
+		$this->Keterangan2->AdvancedSearch->SearchOperator2 = @$filter["w_Keterangan2"];
+		$this->Keterangan2->AdvancedSearch->Save();
 
-		// Field JumlahBayar
-		$this->JumlahBayar->AdvancedSearch->SearchValue = @$filter["x_JumlahBayar"];
-		$this->JumlahBayar->AdvancedSearch->SearchOperator = @$filter["z_JumlahBayar"];
-		$this->JumlahBayar->AdvancedSearch->SearchCondition = @$filter["v_JumlahBayar"];
-		$this->JumlahBayar->AdvancedSearch->SearchValue2 = @$filter["y_JumlahBayar"];
-		$this->JumlahBayar->AdvancedSearch->SearchOperator2 = @$filter["w_JumlahBayar"];
-		$this->JumlahBayar->AdvancedSearch->Save();
+		// Field Status
+		$this->Status->AdvancedSearch->SearchValue = @$filter["x_Status"];
+		$this->Status->AdvancedSearch->SearchOperator = @$filter["z_Status"];
+		$this->Status->AdvancedSearch->SearchCondition = @$filter["v_Status"];
+		$this->Status->AdvancedSearch->SearchValue2 = @$filter["y_Status"];
+		$this->Status->AdvancedSearch->SearchOperator2 = @$filter["w_Status"];
+		$this->Status->AdvancedSearch->Save();
 
-		// Field SaldoHutang
-		$this->SaldoHutang->AdvancedSearch->SearchValue = @$filter["x_SaldoHutang"];
-		$this->SaldoHutang->AdvancedSearch->SearchOperator = @$filter["z_SaldoHutang"];
-		$this->SaldoHutang->AdvancedSearch->SearchCondition = @$filter["v_SaldoHutang"];
-		$this->SaldoHutang->AdvancedSearch->SearchValue2 = @$filter["y_SaldoHutang"];
-		$this->SaldoHutang->AdvancedSearch->SearchOperator2 = @$filter["w_SaldoHutang"];
-		$this->SaldoHutang->AdvancedSearch->Save();
+		// Field TanggalJam
+		$this->TanggalJam->AdvancedSearch->SearchValue = @$filter["x_TanggalJam"];
+		$this->TanggalJam->AdvancedSearch->SearchOperator = @$filter["z_TanggalJam"];
+		$this->TanggalJam->AdvancedSearch->SearchCondition = @$filter["v_TanggalJam"];
+		$this->TanggalJam->AdvancedSearch->SearchValue2 = @$filter["y_TanggalJam"];
+		$this->TanggalJam->AdvancedSearch->SearchOperator2 = @$filter["w_TanggalJam"];
+		$this->TanggalJam->AdvancedSearch->Save();
 		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
 		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
 	}
@@ -933,7 +916,8 @@ class ct09_hutang_list extends ct09_hutang {
 	// Return basic search SQL
 	function BasicSearchSQL($arKeywords, $type) {
 		$sWhere = "";
-		$this->BuildBasicSearchSQL($sWhere, $this->NoHutang, $arKeywords, $type);
+		$this->BuildBasicSearchSQL($sWhere, $this->Keterangan, $arKeywords, $type);
+		$this->BuildBasicSearchSQL($sWhere, $this->Keterangan2, $arKeywords, $type);
 		return $sWhere;
 	}
 
@@ -1083,11 +1067,11 @@ class ct09_hutang_list extends ct09_hutang {
 		if (@$_GET["order"] <> "") {
 			$this->CurrentOrder = @$_GET["order"];
 			$this->CurrentOrderType = @$_GET["ordertype"];
-			$this->UpdateSort($this->NoHutang, $bCtrl); // NoHutang
-			$this->UpdateSort($this->BeliID, $bCtrl); // BeliID
-			$this->UpdateSort($this->JumlahHutang, $bCtrl); // JumlahHutang
-			$this->UpdateSort($this->JumlahBayar, $bCtrl); // JumlahBayar
-			$this->UpdateSort($this->SaldoHutang, $bCtrl); // SaldoHutang
+			$this->UpdateSort($this->No, $bCtrl); // No
+			$this->UpdateSort($this->Keterangan, $bCtrl); // Keterangan
+			$this->UpdateSort($this->Keterangan2, $bCtrl); // Keterangan2
+			$this->UpdateSort($this->Status, $bCtrl); // Status
+			$this->UpdateSort($this->TanggalJam, $bCtrl); // TanggalJam
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -1099,7 +1083,8 @@ class ct09_hutang_list extends ct09_hutang {
 			if ($this->getSqlOrderBy() <> "") {
 				$sOrderBy = $this->getSqlOrderBy();
 				$this->setSessionOrderBy($sOrderBy);
-				$this->NoHutang->setSort("ASC");
+				$this->No->setSort("ASC");
+				$this->TanggalJam->setSort("ASC");
 			}
 		}
 	}
@@ -1121,12 +1106,11 @@ class ct09_hutang_list extends ct09_hutang {
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
-				$this->setSessionOrderByList($sOrderBy);
-				$this->NoHutang->setSort("");
-				$this->BeliID->setSort("");
-				$this->JumlahHutang->setSort("");
-				$this->JumlahBayar->setSort("");
-				$this->SaldoHutang->setSort("");
+				$this->No->setSort("");
+				$this->Keterangan->setSort("");
+				$this->Keterangan2->setSort("");
+				$this->Status->setSort("");
+				$this->TanggalJam->setSort("");
 			}
 
 			// Reset start position
@@ -1145,27 +1129,17 @@ class ct09_hutang_list extends ct09_hutang {
 		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
 
-		// "detail_t10_hutangdetail"
-		$item = &$this->ListOptions->Add("detail_t10_hutangdetail");
+		// "edit"
+		$item = &$this->ListOptions->Add("edit");
 		$item->CssClass = "text-nowrap";
-		$item->Visible = $Security->AllowList(CurrentProjectID() . 't10_hutangdetail') && !$this->ShowMultipleDetails;
+		$item->Visible = $Security->CanEdit();
 		$item->OnLeft = TRUE;
-		$item->ShowInButtonGroup = FALSE;
-		if (!isset($GLOBALS["t10_hutangdetail_grid"])) $GLOBALS["t10_hutangdetail_grid"] = new ct10_hutangdetail_grid;
 
-		// Multiple details
-		if ($this->ShowMultipleDetails) {
-			$item = &$this->ListOptions->Add("details");
-			$item->CssClass = "text-nowrap";
-			$item->Visible = $this->ShowMultipleDetails;
-			$item->OnLeft = TRUE;
-			$item->ShowInButtonGroup = FALSE;
-		}
-
-		// Set up detail pages
-		$pages = new cSubPages();
-		$pages->Add("t10_hutangdetail");
-		$this->DetailPages = $pages;
+		// "copy"
+		$item = &$this->ListOptions->Add("copy");
+		$item->CssClass = "text-nowrap";
+		$item->Visible = $Security->CanAdd();
+		$item->OnLeft = TRUE;
 
 		// List actions
 		$item = &$this->ListOptions->Add("listactions");
@@ -1177,18 +1151,10 @@ class ct09_hutang_list extends ct09_hutang {
 
 		// "checkbox"
 		$item = &$this->ListOptions->Add("checkbox");
-		$item->Visible = FALSE;
+		$item->Visible = $Security->CanDelete();
 		$item->OnLeft = TRUE;
 		$item->Header = "<input type=\"checkbox\" name=\"key\" id=\"key\" onclick=\"ew_SelectAllKey(this);\">";
 		$item->MoveTo(0);
-		$item->ShowInDropDown = FALSE;
-		$item->ShowInButtonGroup = FALSE;
-
-		// "sequence"
-		$item = &$this->ListOptions->Add("sequence");
-		$item->CssClass = "text-nowrap";
-		$item->Visible = TRUE;
-		$item->OnLeft = TRUE; // Always on left
 		$item->ShowInDropDown = FALSE;
 		$item->ShowInButtonGroup = FALSE;
 
@@ -1216,9 +1182,23 @@ class ct09_hutang_list extends ct09_hutang {
 		// Call ListOptions_Rendering event
 		$this->ListOptions_Rendering();
 
-		// "sequence"
-		$oListOpt = &$this->ListOptions->Items["sequence"];
-		$oListOpt->Body = ew_FormatSeqNo($this->RecCnt);
+		// "edit"
+		$oListOpt = &$this->ListOptions->Items["edit"];
+		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
+		if ($Security->CanEdit()) {
+			$oListOpt->Body = "<a class=\"ewRowLink ewEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("EditLink")) . "\" href=\"" . ew_HtmlEncode($this->EditUrl) . "\">" . $Language->Phrase("EditLink") . "</a>";
+		} else {
+			$oListOpt->Body = "";
+		}
+
+		// "copy"
+		$oListOpt = &$this->ListOptions->Items["copy"];
+		$copycaption = ew_HtmlTitle($Language->Phrase("CopyLink"));
+		if ($Security->CanAdd()) {
+			$oListOpt->Body = "<a class=\"ewRowLink ewCopy\" title=\"" . $copycaption . "\" data-caption=\"" . $copycaption . "\" href=\"" . ew_HtmlEncode($this->CopyUrl) . "\">" . $Language->Phrase("CopyLink") . "</a>";
+		} else {
+			$oListOpt->Body = "";
+		}
 
 		// Set up list action buttons
 		$oListOpt = &$this->ListOptions->GetItem("listactions");
@@ -1248,47 +1228,6 @@ class ct09_hutang_list extends ct09_hutang {
 				$oListOpt->Visible = TRUE;
 			}
 		}
-		$DetailViewTblVar = "";
-		$DetailCopyTblVar = "";
-		$DetailEditTblVar = "";
-
-		// "detail_t10_hutangdetail"
-		$oListOpt = &$this->ListOptions->Items["detail_t10_hutangdetail"];
-		if ($Security->AllowList(CurrentProjectID() . 't10_hutangdetail')) {
-			$body = $Language->Phrase("DetailLink") . $Language->TablePhrase("t10_hutangdetail", "TblCaption");
-			$body = "<a class=\"btn btn-default btn-sm ewRowLink ewDetail\" data-action=\"list\" href=\"" . ew_HtmlEncode("t10_hutangdetaillist.php?" . EW_TABLE_SHOW_MASTER . "=t09_hutang&fk_id=" . urlencode(strval($this->id->CurrentValue)) . "") . "\">" . $body . "</a>";
-			$links = "";
-			if ($links <> "") {
-				$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewDetail\" data-toggle=\"dropdown\"><b class=\"caret\"></b></button>";
-				$body .= "<ul class=\"dropdown-menu\">". $links . "</ul>";
-			}
-			$body = "<div class=\"btn-group\">" . $body . "</div>";
-			$oListOpt->Body = $body;
-			if ($this->ShowMultipleDetails) $oListOpt->Visible = FALSE;
-		}
-		if ($this->ShowMultipleDetails) {
-			$body = $Language->Phrase("MultipleMasterDetails");
-			$body = "<div class=\"btn-group\">";
-			$links = "";
-			if ($DetailViewTblVar <> "") {
-				$links .= "<li><a class=\"ewRowLink ewDetailView\" data-action=\"view\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailViewLink")) . "\" href=\"" . ew_HtmlEncode($this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailViewTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailViewLink")) . "</a></li>";
-			}
-			if ($DetailEditTblVar <> "") {
-				$links .= "<li><a class=\"ewRowLink ewDetailEdit\" data-action=\"edit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GetEditUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailEditTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailEditLink")) . "</a></li>";
-			}
-			if ($DetailCopyTblVar <> "") {
-				$links .= "<li><a class=\"ewRowLink ewDetailCopy\" data-action=\"add\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->GetCopyUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailCopyTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailCopyLink")) . "</a></li>";
-			}
-			if ($links <> "") {
-				$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewMasterDetail\" title=\"" . ew_HtmlTitle($Language->Phrase("MultipleMasterDetails")) . "\" data-toggle=\"dropdown\">" . $Language->Phrase("MultipleMasterDetails") . "<b class=\"caret\"></b></button>";
-				$body .= "<ul class=\"dropdown-menu ewMenu\">". $links . "</ul>";
-			}
-			$body .= "</div>";
-
-			// Multiple details
-			$oListOpt = &$this->ListOptions->Items["details"];
-			$oListOpt->Body = $body;
-		}
 
 		// "checkbox"
 		$oListOpt = &$this->ListOptions->Items["checkbox"];
@@ -1303,7 +1242,19 @@ class ct09_hutang_list extends ct09_hutang {
 	function SetupOtherOptions() {
 		global $Language, $Security;
 		$options = &$this->OtherOptions;
+		$option = $options["addedit"];
+
+		// Add
+		$item = &$option->Add("add");
+		$addcaption = ew_HtmlTitle($Language->Phrase("AddLink"));
+		$item->Body = "<a class=\"ewAddEdit ewAdd\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . ew_HtmlEncode($this->AddUrl) . "\">" . $Language->Phrase("AddLink") . "</a>";
+		$item->Visible = ($this->AddUrl <> "" && $Security->CanAdd());
 		$option = $options["action"];
+
+		// Add multi delete
+		$item = &$option->Add("multidelete");
+		$item->Body = "<a class=\"ewAction ewMultiDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteSelectedLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteSelectedLink")) . "\" href=\"\" onclick=\"ew_SubmitAction(event,{f:document.ft92_loglist,url:'" . $this->MultiDeleteUrl . "'});return false;\">" . $Language->Phrase("DeleteSelectedLink") . "</a>";
+		$item->Visible = ($Security->CanDelete());
 
 		// Set up options default
 		foreach ($options as &$option) {
@@ -1321,10 +1272,10 @@ class ct09_hutang_list extends ct09_hutang {
 
 		// Filter button
 		$item = &$this->FilterOptions->Add("savecurrentfilter");
-		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ft09_hutanglistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
+		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ft92_loglistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
 		$item->Visible = TRUE;
 		$item = &$this->FilterOptions->Add("deletefilter");
-		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ft09_hutanglistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
+		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ft92_loglistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
 		$item->Visible = TRUE;
 		$this->FilterOptions->UseDropDownButton = TRUE;
 		$this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1348,7 +1299,7 @@ class ct09_hutang_list extends ct09_hutang {
 					$item = &$option->Add("custom_" . $listaction->Action);
 					$caption = $listaction->Caption;
 					$icon = ($listaction->Icon <> "") ? "<span class=\"" . ew_HtmlEncode($listaction->Icon) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\"></span> " : $caption;
-					$item->Body = "<a class=\"ewAction ewListAction\" title=\"" . ew_HtmlEncode($caption) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\" href=\"\" onclick=\"ew_SubmitAction(event,jQuery.extend({f:document.ft09_hutanglist}," . $listaction->ToJson(TRUE) . "));return false;\">" . $icon . "</a>";
+					$item->Body = "<a class=\"ewAction ewListAction\" title=\"" . ew_HtmlEncode($caption) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\" href=\"\" onclick=\"ew_SubmitAction(event,jQuery.extend({f:document.ft92_loglist}," . $listaction->ToJson(TRUE) . "));return false;\">" . $icon . "</a>";
 					$item->Visible = $listaction->Allow;
 				}
 			}
@@ -1452,7 +1403,7 @@ class ct09_hutang_list extends ct09_hutang {
 		// Search button
 		$item = &$this->SearchOptions->Add("searchtoggle");
 		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : " active";
-		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ft09_hutanglistsrch\">" . $Language->Phrase("SearchLink") . "</button>";
+		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ft92_loglistsrch\">" . $Language->Phrase("SearchLink") . "</button>";
 		$item->Visible = TRUE;
 
 		// Show all button
@@ -1544,7 +1495,7 @@ class ct09_hutang_list extends ct09_hutang {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -1592,27 +1543,22 @@ class ct09_hutang_list extends ct09_hutang {
 		if (!$rs || $rs->EOF)
 			return;
 		$this->id->setDbValue($row['id']);
-		$this->NoHutang->setDbValue($row['NoHutang']);
-		$this->BeliID->setDbValue($row['BeliID']);
-		if (array_key_exists('EV__BeliID', $rs->fields)) {
-			$this->BeliID->VirtualValue = $rs->fields('EV__BeliID'); // Set up virtual field value
-		} else {
-			$this->BeliID->VirtualValue = ""; // Clear value
-		}
-		$this->JumlahHutang->setDbValue($row['JumlahHutang']);
-		$this->JumlahBayar->setDbValue($row['JumlahBayar']);
-		$this->SaldoHutang->setDbValue($row['SaldoHutang']);
+		$this->No->setDbValue($row['No']);
+		$this->Keterangan->setDbValue($row['Keterangan']);
+		$this->Keterangan2->setDbValue($row['Keterangan2']);
+		$this->Status->setDbValue($row['Status']);
+		$this->TanggalJam->setDbValue($row['TanggalJam']);
 	}
 
 	// Return a row with default values
 	function NewRow() {
 		$row = array();
 		$row['id'] = NULL;
-		$row['NoHutang'] = NULL;
-		$row['BeliID'] = NULL;
-		$row['JumlahHutang'] = NULL;
-		$row['JumlahBayar'] = NULL;
-		$row['SaldoHutang'] = NULL;
+		$row['No'] = NULL;
+		$row['Keterangan'] = NULL;
+		$row['Keterangan2'] = NULL;
+		$row['Status'] = NULL;
+		$row['TanggalJam'] = NULL;
 		return $row;
 	}
 
@@ -1622,11 +1568,11 @@ class ct09_hutang_list extends ct09_hutang {
 			return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
-		$this->NoHutang->DbValue = $row['NoHutang'];
-		$this->BeliID->DbValue = $row['BeliID'];
-		$this->JumlahHutang->DbValue = $row['JumlahHutang'];
-		$this->JumlahBayar->DbValue = $row['JumlahBayar'];
-		$this->SaldoHutang->DbValue = $row['SaldoHutang'];
+		$this->No->DbValue = $row['No'];
+		$this->Keterangan->DbValue = $row['Keterangan'];
+		$this->Keterangan2->DbValue = $row['Keterangan2'];
+		$this->Status->DbValue = $row['Status'];
+		$this->TanggalJam->DbValue = $row['TanggalJam'];
 	}
 
 	// Load old record
@@ -1663,142 +1609,88 @@ class ct09_hutang_list extends ct09_hutang {
 		$this->InlineCopyUrl = $this->GetInlineCopyUrl();
 		$this->DeleteUrl = $this->GetDeleteUrl();
 
-		// Convert decimal values if posted back
-		if ($this->JumlahHutang->FormValue == $this->JumlahHutang->CurrentValue && is_numeric(ew_StrToFloat($this->JumlahHutang->CurrentValue)))
-			$this->JumlahHutang->CurrentValue = ew_StrToFloat($this->JumlahHutang->CurrentValue);
-
-		// Convert decimal values if posted back
-		if ($this->JumlahBayar->FormValue == $this->JumlahBayar->CurrentValue && is_numeric(ew_StrToFloat($this->JumlahBayar->CurrentValue)))
-			$this->JumlahBayar->CurrentValue = ew_StrToFloat($this->JumlahBayar->CurrentValue);
-
-		// Convert decimal values if posted back
-		if ($this->SaldoHutang->FormValue == $this->SaldoHutang->CurrentValue && is_numeric(ew_StrToFloat($this->SaldoHutang->CurrentValue)))
-			$this->SaldoHutang->CurrentValue = ew_StrToFloat($this->SaldoHutang->CurrentValue);
-
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
 		// id
-		// NoHutang
-		// BeliID
-		// JumlahHutang
-		// JumlahBayar
-		// SaldoHutang
-		// Accumulate aggregate value
+		// No
+		// Keterangan
+		// Keterangan2
+		// Status
+		// TanggalJam
 
-		if ($this->RowType <> EW_ROWTYPE_AGGREGATEINIT && $this->RowType <> EW_ROWTYPE_AGGREGATE) {
-			if (is_numeric($this->JumlahHutang->CurrentValue))
-				$this->JumlahHutang->Total += $this->JumlahHutang->CurrentValue; // Accumulate total
-			if (is_numeric($this->JumlahBayar->CurrentValue))
-				$this->JumlahBayar->Total += $this->JumlahBayar->CurrentValue; // Accumulate total
-			if (is_numeric($this->SaldoHutang->CurrentValue))
-				$this->SaldoHutang->Total += $this->SaldoHutang->CurrentValue; // Accumulate total
-		}
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
 		// id
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// NoHutang
-		$this->NoHutang->ViewValue = $this->NoHutang->CurrentValue;
-		$this->NoHutang->ViewCustomAttributes = "";
+		// No
+		$this->No->ViewValue = $this->No->CurrentValue;
+		$this->No->ViewCustomAttributes = "";
 
-		// BeliID
-		if ($this->BeliID->VirtualValue <> "") {
-			$this->BeliID->ViewValue = $this->BeliID->VirtualValue;
-		} else {
-			$this->BeliID->ViewValue = $this->BeliID->CurrentValue;
-		if (strval($this->BeliID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->BeliID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_beli`";
+		// Keterangan
+		$this->Keterangan->ViewValue = ew_TruncateMemo($this->Keterangan->CurrentValue, 50, $this->Keterangan->TruncateMemoRemoveHtml);
+		if (!is_null($this->Keterangan->ViewValue)) $this->Keterangan->ViewValue = str_replace("\n", "<br>", $this->Keterangan->ViewValue);
+		$this->Keterangan->ViewCustomAttributes = "";
+
+		// Keterangan2
+		$this->Keterangan2->ViewValue = ew_TruncateMemo($this->Keterangan2->CurrentValue, 25, $this->Keterangan2->TruncateMemoRemoveHtml);
+		$this->Keterangan2->ViewCustomAttributes = "";
+
+		// Status
+		if (strval($this->Status->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->Status->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Status` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t91_log_status`";
 		$sWhereWrk = "";
-		$this->BeliID->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`');
+		$this->Status->LookupFilters = array("dx1" => '`Status`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->BeliID, $sWhereWrk); // Call Lookup Selecting
+		$this->Lookup_Selecting($this->Status, $sWhereWrk); // Call Lookup Selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 			$rswrk = Conn()->Execute($sSqlWrk);
 			if ($rswrk && !$rswrk->EOF) { // Lookup values found
 				$arwrk = array();
-				$arwrk[1] = ew_FormatDateTime($rswrk->fields('DispFld'), 7);
-				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$this->BeliID->ViewValue = $this->BeliID->DisplayValue($arwrk);
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$this->Status->ViewValue = $this->Status->DisplayValue($arwrk);
 				$rswrk->Close();
 			} else {
-				$this->BeliID->ViewValue = $this->BeliID->CurrentValue;
+				$this->Status->ViewValue = $this->Status->CurrentValue;
 			}
 		} else {
-			$this->BeliID->ViewValue = NULL;
+			$this->Status->ViewValue = NULL;
 		}
-		}
-		$this->BeliID->ViewCustomAttributes = "";
+		$this->Status->ViewCustomAttributes = "";
 
-		// JumlahHutang
-		$this->JumlahHutang->ViewValue = $this->JumlahHutang->CurrentValue;
-		$this->JumlahHutang->ViewValue = ew_FormatNumber($this->JumlahHutang->ViewValue, 2, -2, -2, -2);
-		$this->JumlahHutang->CellCssStyle .= "text-align: left;";
-		$this->JumlahHutang->ViewCustomAttributes = "";
+		// TanggalJam
+		$this->TanggalJam->ViewValue = $this->TanggalJam->CurrentValue;
+		$this->TanggalJam->ViewValue = ew_FormatDateTime($this->TanggalJam->ViewValue, 1);
+		$this->TanggalJam->ViewCustomAttributes = "";
 
-		// JumlahBayar
-		$this->JumlahBayar->ViewValue = $this->JumlahBayar->CurrentValue;
-		$this->JumlahBayar->ViewValue = ew_FormatNumber($this->JumlahBayar->ViewValue, 2, -2, -2, -2);
-		$this->JumlahBayar->CellCssStyle .= "text-align: left;";
-		$this->JumlahBayar->ViewCustomAttributes = "";
+			// No
+			$this->No->LinkCustomAttributes = "";
+			$this->No->HrefValue = "";
+			$this->No->TooltipValue = "";
 
-		// SaldoHutang
-		$this->SaldoHutang->ViewValue = $this->SaldoHutang->CurrentValue;
-		$this->SaldoHutang->ViewValue = ew_FormatNumber($this->SaldoHutang->ViewValue, 2, -2, -2, -2);
-		$this->SaldoHutang->CellCssStyle .= "text-align: left;";
-		$this->SaldoHutang->ViewCustomAttributes = "";
+			// Keterangan
+			$this->Keterangan->LinkCustomAttributes = "";
+			$this->Keterangan->HrefValue = "";
+			$this->Keterangan->TooltipValue = "";
 
-			// NoHutang
-			$this->NoHutang->LinkCustomAttributes = "";
-			$this->NoHutang->HrefValue = "";
-			$this->NoHutang->TooltipValue = "";
+			// Keterangan2
+			$this->Keterangan2->LinkCustomAttributes = "";
+			$this->Keterangan2->HrefValue = "";
+			$this->Keterangan2->TooltipValue = "";
 
-			// BeliID
-			$this->BeliID->LinkCustomAttributes = "";
-			$this->BeliID->HrefValue = "";
-			$this->BeliID->TooltipValue = "";
+			// Status
+			$this->Status->LinkCustomAttributes = "";
+			$this->Status->HrefValue = "";
+			$this->Status->TooltipValue = "";
 
-			// JumlahHutang
-			$this->JumlahHutang->LinkCustomAttributes = "";
-			$this->JumlahHutang->HrefValue = "";
-			$this->JumlahHutang->TooltipValue = "";
-
-			// JumlahBayar
-			$this->JumlahBayar->LinkCustomAttributes = "";
-			$this->JumlahBayar->HrefValue = "";
-			$this->JumlahBayar->TooltipValue = "";
-
-			// SaldoHutang
-			$this->SaldoHutang->LinkCustomAttributes = "";
-			$this->SaldoHutang->HrefValue = "";
-			$this->SaldoHutang->TooltipValue = "";
-		} elseif ($this->RowType == EW_ROWTYPE_AGGREGATEINIT) { // Initialize aggregate row
-			$this->JumlahHutang->Total = 0; // Initialize total
-			$this->JumlahBayar->Total = 0; // Initialize total
-			$this->SaldoHutang->Total = 0; // Initialize total
-		} elseif ($this->RowType == EW_ROWTYPE_AGGREGATE) { // Aggregate row
-			$this->JumlahHutang->CurrentValue = $this->JumlahHutang->Total;
-			$this->JumlahHutang->ViewValue = $this->JumlahHutang->CurrentValue;
-			$this->JumlahHutang->ViewValue = ew_FormatNumber($this->JumlahHutang->ViewValue, 2, -2, -2, -2);
-			$this->JumlahHutang->CellCssStyle .= "text-align: left;";
-			$this->JumlahHutang->ViewCustomAttributes = "";
-			$this->JumlahHutang->HrefValue = ""; // Clear href value
-			$this->JumlahBayar->CurrentValue = $this->JumlahBayar->Total;
-			$this->JumlahBayar->ViewValue = $this->JumlahBayar->CurrentValue;
-			$this->JumlahBayar->ViewValue = ew_FormatNumber($this->JumlahBayar->ViewValue, 2, -2, -2, -2);
-			$this->JumlahBayar->CellCssStyle .= "text-align: left;";
-			$this->JumlahBayar->ViewCustomAttributes = "";
-			$this->JumlahBayar->HrefValue = ""; // Clear href value
-			$this->SaldoHutang->CurrentValue = $this->SaldoHutang->Total;
-			$this->SaldoHutang->ViewValue = $this->SaldoHutang->CurrentValue;
-			$this->SaldoHutang->ViewValue = ew_FormatNumber($this->SaldoHutang->ViewValue, 2, -2, -2, -2);
-			$this->SaldoHutang->CellCssStyle .= "text-align: left;";
-			$this->SaldoHutang->ViewCustomAttributes = "";
-			$this->SaldoHutang->HrefValue = ""; // Clear href value
+			// TanggalJam
+			$this->TanggalJam->LinkCustomAttributes = "";
+			$this->TanggalJam->HrefValue = "";
+			$this->TanggalJam->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -1848,7 +1740,7 @@ class ct09_hutang_list extends ct09_hutang {
 		// Export to Email
 		$item = &$this->ExportOptions->Add("email");
 		$url = "";
-		$item->Body = "<button id=\"emf_t09_hutang\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_t09_hutang',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ft09_hutanglist,sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
+		$item->Body = "<button id=\"emf_t92_log\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_t92_log',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ft92_loglist,sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
 		$item->Visible = TRUE;
 
 		// Drop down button for export
@@ -2229,31 +2121,31 @@ class ct09_hutang_list extends ct09_hutang {
 <?php
 
 // Create page object
-if (!isset($t09_hutang_list)) $t09_hutang_list = new ct09_hutang_list();
+if (!isset($t92_log_list)) $t92_log_list = new ct92_log_list();
 
 // Page init
-$t09_hutang_list->Page_Init();
+$t92_log_list->Page_Init();
 
 // Page main
-$t09_hutang_list->Page_Main();
+$t92_log_list->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t09_hutang_list->Page_Render();
+$t92_log_list->Page_Render();
 ?>
 <?php include_once "header.php" ?>
-<?php if ($t09_hutang->Export == "") { ?>
+<?php if ($t92_log->Export == "") { ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "list";
-var CurrentForm = ft09_hutanglist = new ew_Form("ft09_hutanglist", "list");
-ft09_hutanglist.FormKeyCountName = '<?php echo $t09_hutang_list->FormKeyCountName ?>';
+var CurrentForm = ft92_loglist = new ew_Form("ft92_loglist", "list");
+ft92_loglist.FormKeyCountName = '<?php echo $t92_log_list->FormKeyCountName ?>';
 
 // Form_CustomValidate event
-ft09_hutanglist.Form_CustomValidate = 
+ft92_loglist.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid.
@@ -2261,89 +2153,88 @@ ft09_hutanglist.Form_CustomValidate =
  }
 
 // Use JavaScript validation or not
-ft09_hutanglist.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
+ft92_loglist.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
 
 // Dynamic selection lists
-ft09_hutanglist.Lists["x_BeliID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_TglPO","x_NoPO","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t08_beli"};
-ft09_hutanglist.Lists["x_BeliID"].Data = "<?php echo $t09_hutang_list->BeliID->LookupFilterQuery(FALSE, "list") ?>";
-ft09_hutanglist.AutoSuggests["x_BeliID"] = <?php echo json_encode(array("data" => "ajax=autosuggest&" . $t09_hutang_list->BeliID->LookupFilterQuery(TRUE, "list"))) ?>;
+ft92_loglist.Lists["x_Status"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Status","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t91_log_status"};
+ft92_loglist.Lists["x_Status"].Data = "<?php echo $t92_log_list->Status->LookupFilterQuery(FALSE, "list") ?>";
 
 // Form object for search
-var CurrentSearchForm = ft09_hutanglistsrch = new ew_Form("ft09_hutanglistsrch");
+var CurrentSearchForm = ft92_loglistsrch = new ew_Form("ft92_loglistsrch");
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
 <?php } ?>
-<?php if ($t09_hutang->Export == "") { ?>
+<?php if ($t92_log->Export == "") { ?>
 <div class="ewToolbar">
-<?php if ($t09_hutang_list->TotalRecs > 0 && $t09_hutang_list->ExportOptions->Visible()) { ?>
-<?php $t09_hutang_list->ExportOptions->Render("body") ?>
+<?php if ($t92_log_list->TotalRecs > 0 && $t92_log_list->ExportOptions->Visible()) { ?>
+<?php $t92_log_list->ExportOptions->Render("body") ?>
 <?php } ?>
-<?php if ($t09_hutang_list->SearchOptions->Visible()) { ?>
-<?php $t09_hutang_list->SearchOptions->Render("body") ?>
+<?php if ($t92_log_list->SearchOptions->Visible()) { ?>
+<?php $t92_log_list->SearchOptions->Render("body") ?>
 <?php } ?>
-<?php if ($t09_hutang_list->FilterOptions->Visible()) { ?>
-<?php $t09_hutang_list->FilterOptions->Render("body") ?>
+<?php if ($t92_log_list->FilterOptions->Visible()) { ?>
+<?php $t92_log_list->FilterOptions->Render("body") ?>
 <?php } ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
 <?php
-	$bSelectLimit = $t09_hutang_list->UseSelectLimit;
+	$bSelectLimit = $t92_log_list->UseSelectLimit;
 	if ($bSelectLimit) {
-		if ($t09_hutang_list->TotalRecs <= 0)
-			$t09_hutang_list->TotalRecs = $t09_hutang->ListRecordCount();
+		if ($t92_log_list->TotalRecs <= 0)
+			$t92_log_list->TotalRecs = $t92_log->ListRecordCount();
 	} else {
-		if (!$t09_hutang_list->Recordset && ($t09_hutang_list->Recordset = $t09_hutang_list->LoadRecordset()))
-			$t09_hutang_list->TotalRecs = $t09_hutang_list->Recordset->RecordCount();
+		if (!$t92_log_list->Recordset && ($t92_log_list->Recordset = $t92_log_list->LoadRecordset()))
+			$t92_log_list->TotalRecs = $t92_log_list->Recordset->RecordCount();
 	}
-	$t09_hutang_list->StartRec = 1;
-	if ($t09_hutang_list->DisplayRecs <= 0 || ($t09_hutang->Export <> "" && $t09_hutang->ExportAll)) // Display all records
-		$t09_hutang_list->DisplayRecs = $t09_hutang_list->TotalRecs;
-	if (!($t09_hutang->Export <> "" && $t09_hutang->ExportAll))
-		$t09_hutang_list->SetupStartRec(); // Set up start record position
+	$t92_log_list->StartRec = 1;
+	if ($t92_log_list->DisplayRecs <= 0 || ($t92_log->Export <> "" && $t92_log->ExportAll)) // Display all records
+		$t92_log_list->DisplayRecs = $t92_log_list->TotalRecs;
+	if (!($t92_log->Export <> "" && $t92_log->ExportAll))
+		$t92_log_list->SetupStartRec(); // Set up start record position
 	if ($bSelectLimit)
-		$t09_hutang_list->Recordset = $t09_hutang_list->LoadRecordset($t09_hutang_list->StartRec-1, $t09_hutang_list->DisplayRecs);
+		$t92_log_list->Recordset = $t92_log_list->LoadRecordset($t92_log_list->StartRec-1, $t92_log_list->DisplayRecs);
 
 	// Set no record found message
-	if ($t09_hutang->CurrentAction == "" && $t09_hutang_list->TotalRecs == 0) {
+	if ($t92_log->CurrentAction == "" && $t92_log_list->TotalRecs == 0) {
 		if (!$Security->CanList())
-			$t09_hutang_list->setWarningMessage(ew_DeniedMsg());
-		if ($t09_hutang_list->SearchWhere == "0=101")
-			$t09_hutang_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
+			$t92_log_list->setWarningMessage(ew_DeniedMsg());
+		if ($t92_log_list->SearchWhere == "0=101")
+			$t92_log_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
-			$t09_hutang_list->setWarningMessage($Language->Phrase("NoRecord"));
+			$t92_log_list->setWarningMessage($Language->Phrase("NoRecord"));
 	}
 
 	// Audit trail on search
-	if ($t09_hutang_list->AuditTrailOnSearch && $t09_hutang_list->Command == "search" && !$t09_hutang_list->RestoreSearch) {
+	if ($t92_log_list->AuditTrailOnSearch && $t92_log_list->Command == "search" && !$t92_log_list->RestoreSearch) {
 		$searchparm = ew_ServerVar("QUERY_STRING");
-		$searchsql = $t09_hutang_list->getSessionWhere();
-		$t09_hutang_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
+		$searchsql = $t92_log_list->getSessionWhere();
+		$t92_log_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
 	}
-$t09_hutang_list->RenderOtherOptions();
+$t92_log_list->RenderOtherOptions();
 ?>
 <?php if ($Security->CanSearch()) { ?>
-<?php if ($t09_hutang->Export == "" && $t09_hutang->CurrentAction == "") { ?>
-<form name="ft09_hutanglistsrch" id="ft09_hutanglistsrch" class="form-inline ewForm ewExtSearchForm" action="<?php echo ew_CurrentPage() ?>">
-<?php $SearchPanelClass = ($t09_hutang_list->SearchWhere <> "") ? " in" : " in"; ?>
-<div id="ft09_hutanglistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
+<?php if ($t92_log->Export == "" && $t92_log->CurrentAction == "") { ?>
+<form name="ft92_loglistsrch" id="ft92_loglistsrch" class="form-inline ewForm ewExtSearchForm" action="<?php echo ew_CurrentPage() ?>">
+<?php $SearchPanelClass = ($t92_log_list->SearchWhere <> "") ? " in" : " in"; ?>
+<div id="ft92_loglistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
 <input type="hidden" name="cmd" value="search">
-<input type="hidden" name="t" value="t09_hutang">
+<input type="hidden" name="t" value="t92_log">
 	<div class="ewBasicSearch">
 <div id="xsr_1" class="ewRow">
 	<div class="ewQuickSearch input-group">
-	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="form-control" value="<?php echo ew_HtmlEncode($t09_hutang_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo ew_HtmlEncode($Language->Phrase("Search")) ?>">
-	<input type="hidden" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" id="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="<?php echo ew_HtmlEncode($t09_hutang_list->BasicSearch->getType()) ?>">
+	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="form-control" value="<?php echo ew_HtmlEncode($t92_log_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo ew_HtmlEncode($Language->Phrase("Search")) ?>">
+	<input type="hidden" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" id="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="<?php echo ew_HtmlEncode($t92_log_list->BasicSearch->getType()) ?>">
 	<div class="input-group-btn">
-		<button type="button" data-toggle="dropdown" class="btn btn-default"><span id="searchtype"><?php echo $t09_hutang_list->BasicSearch->getTypeNameShort() ?></span><span class="caret"></span></button>
+		<button type="button" data-toggle="dropdown" class="btn btn-default"><span id="searchtype"><?php echo $t92_log_list->BasicSearch->getTypeNameShort() ?></span><span class="caret"></span></button>
 		<ul class="dropdown-menu pull-right" role="menu">
-			<li<?php if ($t09_hutang_list->BasicSearch->getType() == "") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this)"><?php echo $Language->Phrase("QuickSearchAuto") ?></a></li>
-			<li<?php if ($t09_hutang_list->BasicSearch->getType() == "=") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'=')"><?php echo $Language->Phrase("QuickSearchExact") ?></a></li>
-			<li<?php if ($t09_hutang_list->BasicSearch->getType() == "AND") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'AND')"><?php echo $Language->Phrase("QuickSearchAll") ?></a></li>
-			<li<?php if ($t09_hutang_list->BasicSearch->getType() == "OR") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'OR')"><?php echo $Language->Phrase("QuickSearchAny") ?></a></li>
+			<li<?php if ($t92_log_list->BasicSearch->getType() == "") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this)"><?php echo $Language->Phrase("QuickSearchAuto") ?></a></li>
+			<li<?php if ($t92_log_list->BasicSearch->getType() == "=") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'=')"><?php echo $Language->Phrase("QuickSearchExact") ?></a></li>
+			<li<?php if ($t92_log_list->BasicSearch->getType() == "AND") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'AND')"><?php echo $Language->Phrase("QuickSearchAll") ?></a></li>
+			<li<?php if ($t92_log_list->BasicSearch->getType() == "OR") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'OR')"><?php echo $Language->Phrase("QuickSearchAny") ?></a></li>
 		</ul>
 	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit"><?php echo $Language->Phrase("SearchBtn") ?></button>
 	</div>
@@ -2354,71 +2245,71 @@ $t09_hutang_list->RenderOtherOptions();
 </form>
 <?php } ?>
 <?php } ?>
-<?php $t09_hutang_list->ShowPageHeader(); ?>
+<?php $t92_log_list->ShowPageHeader(); ?>
 <?php
-$t09_hutang_list->ShowMessage();
+$t92_log_list->ShowMessage();
 ?>
-<?php if ($t09_hutang_list->TotalRecs > 0 || $t09_hutang->CurrentAction <> "") { ?>
-<div class="box ewBox ewGrid<?php if ($t09_hutang_list->IsAddOrEdit()) { ?> ewGridAddEdit<?php } ?> t09_hutang">
-<?php if ($t09_hutang->Export == "") { ?>
+<?php if ($t92_log_list->TotalRecs > 0 || $t92_log->CurrentAction <> "") { ?>
+<div class="box ewBox ewGrid<?php if ($t92_log_list->IsAddOrEdit()) { ?> ewGridAddEdit<?php } ?> t92_log">
+<?php if ($t92_log->Export == "") { ?>
 <div class="box-header ewGridUpperPanel">
-<?php if ($t09_hutang->CurrentAction <> "gridadd" && $t09_hutang->CurrentAction <> "gridedit") { ?>
+<?php if ($t92_log->CurrentAction <> "gridadd" && $t92_log->CurrentAction <> "gridedit") { ?>
 <form name="ewPagerForm" class="form-inline ewForm ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
-<?php if (!isset($t09_hutang_list->Pager)) $t09_hutang_list->Pager = new cPrevNextPager($t09_hutang_list->StartRec, $t09_hutang_list->DisplayRecs, $t09_hutang_list->TotalRecs, $t09_hutang_list->AutoHidePager) ?>
-<?php if ($t09_hutang_list->Pager->RecordCount > 0 && $t09_hutang_list->Pager->Visible) { ?>
+<?php if (!isset($t92_log_list->Pager)) $t92_log_list->Pager = new cPrevNextPager($t92_log_list->StartRec, $t92_log_list->DisplayRecs, $t92_log_list->TotalRecs, $t92_log_list->AutoHidePager) ?>
+<?php if ($t92_log_list->Pager->RecordCount > 0 && $t92_log_list->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t09_hutang_list->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t09_hutang_list->PageUrl() ?>start=<?php echo $t09_hutang_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t92_log_list->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t92_log_list->PageUrl() ?>start=<?php echo $t92_log_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t09_hutang_list->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t09_hutang_list->PageUrl() ?>start=<?php echo $t09_hutang_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t92_log_list->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t92_log_list->PageUrl() ?>start=<?php echo $t92_log_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t09_hutang_list->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t92_log_list->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t09_hutang_list->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t09_hutang_list->PageUrl() ?>start=<?php echo $t09_hutang_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t92_log_list->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t92_log_list->PageUrl() ?>start=<?php echo $t92_log_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t09_hutang_list->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t09_hutang_list->PageUrl() ?>start=<?php echo $t09_hutang_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t92_log_list->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t92_log_list->PageUrl() ?>start=<?php echo $t92_log_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t09_hutang_list->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t92_log_list->Pager->PageCount ?></span>
 </div>
 <?php } ?>
-<?php if ($t09_hutang_list->Pager->RecordCount > 0) { ?>
+<?php if ($t92_log_list->Pager->RecordCount > 0) { ?>
 <div class="ewPager ewRec">
-	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $t09_hutang_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $t09_hutang_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $t09_hutang_list->Pager->RecordCount ?></span>
+	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $t92_log_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $t92_log_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $t92_log_list->Pager->RecordCount ?></span>
 </div>
 <?php } ?>
-<?php if ($t09_hutang_list->TotalRecs > 0 && (!$t09_hutang_list->AutoHidePageSizeSelector || $t09_hutang_list->Pager->Visible)) { ?>
+<?php if ($t92_log_list->TotalRecs > 0 && (!$t92_log_list->AutoHidePageSizeSelector || $t92_log_list->Pager->Visible)) { ?>
 <div class="ewPager">
-<input type="hidden" name="t" value="t09_hutang">
+<input type="hidden" name="t" value="t92_log">
 <select name="<?php echo EW_TABLE_REC_PER_PAGE ?>" class="form-control input-sm ewTooltip" title="<?php echo $Language->Phrase("RecordsPerPage") ?>" onchange="this.form.submit();">
-<option value="10"<?php if ($t09_hutang_list->DisplayRecs == 10) { ?> selected<?php } ?>>10</option>
-<option value="20"<?php if ($t09_hutang_list->DisplayRecs == 20) { ?> selected<?php } ?>>20</option>
-<option value="50"<?php if ($t09_hutang_list->DisplayRecs == 50) { ?> selected<?php } ?>>50</option>
-<option value="100"<?php if ($t09_hutang_list->DisplayRecs == 100) { ?> selected<?php } ?>>100</option>
-<option value="200"<?php if ($t09_hutang_list->DisplayRecs == 200) { ?> selected<?php } ?>>200</option>
-<option value="ALL"<?php if ($t09_hutang->getRecordsPerPage() == -1) { ?> selected<?php } ?>><?php echo $Language->Phrase("AllRecords") ?></option>
+<option value="10"<?php if ($t92_log_list->DisplayRecs == 10) { ?> selected<?php } ?>>10</option>
+<option value="20"<?php if ($t92_log_list->DisplayRecs == 20) { ?> selected<?php } ?>>20</option>
+<option value="50"<?php if ($t92_log_list->DisplayRecs == 50) { ?> selected<?php } ?>>50</option>
+<option value="100"<?php if ($t92_log_list->DisplayRecs == 100) { ?> selected<?php } ?>>100</option>
+<option value="200"<?php if ($t92_log_list->DisplayRecs == 200) { ?> selected<?php } ?>>200</option>
+<option value="ALL"<?php if ($t92_log->getRecordsPerPage() == -1) { ?> selected<?php } ?>><?php echo $Language->Phrase("AllRecords") ?></option>
 </select>
 </div>
 <?php } ?>
@@ -2426,254 +2317,200 @@ $t09_hutang_list->ShowMessage();
 <?php } ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($t09_hutang_list->OtherOptions as &$option)
+	foreach ($t92_log_list->OtherOptions as &$option)
 		$option->Render("body");
 ?>
 </div>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<form name="ft09_hutanglist" id="ft09_hutanglist" class="form-inline ewForm ewListForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t09_hutang_list->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t09_hutang_list->Token ?>">
+<form name="ft92_loglist" id="ft92_loglist" class="form-inline ewForm ewListForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t92_log_list->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t92_log_list->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t09_hutang">
-<div id="gmp_t09_hutang" class="<?php if (ew_IsResponsiveLayout()) { ?>table-responsive <?php } ?>ewGridMiddlePanel">
-<?php if ($t09_hutang_list->TotalRecs > 0 || $t09_hutang->CurrentAction == "gridedit") { ?>
-<table id="tbl_t09_hutanglist" class="table ewTable">
+<input type="hidden" name="t" value="t92_log">
+<div id="gmp_t92_log" class="<?php if (ew_IsResponsiveLayout()) { ?>table-responsive <?php } ?>ewGridMiddlePanel">
+<?php if ($t92_log_list->TotalRecs > 0 || $t92_log->CurrentAction == "gridedit") { ?>
+<table id="tbl_t92_loglist" class="table ewTable">
 <thead>
 	<tr class="ewTableHeader">
 <?php
 
 // Header row
-$t09_hutang_list->RowType = EW_ROWTYPE_HEADER;
+$t92_log_list->RowType = EW_ROWTYPE_HEADER;
 
 // Render list options
-$t09_hutang_list->RenderListOptions();
+$t92_log_list->RenderListOptions();
 
 // Render list options (header, left)
-$t09_hutang_list->ListOptions->Render("header", "left");
+$t92_log_list->ListOptions->Render("header", "left");
 ?>
-<?php if ($t09_hutang->NoHutang->Visible) { // NoHutang ?>
-	<?php if ($t09_hutang->SortUrl($t09_hutang->NoHutang) == "") { ?>
-		<th data-name="NoHutang" class="<?php echo $t09_hutang->NoHutang->HeaderCellClass() ?>"><div id="elh_t09_hutang_NoHutang" class="t09_hutang_NoHutang"><div class="ewTableHeaderCaption"><?php echo $t09_hutang->NoHutang->FldCaption() ?></div></div></th>
+<?php if ($t92_log->No->Visible) { // No ?>
+	<?php if ($t92_log->SortUrl($t92_log->No) == "") { ?>
+		<th data-name="No" class="<?php echo $t92_log->No->HeaderCellClass() ?>"><div id="elh_t92_log_No" class="t92_log_No"><div class="ewTableHeaderCaption"><?php echo $t92_log->No->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="NoHutang" class="<?php echo $t09_hutang->NoHutang->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t09_hutang->SortUrl($t09_hutang->NoHutang) ?>',2);"><div id="elh_t09_hutang_NoHutang" class="t09_hutang_NoHutang">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_hutang->NoHutang->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($t09_hutang->NoHutang->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_hutang->NoHutang->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="No" class="<?php echo $t92_log->No->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t92_log->SortUrl($t92_log->No) ?>',2);"><div id="elh_t92_log_No" class="t92_log_No">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t92_log->No->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t92_log->No->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t92_log->No->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
 		</div></div></th>
 	<?php } ?>
 <?php } ?>
-<?php if ($t09_hutang->BeliID->Visible) { // BeliID ?>
-	<?php if ($t09_hutang->SortUrl($t09_hutang->BeliID) == "") { ?>
-		<th data-name="BeliID" class="<?php echo $t09_hutang->BeliID->HeaderCellClass() ?>"><div id="elh_t09_hutang_BeliID" class="t09_hutang_BeliID"><div class="ewTableHeaderCaption"><?php echo $t09_hutang->BeliID->FldCaption() ?></div></div></th>
+<?php if ($t92_log->Keterangan->Visible) { // Keterangan ?>
+	<?php if ($t92_log->SortUrl($t92_log->Keterangan) == "") { ?>
+		<th data-name="Keterangan" class="<?php echo $t92_log->Keterangan->HeaderCellClass() ?>"><div id="elh_t92_log_Keterangan" class="t92_log_Keterangan"><div class="ewTableHeaderCaption"><?php echo $t92_log->Keterangan->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="BeliID" class="<?php echo $t09_hutang->BeliID->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t09_hutang->SortUrl($t09_hutang->BeliID) ?>',2);"><div id="elh_t09_hutang_BeliID" class="t09_hutang_BeliID">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_hutang->BeliID->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_hutang->BeliID->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_hutang->BeliID->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="Keterangan" class="<?php echo $t92_log->Keterangan->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t92_log->SortUrl($t92_log->Keterangan) ?>',2);"><div id="elh_t92_log_Keterangan" class="t92_log_Keterangan">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t92_log->Keterangan->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($t92_log->Keterangan->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t92_log->Keterangan->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
 		</div></div></th>
 	<?php } ?>
 <?php } ?>
-<?php if ($t09_hutang->JumlahHutang->Visible) { // JumlahHutang ?>
-	<?php if ($t09_hutang->SortUrl($t09_hutang->JumlahHutang) == "") { ?>
-		<th data-name="JumlahHutang" class="<?php echo $t09_hutang->JumlahHutang->HeaderCellClass() ?>"><div id="elh_t09_hutang_JumlahHutang" class="t09_hutang_JumlahHutang"><div class="ewTableHeaderCaption"><?php echo $t09_hutang->JumlahHutang->FldCaption() ?></div></div></th>
+<?php if ($t92_log->Keterangan2->Visible) { // Keterangan2 ?>
+	<?php if ($t92_log->SortUrl($t92_log->Keterangan2) == "") { ?>
+		<th data-name="Keterangan2" class="<?php echo $t92_log->Keterangan2->HeaderCellClass() ?>"><div id="elh_t92_log_Keterangan2" class="t92_log_Keterangan2"><div class="ewTableHeaderCaption"><?php echo $t92_log->Keterangan2->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="JumlahHutang" class="<?php echo $t09_hutang->JumlahHutang->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t09_hutang->SortUrl($t09_hutang->JumlahHutang) ?>',2);"><div id="elh_t09_hutang_JumlahHutang" class="t09_hutang_JumlahHutang">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_hutang->JumlahHutang->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_hutang->JumlahHutang->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_hutang->JumlahHutang->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="Keterangan2" class="<?php echo $t92_log->Keterangan2->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t92_log->SortUrl($t92_log->Keterangan2) ?>',2);"><div id="elh_t92_log_Keterangan2" class="t92_log_Keterangan2">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t92_log->Keterangan2->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($t92_log->Keterangan2->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t92_log->Keterangan2->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
 		</div></div></th>
 	<?php } ?>
 <?php } ?>
-<?php if ($t09_hutang->JumlahBayar->Visible) { // JumlahBayar ?>
-	<?php if ($t09_hutang->SortUrl($t09_hutang->JumlahBayar) == "") { ?>
-		<th data-name="JumlahBayar" class="<?php echo $t09_hutang->JumlahBayar->HeaderCellClass() ?>"><div id="elh_t09_hutang_JumlahBayar" class="t09_hutang_JumlahBayar"><div class="ewTableHeaderCaption"><?php echo $t09_hutang->JumlahBayar->FldCaption() ?></div></div></th>
+<?php if ($t92_log->Status->Visible) { // Status ?>
+	<?php if ($t92_log->SortUrl($t92_log->Status) == "") { ?>
+		<th data-name="Status" class="<?php echo $t92_log->Status->HeaderCellClass() ?>"><div id="elh_t92_log_Status" class="t92_log_Status"><div class="ewTableHeaderCaption"><?php echo $t92_log->Status->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="JumlahBayar" class="<?php echo $t09_hutang->JumlahBayar->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t09_hutang->SortUrl($t09_hutang->JumlahBayar) ?>',2);"><div id="elh_t09_hutang_JumlahBayar" class="t09_hutang_JumlahBayar">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_hutang->JumlahBayar->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_hutang->JumlahBayar->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_hutang->JumlahBayar->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="Status" class="<?php echo $t92_log->Status->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t92_log->SortUrl($t92_log->Status) ?>',2);"><div id="elh_t92_log_Status" class="t92_log_Status">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t92_log->Status->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t92_log->Status->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t92_log->Status->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
 		</div></div></th>
 	<?php } ?>
 <?php } ?>
-<?php if ($t09_hutang->SaldoHutang->Visible) { // SaldoHutang ?>
-	<?php if ($t09_hutang->SortUrl($t09_hutang->SaldoHutang) == "") { ?>
-		<th data-name="SaldoHutang" class="<?php echo $t09_hutang->SaldoHutang->HeaderCellClass() ?>"><div id="elh_t09_hutang_SaldoHutang" class="t09_hutang_SaldoHutang"><div class="ewTableHeaderCaption"><?php echo $t09_hutang->SaldoHutang->FldCaption() ?></div></div></th>
+<?php if ($t92_log->TanggalJam->Visible) { // TanggalJam ?>
+	<?php if ($t92_log->SortUrl($t92_log->TanggalJam) == "") { ?>
+		<th data-name="TanggalJam" class="<?php echo $t92_log->TanggalJam->HeaderCellClass() ?>"><div id="elh_t92_log_TanggalJam" class="t92_log_TanggalJam"><div class="ewTableHeaderCaption"><?php echo $t92_log->TanggalJam->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="SaldoHutang" class="<?php echo $t09_hutang->SaldoHutang->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t09_hutang->SortUrl($t09_hutang->SaldoHutang) ?>',2);"><div id="elh_t09_hutang_SaldoHutang" class="t09_hutang_SaldoHutang">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_hutang->SaldoHutang->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_hutang->SaldoHutang->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_hutang->SaldoHutang->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="TanggalJam" class="<?php echo $t92_log->TanggalJam->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t92_log->SortUrl($t92_log->TanggalJam) ?>',2);"><div id="elh_t92_log_TanggalJam" class="t92_log_TanggalJam">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t92_log->TanggalJam->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t92_log->TanggalJam->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t92_log->TanggalJam->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
 		</div></div></th>
 	<?php } ?>
 <?php } ?>
 <?php
 
 // Render list options (header, right)
-$t09_hutang_list->ListOptions->Render("header", "right");
+$t92_log_list->ListOptions->Render("header", "right");
 ?>
 	</tr>
 </thead>
 <tbody>
 <?php
-if ($t09_hutang->ExportAll && $t09_hutang->Export <> "") {
-	$t09_hutang_list->StopRec = $t09_hutang_list->TotalRecs;
+if ($t92_log->ExportAll && $t92_log->Export <> "") {
+	$t92_log_list->StopRec = $t92_log_list->TotalRecs;
 } else {
 
 	// Set the last record to display
-	if ($t09_hutang_list->TotalRecs > $t09_hutang_list->StartRec + $t09_hutang_list->DisplayRecs - 1)
-		$t09_hutang_list->StopRec = $t09_hutang_list->StartRec + $t09_hutang_list->DisplayRecs - 1;
+	if ($t92_log_list->TotalRecs > $t92_log_list->StartRec + $t92_log_list->DisplayRecs - 1)
+		$t92_log_list->StopRec = $t92_log_list->StartRec + $t92_log_list->DisplayRecs - 1;
 	else
-		$t09_hutang_list->StopRec = $t09_hutang_list->TotalRecs;
+		$t92_log_list->StopRec = $t92_log_list->TotalRecs;
 }
-$t09_hutang_list->RecCnt = $t09_hutang_list->StartRec - 1;
-if ($t09_hutang_list->Recordset && !$t09_hutang_list->Recordset->EOF) {
-	$t09_hutang_list->Recordset->MoveFirst();
-	$bSelectLimit = $t09_hutang_list->UseSelectLimit;
-	if (!$bSelectLimit && $t09_hutang_list->StartRec > 1)
-		$t09_hutang_list->Recordset->Move($t09_hutang_list->StartRec - 1);
-} elseif (!$t09_hutang->AllowAddDeleteRow && $t09_hutang_list->StopRec == 0) {
-	$t09_hutang_list->StopRec = $t09_hutang->GridAddRowCount;
+$t92_log_list->RecCnt = $t92_log_list->StartRec - 1;
+if ($t92_log_list->Recordset && !$t92_log_list->Recordset->EOF) {
+	$t92_log_list->Recordset->MoveFirst();
+	$bSelectLimit = $t92_log_list->UseSelectLimit;
+	if (!$bSelectLimit && $t92_log_list->StartRec > 1)
+		$t92_log_list->Recordset->Move($t92_log_list->StartRec - 1);
+} elseif (!$t92_log->AllowAddDeleteRow && $t92_log_list->StopRec == 0) {
+	$t92_log_list->StopRec = $t92_log->GridAddRowCount;
 }
 
 // Initialize aggregate
-$t09_hutang->RowType = EW_ROWTYPE_AGGREGATEINIT;
-$t09_hutang->ResetAttrs();
-$t09_hutang_list->RenderRow();
-while ($t09_hutang_list->RecCnt < $t09_hutang_list->StopRec) {
-	$t09_hutang_list->RecCnt++;
-	if (intval($t09_hutang_list->RecCnt) >= intval($t09_hutang_list->StartRec)) {
-		$t09_hutang_list->RowCnt++;
+$t92_log->RowType = EW_ROWTYPE_AGGREGATEINIT;
+$t92_log->ResetAttrs();
+$t92_log_list->RenderRow();
+while ($t92_log_list->RecCnt < $t92_log_list->StopRec) {
+	$t92_log_list->RecCnt++;
+	if (intval($t92_log_list->RecCnt) >= intval($t92_log_list->StartRec)) {
+		$t92_log_list->RowCnt++;
 
 		// Set up key count
-		$t09_hutang_list->KeyCount = $t09_hutang_list->RowIndex;
+		$t92_log_list->KeyCount = $t92_log_list->RowIndex;
 
 		// Init row class and style
-		$t09_hutang->ResetAttrs();
-		$t09_hutang->CssClass = "";
-		if ($t09_hutang->CurrentAction == "gridadd") {
+		$t92_log->ResetAttrs();
+		$t92_log->CssClass = "";
+		if ($t92_log->CurrentAction == "gridadd") {
 		} else {
-			$t09_hutang_list->LoadRowValues($t09_hutang_list->Recordset); // Load row values
+			$t92_log_list->LoadRowValues($t92_log_list->Recordset); // Load row values
 		}
-		$t09_hutang->RowType = EW_ROWTYPE_VIEW; // Render view
+		$t92_log->RowType = EW_ROWTYPE_VIEW; // Render view
 
 		// Set up row id / data-rowindex
-		$t09_hutang->RowAttrs = array_merge($t09_hutang->RowAttrs, array('data-rowindex'=>$t09_hutang_list->RowCnt, 'id'=>'r' . $t09_hutang_list->RowCnt . '_t09_hutang', 'data-rowtype'=>$t09_hutang->RowType));
+		$t92_log->RowAttrs = array_merge($t92_log->RowAttrs, array('data-rowindex'=>$t92_log_list->RowCnt, 'id'=>'r' . $t92_log_list->RowCnt . '_t92_log', 'data-rowtype'=>$t92_log->RowType));
 
 		// Render row
-		$t09_hutang_list->RenderRow();
+		$t92_log_list->RenderRow();
 
 		// Render list options
-		$t09_hutang_list->RenderListOptions();
+		$t92_log_list->RenderListOptions();
 ?>
-	<tr<?php echo $t09_hutang->RowAttributes() ?>>
+	<tr<?php echo $t92_log->RowAttributes() ?>>
 <?php
 
 // Render list options (body, left)
-$t09_hutang_list->ListOptions->Render("body", "left", $t09_hutang_list->RowCnt);
+$t92_log_list->ListOptions->Render("body", "left", $t92_log_list->RowCnt);
 ?>
-	<?php if ($t09_hutang->NoHutang->Visible) { // NoHutang ?>
-		<td data-name="NoHutang"<?php echo $t09_hutang->NoHutang->CellAttributes() ?>>
-<span id="el<?php echo $t09_hutang_list->RowCnt ?>_t09_hutang_NoHutang" class="t09_hutang_NoHutang">
-<span<?php echo $t09_hutang->NoHutang->ViewAttributes() ?>>
-<?php echo $t09_hutang->NoHutang->ListViewValue() ?></span>
+	<?php if ($t92_log->No->Visible) { // No ?>
+		<td data-name="No"<?php echo $t92_log->No->CellAttributes() ?>>
+<span id="el<?php echo $t92_log_list->RowCnt ?>_t92_log_No" class="t92_log_No">
+<span<?php echo $t92_log->No->ViewAttributes() ?>>
+<?php echo $t92_log->No->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>
-	<?php if ($t09_hutang->BeliID->Visible) { // BeliID ?>
-		<td data-name="BeliID"<?php echo $t09_hutang->BeliID->CellAttributes() ?>>
-<span id="el<?php echo $t09_hutang_list->RowCnt ?>_t09_hutang_BeliID" class="t09_hutang_BeliID">
-<span<?php echo $t09_hutang->BeliID->ViewAttributes() ?>>
-<?php echo $t09_hutang->BeliID->ListViewValue() ?></span>
+	<?php if ($t92_log->Keterangan->Visible) { // Keterangan ?>
+		<td data-name="Keterangan"<?php echo $t92_log->Keterangan->CellAttributes() ?>>
+<span id="el<?php echo $t92_log_list->RowCnt ?>_t92_log_Keterangan" class="t92_log_Keterangan">
+<span<?php echo $t92_log->Keterangan->ViewAttributes() ?>>
+<?php echo $t92_log->Keterangan->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>
-	<?php if ($t09_hutang->JumlahHutang->Visible) { // JumlahHutang ?>
-		<td data-name="JumlahHutang"<?php echo $t09_hutang->JumlahHutang->CellAttributes() ?>>
-<span id="el<?php echo $t09_hutang_list->RowCnt ?>_t09_hutang_JumlahHutang" class="t09_hutang_JumlahHutang">
-<span<?php echo $t09_hutang->JumlahHutang->ViewAttributes() ?>>
-<?php echo $t09_hutang->JumlahHutang->ListViewValue() ?></span>
+	<?php if ($t92_log->Keterangan2->Visible) { // Keterangan2 ?>
+		<td data-name="Keterangan2"<?php echo $t92_log->Keterangan2->CellAttributes() ?>>
+<span id="el<?php echo $t92_log_list->RowCnt ?>_t92_log_Keterangan2" class="t92_log_Keterangan2">
+<span<?php echo $t92_log->Keterangan2->ViewAttributes() ?>>
+<?php echo $t92_log->Keterangan2->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>
-	<?php if ($t09_hutang->JumlahBayar->Visible) { // JumlahBayar ?>
-		<td data-name="JumlahBayar"<?php echo $t09_hutang->JumlahBayar->CellAttributes() ?>>
-<span id="el<?php echo $t09_hutang_list->RowCnt ?>_t09_hutang_JumlahBayar" class="t09_hutang_JumlahBayar">
-<span<?php echo $t09_hutang->JumlahBayar->ViewAttributes() ?>>
-<?php echo $t09_hutang->JumlahBayar->ListViewValue() ?></span>
+	<?php if ($t92_log->Status->Visible) { // Status ?>
+		<td data-name="Status"<?php echo $t92_log->Status->CellAttributes() ?>>
+<span id="el<?php echo $t92_log_list->RowCnt ?>_t92_log_Status" class="t92_log_Status">
+<span<?php echo $t92_log->Status->ViewAttributes() ?>>
+<?php echo $t92_log->Status->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>
-	<?php if ($t09_hutang->SaldoHutang->Visible) { // SaldoHutang ?>
-		<td data-name="SaldoHutang"<?php echo $t09_hutang->SaldoHutang->CellAttributes() ?>>
-<span id="el<?php echo $t09_hutang_list->RowCnt ?>_t09_hutang_SaldoHutang" class="t09_hutang_SaldoHutang">
-<span<?php echo $t09_hutang->SaldoHutang->ViewAttributes() ?>>
-<?php echo $t09_hutang->SaldoHutang->ListViewValue() ?></span>
+	<?php if ($t92_log->TanggalJam->Visible) { // TanggalJam ?>
+		<td data-name="TanggalJam"<?php echo $t92_log->TanggalJam->CellAttributes() ?>>
+<span id="el<?php echo $t92_log_list->RowCnt ?>_t92_log_TanggalJam" class="t92_log_TanggalJam">
+<span<?php echo $t92_log->TanggalJam->ViewAttributes() ?>>
+<?php echo $t92_log->TanggalJam->ListViewValue() ?></span>
 </span>
 </td>
 	<?php } ?>
 <?php
 
 // Render list options (body, right)
-$t09_hutang_list->ListOptions->Render("body", "right", $t09_hutang_list->RowCnt);
+$t92_log_list->ListOptions->Render("body", "right", $t92_log_list->RowCnt);
 ?>
 	</tr>
 <?php
 	}
-	if ($t09_hutang->CurrentAction <> "gridadd")
-		$t09_hutang_list->Recordset->MoveNext();
+	if ($t92_log->CurrentAction <> "gridadd")
+		$t92_log_list->Recordset->MoveNext();
 }
 ?>
 </tbody>
-<?php
-
-// Render aggregate row
-$t09_hutang->RowType = EW_ROWTYPE_AGGREGATE;
-$t09_hutang->ResetAttrs();
-$t09_hutang_list->RenderRow();
-?>
-<?php if ($t09_hutang_list->TotalRecs > 0 && ($t09_hutang->CurrentAction <> "gridadd" && $t09_hutang->CurrentAction <> "gridedit")) { ?>
-<tfoot><!-- Table footer -->
-	<tr class="ewTableFooter">
-<?php
-
-// Render list options
-$t09_hutang_list->RenderListOptions();
-
-// Render list options (footer, left)
-$t09_hutang_list->ListOptions->Render("footer", "left");
-?>
-	<?php if ($t09_hutang->NoHutang->Visible) { // NoHutang ?>
-		<td data-name="NoHutang" class="<?php echo $t09_hutang->NoHutang->FooterCellClass() ?>"><span id="elf_t09_hutang_NoHutang" class="t09_hutang_NoHutang">
-		&nbsp;
-		</span></td>
-	<?php } ?>
-	<?php if ($t09_hutang->BeliID->Visible) { // BeliID ?>
-		<td data-name="BeliID" class="<?php echo $t09_hutang->BeliID->FooterCellClass() ?>"><span id="elf_t09_hutang_BeliID" class="t09_hutang_BeliID">
-		&nbsp;
-		</span></td>
-	<?php } ?>
-	<?php if ($t09_hutang->JumlahHutang->Visible) { // JumlahHutang ?>
-		<td data-name="JumlahHutang" class="<?php echo $t09_hutang->JumlahHutang->FooterCellClass() ?>"><span id="elf_t09_hutang_JumlahHutang" class="t09_hutang_JumlahHutang">
-<span class="ewAggregate"><?php echo $Language->Phrase("TOTAL") ?></span><span class="ewAggregateValue">
-<?php echo $t09_hutang->JumlahHutang->ViewValue ?></span>
-		</span></td>
-	<?php } ?>
-	<?php if ($t09_hutang->JumlahBayar->Visible) { // JumlahBayar ?>
-		<td data-name="JumlahBayar" class="<?php echo $t09_hutang->JumlahBayar->FooterCellClass() ?>"><span id="elf_t09_hutang_JumlahBayar" class="t09_hutang_JumlahBayar">
-<span class="ewAggregate"><?php echo $Language->Phrase("TOTAL") ?></span><span class="ewAggregateValue">
-<?php echo $t09_hutang->JumlahBayar->ViewValue ?></span>
-		</span></td>
-	<?php } ?>
-	<?php if ($t09_hutang->SaldoHutang->Visible) { // SaldoHutang ?>
-		<td data-name="SaldoHutang" class="<?php echo $t09_hutang->SaldoHutang->FooterCellClass() ?>"><span id="elf_t09_hutang_SaldoHutang" class="t09_hutang_SaldoHutang">
-<span class="ewAggregate"><?php echo $Language->Phrase("TOTAL") ?></span><span class="ewAggregateValue">
-<?php echo $t09_hutang->SaldoHutang->ViewValue ?></span>
-		</span></td>
-	<?php } ?>
-<?php
-
-// Render list options (footer, right)
-$t09_hutang_list->ListOptions->Render("footer", "right");
-?>
-	</tr>
-</tfoot>
-<?php } ?>
 </table>
 <?php } ?>
-<?php if ($t09_hutang->CurrentAction == "") { ?>
+<?php if ($t92_log->CurrentAction == "") { ?>
 <input type="hidden" name="a_list" id="a_list" value="">
 <?php } ?>
 </div>
@@ -2681,68 +2518,68 @@ $t09_hutang_list->ListOptions->Render("footer", "right");
 <?php
 
 // Close recordset
-if ($t09_hutang_list->Recordset)
-	$t09_hutang_list->Recordset->Close();
+if ($t92_log_list->Recordset)
+	$t92_log_list->Recordset->Close();
 ?>
-<?php if ($t09_hutang->Export == "") { ?>
+<?php if ($t92_log->Export == "") { ?>
 <div class="box-footer ewGridLowerPanel">
-<?php if ($t09_hutang->CurrentAction <> "gridadd" && $t09_hutang->CurrentAction <> "gridedit") { ?>
+<?php if ($t92_log->CurrentAction <> "gridadd" && $t92_log->CurrentAction <> "gridedit") { ?>
 <form name="ewPagerForm" class="ewForm form-inline ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
-<?php if (!isset($t09_hutang_list->Pager)) $t09_hutang_list->Pager = new cPrevNextPager($t09_hutang_list->StartRec, $t09_hutang_list->DisplayRecs, $t09_hutang_list->TotalRecs, $t09_hutang_list->AutoHidePager) ?>
-<?php if ($t09_hutang_list->Pager->RecordCount > 0 && $t09_hutang_list->Pager->Visible) { ?>
+<?php if (!isset($t92_log_list->Pager)) $t92_log_list->Pager = new cPrevNextPager($t92_log_list->StartRec, $t92_log_list->DisplayRecs, $t92_log_list->TotalRecs, $t92_log_list->AutoHidePager) ?>
+<?php if ($t92_log_list->Pager->RecordCount > 0 && $t92_log_list->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t09_hutang_list->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t09_hutang_list->PageUrl() ?>start=<?php echo $t09_hutang_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t92_log_list->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t92_log_list->PageUrl() ?>start=<?php echo $t92_log_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t09_hutang_list->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t09_hutang_list->PageUrl() ?>start=<?php echo $t09_hutang_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t92_log_list->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t92_log_list->PageUrl() ?>start=<?php echo $t92_log_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t09_hutang_list->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t92_log_list->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t09_hutang_list->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t09_hutang_list->PageUrl() ?>start=<?php echo $t09_hutang_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t92_log_list->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t92_log_list->PageUrl() ?>start=<?php echo $t92_log_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t09_hutang_list->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t09_hutang_list->PageUrl() ?>start=<?php echo $t09_hutang_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t92_log_list->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t92_log_list->PageUrl() ?>start=<?php echo $t92_log_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t09_hutang_list->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t92_log_list->Pager->PageCount ?></span>
 </div>
 <?php } ?>
-<?php if ($t09_hutang_list->Pager->RecordCount > 0) { ?>
+<?php if ($t92_log_list->Pager->RecordCount > 0) { ?>
 <div class="ewPager ewRec">
-	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $t09_hutang_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $t09_hutang_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $t09_hutang_list->Pager->RecordCount ?></span>
+	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $t92_log_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $t92_log_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $t92_log_list->Pager->RecordCount ?></span>
 </div>
 <?php } ?>
-<?php if ($t09_hutang_list->TotalRecs > 0 && (!$t09_hutang_list->AutoHidePageSizeSelector || $t09_hutang_list->Pager->Visible)) { ?>
+<?php if ($t92_log_list->TotalRecs > 0 && (!$t92_log_list->AutoHidePageSizeSelector || $t92_log_list->Pager->Visible)) { ?>
 <div class="ewPager">
-<input type="hidden" name="t" value="t09_hutang">
+<input type="hidden" name="t" value="t92_log">
 <select name="<?php echo EW_TABLE_REC_PER_PAGE ?>" class="form-control input-sm ewTooltip" title="<?php echo $Language->Phrase("RecordsPerPage") ?>" onchange="this.form.submit();">
-<option value="10"<?php if ($t09_hutang_list->DisplayRecs == 10) { ?> selected<?php } ?>>10</option>
-<option value="20"<?php if ($t09_hutang_list->DisplayRecs == 20) { ?> selected<?php } ?>>20</option>
-<option value="50"<?php if ($t09_hutang_list->DisplayRecs == 50) { ?> selected<?php } ?>>50</option>
-<option value="100"<?php if ($t09_hutang_list->DisplayRecs == 100) { ?> selected<?php } ?>>100</option>
-<option value="200"<?php if ($t09_hutang_list->DisplayRecs == 200) { ?> selected<?php } ?>>200</option>
-<option value="ALL"<?php if ($t09_hutang->getRecordsPerPage() == -1) { ?> selected<?php } ?>><?php echo $Language->Phrase("AllRecords") ?></option>
+<option value="10"<?php if ($t92_log_list->DisplayRecs == 10) { ?> selected<?php } ?>>10</option>
+<option value="20"<?php if ($t92_log_list->DisplayRecs == 20) { ?> selected<?php } ?>>20</option>
+<option value="50"<?php if ($t92_log_list->DisplayRecs == 50) { ?> selected<?php } ?>>50</option>
+<option value="100"<?php if ($t92_log_list->DisplayRecs == 100) { ?> selected<?php } ?>>100</option>
+<option value="200"<?php if ($t92_log_list->DisplayRecs == 200) { ?> selected<?php } ?>>200</option>
+<option value="ALL"<?php if ($t92_log->getRecordsPerPage() == -1) { ?> selected<?php } ?>><?php echo $Language->Phrase("AllRecords") ?></option>
 </select>
 </div>
 <?php } ?>
@@ -2750,7 +2587,7 @@ if ($t09_hutang_list->Recordset)
 <?php } ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($t09_hutang_list->OtherOptions as &$option)
+	foreach ($t92_log_list->OtherOptions as &$option)
 		$option->Render("body", "bottom");
 ?>
 </div>
@@ -2759,10 +2596,10 @@ if ($t09_hutang_list->Recordset)
 <?php } ?>
 </div>
 <?php } ?>
-<?php if ($t09_hutang_list->TotalRecs == 0 && $t09_hutang->CurrentAction == "") { // Show other options ?>
+<?php if ($t92_log_list->TotalRecs == 0 && $t92_log->CurrentAction == "") { // Show other options ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($t09_hutang_list->OtherOptions as &$option) {
+	foreach ($t92_log_list->OtherOptions as &$option) {
 		$option->ButtonClass = "";
 		$option->Render("body", "");
 	}
@@ -2770,19 +2607,19 @@ if ($t09_hutang_list->Recordset)
 </div>
 <div class="clearfix"></div>
 <?php } ?>
-<?php if ($t09_hutang->Export == "") { ?>
+<?php if ($t92_log->Export == "") { ?>
 <script type="text/javascript">
-ft09_hutanglistsrch.FilterList = <?php echo $t09_hutang_list->GetFilterList() ?>;
-ft09_hutanglistsrch.Init();
-ft09_hutanglist.Init();
+ft92_loglistsrch.FilterList = <?php echo $t92_log_list->GetFilterList() ?>;
+ft92_loglistsrch.Init();
+ft92_loglist.Init();
 </script>
 <?php } ?>
 <?php
-$t09_hutang_list->ShowPageFooter();
+$t92_log_list->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
-<?php if ($t09_hutang->Export == "") { ?>
+<?php if ($t92_log->Export == "") { ?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
@@ -2792,5 +2629,5 @@ if (EW_DEBUG_ENABLED)
 <?php } ?>
 <?php include_once "footer.php" ?>
 <?php
-$t09_hutang_list->Page_Terminate();
+$t92_log_list->Page_Terminate();
 ?>

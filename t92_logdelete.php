@@ -5,7 +5,7 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg14.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql14.php") ?>
 <?php include_once "phpfn14.php" ?>
-<?php include_once "t08_beliinfo.php" ?>
+<?php include_once "t92_loginfo.php" ?>
 <?php include_once "t96_employeesinfo.php" ?>
 <?php include_once "userfn14.php" ?>
 <?php
@@ -14,9 +14,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t08_beli_delete = NULL; // Initialize page object first
+$t92_log_delete = NULL; // Initialize page object first
 
-class ct08_beli_delete extends ct08_beli {
+class ct92_log_delete extends ct92_log {
 
 	// Page ID
 	var $PageID = 'delete';
@@ -25,10 +25,10 @@ class ct08_beli_delete extends ct08_beli {
 	var $ProjectID = '{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}';
 
 	// Table name
-	var $TableName = 't08_beli';
+	var $TableName = 't92_log';
 
 	// Page object name
-	var $PageObjName = 't08_beli_delete';
+	var $PageObjName = 't92_log_delete';
 
 	// Page headings
 	var $Heading = '';
@@ -256,10 +256,10 @@ class ct08_beli_delete extends ct08_beli {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t08_beli)
-		if (!isset($GLOBALS["t08_beli"]) || get_class($GLOBALS["t08_beli"]) == "ct08_beli") {
-			$GLOBALS["t08_beli"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t08_beli"];
+		// Table object (t92_log)
+		if (!isset($GLOBALS["t92_log"]) || get_class($GLOBALS["t92_log"]) == "ct92_log") {
+			$GLOBALS["t92_log"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t92_log"];
 		}
 
 		// Table object (t96_employees)
@@ -271,7 +271,7 @@ class ct08_beli_delete extends ct08_beli {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't08_beli', TRUE);
+			define("EW_TABLE_NAME", 't92_log', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"]))
@@ -310,7 +310,7 @@ class ct08_beli_delete extends ct08_beli {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
 			if ($Security->CanList())
-				$this->Page_Terminate(ew_GetUrl("t08_belilist.php"));
+				$this->Page_Terminate(ew_GetUrl("t92_loglist.php"));
 			else
 				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
@@ -326,14 +326,11 @@ class ct08_beli_delete extends ct08_beli {
 		// 
 
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-		$this->TglPO->SetVisibility();
-		$this->NoPO->SetVisibility();
-		$this->VendorID->SetVisibility();
-		$this->ArticleID->SetVisibility();
-		$this->Harga->SetVisibility();
-		$this->Qty->SetVisibility();
-		$this->SatuanID->SetVisibility();
-		$this->SubTotal->SetVisibility();
+		$this->No->SetVisibility();
+		$this->Keterangan->SetVisibility();
+		$this->Keterangan2->SetVisibility();
+		$this->Status->SetVisibility();
+		$this->TanggalJam->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -365,13 +362,13 @@ class ct08_beli_delete extends ct08_beli {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t08_beli;
+		global $EW_EXPORT, $t92_log;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t08_beli);
+				$doc = new $class($t92_log);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -418,10 +415,10 @@ class ct08_beli_delete extends ct08_beli {
 		$this->RecKeys = $this->GetRecordKeys(); // Load record keys
 		$sFilter = $this->GetKeyFilter();
 		if ($sFilter == "")
-			$this->Page_Terminate("t08_belilist.php"); // Prevent SQL injection, return to list
+			$this->Page_Terminate("t92_loglist.php"); // Prevent SQL injection, return to list
 
 		// Set up filter (SQL WHHERE clause) and get return SQL
-		// SQL constructor in t08_beli class, t08_beliinfo.php
+		// SQL constructor in t92_log class, t92_loginfo.php
 
 		$this->CurrentFilter = $sFilter;
 
@@ -449,7 +446,7 @@ class ct08_beli_delete extends ct08_beli {
 			if ($this->TotalRecs <= 0) { // No record found, exit
 				if ($this->Recordset)
 					$this->Recordset->Close();
-				$this->Page_Terminate("t08_belilist.php"); // Return to list
+				$this->Page_Terminate("t92_loglist.php"); // Return to list
 			}
 		}
 	}
@@ -466,7 +463,7 @@ class ct08_beli_delete extends ct08_beli {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -514,38 +511,22 @@ class ct08_beli_delete extends ct08_beli {
 		if (!$rs || $rs->EOF)
 			return;
 		$this->id->setDbValue($row['id']);
-		$this->TglPO->setDbValue($row['TglPO']);
-		$this->NoPO->setDbValue($row['NoPO']);
-		$this->VendorID->setDbValue($row['VendorID']);
-		$this->ArticleID->setDbValue($row['ArticleID']);
-		if (array_key_exists('EV__ArticleID', $rs->fields)) {
-			$this->ArticleID->VirtualValue = $rs->fields('EV__ArticleID'); // Set up virtual field value
-		} else {
-			$this->ArticleID->VirtualValue = ""; // Clear value
-		}
-		$this->Harga->setDbValue($row['Harga']);
-		$this->Qty->setDbValue($row['Qty']);
-		$this->SatuanID->setDbValue($row['SatuanID']);
-		if (array_key_exists('EV__SatuanID', $rs->fields)) {
-			$this->SatuanID->VirtualValue = $rs->fields('EV__SatuanID'); // Set up virtual field value
-		} else {
-			$this->SatuanID->VirtualValue = ""; // Clear value
-		}
-		$this->SubTotal->setDbValue($row['SubTotal']);
+		$this->No->setDbValue($row['No']);
+		$this->Keterangan->setDbValue($row['Keterangan']);
+		$this->Keterangan2->setDbValue($row['Keterangan2']);
+		$this->Status->setDbValue($row['Status']);
+		$this->TanggalJam->setDbValue($row['TanggalJam']);
 	}
 
 	// Return a row with default values
 	function NewRow() {
 		$row = array();
 		$row['id'] = NULL;
-		$row['TglPO'] = NULL;
-		$row['NoPO'] = NULL;
-		$row['VendorID'] = NULL;
-		$row['ArticleID'] = NULL;
-		$row['Harga'] = NULL;
-		$row['Qty'] = NULL;
-		$row['SatuanID'] = NULL;
-		$row['SubTotal'] = NULL;
+		$row['No'] = NULL;
+		$row['Keterangan'] = NULL;
+		$row['Keterangan2'] = NULL;
+		$row['Status'] = NULL;
+		$row['TanggalJam'] = NULL;
 		return $row;
 	}
 
@@ -555,14 +536,11 @@ class ct08_beli_delete extends ct08_beli {
 			return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
-		$this->TglPO->DbValue = $row['TglPO'];
-		$this->NoPO->DbValue = $row['NoPO'];
-		$this->VendorID->DbValue = $row['VendorID'];
-		$this->ArticleID->DbValue = $row['ArticleID'];
-		$this->Harga->DbValue = $row['Harga'];
-		$this->Qty->DbValue = $row['Qty'];
-		$this->SatuanID->DbValue = $row['SatuanID'];
-		$this->SubTotal->DbValue = $row['SubTotal'];
+		$this->No->DbValue = $row['No'];
+		$this->Keterangan->DbValue = $row['Keterangan'];
+		$this->Keterangan2->DbValue = $row['Keterangan2'];
+		$this->Status->DbValue = $row['Status'];
+		$this->TanggalJam->DbValue = $row['TanggalJam'];
 	}
 
 	// Render row values based on field settings
@@ -570,32 +548,17 @@ class ct08_beli_delete extends ct08_beli {
 		global $Security, $Language, $gsLanguage;
 
 		// Initialize URLs
-		// Convert decimal values if posted back
-
-		if ($this->Harga->FormValue == $this->Harga->CurrentValue && is_numeric(ew_StrToFloat($this->Harga->CurrentValue)))
-			$this->Harga->CurrentValue = ew_StrToFloat($this->Harga->CurrentValue);
-
-		// Convert decimal values if posted back
-		if ($this->Qty->FormValue == $this->Qty->CurrentValue && is_numeric(ew_StrToFloat($this->Qty->CurrentValue)))
-			$this->Qty->CurrentValue = ew_StrToFloat($this->Qty->CurrentValue);
-
-		// Convert decimal values if posted back
-		if ($this->SubTotal->FormValue == $this->SubTotal->CurrentValue && is_numeric(ew_StrToFloat($this->SubTotal->CurrentValue)))
-			$this->SubTotal->CurrentValue = ew_StrToFloat($this->SubTotal->CurrentValue);
-
 		// Call Row_Rendering event
+
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
 		// id
-		// TglPO
-		// NoPO
-		// VendorID
-		// ArticleID
-		// Harga
-		// Qty
-		// SatuanID
-		// SubTotal
+		// No
+		// Keterangan
+		// Keterangan2
+		// Status
+		// TanggalJam
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -603,151 +566,71 @@ class ct08_beli_delete extends ct08_beli {
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// TglPO
-		$this->TglPO->ViewValue = $this->TglPO->CurrentValue;
-		$this->TglPO->ViewValue = ew_FormatDateTime($this->TglPO->ViewValue, 7);
-		$this->TglPO->ViewCustomAttributes = "";
+		// No
+		$this->No->ViewValue = $this->No->CurrentValue;
+		$this->No->ViewCustomAttributes = "";
 
-		// NoPO
-		$this->NoPO->ViewValue = $this->NoPO->CurrentValue;
-		$this->NoPO->ViewCustomAttributes = "";
+		// Keterangan
+		$this->Keterangan->ViewValue = ew_TruncateMemo($this->Keterangan->CurrentValue, 50, $this->Keterangan->TruncateMemoRemoveHtml);
+		if (!is_null($this->Keterangan->ViewValue)) $this->Keterangan->ViewValue = str_replace("\n", "<br>", $this->Keterangan->ViewValue);
+		$this->Keterangan->ViewCustomAttributes = "";
 
-		// VendorID
-		if (strval($this->VendorID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->VendorID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t02_vendor`";
+		// Keterangan2
+		$this->Keterangan2->ViewValue = ew_TruncateMemo($this->Keterangan2->CurrentValue, 25, $this->Keterangan2->TruncateMemoRemoveHtml);
+		$this->Keterangan2->ViewCustomAttributes = "";
+
+		// Status
+		if (strval($this->Status->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->Status->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `Status` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t91_log_status`";
 		$sWhereWrk = "";
-		$this->VendorID->LookupFilters = array("dx1" => '`Nama`');
+		$this->Status->LookupFilters = array("dx1" => '`Status`');
 		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->VendorID, $sWhereWrk); // Call Lookup Selecting
+		$this->Lookup_Selecting($this->Status, $sWhereWrk); // Call Lookup Selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
 			$rswrk = Conn()->Execute($sSqlWrk);
 			if ($rswrk && !$rswrk->EOF) { // Lookup values found
 				$arwrk = array();
 				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->VendorID->ViewValue = $this->VendorID->DisplayValue($arwrk);
+				$this->Status->ViewValue = $this->Status->DisplayValue($arwrk);
 				$rswrk->Close();
 			} else {
-				$this->VendorID->ViewValue = $this->VendorID->CurrentValue;
+				$this->Status->ViewValue = $this->Status->CurrentValue;
 			}
 		} else {
-			$this->VendorID->ViewValue = NULL;
+			$this->Status->ViewValue = NULL;
 		}
-		$this->VendorID->ViewCustomAttributes = "";
+		$this->Status->ViewCustomAttributes = "";
 
-		// ArticleID
-		if ($this->ArticleID->VirtualValue <> "") {
-			$this->ArticleID->ViewValue = $this->ArticleID->VirtualValue;
-		} else {
-		if (strval($this->ArticleID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->ArticleID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `v05_article`";
-		$sWhereWrk = "";
-		$this->ArticleID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$this->ArticleID->ViewValue = $this->ArticleID->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->ArticleID->ViewValue = $this->ArticleID->CurrentValue;
-			}
-		} else {
-			$this->ArticleID->ViewValue = NULL;
-		}
-		}
-		$this->ArticleID->ViewCustomAttributes = "";
+		// TanggalJam
+		$this->TanggalJam->ViewValue = $this->TanggalJam->CurrentValue;
+		$this->TanggalJam->ViewValue = ew_FormatDateTime($this->TanggalJam->ViewValue, 1);
+		$this->TanggalJam->ViewCustomAttributes = "";
 
-		// Harga
-		$this->Harga->ViewValue = $this->Harga->CurrentValue;
-		$this->Harga->ViewValue = ew_FormatNumber($this->Harga->ViewValue, 2, -2, -2, -2);
-		$this->Harga->CellCssStyle .= "text-align: right;";
-		$this->Harga->ViewCustomAttributes = "";
+			// No
+			$this->No->LinkCustomAttributes = "";
+			$this->No->HrefValue = "";
+			$this->No->TooltipValue = "";
 
-		// Qty
-		$this->Qty->ViewValue = $this->Qty->CurrentValue;
-		$this->Qty->ViewValue = ew_FormatNumber($this->Qty->ViewValue, 2, -2, -2, -2);
-		$this->Qty->CellCssStyle .= "text-align: right;";
-		$this->Qty->ViewCustomAttributes = "";
+			// Keterangan
+			$this->Keterangan->LinkCustomAttributes = "";
+			$this->Keterangan->HrefValue = "";
+			$this->Keterangan->TooltipValue = "";
 
-		// SatuanID
-		if ($this->SatuanID->VirtualValue <> "") {
-			$this->SatuanID->ViewValue = $this->SatuanID->VirtualValue;
-		} else {
-			$this->SatuanID->ViewValue = $this->SatuanID->CurrentValue;
-		if (strval($this->SatuanID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->SatuanID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_satuan`";
-		$sWhereWrk = "";
-		$this->SatuanID->LookupFilters = array("dx1" => '`Nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->SatuanID, $sWhereWrk); // Call Lookup Selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->SatuanID->ViewValue = $this->SatuanID->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->SatuanID->ViewValue = $this->SatuanID->CurrentValue;
-			}
-		} else {
-			$this->SatuanID->ViewValue = NULL;
-		}
-		}
-		$this->SatuanID->ViewCustomAttributes = "";
+			// Keterangan2
+			$this->Keterangan2->LinkCustomAttributes = "";
+			$this->Keterangan2->HrefValue = "";
+			$this->Keterangan2->TooltipValue = "";
 
-		// SubTotal
-		$this->SubTotal->ViewValue = $this->SubTotal->CurrentValue;
-		$this->SubTotal->ViewValue = ew_FormatNumber($this->SubTotal->ViewValue, 2, -2, -2, -2);
-		$this->SubTotal->CellCssStyle .= "text-align: right;";
-		$this->SubTotal->ViewCustomAttributes = "";
+			// Status
+			$this->Status->LinkCustomAttributes = "";
+			$this->Status->HrefValue = "";
+			$this->Status->TooltipValue = "";
 
-			// TglPO
-			$this->TglPO->LinkCustomAttributes = "";
-			$this->TglPO->HrefValue = "";
-			$this->TglPO->TooltipValue = "";
-
-			// NoPO
-			$this->NoPO->LinkCustomAttributes = "";
-			$this->NoPO->HrefValue = "";
-			$this->NoPO->TooltipValue = "";
-
-			// VendorID
-			$this->VendorID->LinkCustomAttributes = "";
-			$this->VendorID->HrefValue = "";
-			$this->VendorID->TooltipValue = "";
-
-			// ArticleID
-			$this->ArticleID->LinkCustomAttributes = "";
-			$this->ArticleID->HrefValue = "";
-			$this->ArticleID->TooltipValue = "";
-
-			// Harga
-			$this->Harga->LinkCustomAttributes = "";
-			$this->Harga->HrefValue = "";
-			$this->Harga->TooltipValue = "";
-
-			// Qty
-			$this->Qty->LinkCustomAttributes = "";
-			$this->Qty->HrefValue = "";
-			$this->Qty->TooltipValue = "";
-
-			// SatuanID
-			$this->SatuanID->LinkCustomAttributes = "";
-			$this->SatuanID->HrefValue = "";
-			$this->SatuanID->TooltipValue = "";
-
-			// SubTotal
-			$this->SubTotal->LinkCustomAttributes = "";
-			$this->SubTotal->HrefValue = "";
-			$this->SubTotal->TooltipValue = "";
+			// TanggalJam
+			$this->TanggalJam->LinkCustomAttributes = "";
+			$this->TanggalJam->HrefValue = "";
+			$this->TanggalJam->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -843,7 +726,7 @@ class ct08_beli_delete extends ct08_beli {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t08_belilist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t92_loglist.php"), "", $this->TableVar, TRUE);
 		$PageId = "delete";
 		$Breadcrumb->Add("delete", $PageId, $url);
 	}
@@ -929,29 +812,29 @@ class ct08_beli_delete extends ct08_beli {
 <?php
 
 // Create page object
-if (!isset($t08_beli_delete)) $t08_beli_delete = new ct08_beli_delete();
+if (!isset($t92_log_delete)) $t92_log_delete = new ct92_log_delete();
 
 // Page init
-$t08_beli_delete->Page_Init();
+$t92_log_delete->Page_Init();
 
 // Page main
-$t08_beli_delete->Page_Main();
+$t92_log_delete->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t08_beli_delete->Page_Render();
+$t92_log_delete->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "delete";
-var CurrentForm = ft08_belidelete = new ew_Form("ft08_belidelete", "delete");
+var CurrentForm = ft92_logdelete = new ew_Form("ft92_logdelete", "delete");
 
 // Form_CustomValidate event
-ft08_belidelete.Form_CustomValidate = 
+ft92_logdelete.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid.
@@ -959,16 +842,11 @@ ft08_belidelete.Form_CustomValidate =
  }
 
 // Use JavaScript validation or not
-ft08_belidelete.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
+ft92_logdelete.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
 
 // Dynamic selection lists
-ft08_belidelete.Lists["x_VendorID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t02_vendor"};
-ft08_belidelete.Lists["x_VendorID"].Data = "<?php echo $t08_beli_delete->VendorID->LookupFilterQuery(FALSE, "delete") ?>";
-ft08_belidelete.Lists["x_ArticleID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kode","x_Nama","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"v05_article"};
-ft08_belidelete.Lists["x_ArticleID"].Data = "<?php echo $t08_beli_delete->ArticleID->LookupFilterQuery(FALSE, "delete") ?>";
-ft08_belidelete.Lists["x_SatuanID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_satuan"};
-ft08_belidelete.Lists["x_SatuanID"].Data = "<?php echo $t08_beli_delete->SatuanID->LookupFilterQuery(FALSE, "delete") ?>";
-ft08_belidelete.AutoSuggests["x_SatuanID"] = <?php echo json_encode(array("data" => "ajax=autosuggest&" . $t08_beli_delete->SatuanID->LookupFilterQuery(TRUE, "delete"))) ?>;
+ft92_logdelete.Lists["x_Status"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Status","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t91_log_status"};
+ft92_logdelete.Lists["x_Status"].Data = "<?php echo $t92_log_delete->Status->LookupFilterQuery(FALSE, "delete") ?>";
 
 // Form object for search
 </script>
@@ -976,17 +854,17 @@ ft08_belidelete.AutoSuggests["x_SatuanID"] = <?php echo json_encode(array("data"
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php $t08_beli_delete->ShowPageHeader(); ?>
+<?php $t92_log_delete->ShowPageHeader(); ?>
 <?php
-$t08_beli_delete->ShowMessage();
+$t92_log_delete->ShowMessage();
 ?>
-<form name="ft08_belidelete" id="ft08_belidelete" class="form-inline ewForm ewDeleteForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t08_beli_delete->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t08_beli_delete->Token ?>">
+<form name="ft92_logdelete" id="ft92_logdelete" class="form-inline ewForm ewDeleteForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t92_log_delete->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t92_log_delete->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t08_beli">
+<input type="hidden" name="t" value="t92_log">
 <input type="hidden" name="a_delete" id="a_delete" value="D">
-<?php foreach ($t08_beli_delete->RecKeys as $key) { ?>
+<?php foreach ($t92_log_delete->RecKeys as $key) { ?>
 <?php $keyvalue = is_array($key) ? implode($EW_COMPOSITE_KEY_SEPARATOR, $key) : $key; ?>
 <input type="hidden" name="key_m[]" value="<?php echo ew_HtmlEncode($keyvalue) ?>">
 <?php } ?>
@@ -995,120 +873,87 @@ $t08_beli_delete->ShowMessage();
 <table class="table ewTable">
 	<thead>
 	<tr class="ewTableHeader">
-<?php if ($t08_beli->TglPO->Visible) { // TglPO ?>
-		<th class="<?php echo $t08_beli->TglPO->HeaderCellClass() ?>"><span id="elh_t08_beli_TglPO" class="t08_beli_TglPO"><?php echo $t08_beli->TglPO->FldCaption() ?></span></th>
+<?php if ($t92_log->No->Visible) { // No ?>
+		<th class="<?php echo $t92_log->No->HeaderCellClass() ?>"><span id="elh_t92_log_No" class="t92_log_No"><?php echo $t92_log->No->FldCaption() ?></span></th>
 <?php } ?>
-<?php if ($t08_beli->NoPO->Visible) { // NoPO ?>
-		<th class="<?php echo $t08_beli->NoPO->HeaderCellClass() ?>"><span id="elh_t08_beli_NoPO" class="t08_beli_NoPO"><?php echo $t08_beli->NoPO->FldCaption() ?></span></th>
+<?php if ($t92_log->Keterangan->Visible) { // Keterangan ?>
+		<th class="<?php echo $t92_log->Keterangan->HeaderCellClass() ?>"><span id="elh_t92_log_Keterangan" class="t92_log_Keterangan"><?php echo $t92_log->Keterangan->FldCaption() ?></span></th>
 <?php } ?>
-<?php if ($t08_beli->VendorID->Visible) { // VendorID ?>
-		<th class="<?php echo $t08_beli->VendorID->HeaderCellClass() ?>"><span id="elh_t08_beli_VendorID" class="t08_beli_VendorID"><?php echo $t08_beli->VendorID->FldCaption() ?></span></th>
+<?php if ($t92_log->Keterangan2->Visible) { // Keterangan2 ?>
+		<th class="<?php echo $t92_log->Keterangan2->HeaderCellClass() ?>"><span id="elh_t92_log_Keterangan2" class="t92_log_Keterangan2"><?php echo $t92_log->Keterangan2->FldCaption() ?></span></th>
 <?php } ?>
-<?php if ($t08_beli->ArticleID->Visible) { // ArticleID ?>
-		<th class="<?php echo $t08_beli->ArticleID->HeaderCellClass() ?>"><span id="elh_t08_beli_ArticleID" class="t08_beli_ArticleID"><?php echo $t08_beli->ArticleID->FldCaption() ?></span></th>
+<?php if ($t92_log->Status->Visible) { // Status ?>
+		<th class="<?php echo $t92_log->Status->HeaderCellClass() ?>"><span id="elh_t92_log_Status" class="t92_log_Status"><?php echo $t92_log->Status->FldCaption() ?></span></th>
 <?php } ?>
-<?php if ($t08_beli->Harga->Visible) { // Harga ?>
-		<th class="<?php echo $t08_beli->Harga->HeaderCellClass() ?>"><span id="elh_t08_beli_Harga" class="t08_beli_Harga"><?php echo $t08_beli->Harga->FldCaption() ?></span></th>
-<?php } ?>
-<?php if ($t08_beli->Qty->Visible) { // Qty ?>
-		<th class="<?php echo $t08_beli->Qty->HeaderCellClass() ?>"><span id="elh_t08_beli_Qty" class="t08_beli_Qty"><?php echo $t08_beli->Qty->FldCaption() ?></span></th>
-<?php } ?>
-<?php if ($t08_beli->SatuanID->Visible) { // SatuanID ?>
-		<th class="<?php echo $t08_beli->SatuanID->HeaderCellClass() ?>"><span id="elh_t08_beli_SatuanID" class="t08_beli_SatuanID"><?php echo $t08_beli->SatuanID->FldCaption() ?></span></th>
-<?php } ?>
-<?php if ($t08_beli->SubTotal->Visible) { // SubTotal ?>
-		<th class="<?php echo $t08_beli->SubTotal->HeaderCellClass() ?>"><span id="elh_t08_beli_SubTotal" class="t08_beli_SubTotal"><?php echo $t08_beli->SubTotal->FldCaption() ?></span></th>
+<?php if ($t92_log->TanggalJam->Visible) { // TanggalJam ?>
+		<th class="<?php echo $t92_log->TanggalJam->HeaderCellClass() ?>"><span id="elh_t92_log_TanggalJam" class="t92_log_TanggalJam"><?php echo $t92_log->TanggalJam->FldCaption() ?></span></th>
 <?php } ?>
 	</tr>
 	</thead>
 	<tbody>
 <?php
-$t08_beli_delete->RecCnt = 0;
+$t92_log_delete->RecCnt = 0;
 $i = 0;
-while (!$t08_beli_delete->Recordset->EOF) {
-	$t08_beli_delete->RecCnt++;
-	$t08_beli_delete->RowCnt++;
+while (!$t92_log_delete->Recordset->EOF) {
+	$t92_log_delete->RecCnt++;
+	$t92_log_delete->RowCnt++;
 
 	// Set row properties
-	$t08_beli->ResetAttrs();
-	$t08_beli->RowType = EW_ROWTYPE_VIEW; // View
+	$t92_log->ResetAttrs();
+	$t92_log->RowType = EW_ROWTYPE_VIEW; // View
 
 	// Get the field contents
-	$t08_beli_delete->LoadRowValues($t08_beli_delete->Recordset);
+	$t92_log_delete->LoadRowValues($t92_log_delete->Recordset);
 
 	// Render row
-	$t08_beli_delete->RenderRow();
+	$t92_log_delete->RenderRow();
 ?>
-	<tr<?php echo $t08_beli->RowAttributes() ?>>
-<?php if ($t08_beli->TglPO->Visible) { // TglPO ?>
-		<td<?php echo $t08_beli->TglPO->CellAttributes() ?>>
-<span id="el<?php echo $t08_beli_delete->RowCnt ?>_t08_beli_TglPO" class="t08_beli_TglPO">
-<span<?php echo $t08_beli->TglPO->ViewAttributes() ?>>
-<?php echo $t08_beli->TglPO->ListViewValue() ?></span>
+	<tr<?php echo $t92_log->RowAttributes() ?>>
+<?php if ($t92_log->No->Visible) { // No ?>
+		<td<?php echo $t92_log->No->CellAttributes() ?>>
+<span id="el<?php echo $t92_log_delete->RowCnt ?>_t92_log_No" class="t92_log_No">
+<span<?php echo $t92_log->No->ViewAttributes() ?>>
+<?php echo $t92_log->No->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($t08_beli->NoPO->Visible) { // NoPO ?>
-		<td<?php echo $t08_beli->NoPO->CellAttributes() ?>>
-<span id="el<?php echo $t08_beli_delete->RowCnt ?>_t08_beli_NoPO" class="t08_beli_NoPO">
-<span<?php echo $t08_beli->NoPO->ViewAttributes() ?>>
-<?php echo $t08_beli->NoPO->ListViewValue() ?></span>
+<?php if ($t92_log->Keterangan->Visible) { // Keterangan ?>
+		<td<?php echo $t92_log->Keterangan->CellAttributes() ?>>
+<span id="el<?php echo $t92_log_delete->RowCnt ?>_t92_log_Keterangan" class="t92_log_Keterangan">
+<span<?php echo $t92_log->Keterangan->ViewAttributes() ?>>
+<?php echo $t92_log->Keterangan->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($t08_beli->VendorID->Visible) { // VendorID ?>
-		<td<?php echo $t08_beli->VendorID->CellAttributes() ?>>
-<span id="el<?php echo $t08_beli_delete->RowCnt ?>_t08_beli_VendorID" class="t08_beli_VendorID">
-<span<?php echo $t08_beli->VendorID->ViewAttributes() ?>>
-<?php echo $t08_beli->VendorID->ListViewValue() ?></span>
+<?php if ($t92_log->Keterangan2->Visible) { // Keterangan2 ?>
+		<td<?php echo $t92_log->Keterangan2->CellAttributes() ?>>
+<span id="el<?php echo $t92_log_delete->RowCnt ?>_t92_log_Keterangan2" class="t92_log_Keterangan2">
+<span<?php echo $t92_log->Keterangan2->ViewAttributes() ?>>
+<?php echo $t92_log->Keterangan2->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($t08_beli->ArticleID->Visible) { // ArticleID ?>
-		<td<?php echo $t08_beli->ArticleID->CellAttributes() ?>>
-<span id="el<?php echo $t08_beli_delete->RowCnt ?>_t08_beli_ArticleID" class="t08_beli_ArticleID">
-<span<?php echo $t08_beli->ArticleID->ViewAttributes() ?>>
-<?php echo $t08_beli->ArticleID->ListViewValue() ?></span>
+<?php if ($t92_log->Status->Visible) { // Status ?>
+		<td<?php echo $t92_log->Status->CellAttributes() ?>>
+<span id="el<?php echo $t92_log_delete->RowCnt ?>_t92_log_Status" class="t92_log_Status">
+<span<?php echo $t92_log->Status->ViewAttributes() ?>>
+<?php echo $t92_log->Status->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($t08_beli->Harga->Visible) { // Harga ?>
-		<td<?php echo $t08_beli->Harga->CellAttributes() ?>>
-<span id="el<?php echo $t08_beli_delete->RowCnt ?>_t08_beli_Harga" class="t08_beli_Harga">
-<span<?php echo $t08_beli->Harga->ViewAttributes() ?>>
-<?php echo $t08_beli->Harga->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($t08_beli->Qty->Visible) { // Qty ?>
-		<td<?php echo $t08_beli->Qty->CellAttributes() ?>>
-<span id="el<?php echo $t08_beli_delete->RowCnt ?>_t08_beli_Qty" class="t08_beli_Qty">
-<span<?php echo $t08_beli->Qty->ViewAttributes() ?>>
-<?php echo $t08_beli->Qty->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($t08_beli->SatuanID->Visible) { // SatuanID ?>
-		<td<?php echo $t08_beli->SatuanID->CellAttributes() ?>>
-<span id="el<?php echo $t08_beli_delete->RowCnt ?>_t08_beli_SatuanID" class="t08_beli_SatuanID">
-<span<?php echo $t08_beli->SatuanID->ViewAttributes() ?>>
-<?php echo $t08_beli->SatuanID->ListViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($t08_beli->SubTotal->Visible) { // SubTotal ?>
-		<td<?php echo $t08_beli->SubTotal->CellAttributes() ?>>
-<span id="el<?php echo $t08_beli_delete->RowCnt ?>_t08_beli_SubTotal" class="t08_beli_SubTotal">
-<span<?php echo $t08_beli->SubTotal->ViewAttributes() ?>>
-<?php echo $t08_beli->SubTotal->ListViewValue() ?></span>
+<?php if ($t92_log->TanggalJam->Visible) { // TanggalJam ?>
+		<td<?php echo $t92_log->TanggalJam->CellAttributes() ?>>
+<span id="el<?php echo $t92_log_delete->RowCnt ?>_t92_log_TanggalJam" class="t92_log_TanggalJam">
+<span<?php echo $t92_log->TanggalJam->ViewAttributes() ?>>
+<?php echo $t92_log->TanggalJam->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
 	</tr>
 <?php
-	$t08_beli_delete->Recordset->MoveNext();
+	$t92_log_delete->Recordset->MoveNext();
 }
-$t08_beli_delete->Recordset->Close();
+$t92_log_delete->Recordset->Close();
 ?>
 </tbody>
 </table>
@@ -1116,14 +961,14 @@ $t08_beli_delete->Recordset->Close();
 </div>
 <div>
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("DeleteBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t08_beli_delete->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t92_log_delete->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
 </div>
 </form>
 <script type="text/javascript">
-ft08_belidelete.Init();
+ft92_logdelete.Init();
 </script>
 <?php
-$t08_beli_delete->ShowPageFooter();
+$t92_log_delete->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -1135,5 +980,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$t08_beli_delete->Page_Terminate();
+$t92_log_delete->Page_Terminate();
 ?>

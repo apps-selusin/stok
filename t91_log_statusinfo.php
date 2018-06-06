@@ -1,24 +1,14 @@
 <?php
 
 // Global variable for table object
-$t09_hutang = NULL;
+$t91_log_status = NULL;
 
 //
-// Table class for t09_hutang
+// Table class for t91_log_status
 //
-class ct09_hutang extends cTable {
-	var $AuditTrailOnAdd = TRUE;
-	var $AuditTrailOnEdit = TRUE;
-	var $AuditTrailOnDelete = TRUE;
-	var $AuditTrailOnView = FALSE;
-	var $AuditTrailOnViewData = FALSE;
-	var $AuditTrailOnSearch = FALSE;
+class ct91_log_status extends cTable {
 	var $id;
-	var $NoHutang;
-	var $BeliID;
-	var $JumlahHutang;
-	var $JumlahBayar;
-	var $SaldoHutang;
+	var $Status;
 
 	//
 	// Table class constructor
@@ -28,12 +18,12 @@ class ct09_hutang extends cTable {
 
 		// Language object
 		if (!isset($Language)) $Language = new cLanguage();
-		$this->TableVar = 't09_hutang';
-		$this->TableName = 't09_hutang';
+		$this->TableVar = 't91_log_status';
+		$this->TableName = 't91_log_status';
 		$this->TableType = 'TABLE';
 
 		// Update Table
-		$this->UpdateTable = "`t09_hutang`";
+		$this->UpdateTable = "`t91_log_status`";
 		$this->DBID = 'DB';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -53,40 +43,15 @@ class ct09_hutang extends cTable {
 		$this->BasicSearch = new cBasicSearch($this->TableVar);
 
 		// id
-		$this->id = new cField('t09_hutang', 't09_hutang', 'x_id', 'id', '`id`', '`id`', 3, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
+		$this->id = new cField('t91_log_status', 't91_log_status', 'x_id', 'id', '`id`', '`id`', 3, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
 		$this->id->Sortable = TRUE; // Allow sort
 		$this->id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['id'] = &$this->id;
 
-		// NoHutang
-		$this->NoHutang = new cField('t09_hutang', 't09_hutang', 'x_NoHutang', 'NoHutang', '`NoHutang`', '`NoHutang`', 200, -1, FALSE, '`NoHutang`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->NoHutang->Sortable = TRUE; // Allow sort
-		$this->fields['NoHutang'] = &$this->NoHutang;
-
-		// BeliID
-		$this->BeliID = new cField('t09_hutang', 't09_hutang', 'x_BeliID', 'BeliID', '`BeliID`', '`BeliID`', 3, -1, FALSE, '`EV__BeliID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'TEXT');
-		$this->BeliID->Sortable = TRUE; // Allow sort
-		$this->BeliID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['BeliID'] = &$this->BeliID;
-
-		// JumlahHutang
-		$this->JumlahHutang = new cField('t09_hutang', 't09_hutang', 'x_JumlahHutang', 'JumlahHutang', '`JumlahHutang`', '`JumlahHutang`', 4, -1, FALSE, '`JumlahHutang`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->JumlahHutang->Sortable = TRUE; // Allow sort
-		$this->JumlahHutang->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
-		$this->fields['JumlahHutang'] = &$this->JumlahHutang;
-
-		// JumlahBayar
-		$this->JumlahBayar = new cField('t09_hutang', 't09_hutang', 'x_JumlahBayar', 'JumlahBayar', '`JumlahBayar`', '`JumlahBayar`', 4, -1, FALSE, '`JumlahBayar`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->JumlahBayar->Sortable = TRUE; // Allow sort
-		$this->JumlahBayar->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
-		$this->fields['JumlahBayar'] = &$this->JumlahBayar;
-
-		// SaldoHutang
-		$this->SaldoHutang = new cField('t09_hutang', 't09_hutang', 'x_SaldoHutang', 'SaldoHutang', '(select jumlahhutang - jumlahbayar)', '(select jumlahhutang - jumlahbayar)', 5, -1, FALSE, '(select jumlahhutang - jumlahbayar)', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->SaldoHutang->FldIsCustom = TRUE; // Custom field
-		$this->SaldoHutang->Sortable = TRUE; // Allow sort
-		$this->SaldoHutang->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
-		$this->fields['SaldoHutang'] = &$this->SaldoHutang;
+		// Status
+		$this->Status = new cField('t91_log_status', 't91_log_status', 'x_Status', 'Status', '`Status`', '`Status`', 200, -1, FALSE, '`Status`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Status->Sortable = TRUE; // Allow sort
+		$this->fields['Status'] = &$this->Status;
 	}
 
 	// Field Visibility
@@ -132,62 +97,16 @@ class ct09_hutang extends cTable {
 			} else {
 				$this->setSessionOrderBy($sSortField . " " . $sThisSort); // Save to Session
 			}
-			$sSortFieldList = ($ofld->FldVirtualExpression <> "") ? $ofld->FldVirtualExpression : $sSortField;
-			if ($ctrl) {
-				$sOrderByList = $this->getSessionOrderByList();
-				if (strpos($sOrderByList, $sSortFieldList . " " . $sLastSort) !== FALSE) {
-					$sOrderByList = str_replace($sSortFieldList . " " . $sLastSort, $sSortFieldList . " " . $sThisSort, $sOrderByList);
-				} else {
-					if ($sOrderByList <> "") $sOrderByList .= ", ";
-					$sOrderByList .= $sSortFieldList . " " . $sThisSort;
-				}
-				$this->setSessionOrderByList($sOrderByList); // Save to Session
-			} else {
-				$this->setSessionOrderByList($sSortFieldList . " " . $sThisSort); // Save to Session
-			}
 		} else {
 			if (!$ctrl) $ofld->setSort("");
 		}
-	}
-
-	// Session ORDER BY for List page
-	function getSessionOrderByList() {
-		return @$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST];
-	}
-
-	function setSessionOrderByList($v) {
-		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST] = $v;
-	}
-
-	// Current detail table name
-	function getCurrentDetailTable() {
-		return @$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_DETAIL_TABLE];
-	}
-
-	function setCurrentDetailTable($v) {
-		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_DETAIL_TABLE] = $v;
-	}
-
-	// Get detail url
-	function GetDetailUrl() {
-
-		// Detail url
-		$sDetailUrl = "";
-		if ($this->getCurrentDetailTable() == "t10_hutangdetail") {
-			$sDetailUrl = $GLOBALS["t10_hutangdetail"]->GetListUrl() . "?" . EW_TABLE_SHOW_MASTER . "=" . $this->TableVar;
-			$sDetailUrl .= "&fk_id=" . urlencode($this->id->CurrentValue);
-		}
-		if ($sDetailUrl == "") {
-			$sDetailUrl = "t09_hutanglist.php";
-		}
-		return $sDetailUrl;
 	}
 
 	// Table level SQL
 	var $_SqlFrom = "";
 
 	function getSqlFrom() { // From
-		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t09_hutang`";
+		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t91_log_status`";
 	}
 
 	function SqlFrom() { // For backward compatibility
@@ -200,7 +119,7 @@ class ct09_hutang extends cTable {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() { // Select
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (select jumlahhutang - jumlahbayar) AS `SaldoHutang` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT * FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -209,23 +128,6 @@ class ct09_hutang extends cTable {
 
 	function setSqlSelect($v) {
 		$this->_SqlSelect = $v;
-	}
-	var $_SqlSelectList = "";
-
-	function getSqlSelectList() { // Select for List page
-		$select = "";
-		$select = "SELECT * FROM (" .
-			"SELECT *, (select jumlahhutang - jumlahbayar) AS `SaldoHutang`, (SELECT CONCAT(COALESCE(`TglPO`, ''),'" . ew_ValueSeparator(1, $this->BeliID) . "',COALESCE(`NoPO`,'')) FROM `t08_beli` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t09_hutang`.`BeliID` LIMIT 1) AS `EV__BeliID` FROM `t09_hutang`" .
-			") `EW_TMP_TABLE`";
-		return ($this->_SqlSelectList <> "") ? $this->_SqlSelectList : $select;
-	}
-
-	function SqlSelectList() { // For backward compatibility
-		return $this->getSqlSelectList();
-	}
-
-	function setSqlSelectList($v) {
-		$this->_SqlSelectList = $v;
 	}
 	var $_SqlWhere = "";
 
@@ -272,7 +174,7 @@ class ct09_hutang extends cTable {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() { // Order By
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`NoHutang` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -338,38 +240,16 @@ class ct09_hutang extends cTable {
 		ew_AddFilter($sFilter, $this->CurrentFilter);
 		$sFilter = $this->ApplyUserIDFilters($sFilter);
 		$this->Recordset_Selecting($sFilter);
-		if ($this->UseVirtualFields()) {
-			$sSelect = $this->getSqlSelectList();
-			$sSort = $this->UseSessionForListSQL ? $this->getSessionOrderByList() : "";
-		} else {
-			$sSelect = $this->getSqlSelect();
-			$sSort = $this->UseSessionForListSQL ? $this->getSessionOrderBy() : "";
-		}
+		$sSelect = $this->getSqlSelect();
+		$sSort = $this->UseSessionForListSQL ? $this->getSessionOrderBy() : "";
 		return ew_BuildSelectSql($sSelect, $this->getSqlWhere(), $this->getSqlGroupBy(),
 			$this->getSqlHaving(), $this->getSqlOrderBy(), $sFilter, $sSort);
 	}
 
 	// Get ORDER BY clause
 	function GetOrderBy() {
-		$sSort = ($this->UseVirtualFields()) ? $this->getSessionOrderByList() : $this->getSessionOrderBy();
+		$sSort = $this->getSessionOrderBy();
 		return ew_BuildSelectSql("", "", "", "", $this->getSqlOrderBy(), "", $sSort);
-	}
-
-	// Check if virtual fields is used in SQL
-	function UseVirtualFields() {
-		$sWhere = $this->UseSessionForListSQL ? $this->getSessionWhere() : $this->CurrentFilter;
-		$sOrderBy = $this->UseSessionForListSQL ? $this->getSessionOrderByList() : "";
-		if ($sWhere <> "")
-			$sWhere = " " . str_replace(array("(",")"), array("",""), $sWhere) . " ";
-		if ($sOrderBy <> "")
-			$sOrderBy = " " . str_replace(array("(",")"), array("",""), $sOrderBy) . " ";
-		if ($this->BeliID->AdvancedSearch->SearchValue <> "" ||
-			$this->BeliID->AdvancedSearch->SearchValue2 <> "" ||
-			strpos($sWhere, " " . $this->BeliID->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		if (strpos($sOrderBy, " " . $this->BeliID->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		return FALSE;
 	}
 
 	// Try to get record count
@@ -420,10 +300,7 @@ class ct09_hutang extends cTable {
 		$select = $this->TableType == 'CUSTOMVIEW' ? $this->getSqlSelect() : "SELECT * FROM " . $this->getSqlFrom();
 		$groupBy = $this->TableType == 'CUSTOMVIEW' ? $this->getSqlGroupBy() : "";
 		$having = $this->TableType == 'CUSTOMVIEW' ? $this->getSqlHaving() : "";
-		if ($this->UseVirtualFields())
-			$sql = ew_BuildSelectSql($this->getSqlSelectList(), $this->getSqlWhere(), $groupBy, $having, "", $filter, "");
-		else
-			$sql = ew_BuildSelectSql($select, $this->getSqlWhere(), $groupBy, $having, "", $filter, "");
+		$sql = ew_BuildSelectSql($select, $this->getSqlWhere(), $groupBy, $having, "", $filter, "");
 		$cnt = $this->TryGetRecordCount($sql);
 		if ($cnt == -1) {
 			$conn = &$this->Connection();
@@ -459,8 +336,6 @@ class ct09_hutang extends cTable {
 			// Get insert id if necessary
 			$this->id->setDbValue($conn->Insert_ID());
 			$rs['id'] = $this->id->DbValue;
-			if ($this->AuditTrailOnAdd)
-				$this->WriteAuditTrailOnAdd($rs);
 		}
 		return $bInsert;
 	}
@@ -487,12 +362,6 @@ class ct09_hutang extends cTable {
 	function Update(&$rs, $where = "", $rsold = NULL, $curfilter = TRUE) {
 		$conn = &$this->Connection();
 		$bUpdate = $conn->Execute($this->UpdateSQL($rs, $where, $curfilter));
-		if ($bUpdate && $this->AuditTrailOnEdit) {
-			$rsaudit = $rs;
-			$fldname = 'id';
-			if (!array_key_exists($fldname, $rsaudit)) $rsaudit[$fldname] = $rsold[$fldname];
-			$this->WriteAuditTrailOnEdit($rsold, $rsaudit);
-		}
 		return $bUpdate;
 	}
 
@@ -520,8 +389,6 @@ class ct09_hutang extends cTable {
 		$conn = &$this->Connection();
 		if ($bDelete)
 			$bDelete = $conn->Execute($this->DeleteSQL($rs, $where, $curfilter));
-		if ($bDelete && $this->AuditTrailOnDelete)
-			$this->WriteAuditTrailOnDelete($rs);
 		return $bDelete;
 	}
 
@@ -552,7 +419,7 @@ class ct09_hutang extends cTable {
 		if (@$_SESSION[$name] <> "") {
 			return $_SESSION[$name];
 		} else {
-			return "t09_hutanglist.php";
+			return "t91_log_statuslist.php";
 		}
 	}
 
@@ -563,11 +430,11 @@ class ct09_hutang extends cTable {
 	// Get modal caption
 	function GetModalCaption($pageName) {
 		global $Language;
-		if ($pageName == "t09_hutangview.php")
+		if ($pageName == "t91_log_statusview.php")
 			return $Language->Phrase("View");
-		elseif ($pageName == "t09_hutangedit.php")
+		elseif ($pageName == "t91_log_statusedit.php")
 			return $Language->Phrase("Edit");
-		elseif ($pageName == "t09_hutangadd.php")
+		elseif ($pageName == "t91_log_statusadd.php")
 			return $Language->Phrase("Add");
 		else
 			return "";
@@ -575,33 +442,30 @@ class ct09_hutang extends cTable {
 
 	// List URL
 	function GetListUrl() {
-		return "t09_hutanglist.php";
+		return "t91_log_statuslist.php";
 	}
 
 	// View URL
 	function GetViewUrl($parm = "") {
 		if ($parm <> "")
-			$url = $this->KeyUrl("t09_hutangview.php", $this->UrlParm($parm));
+			$url = $this->KeyUrl("t91_log_statusview.php", $this->UrlParm($parm));
 		else
-			$url = $this->KeyUrl("t09_hutangview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+			$url = $this->KeyUrl("t91_log_statusview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
 		return $this->AddMasterUrl($url);
 	}
 
 	// Add URL
 	function GetAddUrl($parm = "") {
 		if ($parm <> "")
-			$url = "t09_hutangadd.php?" . $this->UrlParm($parm);
+			$url = "t91_log_statusadd.php?" . $this->UrlParm($parm);
 		else
-			$url = "t09_hutangadd.php";
+			$url = "t91_log_statusadd.php";
 		return $this->AddMasterUrl($url);
 	}
 
 	// Edit URL
 	function GetEditUrl($parm = "") {
-		if ($parm <> "")
-			$url = $this->KeyUrl("t09_hutangedit.php", $this->UrlParm($parm));
-		else
-			$url = $this->KeyUrl("t09_hutangedit.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+		$url = $this->KeyUrl("t91_log_statusedit.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -613,10 +477,7 @@ class ct09_hutang extends cTable {
 
 	// Copy URL
 	function GetCopyUrl($parm = "") {
-		if ($parm <> "")
-			$url = $this->KeyUrl("t09_hutangadd.php", $this->UrlParm($parm));
-		else
-			$url = $this->KeyUrl("t09_hutangadd.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+		$url = $this->KeyUrl("t91_log_statusadd.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -628,7 +489,7 @@ class ct09_hutang extends cTable {
 
 	// Delete URL
 	function GetDeleteUrl() {
-		return $this->KeyUrl("t09_hutangdelete.php", $this->UrlParm());
+		return $this->KeyUrl("t91_log_statusdelete.php", $this->UrlParm());
 	}
 
 	// Add master url
@@ -730,11 +591,7 @@ class ct09_hutang extends cTable {
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
 		$this->id->setDbValue($rs->fields('id'));
-		$this->NoHutang->setDbValue($rs->fields('NoHutang'));
-		$this->BeliID->setDbValue($rs->fields('BeliID'));
-		$this->JumlahHutang->setDbValue($rs->fields('JumlahHutang'));
-		$this->JumlahBayar->setDbValue($rs->fields('JumlahBayar'));
-		$this->SaldoHutang->setDbValue($rs->fields('SaldoHutang'));
+		$this->Status->setDbValue($rs->fields('Status'));
 	}
 
 	// Render list row values
@@ -746,96 +603,25 @@ class ct09_hutang extends cTable {
 
 	// Common render codes
 		// id
-		// NoHutang
-		// BeliID
-		// JumlahHutang
-		// JumlahBayar
-		// SaldoHutang
+		// Status
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// NoHutang
-		$this->NoHutang->ViewValue = $this->NoHutang->CurrentValue;
-		$this->NoHutang->ViewCustomAttributes = "";
-
-		// BeliID
-		if ($this->BeliID->VirtualValue <> "") {
-			$this->BeliID->ViewValue = $this->BeliID->VirtualValue;
-		} else {
-			$this->BeliID->ViewValue = $this->BeliID->CurrentValue;
-		if (strval($this->BeliID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->BeliID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `TglPO` AS `DispFld`, `NoPO` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t08_beli`";
-		$sWhereWrk = "";
-		$this->BeliID->LookupFilters = array("df1" => "7", "dx1" => ew_CastDateFieldForLike('`TglPO`', 7, "DB"), "dx2" => '`NoPO`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->BeliID, $sWhereWrk); // Call Lookup Selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_FormatDateTime($rswrk->fields('DispFld'), 7);
-				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$this->BeliID->ViewValue = $this->BeliID->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->BeliID->ViewValue = $this->BeliID->CurrentValue;
-			}
-		} else {
-			$this->BeliID->ViewValue = NULL;
-		}
-		}
-		$this->BeliID->ViewCustomAttributes = "";
-
-		// JumlahHutang
-		$this->JumlahHutang->ViewValue = $this->JumlahHutang->CurrentValue;
-		$this->JumlahHutang->ViewValue = ew_FormatNumber($this->JumlahHutang->ViewValue, 2, -2, -2, -2);
-		$this->JumlahHutang->CellCssStyle .= "text-align: left;";
-		$this->JumlahHutang->ViewCustomAttributes = "";
-
-		// JumlahBayar
-		$this->JumlahBayar->ViewValue = $this->JumlahBayar->CurrentValue;
-		$this->JumlahBayar->ViewValue = ew_FormatNumber($this->JumlahBayar->ViewValue, 2, -2, -2, -2);
-		$this->JumlahBayar->CellCssStyle .= "text-align: left;";
-		$this->JumlahBayar->ViewCustomAttributes = "";
-
-		// SaldoHutang
-		$this->SaldoHutang->ViewValue = $this->SaldoHutang->CurrentValue;
-		$this->SaldoHutang->ViewValue = ew_FormatNumber($this->SaldoHutang->ViewValue, 2, -2, -2, -2);
-		$this->SaldoHutang->CellCssStyle .= "text-align: left;";
-		$this->SaldoHutang->ViewCustomAttributes = "";
+		// Status
+		$this->Status->ViewValue = $this->Status->CurrentValue;
+		$this->Status->ViewCustomAttributes = "";
 
 		// id
 		$this->id->LinkCustomAttributes = "";
 		$this->id->HrefValue = "";
 		$this->id->TooltipValue = "";
 
-		// NoHutang
-		$this->NoHutang->LinkCustomAttributes = "";
-		$this->NoHutang->HrefValue = "";
-		$this->NoHutang->TooltipValue = "";
-
-		// BeliID
-		$this->BeliID->LinkCustomAttributes = "";
-		$this->BeliID->HrefValue = "";
-		$this->BeliID->TooltipValue = "";
-
-		// JumlahHutang
-		$this->JumlahHutang->LinkCustomAttributes = "";
-		$this->JumlahHutang->HrefValue = "";
-		$this->JumlahHutang->TooltipValue = "";
-
-		// JumlahBayar
-		$this->JumlahBayar->LinkCustomAttributes = "";
-		$this->JumlahBayar->HrefValue = "";
-		$this->JumlahBayar->TooltipValue = "";
-
-		// SaldoHutang
-		$this->SaldoHutang->LinkCustomAttributes = "";
-		$this->SaldoHutang->HrefValue = "";
-		$this->SaldoHutang->TooltipValue = "";
+		// Status
+		$this->Status->LinkCustomAttributes = "";
+		$this->Status->HrefValue = "";
+		$this->Status->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -857,38 +643,11 @@ class ct09_hutang extends cTable {
 		$this->id->EditValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// NoHutang
-		$this->NoHutang->EditAttrs["class"] = "form-control";
-		$this->NoHutang->EditCustomAttributes = "";
-		$this->NoHutang->EditValue = $this->NoHutang->CurrentValue;
-		$this->NoHutang->PlaceHolder = ew_RemoveHtml($this->NoHutang->FldCaption());
-
-		// BeliID
-		$this->BeliID->EditAttrs["class"] = "form-control";
-		$this->BeliID->EditCustomAttributes = "";
-		$this->BeliID->EditValue = $this->BeliID->CurrentValue;
-		$this->BeliID->PlaceHolder = ew_RemoveHtml($this->BeliID->FldCaption());
-
-		// JumlahHutang
-		$this->JumlahHutang->EditAttrs["class"] = "form-control";
-		$this->JumlahHutang->EditCustomAttributes = "";
-		$this->JumlahHutang->EditValue = $this->JumlahHutang->CurrentValue;
-		$this->JumlahHutang->PlaceHolder = ew_RemoveHtml($this->JumlahHutang->FldCaption());
-		if (strval($this->JumlahHutang->EditValue) <> "" && is_numeric($this->JumlahHutang->EditValue)) $this->JumlahHutang->EditValue = ew_FormatNumber($this->JumlahHutang->EditValue, -2, -2, -2, -2);
-
-		// JumlahBayar
-		$this->JumlahBayar->EditAttrs["class"] = "form-control";
-		$this->JumlahBayar->EditCustomAttributes = "";
-		$this->JumlahBayar->EditValue = $this->JumlahBayar->CurrentValue;
-		$this->JumlahBayar->PlaceHolder = ew_RemoveHtml($this->JumlahBayar->FldCaption());
-		if (strval($this->JumlahBayar->EditValue) <> "" && is_numeric($this->JumlahBayar->EditValue)) $this->JumlahBayar->EditValue = ew_FormatNumber($this->JumlahBayar->EditValue, -2, -2, -2, -2);
-
-		// SaldoHutang
-		$this->SaldoHutang->EditAttrs["class"] = "form-control";
-		$this->SaldoHutang->EditCustomAttributes = "";
-		$this->SaldoHutang->EditValue = $this->SaldoHutang->CurrentValue;
-		$this->SaldoHutang->PlaceHolder = ew_RemoveHtml($this->SaldoHutang->FldCaption());
-		if (strval($this->SaldoHutang->EditValue) <> "" && is_numeric($this->SaldoHutang->EditValue)) $this->SaldoHutang->EditValue = ew_FormatNumber($this->SaldoHutang->EditValue, -2, -2, -2, -2);
+		// Status
+		$this->Status->EditAttrs["class"] = "form-control";
+		$this->Status->EditCustomAttributes = "";
+		$this->Status->EditValue = $this->Status->CurrentValue;
+		$this->Status->PlaceHolder = ew_RemoveHtml($this->Status->FldCaption());
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -896,34 +655,10 @@ class ct09_hutang extends cTable {
 
 	// Aggregate list row values
 	function AggregateListRowValues() {
-			if (is_numeric($this->JumlahHutang->CurrentValue))
-				$this->JumlahHutang->Total += $this->JumlahHutang->CurrentValue; // Accumulate total
-			if (is_numeric($this->JumlahBayar->CurrentValue))
-				$this->JumlahBayar->Total += $this->JumlahBayar->CurrentValue; // Accumulate total
-			if (is_numeric($this->SaldoHutang->CurrentValue))
-				$this->SaldoHutang->Total += $this->SaldoHutang->CurrentValue; // Accumulate total
 	}
 
 	// Aggregate list row (for rendering)
 	function AggregateListRow() {
-			$this->JumlahHutang->CurrentValue = $this->JumlahHutang->Total;
-			$this->JumlahHutang->ViewValue = $this->JumlahHutang->CurrentValue;
-			$this->JumlahHutang->ViewValue = ew_FormatNumber($this->JumlahHutang->ViewValue, 2, -2, -2, -2);
-			$this->JumlahHutang->CellCssStyle .= "text-align: left;";
-			$this->JumlahHutang->ViewCustomAttributes = "";
-			$this->JumlahHutang->HrefValue = ""; // Clear href value
-			$this->JumlahBayar->CurrentValue = $this->JumlahBayar->Total;
-			$this->JumlahBayar->ViewValue = $this->JumlahBayar->CurrentValue;
-			$this->JumlahBayar->ViewValue = ew_FormatNumber($this->JumlahBayar->ViewValue, 2, -2, -2, -2);
-			$this->JumlahBayar->CellCssStyle .= "text-align: left;";
-			$this->JumlahBayar->ViewCustomAttributes = "";
-			$this->JumlahBayar->HrefValue = ""; // Clear href value
-			$this->SaldoHutang->CurrentValue = $this->SaldoHutang->Total;
-			$this->SaldoHutang->ViewValue = $this->SaldoHutang->CurrentValue;
-			$this->SaldoHutang->ViewValue = ew_FormatNumber($this->SaldoHutang->ViewValue, 2, -2, -2, -2);
-			$this->SaldoHutang->CellCssStyle .= "text-align: left;";
-			$this->SaldoHutang->ViewCustomAttributes = "";
-			$this->SaldoHutang->HrefValue = ""; // Clear href value
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -941,18 +676,11 @@ class ct09_hutang extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
-					if ($this->NoHutang->Exportable) $Doc->ExportCaption($this->NoHutang);
-					if ($this->BeliID->Exportable) $Doc->ExportCaption($this->BeliID);
-					if ($this->JumlahHutang->Exportable) $Doc->ExportCaption($this->JumlahHutang);
-					if ($this->JumlahBayar->Exportable) $Doc->ExportCaption($this->JumlahBayar);
-					if ($this->SaldoHutang->Exportable) $Doc->ExportCaption($this->SaldoHutang);
+					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
+					if ($this->Status->Exportable) $Doc->ExportCaption($this->Status);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
-					if ($this->NoHutang->Exportable) $Doc->ExportCaption($this->NoHutang);
-					if ($this->BeliID->Exportable) $Doc->ExportCaption($this->BeliID);
-					if ($this->JumlahHutang->Exportable) $Doc->ExportCaption($this->JumlahHutang);
-					if ($this->JumlahBayar->Exportable) $Doc->ExportCaption($this->JumlahBayar);
-					if ($this->SaldoHutang->Exportable) $Doc->ExportCaption($this->SaldoHutang);
+					if ($this->Status->Exportable) $Doc->ExportCaption($this->Status);
 				}
 				$Doc->EndExportRow();
 			}
@@ -976,7 +704,6 @@ class ct09_hutang extends cTable {
 						$Doc->ExportPageBreak();
 				}
 				$this->LoadListRowValues($Recordset);
-				$this->AggregateListRowValues(); // Aggregate row values
 
 				// Render row
 				$this->RowType = EW_ROWTYPE_VIEW; // Render view
@@ -985,18 +712,11 @@ class ct09_hutang extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
-						if ($this->NoHutang->Exportable) $Doc->ExportField($this->NoHutang);
-						if ($this->BeliID->Exportable) $Doc->ExportField($this->BeliID);
-						if ($this->JumlahHutang->Exportable) $Doc->ExportField($this->JumlahHutang);
-						if ($this->JumlahBayar->Exportable) $Doc->ExportField($this->JumlahBayar);
-						if ($this->SaldoHutang->Exportable) $Doc->ExportField($this->SaldoHutang);
+						if ($this->id->Exportable) $Doc->ExportField($this->id);
+						if ($this->Status->Exportable) $Doc->ExportField($this->Status);
 					} else {
 						if ($this->id->Exportable) $Doc->ExportField($this->id);
-						if ($this->NoHutang->Exportable) $Doc->ExportField($this->NoHutang);
-						if ($this->BeliID->Exportable) $Doc->ExportField($this->BeliID);
-						if ($this->JumlahHutang->Exportable) $Doc->ExportField($this->JumlahHutang);
-						if ($this->JumlahBayar->Exportable) $Doc->ExportField($this->JumlahBayar);
-						if ($this->SaldoHutang->Exportable) $Doc->ExportField($this->SaldoHutang);
+						if ($this->Status->Exportable) $Doc->ExportField($this->Status);
 					}
 					$Doc->EndExportRow($RowCnt);
 				}
@@ -1006,23 +726,6 @@ class ct09_hutang extends cTable {
 			if ($Doc->ExportCustom)
 				$this->Row_Export($Recordset->fields);
 			$Recordset->MoveNext();
-		}
-
-		// Export aggregates (horizontal format only)
-		if ($Doc->Horizontal) {
-			$this->RowType = EW_ROWTYPE_AGGREGATE;
-			$this->ResetAttrs();
-			$this->AggregateListRow();
-			if (!$Doc->ExportCustom) {
-				$Doc->BeginExportRow(-1);
-				if ($this->id->Exportable) $Doc->ExportAggregate($this->id, '');
-				if ($this->NoHutang->Exportable) $Doc->ExportAggregate($this->NoHutang, '');
-				if ($this->BeliID->Exportable) $Doc->ExportAggregate($this->BeliID, '');
-				if ($this->JumlahHutang->Exportable) $Doc->ExportAggregate($this->JumlahHutang, 'TOTAL');
-				if ($this->JumlahBayar->Exportable) $Doc->ExportAggregate($this->JumlahBayar, 'TOTAL');
-				if ($this->SaldoHutang->Exportable) $Doc->ExportAggregate($this->SaldoHutang, 'TOTAL');
-				$Doc->EndExportRow();
-			}
 		}
 		if (!$Doc->ExportCustom) {
 			$Doc->ExportTableFooter();
@@ -1052,129 +755,6 @@ class ct09_hutang extends cTable {
 			return ew_ArrayToJson($rsarr);
 		} else {
 			return FALSE;
-		}
-	}
-
-	// Write Audit Trail start/end for grid update
-	function WriteAuditTrailDummy($typ) {
-		$table = 't09_hutang';
-		$usr = CurrentUserID();
-		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
-	}
-
-	// Write Audit Trail (add page)
-	function WriteAuditTrailOnAdd(&$rs) {
-		global $Language;
-		if (!$this->AuditTrailOnAdd) return;
-		$table = 't09_hutang';
-
-		// Get key value
-		$key = "";
-		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rs['id'];
-
-		// Write Audit Trail
-		$dt = ew_StdCurrentDateTime();
-		$id = ew_ScriptName();
-		$usr = CurrentUserID();
-		foreach (array_keys($rs) as $fldname) {
-			if (array_key_exists($fldname, $this->fields) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
-				if ($this->fields[$fldname]->FldHtmlTag == "PASSWORD") {
-					$newvalue = $Language->Phrase("PasswordMask"); // Password Field
-				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) {
-					if (EW_AUDIT_TRAIL_TO_DATABASE)
-						$newvalue = $rs[$fldname];
-					else
-						$newvalue = "[MEMO]"; // Memo Field
-				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_XML) {
-					$newvalue = "[XML]"; // XML Field
-				} else {
-					$newvalue = $rs[$fldname];
-				}
-				ew_WriteAuditTrail("log", $dt, $id, $usr, "A", $table, $fldname, $key, "", $newvalue);
-			}
-		}
-	}
-
-	// Write Audit Trail (edit page)
-	function WriteAuditTrailOnEdit(&$rsold, &$rsnew) {
-		global $Language;
-		if (!$this->AuditTrailOnEdit) return;
-		$table = 't09_hutang';
-
-		// Get key value
-		$key = "";
-		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rsold['id'];
-
-		// Write Audit Trail
-		$dt = ew_StdCurrentDateTime();
-		$id = ew_ScriptName();
-		$usr = CurrentUserID();
-		foreach (array_keys($rsnew) as $fldname) {
-			if (array_key_exists($fldname, $this->fields) && array_key_exists($fldname, $rsold) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
-				if ($this->fields[$fldname]->FldDataType == EW_DATATYPE_DATE) { // DateTime field
-					$modified = (ew_FormatDateTime($rsold[$fldname], 0) <> ew_FormatDateTime($rsnew[$fldname], 0));
-				} else {
-					$modified = !ew_CompareValue($rsold[$fldname], $rsnew[$fldname]);
-				}
-				if ($modified) {
-					if ($this->fields[$fldname]->FldHtmlTag == "PASSWORD") { // Password Field
-						$oldvalue = $Language->Phrase("PasswordMask");
-						$newvalue = $Language->Phrase("PasswordMask");
-					} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) { // Memo field
-						if (EW_AUDIT_TRAIL_TO_DATABASE) {
-							$oldvalue = $rsold[$fldname];
-							$newvalue = $rsnew[$fldname];
-						} else {
-							$oldvalue = "[MEMO]";
-							$newvalue = "[MEMO]";
-						}
-					} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_XML) { // XML field
-						$oldvalue = "[XML]";
-						$newvalue = "[XML]";
-					} else {
-						$oldvalue = $rsold[$fldname];
-						$newvalue = $rsnew[$fldname];
-					}
-					ew_WriteAuditTrail("log", $dt, $id, $usr, "U", $table, $fldname, $key, $oldvalue, $newvalue);
-				}
-			}
-		}
-	}
-
-	// Write Audit Trail (delete page)
-	function WriteAuditTrailOnDelete(&$rs) {
-		global $Language;
-		if (!$this->AuditTrailOnDelete) return;
-		$table = 't09_hutang';
-
-		// Get key value
-		$key = "";
-		if ($key <> "")
-			$key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rs['id'];
-
-		// Write Audit Trail
-		$dt = ew_StdCurrentDateTime();
-		$id = ew_ScriptName();
-		$curUser = CurrentUserID();
-		foreach (array_keys($rs) as $fldname) {
-			if (array_key_exists($fldname, $this->fields) && $this->fields[$fldname]->FldDataType <> EW_DATATYPE_BLOB) { // Ignore BLOB fields
-				if ($this->fields[$fldname]->FldHtmlTag == "PASSWORD") {
-					$oldvalue = $Language->Phrase("PasswordMask"); // Password Field
-				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_MEMO) {
-					if (EW_AUDIT_TRAIL_TO_DATABASE)
-						$oldvalue = $rs[$fldname];
-					else
-						$oldvalue = "[MEMO]"; // Memo field
-				} elseif ($this->fields[$fldname]->FldDataType == EW_DATATYPE_XML) {
-					$oldvalue = "[XML]"; // XML field
-				} else {
-					$oldvalue = $rs[$fldname];
-				}
-				ew_WriteAuditTrail("log", $dt, $id, $curUser, "D", $table, $fldname, $key, $oldvalue, "");
-			}
 		}
 	}
 
@@ -1328,10 +908,6 @@ class ct09_hutang extends cTable {
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
 
-		$this->NoHutang->ReadOnly = true;
-		$this->BeliID->ReadOnly = true;
-		$this->JumlahHutang->ReadOnly = true;
-		$this->JumlahBayar->ReadOnly = true;
 	}
 
 	// User ID Filtering event

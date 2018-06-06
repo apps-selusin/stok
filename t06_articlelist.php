@@ -1257,6 +1257,7 @@ class ct06_article_list extends ct06_article {
 			if ($this->getSqlOrderBy() <> "") {
 				$sOrderBy = $this->getSqlOrderBy();
 				$this->setSessionOrderBy($sOrderBy);
+				$this->SubGroupID->setSort("ASC");
 				$this->Nama->setSort("ASC");
 			}
 		}
