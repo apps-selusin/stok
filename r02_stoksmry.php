@@ -647,6 +647,10 @@ class crr02_stok_summary extends crr02_stok {
 		// Call Page Selecting event
 		$this->Page_Selecting($this->Filter);
 
+		// Requires search criteria
+		if (($this->Filter == $this->UserIDFilter || $grFormError != "") && !$this->DrillDown)
+			$this->Filter = "0=101";
+
 		// Search options
 		$this->SetupSearchOptions();
 
@@ -2489,11 +2493,34 @@ if (!$Page->DrillDownInPanel) {
 	<label for="sv_MainGroup" class="ewSearchCaption ewLabel"><?php echo $Page->MainGroup->FldCaption() ?></label>
 	<span class="ewSearchField">
 <?php $Page->MainGroup->EditAttrs["onchange"] = "ewr_UpdateOpt.call(this, ['sv_SubGroup','sv_Article']); " . @$Page->MainGroup->EditAttrs["onchange"]; ?>
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_sv_MainGroup"><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></span>
-</span>
-<button type="button" title="<?php echo ewr_HtmlEncode(str_replace("%s", ewr_RemoveHtml($Page->MainGroup->FldCaption()), $ReportLanguage->Phrase("LookupLink", TRUE))) ?>" onclick="ewr_ModalLookupShow({lnk:this,el:'sv_MainGroup',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="r02_stok" data-field="x_MainGroup" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $Page->MainGroup->DisplayValueSeparatorAttribute() ?>" name="sv_MainGroup" id="sv_MainGroup" value="<?php echo ewr_FilterCurrentValue($Page->MainGroup, ",") ?>"<?php echo $Page->MainGroup->EditAttributes() ?>>
+<?php ewr_PrependClass($Page->MainGroup->EditAttrs["class"], "form-control"); ?>
+<select data-table="r02_stok" data-field="x_MainGroup" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->MainGroup->DisplayValueSeparator) ? json_encode($Page->MainGroup->DisplayValueSeparator) : $Page->MainGroup->DisplayValueSeparator) ?>" id="sv_MainGroup" name="sv_MainGroup"<?php echo $Page->MainGroup->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->MainGroup->AdvancedFilters) ? count($Page->MainGroup->AdvancedFilters) : 0;
+	$cntd = is_array($Page->MainGroup->DropDownList) ? count($Page->MainGroup->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->MainGroup->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->MainGroup->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->MainGroup->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->MainGroup->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
 <input type="hidden" name="s_sv_MainGroup" id="s_sv_MainGroup" value="<?php echo $Page->MainGroup->LookupFilterQuery() ?>">
 <script type="text/javascript">
 fr02_stoksummary.Lists["sv_MainGroup"].Options = <?php echo ewr_ArrayToJson($Page->MainGroup->LookupFilterOptions) ?>;
@@ -2506,11 +2533,34 @@ fr02_stoksummary.Lists["sv_MainGroup"].Options = <?php echo ewr_ArrayToJson($Pag
 	<label for="sv_SubGroup" class="ewSearchCaption ewLabel"><?php echo $Page->SubGroup->FldCaption() ?></label>
 	<span class="ewSearchField">
 <?php $Page->SubGroup->EditAttrs["onchange"] = "ewr_UpdateOpt.call(this, ['sv_Article']); " . @$Page->SubGroup->EditAttrs["onchange"]; ?>
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_sv_SubGroup"><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></span>
-</span>
-<button type="button" title="<?php echo ewr_HtmlEncode(str_replace("%s", ewr_RemoveHtml($Page->SubGroup->FldCaption()), $ReportLanguage->Phrase("LookupLink", TRUE))) ?>" onclick="ewr_ModalLookupShow({lnk:this,el:'sv_SubGroup',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="r02_stok" data-field="x_SubGroup" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $Page->SubGroup->DisplayValueSeparatorAttribute() ?>" name="sv_SubGroup" id="sv_SubGroup" value="<?php echo ewr_FilterCurrentValue($Page->SubGroup, ",") ?>"<?php echo $Page->SubGroup->EditAttributes() ?>>
+<?php ewr_PrependClass($Page->SubGroup->EditAttrs["class"], "form-control"); ?>
+<select data-table="r02_stok" data-field="x_SubGroup" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->SubGroup->DisplayValueSeparator) ? json_encode($Page->SubGroup->DisplayValueSeparator) : $Page->SubGroup->DisplayValueSeparator) ?>" id="sv_SubGroup" name="sv_SubGroup"<?php echo $Page->SubGroup->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->SubGroup->AdvancedFilters) ? count($Page->SubGroup->AdvancedFilters) : 0;
+	$cntd = is_array($Page->SubGroup->DropDownList) ? count($Page->SubGroup->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->SubGroup->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->SubGroup->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->SubGroup->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->SubGroup->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
 <input type="hidden" name="s_sv_SubGroup" id="s_sv_SubGroup" value="<?php echo $Page->SubGroup->LookupFilterQuery() ?>">
 <script type="text/javascript">
 fr02_stoksummary.Lists["sv_SubGroup"].Options = <?php echo ewr_ArrayToJson($Page->SubGroup->LookupFilterOptions) ?>;
@@ -2522,11 +2572,34 @@ fr02_stoksummary.Lists["sv_SubGroup"].Options = <?php echo ewr_ArrayToJson($Page
 <div id="c_Article" class="ewCell form-group">
 	<label for="sv_Article" class="ewSearchCaption ewLabel"><?php echo $Page->Article->FldCaption() ?></label>
 	<span class="ewSearchField">
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_sv_Article"><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></span>
-</span>
-<button type="button" title="<?php echo ewr_HtmlEncode(str_replace("%s", ewr_RemoveHtml($Page->Article->FldCaption()), $ReportLanguage->Phrase("LookupLink", TRUE))) ?>" onclick="ewr_ModalLookupShow({lnk:this,el:'sv_Article',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="r02_stok" data-field="x_Article" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $Page->Article->DisplayValueSeparatorAttribute() ?>" name="sv_Article" id="sv_Article" value="<?php echo ewr_FilterCurrentValue($Page->Article, ",") ?>"<?php echo $Page->Article->EditAttributes() ?>>
+<?php ewr_PrependClass($Page->Article->EditAttrs["class"], "form-control"); ?>
+<select data-table="r02_stok" data-field="x_Article" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->Article->DisplayValueSeparator) ? json_encode($Page->Article->DisplayValueSeparator) : $Page->Article->DisplayValueSeparator) ?>" id="sv_Article" name="sv_Article"<?php echo $Page->Article->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->Article->AdvancedFilters) ? count($Page->Article->AdvancedFilters) : 0;
+	$cntd = is_array($Page->Article->DropDownList) ? count($Page->Article->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->Article->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->Article->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->Article->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->Article->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
 <input type="hidden" name="s_sv_Article" id="s_sv_Article" value="<?php echo $Page->Article->LookupFilterQuery() ?>">
 <script type="text/javascript">
 fr02_stoksummary.Lists["sv_Article"].Options = <?php echo ewr_ArrayToJson($Page->Article->LookupFilterOptions) ?>;

@@ -436,12 +436,12 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		$item = &$this->SearchOptions->Add("searchtoggle");
 		$SearchToggleClass = $this->FilterApplied ? " active" : " active";
 		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $ReportLanguage->Phrase("SearchBtn", TRUE) . "\" data-caption=\"" . $ReportLanguage->Phrase("SearchBtn", TRUE) . "\" data-toggle=\"button\" data-form=\"fr05_mutasisummary\">" . $ReportLanguage->Phrase("SearchBtn") . "</button>";
-		$item->Visible = FALSE;
+		$item->Visible = TRUE;
 
 		// Reset filter
 		$item = &$this->SearchOptions->Add("resetfilter");
 		$item->Body = "<button type=\"button\" class=\"btn btn-default\" title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ResetAllFilter", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ResetAllFilter", TRUE)) . "\" onclick=\"location='" . ewr_CurrentPage() . "?cmd=reset'\">" . $ReportLanguage->Phrase("ResetAllFilter") . "</button>";
-		$item->Visible = FALSE && $this->FilterApplied;
+		$item->Visible = TRUE && $this->FilterApplied;
 
 		// Button group for reset filter
 		$this->SearchOptions->UseButtonGroup = TRUE;
@@ -576,20 +576,21 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		// Set field visibility for detail fields
 		$this->No->SetVisibility();
 		$this->ArticleID->SetVisibility();
+		$this->Article->SetVisibility();
+		$this->ArticleNama->SetVisibility();
 		$this->Tgl->SetVisibility();
 		$this->Keterangan->SetVisibility();
 		$this->NoRef->SetVisibility();
 		$this->MasukQty->SetVisibility();
 		$this->KeluarQty->SetVisibility();
 		$this->SaldoQty->SetVisibility();
-		$this->MainGroup->SetVisibility();
 
 		// Aggregate variables
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 10;
-		$nGrps = 3;
+		$nDtls = 11;
+		$nGrps = 4;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
 		$this->Smry = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -601,7 +602,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(FALSE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -609,6 +610,12 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		// Set up Breadcrumb
 		if ($this->Export == "")
 			$this->SetupBreadcrumb();
+
+		// Check if search command
+		$this->SearchCommand = (@$_GET["cmd"] == "search");
+
+		// Load default filter values
+		$this->LoadDefaultFilters();
 
 		// Load custom filters
 		$this->Page_FilterLoad();
@@ -625,19 +632,28 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		// Extended filter
 		$sExtendedFilter = "";
 
+		// Restore filter list
+		$this->RestoreFilterList();
+
+		// Build extended filter
+		$sExtendedFilter = $this->GetExtendedFilter();
+		ewr_AddFilter($this->Filter, $sExtendedFilter);
+
 		// Build popup filter
 		$sPopupFilter = $this->GetPopupFilter();
 
 		//ewr_SetDebugMsg("popup filter: " . $sPopupFilter);
 		ewr_AddFilter($this->Filter, $sPopupFilter);
 
-		// No filter
-		$this->FilterApplied = FALSE;
-		$this->FilterOptions->GetItem("savecurrentfilter")->Visible = FALSE;
-		$this->FilterOptions->GetItem("deletefilter")->Visible = FALSE;
+		// Check if filter applied
+		$this->FilterApplied = $this->CheckFilter();
 
 		// Call Page Selecting event
 		$this->Page_Selecting($this->Filter);
+
+		// Requires search criteria
+		if (($this->Filter == $this->UserIDFilter || $grFormError != "") && !$this->DrillDown)
+			$this->Filter = "0=101";
 
 		// Search options
 		$this->SetupSearchOptions();
@@ -698,20 +714,28 @@ class crr05_mutasi_summary extends crr05_mutasi {
 	function GetSummaryCount($lvl, $curValue = TRUE) {
 		$cnt = 0;
 		foreach ($this->DetailRows as $row) {
+			$wrkMainGroup = $row["MainGroup"];
+			$wrkSubGroup = $row["SubGroup"];
 			$wrkKode = $row["Kode"];
-			$wrkArticleNama = $row["ArticleNama"];
 			if ($lvl >= 1) {
+				$val = $curValue ? $this->MainGroup->CurrentValue : $this->MainGroup->OldValue;
+				$grpval = $curValue ? $this->MainGroup->GroupValue() : $this->MainGroup->GroupOldValue();
+				if (is_null($val) && !is_null($wrkMainGroup) || !is_null($val) && is_null($wrkMainGroup) ||
+					$grpval <> $this->MainGroup->getGroupValueBase($wrkMainGroup))
+				continue;
+			}
+			if ($lvl >= 2) {
+				$val = $curValue ? $this->SubGroup->CurrentValue : $this->SubGroup->OldValue;
+				$grpval = $curValue ? $this->SubGroup->GroupValue() : $this->SubGroup->GroupOldValue();
+				if (is_null($val) && !is_null($wrkSubGroup) || !is_null($val) && is_null($wrkSubGroup) ||
+					$grpval <> $this->SubGroup->getGroupValueBase($wrkSubGroup))
+				continue;
+			}
+			if ($lvl >= 3) {
 				$val = $curValue ? $this->Kode->CurrentValue : $this->Kode->OldValue;
 				$grpval = $curValue ? $this->Kode->GroupValue() : $this->Kode->GroupOldValue();
 				if (is_null($val) && !is_null($wrkKode) || !is_null($val) && is_null($wrkKode) ||
 					$grpval <> $this->Kode->getGroupValueBase($wrkKode))
-				continue;
-			}
-			if ($lvl >= 2) {
-				$val = $curValue ? $this->ArticleNama->CurrentValue : $this->ArticleNama->OldValue;
-				$grpval = $curValue ? $this->ArticleNama->GroupValue() : $this->ArticleNama->GroupOldValue();
-				if (is_null($val) && !is_null($wrkArticleNama) || !is_null($val) && is_null($wrkArticleNama) ||
-					$grpval <> $this->ArticleNama->getGroupValueBase($wrkArticleNama))
 				continue;
 			}
 			$cnt++;
@@ -723,13 +747,17 @@ class crr05_mutasi_summary extends crr05_mutasi {
 	function ChkLvlBreak($lvl) {
 		switch ($lvl) {
 			case 1:
+				return (is_null($this->MainGroup->CurrentValue) && !is_null($this->MainGroup->OldValue)) ||
+					(!is_null($this->MainGroup->CurrentValue) && is_null($this->MainGroup->OldValue)) ||
+					($this->MainGroup->GroupValue() <> $this->MainGroup->GroupOldValue());
+			case 2:
+				return (is_null($this->SubGroup->CurrentValue) && !is_null($this->SubGroup->OldValue)) ||
+					(!is_null($this->SubGroup->CurrentValue) && is_null($this->SubGroup->OldValue)) ||
+					($this->SubGroup->GroupValue() <> $this->SubGroup->GroupOldValue()) || $this->ChkLvlBreak(1); // Recurse upper level
+			case 3:
 				return (is_null($this->Kode->CurrentValue) && !is_null($this->Kode->OldValue)) ||
 					(!is_null($this->Kode->CurrentValue) && is_null($this->Kode->OldValue)) ||
-					($this->Kode->GroupValue() <> $this->Kode->GroupOldValue());
-			case 2:
-				return (is_null($this->ArticleNama->CurrentValue) && !is_null($this->ArticleNama->OldValue)) ||
-					(!is_null($this->ArticleNama->CurrentValue) && is_null($this->ArticleNama->OldValue)) ||
-					($this->ArticleNama->GroupValue() <> $this->ArticleNama->GroupOldValue()) || $this->ChkLvlBreak(1); // Recurse upper level
+					($this->Kode->GroupValue() <> $this->Kode->GroupOldValue()) || $this->ChkLvlBreak(2); // Recurse upper level
 		}
 	}
 
@@ -847,14 +875,14 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		if ($opt == 1) { // Get first group
 
 			//$rsgrp->MoveFirst(); // NOTE: no need to move position
-			$this->Kode->setDbValue(""); // Init first value
+			$this->MainGroup->setDbValue(""); // Init first value
 		} else { // Get next group
 			$rsgrp->MoveNext();
 		}
 		if (!$rsgrp->EOF)
-			$this->Kode->setDbValue($rsgrp->fields[0]);
+			$this->MainGroup->setDbValue($rsgrp->fields[0]);
 		if ($rsgrp->EOF) {
-			$this->Kode->setDbValue("");
+			$this->MainGroup->setDbValue("");
 		}
 	}
 
@@ -889,6 +917,9 @@ class crr05_mutasi_summary extends crr05_mutasi {
 				$this->FirstRowData['Url'] = ewr_Conv($rs->fields('Url'), 200);
 				$this->FirstRowData['No'] = ewr_Conv($rs->fields('No'), 20);
 				$this->FirstRowData['ArticleID'] = ewr_Conv($rs->fields('ArticleID'), 3);
+				$this->FirstRowData['MainGroup'] = ewr_Conv($rs->fields('MainGroup'), 200);
+				$this->FirstRowData['SubGroup'] = ewr_Conv($rs->fields('SubGroup'), 200);
+				$this->FirstRowData['Article'] = ewr_Conv($rs->fields('Article'), 200);
 				$this->FirstRowData['Kode'] = ewr_Conv($rs->fields('Kode'), 200);
 				$this->FirstRowData['ArticleNama'] = ewr_Conv($rs->fields('ArticleNama'), 200);
 				$this->FirstRowData['NoUrut'] = ewr_Conv($rs->fields('NoUrut'), 16);
@@ -902,7 +933,6 @@ class crr05_mutasi_summary extends crr05_mutasi {
 				$this->FirstRowData['KeluarHarga'] = ewr_Conv($rs->fields('KeluarHarga'), 4);
 				$this->FirstRowData['SaldoQty'] = ewr_Conv($rs->fields('SaldoQty'), 4);
 				$this->FirstRowData['SaldoHarga'] = ewr_Conv($rs->fields('SaldoHarga'), 4);
-				$this->FirstRowData['MainGroup'] = ewr_Conv($rs->fields('MainGroup'), 200);
 			}
 		} else { // Get next row
 			$rs->MoveNext();
@@ -914,11 +944,14 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->No->setDbValue($rs->fields('No'));
 			$this->ArticleID->setDbValue($rs->fields('ArticleID'));
 			if ($opt <> 1) {
-				if (is_array($this->Kode->GroupDbValues))
-					$this->Kode->setDbValue(@$this->Kode->GroupDbValues[$rs->fields('Kode')]);
+				if (is_array($this->MainGroup->GroupDbValues))
+					$this->MainGroup->setDbValue(@$this->MainGroup->GroupDbValues[$rs->fields('MainGroup')]);
 				else
-					$this->Kode->setDbValue(ewr_GroupValue($this->Kode, $rs->fields('Kode')));
+					$this->MainGroup->setDbValue(ewr_GroupValue($this->MainGroup, $rs->fields('MainGroup')));
 			}
+			$this->SubGroup->setDbValue($rs->fields('SubGroup'));
+			$this->Article->setDbValue($rs->fields('Article'));
+			$this->Kode->setDbValue($rs->fields('Kode'));
 			$this->ArticleNama->setDbValue($rs->fields('ArticleNama'));
 			$this->NoUrut->setDbValue($rs->fields('NoUrut'));
 			$this->Tgl->setDbValue($rs->fields('Tgl'));
@@ -931,22 +964,25 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->KeluarHarga->setDbValue($rs->fields('KeluarHarga'));
 			$this->SaldoQty->setDbValue($rs->fields('SaldoQty'));
 			$this->SaldoHarga->setDbValue($rs->fields('SaldoHarga'));
-			$this->MainGroup->setDbValue($rs->fields('MainGroup'));
 			$this->Val[1] = $this->No->CurrentValue;
 			$this->Val[2] = $this->ArticleID->CurrentValue;
-			$this->Val[3] = $this->Tgl->CurrentValue;
-			$this->Val[4] = $this->Keterangan->CurrentValue;
-			$this->Val[5] = $this->NoRef->CurrentValue;
-			$this->Val[6] = $this->MasukQty->CurrentValue;
-			$this->Val[7] = $this->KeluarQty->CurrentValue;
-			$this->Val[8] = $this->SaldoQty->CurrentValue;
-			$this->Val[9] = $this->MainGroup->CurrentValue;
+			$this->Val[3] = $this->Article->CurrentValue;
+			$this->Val[4] = $this->ArticleNama->CurrentValue;
+			$this->Val[5] = $this->Tgl->CurrentValue;
+			$this->Val[6] = $this->Keterangan->CurrentValue;
+			$this->Val[7] = $this->NoRef->CurrentValue;
+			$this->Val[8] = $this->MasukQty->CurrentValue;
+			$this->Val[9] = $this->KeluarQty->CurrentValue;
+			$this->Val[10] = $this->SaldoQty->CurrentValue;
 		} else {
 			$this->id->setDbValue("");
 			$this->TabelID->setDbValue("");
 			$this->Url->setDbValue("");
 			$this->No->setDbValue("");
 			$this->ArticleID->setDbValue("");
+			$this->MainGroup->setDbValue("");
+			$this->SubGroup->setDbValue("");
+			$this->Article->setDbValue("");
 			$this->Kode->setDbValue("");
 			$this->ArticleNama->setDbValue("");
 			$this->NoUrut->setDbValue("");
@@ -960,7 +996,6 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->KeluarHarga->setDbValue("");
 			$this->SaldoQty->setDbValue("");
 			$this->SaldoHarga->setDbValue("");
-			$this->MainGroup->setDbValue("");
 		}
 	}
 
@@ -1049,6 +1084,13 @@ class crr05_mutasi_summary extends crr05_mutasi {
 					$arValues = $_POST["sel_$sName"];
 					if (trim($arValues[0]) == "") // Select all
 						$arValues = EWR_INIT_VALUE;
+					$this->PopupName = $sName;
+					if (ewr_IsAdvancedFilterValue($arValues) || $arValues == EWR_INIT_VALUE)
+						$this->PopupValue = $arValues;
+					if (!ewr_MatchedArray($arValues, $_SESSION["sel_$sName"])) {
+						if ($this->HasSessionFilterValues($sName))
+							$this->ClearExtFilter = $sName; // Clear extended filter for this field
+					}
 					$_SESSION["sel_$sName"] = $arValues;
 					$_SESSION["rf_$sName"] = @$_POST["rf_$sName"];
 					$_SESSION["rt_$sName"] = @$_POST["rt_$sName"];
@@ -1132,11 +1174,12 @@ class crr05_mutasi_summary extends crr05_mutasi {
 				$this->GrandCnt[4] = $this->TotCount;
 				$this->GrandCnt[5] = $this->TotCount;
 				$this->GrandCnt[6] = $this->TotCount;
-				$this->GrandSmry[6] = $rsagg->fields("sum_masukqty");
 				$this->GrandCnt[7] = $this->TotCount;
-				$this->GrandSmry[7] = $rsagg->fields("sum_keluarqty");
 				$this->GrandCnt[8] = $this->TotCount;
+				$this->GrandSmry[8] = $rsagg->fields("sum_masukqty");
 				$this->GrandCnt[9] = $this->TotCount;
+				$this->GrandSmry[9] = $rsagg->fields("sum_keluarqty");
+				$this->GrandCnt[10] = $this->TotCount;
 				$rsagg->Close();
 				$bGotSummary = TRUE;
 			}
@@ -1166,24 +1209,33 @@ class crr05_mutasi_summary extends crr05_mutasi {
 
 		if ($this->RowType == EWR_ROWTYPE_TOTAL && !($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER)) { // Summary row
 			ewr_PrependClass($this->RowAttrs["class"], ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : ""); // Set up row class
-			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP) $this->RowAttrs["data-group"] = $this->Kode->GroupOldValue(); // Set up group attribute
-			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->ArticleNama->GroupOldValue(); // Set up group attribute 2
+			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP) $this->RowAttrs["data-group"] = $this->MainGroup->GroupOldValue(); // Set up group attribute
+			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->SubGroup->GroupOldValue(); // Set up group attribute 2
+			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowGroupLevel >= 3) $this->RowAttrs["data-group-3"] = $this->Kode->GroupOldValue(); // Set up group attribute 3
+
+			// MainGroup
+			$this->MainGroup->GroupViewValue = $this->MainGroup->GroupOldValue();
+			$this->MainGroup->CellAttrs["class"] = ($this->RowGroupLevel == 1) ? "ewRptGrpSummary1" : "ewRptGrpField1";
+			$this->MainGroup->GroupViewValue = ewr_DisplayGroupValue($this->MainGroup, $this->MainGroup->GroupViewValue);
+			$this->MainGroup->GroupSummaryOldValue = $this->MainGroup->GroupSummaryValue;
+			$this->MainGroup->GroupSummaryValue = $this->MainGroup->GroupViewValue;
+			$this->MainGroup->GroupSummaryViewValue = ($this->MainGroup->GroupSummaryOldValue <> $this->MainGroup->GroupSummaryValue) ? $this->MainGroup->GroupSummaryValue : "&nbsp;";
+
+			// SubGroup
+			$this->SubGroup->GroupViewValue = $this->SubGroup->GroupOldValue();
+			$this->SubGroup->CellAttrs["class"] = ($this->RowGroupLevel == 2) ? "ewRptGrpSummary2" : "ewRptGrpField2";
+			$this->SubGroup->GroupViewValue = ewr_DisplayGroupValue($this->SubGroup, $this->SubGroup->GroupViewValue);
+			$this->SubGroup->GroupSummaryOldValue = $this->SubGroup->GroupSummaryValue;
+			$this->SubGroup->GroupSummaryValue = $this->SubGroup->GroupViewValue;
+			$this->SubGroup->GroupSummaryViewValue = ($this->SubGroup->GroupSummaryOldValue <> $this->SubGroup->GroupSummaryValue) ? $this->SubGroup->GroupSummaryValue : "&nbsp;";
 
 			// Kode
 			$this->Kode->GroupViewValue = $this->Kode->GroupOldValue();
-			$this->Kode->CellAttrs["class"] = ($this->RowGroupLevel == 1) ? "ewRptGrpSummary1" : "ewRptGrpField1";
+			$this->Kode->CellAttrs["class"] = ($this->RowGroupLevel == 3) ? "ewRptGrpSummary3" : "ewRptGrpField3";
 			$this->Kode->GroupViewValue = ewr_DisplayGroupValue($this->Kode, $this->Kode->GroupViewValue);
 			$this->Kode->GroupSummaryOldValue = $this->Kode->GroupSummaryValue;
 			$this->Kode->GroupSummaryValue = $this->Kode->GroupViewValue;
 			$this->Kode->GroupSummaryViewValue = ($this->Kode->GroupSummaryOldValue <> $this->Kode->GroupSummaryValue) ? $this->Kode->GroupSummaryValue : "&nbsp;";
-
-			// ArticleNama
-			$this->ArticleNama->GroupViewValue = $this->ArticleNama->GroupOldValue();
-			$this->ArticleNama->CellAttrs["class"] = ($this->RowGroupLevel == 2) ? "ewRptGrpSummary2" : "ewRptGrpField2";
-			$this->ArticleNama->GroupViewValue = ewr_DisplayGroupValue($this->ArticleNama, $this->ArticleNama->GroupViewValue);
-			$this->ArticleNama->GroupSummaryOldValue = $this->ArticleNama->GroupSummaryValue;
-			$this->ArticleNama->GroupSummaryValue = $this->ArticleNama->GroupViewValue;
-			$this->ArticleNama->GroupSummaryViewValue = ($this->ArticleNama->GroupSummaryOldValue <> $this->ArticleNama->GroupSummaryValue) ? $this->ArticleNama->GroupSummaryValue : "&nbsp;";
 
 			// MasukQty
 			$this->MasukQty->SumViewValue = $this->MasukQty->SumValue;
@@ -1197,17 +1249,26 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->KeluarQty->CellAttrs["style"] = "text-align:right;";
 			$this->KeluarQty->CellAttrs["class"] = ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : "ewRptGrpSummary" . $this->RowGroupLevel;
 
+			// MainGroup
+			$this->MainGroup->HrefValue = "";
+
+			// SubGroup
+			$this->SubGroup->HrefValue = "";
+
 			// Kode
 			$this->Kode->HrefValue = "";
-
-			// ArticleNama
-			$this->ArticleNama->HrefValue = "";
 
 			// No
 			$this->No->HrefValue = "";
 
 			// ArticleID
 			$this->ArticleID->HrefValue = "";
+
+			// Article
+			$this->Article->HrefValue = "";
+
+			// ArticleNama
+			$this->ArticleNama->HrefValue = "";
 
 			// Tgl
 			$this->Tgl->HrefValue = "";
@@ -1226,31 +1287,37 @@ class crr05_mutasi_summary extends crr05_mutasi {
 
 			// SaldoQty
 			$this->SaldoQty->HrefValue = "";
-
-			// MainGroup
-			$this->MainGroup->HrefValue = "";
 		} else {
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER) {
-			$this->RowAttrs["data-group"] = $this->Kode->GroupValue(); // Set up group attribute
-			if ($this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->ArticleNama->GroupValue(); // Set up group attribute 2
+			$this->RowAttrs["data-group"] = $this->MainGroup->GroupValue(); // Set up group attribute
+			if ($this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->SubGroup->GroupValue(); // Set up group attribute 2
+			if ($this->RowGroupLevel >= 3) $this->RowAttrs["data-group-3"] = $this->Kode->GroupValue(); // Set up group attribute 3
 			} else {
-			$this->RowAttrs["data-group"] = $this->Kode->GroupValue(); // Set up group attribute
-			$this->RowAttrs["data-group-2"] = $this->ArticleNama->GroupValue(); // Set up group attribute 2
+			$this->RowAttrs["data-group"] = $this->MainGroup->GroupValue(); // Set up group attribute
+			$this->RowAttrs["data-group-2"] = $this->SubGroup->GroupValue(); // Set up group attribute 2
+			$this->RowAttrs["data-group-3"] = $this->Kode->GroupValue(); // Set up group attribute 3
 			}
+
+			// MainGroup
+			$this->MainGroup->GroupViewValue = $this->MainGroup->GroupValue();
+			$this->MainGroup->CellAttrs["class"] = "ewRptGrpField1";
+			$this->MainGroup->GroupViewValue = ewr_DisplayGroupValue($this->MainGroup, $this->MainGroup->GroupViewValue);
+			if ($this->MainGroup->GroupValue() == $this->MainGroup->GroupOldValue() && !$this->ChkLvlBreak(1))
+				$this->MainGroup->GroupViewValue = "&nbsp;";
+
+			// SubGroup
+			$this->SubGroup->GroupViewValue = $this->SubGroup->GroupValue();
+			$this->SubGroup->CellAttrs["class"] = "ewRptGrpField2";
+			$this->SubGroup->GroupViewValue = ewr_DisplayGroupValue($this->SubGroup, $this->SubGroup->GroupViewValue);
+			if ($this->SubGroup->GroupValue() == $this->SubGroup->GroupOldValue() && !$this->ChkLvlBreak(2))
+				$this->SubGroup->GroupViewValue = "&nbsp;";
 
 			// Kode
 			$this->Kode->GroupViewValue = $this->Kode->GroupValue();
-			$this->Kode->CellAttrs["class"] = "ewRptGrpField1";
+			$this->Kode->CellAttrs["class"] = "ewRptGrpField3";
 			$this->Kode->GroupViewValue = ewr_DisplayGroupValue($this->Kode, $this->Kode->GroupViewValue);
-			if ($this->Kode->GroupValue() == $this->Kode->GroupOldValue() && !$this->ChkLvlBreak(1))
+			if ($this->Kode->GroupValue() == $this->Kode->GroupOldValue() && !$this->ChkLvlBreak(3))
 				$this->Kode->GroupViewValue = "&nbsp;";
-
-			// ArticleNama
-			$this->ArticleNama->GroupViewValue = $this->ArticleNama->GroupValue();
-			$this->ArticleNama->CellAttrs["class"] = "ewRptGrpField2";
-			$this->ArticleNama->GroupViewValue = ewr_DisplayGroupValue($this->ArticleNama, $this->ArticleNama->GroupViewValue);
-			if ($this->ArticleNama->GroupValue() == $this->ArticleNama->GroupOldValue() && !$this->ChkLvlBreak(2))
-				$this->ArticleNama->GroupViewValue = "&nbsp;";
 
 			// No
 			$this->No->ViewValue = $this->No->CurrentValue;
@@ -1259,6 +1326,14 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			// ArticleID
 			$this->ArticleID->ViewValue = $this->ArticleID->CurrentValue;
 			$this->ArticleID->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
+			// Article
+			$this->Article->ViewValue = $this->Article->CurrentValue;
+			$this->Article->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
+			// ArticleNama
+			$this->ArticleNama->ViewValue = $this->ArticleNama->CurrentValue;
+			$this->ArticleNama->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 
 			// Tgl
 			$this->Tgl->ViewValue = $this->Tgl->CurrentValue;
@@ -1292,20 +1367,25 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->SaldoQty->CellAttrs["style"] = "text-align:right;";
 
 			// MainGroup
-			$this->MainGroup->ViewValue = $this->MainGroup->CurrentValue;
-			$this->MainGroup->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+			$this->MainGroup->HrefValue = "";
+
+			// SubGroup
+			$this->SubGroup->HrefValue = "";
 
 			// Kode
 			$this->Kode->HrefValue = "";
-
-			// ArticleNama
-			$this->ArticleNama->HrefValue = "";
 
 			// No
 			$this->No->HrefValue = "";
 
 			// ArticleID
 			$this->ArticleID->HrefValue = "";
+
+			// Article
+			$this->Article->HrefValue = "";
+
+			// ArticleNama
+			$this->ArticleNama->HrefValue = "";
 
 			// Tgl
 			$this->Tgl->HrefValue = "";
@@ -1324,13 +1404,28 @@ class crr05_mutasi_summary extends crr05_mutasi {
 
 			// SaldoQty
 			$this->SaldoQty->HrefValue = "";
-
-			// MainGroup
-			$this->MainGroup->HrefValue = "";
 		}
 
 		// Call Cell_Rendered event
 		if ($this->RowType == EWR_ROWTYPE_TOTAL) { // Summary row
+
+			// MainGroup
+			$CurrentValue = $this->MainGroup->GroupViewValue;
+			$ViewValue = &$this->MainGroup->GroupViewValue;
+			$ViewAttrs = &$this->MainGroup->ViewAttrs;
+			$CellAttrs = &$this->MainGroup->CellAttrs;
+			$HrefValue = &$this->MainGroup->HrefValue;
+			$LinkAttrs = &$this->MainGroup->LinkAttrs;
+			$this->Cell_Rendered($this->MainGroup, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// SubGroup
+			$CurrentValue = $this->SubGroup->GroupViewValue;
+			$ViewValue = &$this->SubGroup->GroupViewValue;
+			$ViewAttrs = &$this->SubGroup->ViewAttrs;
+			$CellAttrs = &$this->SubGroup->CellAttrs;
+			$HrefValue = &$this->SubGroup->HrefValue;
+			$LinkAttrs = &$this->SubGroup->LinkAttrs;
+			$this->Cell_Rendered($this->SubGroup, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// Kode
 			$CurrentValue = $this->Kode->GroupViewValue;
@@ -1340,15 +1435,6 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$HrefValue = &$this->Kode->HrefValue;
 			$LinkAttrs = &$this->Kode->LinkAttrs;
 			$this->Cell_Rendered($this->Kode, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
-
-			// ArticleNama
-			$CurrentValue = $this->ArticleNama->GroupViewValue;
-			$ViewValue = &$this->ArticleNama->GroupViewValue;
-			$ViewAttrs = &$this->ArticleNama->ViewAttrs;
-			$CellAttrs = &$this->ArticleNama->CellAttrs;
-			$HrefValue = &$this->ArticleNama->HrefValue;
-			$LinkAttrs = &$this->ArticleNama->LinkAttrs;
-			$this->Cell_Rendered($this->ArticleNama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// MasukQty
 			$CurrentValue = $this->MasukQty->SumValue;
@@ -1369,6 +1455,24 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->Cell_Rendered($this->KeluarQty, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 		} else {
 
+			// MainGroup
+			$CurrentValue = $this->MainGroup->GroupValue();
+			$ViewValue = &$this->MainGroup->GroupViewValue;
+			$ViewAttrs = &$this->MainGroup->ViewAttrs;
+			$CellAttrs = &$this->MainGroup->CellAttrs;
+			$HrefValue = &$this->MainGroup->HrefValue;
+			$LinkAttrs = &$this->MainGroup->LinkAttrs;
+			$this->Cell_Rendered($this->MainGroup, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// SubGroup
+			$CurrentValue = $this->SubGroup->GroupValue();
+			$ViewValue = &$this->SubGroup->GroupViewValue;
+			$ViewAttrs = &$this->SubGroup->ViewAttrs;
+			$CellAttrs = &$this->SubGroup->CellAttrs;
+			$HrefValue = &$this->SubGroup->HrefValue;
+			$LinkAttrs = &$this->SubGroup->LinkAttrs;
+			$this->Cell_Rendered($this->SubGroup, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
 			// Kode
 			$CurrentValue = $this->Kode->GroupValue();
 			$ViewValue = &$this->Kode->GroupViewValue;
@@ -1377,15 +1481,6 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$HrefValue = &$this->Kode->HrefValue;
 			$LinkAttrs = &$this->Kode->LinkAttrs;
 			$this->Cell_Rendered($this->Kode, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
-
-			// ArticleNama
-			$CurrentValue = $this->ArticleNama->GroupValue();
-			$ViewValue = &$this->ArticleNama->GroupViewValue;
-			$ViewAttrs = &$this->ArticleNama->ViewAttrs;
-			$CellAttrs = &$this->ArticleNama->CellAttrs;
-			$HrefValue = &$this->ArticleNama->HrefValue;
-			$LinkAttrs = &$this->ArticleNama->LinkAttrs;
-			$this->Cell_Rendered($this->ArticleNama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// No
 			$CurrentValue = $this->No->CurrentValue;
@@ -1404,6 +1499,24 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$HrefValue = &$this->ArticleID->HrefValue;
 			$LinkAttrs = &$this->ArticleID->LinkAttrs;
 			$this->Cell_Rendered($this->ArticleID, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// Article
+			$CurrentValue = $this->Article->CurrentValue;
+			$ViewValue = &$this->Article->ViewValue;
+			$ViewAttrs = &$this->Article->ViewAttrs;
+			$CellAttrs = &$this->Article->CellAttrs;
+			$HrefValue = &$this->Article->HrefValue;
+			$LinkAttrs = &$this->Article->LinkAttrs;
+			$this->Cell_Rendered($this->Article, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// ArticleNama
+			$CurrentValue = $this->ArticleNama->CurrentValue;
+			$ViewValue = &$this->ArticleNama->ViewValue;
+			$ViewAttrs = &$this->ArticleNama->ViewAttrs;
+			$CellAttrs = &$this->ArticleNama->CellAttrs;
+			$HrefValue = &$this->ArticleNama->HrefValue;
+			$LinkAttrs = &$this->ArticleNama->LinkAttrs;
+			$this->Cell_Rendered($this->ArticleNama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// Tgl
 			$CurrentValue = $this->Tgl->CurrentValue;
@@ -1458,15 +1571,6 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$HrefValue = &$this->SaldoQty->HrefValue;
 			$LinkAttrs = &$this->SaldoQty->LinkAttrs;
 			$this->Cell_Rendered($this->SaldoQty, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
-
-			// MainGroup
-			$CurrentValue = $this->MainGroup->CurrentValue;
-			$ViewValue = &$this->MainGroup->ViewValue;
-			$ViewAttrs = &$this->MainGroup->ViewAttrs;
-			$CellAttrs = &$this->MainGroup->CellAttrs;
-			$HrefValue = &$this->MainGroup->HrefValue;
-			$LinkAttrs = &$this->MainGroup->LinkAttrs;
-			$this->Cell_Rendered($this->MainGroup, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 		}
 
 		// Call Row_Rendered event
@@ -1479,17 +1583,19 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		$this->GrpColumnCount = 0;
 		$this->SubGrpColumnCount = 0;
 		$this->DtlColumnCount = 0;
-		if ($this->Kode->Visible) $this->GrpColumnCount += 1;
-		if ($this->ArticleNama->Visible) { $this->GrpColumnCount += 1; $this->SubGrpColumnCount += 1; }
+		if ($this->MainGroup->Visible) $this->GrpColumnCount += 1;
+		if ($this->SubGroup->Visible) { $this->GrpColumnCount += 1; $this->SubGrpColumnCount += 1; }
+		if ($this->Kode->Visible) { $this->GrpColumnCount += 1; $this->SubGrpColumnCount += 1; }
 		if ($this->No->Visible) $this->DtlColumnCount += 1;
 		if ($this->ArticleID->Visible) $this->DtlColumnCount += 1;
+		if ($this->Article->Visible) $this->DtlColumnCount += 1;
+		if ($this->ArticleNama->Visible) $this->DtlColumnCount += 1;
 		if ($this->Tgl->Visible) $this->DtlColumnCount += 1;
 		if ($this->Keterangan->Visible) $this->DtlColumnCount += 1;
 		if ($this->NoRef->Visible) $this->DtlColumnCount += 1;
 		if ($this->MasukQty->Visible) $this->DtlColumnCount += 1;
 		if ($this->KeluarQty->Visible) $this->DtlColumnCount += 1;
 		if ($this->SaldoQty->Visible) $this->DtlColumnCount += 1;
-		if ($this->MainGroup->Visible) $this->DtlColumnCount += 1;
 	}
 
 	// Set up Breadcrumb
@@ -1512,6 +1618,598 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		$url = $this->ExportPdfUrl;
 		$item->Body = "<a class=\"ewrExportLink ewPdf\" title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToPDF", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToPDF", TRUE)) . "\" href=\"javascript:void(0);\" onclick=\"ewr_ExportCharts(this, '" . $url . "', '" . $exportid . "');\">" . $ReportLanguage->Phrase("ExportToPDF") . "</a>";
 		$ReportOptions["ReportTypes"] = $ReportTypes;
+	}
+
+	// Return extended filter
+	function GetExtendedFilter() {
+		global $grFormError;
+		$sFilter = "";
+		if ($this->DrillDown)
+			return "";
+		$bPostBack = ewr_IsHttpPost();
+		$bRestoreSession = TRUE;
+		$bSetupFilter = FALSE;
+
+		// Reset extended filter if filter changed
+		if ($bPostBack) {
+
+		// Reset search command
+		} elseif (@$_GET["cmd"] == "reset") {
+
+			// Load default values
+			$this->SetSessionDropDownValue($this->MainGroup->DropDownValue, $this->MainGroup->SearchOperator, 'MainGroup'); // Field MainGroup
+			$this->SetSessionDropDownValue($this->SubGroup->DropDownValue, $this->SubGroup->SearchOperator, 'SubGroup'); // Field SubGroup
+			$this->SetSessionDropDownValue($this->Article->DropDownValue, $this->Article->SearchOperator, 'Article'); // Field Article
+
+			//$bSetupFilter = TRUE; // No need to set up, just use default
+		} else {
+			$bRestoreSession = !$this->SearchCommand;
+
+			// Field MainGroup
+			if ($this->GetDropDownValue($this->MainGroup)) {
+				$bSetupFilter = TRUE;
+			} elseif ($this->MainGroup->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_r05_mutasi_MainGroup'])) {
+				$bSetupFilter = TRUE;
+			}
+
+			// Field SubGroup
+			if ($this->GetDropDownValue($this->SubGroup)) {
+				$bSetupFilter = TRUE;
+			} elseif ($this->SubGroup->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_r05_mutasi_SubGroup'])) {
+				$bSetupFilter = TRUE;
+			}
+
+			// Field Article
+			if ($this->GetDropDownValue($this->Article)) {
+				$bSetupFilter = TRUE;
+			} elseif ($this->Article->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_r05_mutasi_Article'])) {
+				$bSetupFilter = TRUE;
+			}
+			if (!$this->ValidateForm()) {
+				$this->setFailureMessage($grFormError);
+				return $sFilter;
+			}
+		}
+
+		// Restore session
+		if ($bRestoreSession) {
+			$this->GetSessionDropDownValue($this->MainGroup); // Field MainGroup
+			$this->GetSessionDropDownValue($this->SubGroup); // Field SubGroup
+			$this->GetSessionDropDownValue($this->Article); // Field Article
+		}
+
+		// Call page filter validated event
+		$this->Page_FilterValidated();
+
+		// Build SQL
+		$this->BuildDropDownFilter($this->MainGroup, $sFilter, $this->MainGroup->SearchOperator, FALSE, TRUE); // Field MainGroup
+		$this->BuildDropDownFilter($this->SubGroup, $sFilter, $this->SubGroup->SearchOperator, FALSE, TRUE); // Field SubGroup
+		$this->BuildDropDownFilter($this->Article, $sFilter, $this->Article->SearchOperator, FALSE, TRUE); // Field Article
+
+		// Save parms to session
+		$this->SetSessionDropDownValue($this->MainGroup->DropDownValue, $this->MainGroup->SearchOperator, 'MainGroup'); // Field MainGroup
+		$this->SetSessionDropDownValue($this->SubGroup->DropDownValue, $this->SubGroup->SearchOperator, 'SubGroup'); // Field SubGroup
+		$this->SetSessionDropDownValue($this->Article->DropDownValue, $this->Article->SearchOperator, 'Article'); // Field Article
+
+		// Setup filter
+		if ($bSetupFilter) {
+		}
+
+		// Field MainGroup
+		ewr_LoadDropDownList($this->MainGroup->DropDownList, $this->MainGroup->DropDownValue);
+
+		// Field SubGroup
+		ewr_LoadDropDownList($this->SubGroup->DropDownList, $this->SubGroup->DropDownValue);
+
+		// Field Article
+		ewr_LoadDropDownList($this->Article->DropDownList, $this->Article->DropDownValue);
+		return $sFilter;
+	}
+
+	// Build dropdown filter
+	function BuildDropDownFilter(&$fld, &$FilterClause, $FldOpr, $Default = FALSE, $SaveFilter = FALSE) {
+		$FldVal = ($Default) ? $fld->DefaultDropDownValue : $fld->DropDownValue;
+		$sSql = "";
+		if (is_array($FldVal)) {
+			foreach ($FldVal as $val) {
+				$sWrk = $this->GetDropDownFilter($fld, $val, $FldOpr);
+
+				// Call Page Filtering event
+				if (substr($val, 0, 2) <> "@@")
+					$this->Page_Filtering($fld, $sWrk, "dropdown", $FldOpr, $val);
+				if ($sWrk <> "") {
+					if ($sSql <> "")
+						$sSql .= " OR " . $sWrk;
+					else
+						$sSql = $sWrk;
+				}
+			}
+		} else {
+			$sSql = $this->GetDropDownFilter($fld, $FldVal, $FldOpr);
+
+			// Call Page Filtering event
+			if (substr($FldVal, 0, 2) <> "@@")
+				$this->Page_Filtering($fld, $sSql, "dropdown", $FldOpr, $FldVal);
+		}
+		if ($sSql <> "") {
+			ewr_AddFilter($FilterClause, $sSql);
+			if ($SaveFilter) $fld->CurrentFilter = $sSql;
+		}
+	}
+
+	function GetDropDownFilter(&$fld, $FldVal, $FldOpr) {
+		$FldName = $fld->FldName;
+		$FldExpression = $fld->FldExpression;
+		$FldDataType = $fld->FldDataType;
+		$FldDelimiter = $fld->FldDelimiter;
+		$FldVal = strval($FldVal);
+		if ($FldOpr == "") $FldOpr = "=";
+		$sWrk = "";
+		if (ewr_SameStr($FldVal, EWR_NULL_VALUE)) {
+			$sWrk = $FldExpression . " IS NULL";
+		} elseif (ewr_SameStr($FldVal, EWR_NOT_NULL_VALUE)) {
+			$sWrk = $FldExpression . " IS NOT NULL";
+		} elseif (ewr_SameStr($FldVal, EWR_EMPTY_VALUE)) {
+			$sWrk = $FldExpression . " = ''";
+		} elseif (ewr_SameStr($FldVal, EWR_ALL_VALUE)) {
+			$sWrk = "1 = 1";
+		} else {
+			if (substr($FldVal, 0, 2) == "@@") {
+				$sWrk = $this->GetCustomFilter($fld, $FldVal, $this->DBID);
+			} elseif ($FldDelimiter <> "" && trim($FldVal) <> "" && ($FldDataType == EWR_DATATYPE_STRING || $FldDataType == EWR_DATATYPE_MEMO)) {
+				$sWrk = ewr_GetMultiSearchSql($FldExpression, trim($FldVal), $this->DBID);
+			} else {
+				if ($FldVal <> "" && $FldVal <> EWR_INIT_VALUE) {
+					if ($FldDataType == EWR_DATATYPE_DATE && $FldOpr <> "") {
+						$sWrk = ewr_DateFilterString($FldExpression, $FldOpr, $FldVal, $FldDataType, $this->DBID);
+					} else {
+						$sWrk = ewr_FilterString($FldOpr, $FldVal, $FldDataType, $this->DBID);
+						if ($sWrk <> "") $sWrk = $FldExpression . $sWrk;
+					}
+				}
+			}
+		}
+		return $sWrk;
+	}
+
+	// Get custom filter
+	function GetCustomFilter(&$fld, $FldVal, $dbid = 0) {
+		$sWrk = "";
+		if (is_array($fld->AdvancedFilters)) {
+			foreach ($fld->AdvancedFilters as $filter) {
+				if ($filter->ID == $FldVal && $filter->Enabled) {
+					$sFld = $fld->FldExpression;
+					$sFn = $filter->FunctionName;
+					$wrkid = (substr($filter->ID, 0, 2) == "@@") ? substr($filter->ID,2) : $filter->ID;
+					if ($sFn <> "")
+						$sWrk = $sFn($sFld, $dbid);
+					else
+						$sWrk = "";
+					$this->Page_Filtering($fld, $sWrk, "custom", $wrkid);
+					break;
+				}
+			}
+		}
+		return $sWrk;
+	}
+
+	// Build extended filter
+	function BuildExtendedFilter(&$fld, &$FilterClause, $Default = FALSE, $SaveFilter = FALSE) {
+		$sWrk = ewr_GetExtendedFilter($fld, $Default, $this->DBID);
+		if (!$Default)
+			$this->Page_Filtering($fld, $sWrk, "extended", $fld->SearchOperator, $fld->SearchValue, $fld->SearchCondition, $fld->SearchOperator2, $fld->SearchValue2);
+		if ($sWrk <> "") {
+			ewr_AddFilter($FilterClause, $sWrk);
+			if ($SaveFilter) $fld->CurrentFilter = $sWrk;
+		}
+	}
+
+	// Get drop down value from querystring
+	function GetDropDownValue(&$fld) {
+		$parm = substr($fld->FldVar, 2);
+		if (ewr_IsHttpPost())
+			return FALSE; // Skip post back
+		if (isset($_GET["so_$parm"]))
+			$fld->SearchOperator = @$_GET["so_$parm"];
+		if (isset($_GET["sv_$parm"])) {
+			$fld->DropDownValue = @$_GET["sv_$parm"];
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+	// Get filter values from querystring
+	function GetFilterValues(&$fld) {
+		$parm = substr($fld->FldVar, 2);
+		if (ewr_IsHttpPost())
+			return; // Skip post back
+		$got = FALSE;
+		if (isset($_GET["sv_$parm"])) {
+			$fld->SearchValue = @$_GET["sv_$parm"];
+			$got = TRUE;
+		}
+		if (isset($_GET["so_$parm"])) {
+			$fld->SearchOperator = @$_GET["so_$parm"];
+			$got = TRUE;
+		}
+		if (isset($_GET["sc_$parm"])) {
+			$fld->SearchCondition = @$_GET["sc_$parm"];
+			$got = TRUE;
+		}
+		if (isset($_GET["sv2_$parm"])) {
+			$fld->SearchValue2 = @$_GET["sv2_$parm"];
+			$got = TRUE;
+		}
+		if (isset($_GET["so2_$parm"])) {
+			$fld->SearchOperator2 = $_GET["so2_$parm"];
+			$got = TRUE;
+		}
+		return $got;
+	}
+
+	// Set default ext filter
+	function SetDefaultExtFilter(&$fld, $so1, $sv1, $sc, $so2, $sv2) {
+		$fld->DefaultSearchValue = $sv1; // Default ext filter value 1
+		$fld->DefaultSearchValue2 = $sv2; // Default ext filter value 2 (if operator 2 is enabled)
+		$fld->DefaultSearchOperator = $so1; // Default search operator 1
+		$fld->DefaultSearchOperator2 = $so2; // Default search operator 2 (if operator 2 is enabled)
+		$fld->DefaultSearchCondition = $sc; // Default search condition (if operator 2 is enabled)
+	}
+
+	// Apply default ext filter
+	function ApplyDefaultExtFilter(&$fld) {
+		$fld->SearchValue = $fld->DefaultSearchValue;
+		$fld->SearchValue2 = $fld->DefaultSearchValue2;
+		$fld->SearchOperator = $fld->DefaultSearchOperator;
+		$fld->SearchOperator2 = $fld->DefaultSearchOperator2;
+		$fld->SearchCondition = $fld->DefaultSearchCondition;
+	}
+
+	// Check if Text Filter applied
+	function TextFilterApplied(&$fld) {
+		return (strval($fld->SearchValue) <> strval($fld->DefaultSearchValue) ||
+			strval($fld->SearchValue2) <> strval($fld->DefaultSearchValue2) ||
+			(strval($fld->SearchValue) <> "" &&
+				strval($fld->SearchOperator) <> strval($fld->DefaultSearchOperator)) ||
+			(strval($fld->SearchValue2) <> "" &&
+				strval($fld->SearchOperator2) <> strval($fld->DefaultSearchOperator2)) ||
+			strval($fld->SearchCondition) <> strval($fld->DefaultSearchCondition));
+	}
+
+	// Check if Non-Text Filter applied
+	function NonTextFilterApplied(&$fld) {
+		if (is_array($fld->DropDownValue)) {
+			if (is_array($fld->DefaultDropDownValue)) {
+				if (count($fld->DefaultDropDownValue) <> count($fld->DropDownValue))
+					return TRUE;
+				else
+					return (count(array_diff($fld->DefaultDropDownValue, $fld->DropDownValue)) <> 0);
+			} else {
+				return TRUE;
+			}
+		} else {
+			if (is_array($fld->DefaultDropDownValue))
+				return TRUE;
+			else
+				$v1 = strval($fld->DefaultDropDownValue);
+			if ($v1 == EWR_INIT_VALUE)
+				$v1 = "";
+			$v2 = strval($fld->DropDownValue);
+			if ($v2 == EWR_INIT_VALUE || $v2 == EWR_ALL_VALUE)
+				$v2 = "";
+			return ($v1 <> $v2);
+		}
+	}
+
+	// Get dropdown value from session
+	function GetSessionDropDownValue(&$fld) {
+		$parm = substr($fld->FldVar, 2);
+		$this->GetSessionValue($fld->DropDownValue, 'sv_r05_mutasi_' . $parm);
+		$this->GetSessionValue($fld->SearchOperator, 'so_r05_mutasi_' . $parm);
+	}
+
+	// Get filter values from session
+	function GetSessionFilterValues(&$fld) {
+		$parm = substr($fld->FldVar, 2);
+		$this->GetSessionValue($fld->SearchValue, 'sv_r05_mutasi_' . $parm);
+		$this->GetSessionValue($fld->SearchOperator, 'so_r05_mutasi_' . $parm);
+		$this->GetSessionValue($fld->SearchCondition, 'sc_r05_mutasi_' . $parm);
+		$this->GetSessionValue($fld->SearchValue2, 'sv2_r05_mutasi_' . $parm);
+		$this->GetSessionValue($fld->SearchOperator2, 'so2_r05_mutasi_' . $parm);
+	}
+
+	// Get value from session
+	function GetSessionValue(&$sv, $sn) {
+		if (array_key_exists($sn, $_SESSION))
+			$sv = $_SESSION[$sn];
+	}
+
+	// Set dropdown value to session
+	function SetSessionDropDownValue($sv, $so, $parm) {
+		$_SESSION['sv_r05_mutasi_' . $parm] = $sv;
+		$_SESSION['so_r05_mutasi_' . $parm] = $so;
+	}
+
+	// Set filter values to session
+	function SetSessionFilterValues($sv1, $so1, $sc, $sv2, $so2, $parm) {
+		$_SESSION['sv_r05_mutasi_' . $parm] = $sv1;
+		$_SESSION['so_r05_mutasi_' . $parm] = $so1;
+		$_SESSION['sc_r05_mutasi_' . $parm] = $sc;
+		$_SESSION['sv2_r05_mutasi_' . $parm] = $sv2;
+		$_SESSION['so2_r05_mutasi_' . $parm] = $so2;
+	}
+
+	// Check if has Session filter values
+	function HasSessionFilterValues($parm) {
+		return ((@$_SESSION['sv_' . $parm] <> "" && @$_SESSION['sv_' . $parm] <> EWR_INIT_VALUE) ||
+			(@$_SESSION['sv_' . $parm] <> "" && @$_SESSION['sv_' . $parm] <> EWR_INIT_VALUE) ||
+			(@$_SESSION['sv2_' . $parm] <> "" && @$_SESSION['sv2_' . $parm] <> EWR_INIT_VALUE));
+	}
+
+	// Dropdown filter exist
+	function DropDownFilterExist(&$fld, $FldOpr) {
+		$sWrk = "";
+		$this->BuildDropDownFilter($fld, $sWrk, $FldOpr);
+		return ($sWrk <> "");
+	}
+
+	// Extended filter exist
+	function ExtendedFilterExist(&$fld) {
+		$sExtWrk = "";
+		$this->BuildExtendedFilter($fld, $sExtWrk);
+		return ($sExtWrk <> "");
+	}
+
+	// Validate form
+	function ValidateForm() {
+		global $ReportLanguage, $grFormError;
+
+		// Initialize form error message
+		$grFormError = "";
+
+		// Check if validation required
+		if (!EWR_SERVER_VALIDATE)
+			return ($grFormError == "");
+
+		// Return validate result
+		$ValidateForm = ($grFormError == "");
+
+		// Call Form_CustomValidate event
+		$sFormCustomError = "";
+		$ValidateForm = $ValidateForm && $this->Form_CustomValidate($sFormCustomError);
+		if ($sFormCustomError <> "") {
+			$grFormError .= ($grFormError <> "") ? "<p>&nbsp;</p>" : "";
+			$grFormError .= $sFormCustomError;
+		}
+		return $ValidateForm;
+	}
+
+	// Clear selection stored in session
+	function ClearSessionSelection($parm) {
+		$_SESSION["sel_r05_mutasi_$parm"] = "";
+		$_SESSION["rf_r05_mutasi_$parm"] = "";
+		$_SESSION["rt_r05_mutasi_$parm"] = "";
+	}
+
+	// Load selection from session
+	function LoadSelectionFromSession($parm) {
+		$fld = &$this->FieldByParm($parm);
+		$fld->SelectionList = @$_SESSION["sel_r05_mutasi_$parm"];
+		$fld->RangeFrom = @$_SESSION["rf_r05_mutasi_$parm"];
+		$fld->RangeTo = @$_SESSION["rt_r05_mutasi_$parm"];
+	}
+
+	// Load default value for filters
+	function LoadDefaultFilters() {
+		/**
+		* Set up default values for non Text filters
+		*/
+
+		// Field MainGroup
+		$this->MainGroup->DefaultDropDownValue = EWR_INIT_VALUE;
+		if (!$this->SearchCommand) $this->MainGroup->DropDownValue = $this->MainGroup->DefaultDropDownValue;
+
+		// Field SubGroup
+		$this->SubGroup->DefaultDropDownValue = EWR_INIT_VALUE;
+		if (!$this->SearchCommand) $this->SubGroup->DropDownValue = $this->SubGroup->DefaultDropDownValue;
+
+		// Field Article
+		$this->Article->DefaultDropDownValue = EWR_INIT_VALUE;
+		if (!$this->SearchCommand) $this->Article->DropDownValue = $this->Article->DefaultDropDownValue;
+		/**
+		* Set up default values for extended filters
+		* function SetDefaultExtFilter(&$fld, $so1, $sv1, $sc, $so2, $sv2)
+		* Parameters:
+		* $fld - Field object
+		* $so1 - Default search operator 1
+		* $sv1 - Default ext filter value 1
+		* $sc - Default search condition (if operator 2 is enabled)
+		* $so2 - Default search operator 2 (if operator 2 is enabled)
+		* $sv2 - Default ext filter value 2 (if operator 2 is enabled)
+		*/
+		/**
+		* Set up default values for popup filters
+		*/
+	}
+
+	// Check if filter applied
+	function CheckFilter() {
+
+		// Check MainGroup extended filter
+		if ($this->NonTextFilterApplied($this->MainGroup))
+			return TRUE;
+
+		// Check SubGroup extended filter
+		if ($this->NonTextFilterApplied($this->SubGroup))
+			return TRUE;
+
+		// Check Article extended filter
+		if ($this->NonTextFilterApplied($this->Article))
+			return TRUE;
+		return FALSE;
+	}
+
+	// Show list of filters
+	function ShowFilterList($showDate = FALSE) {
+		global $ReportLanguage;
+
+		// Initialize
+		$sFilterList = "";
+
+		// Field MainGroup
+		$sExtWrk = "";
+		$sWrk = "";
+		$this->BuildDropDownFilter($this->MainGroup, $sExtWrk, $this->MainGroup->SearchOperator);
+		$sFilter = "";
+		if ($sExtWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
+		elseif ($sWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sWrk</span>";
+		if ($sFilter <> "")
+			$sFilterList .= "<div><span class=\"ewFilterCaption\">" . $this->MainGroup->FldCaption() . "</span>" . $sFilter . "</div>";
+
+		// Field SubGroup
+		$sExtWrk = "";
+		$sWrk = "";
+		$this->BuildDropDownFilter($this->SubGroup, $sExtWrk, $this->SubGroup->SearchOperator);
+		$sFilter = "";
+		if ($sExtWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
+		elseif ($sWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sWrk</span>";
+		if ($sFilter <> "")
+			$sFilterList .= "<div><span class=\"ewFilterCaption\">" . $this->SubGroup->FldCaption() . "</span>" . $sFilter . "</div>";
+
+		// Field Article
+		$sExtWrk = "";
+		$sWrk = "";
+		$this->BuildDropDownFilter($this->Article, $sExtWrk, $this->Article->SearchOperator);
+		$sFilter = "";
+		if ($sExtWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
+		elseif ($sWrk <> "")
+			$sFilter .= "<span class=\"ewFilterValue\">$sWrk</span>";
+		if ($sFilter <> "")
+			$sFilterList .= "<div><span class=\"ewFilterCaption\">" . $this->Article->FldCaption() . "</span>" . $sFilter . "</div>";
+		$divstyle = "";
+		$divdataclass = "";
+
+		// Show Filters
+		if ($sFilterList <> "" || $showDate) {
+			$sMessage = "<div" . $divstyle . $divdataclass . "><div id=\"ewrFilterList\" class=\"alert alert-info\">";
+			if ($showDate)
+				$sMessage .= "<div id=\"ewrCurrentDate\">" . $ReportLanguage->Phrase("ReportGeneratedDate") . ewr_FormatDateTime(date("Y-m-d H:i:s"), 1) . "</div>";
+			if ($sFilterList <> "")
+				$sMessage .= "<div id=\"ewrCurrentFilters\">" . $ReportLanguage->Phrase("CurrentFilters") . "</div>" . $sFilterList;
+			$sMessage .= "</div></div>";
+			$this->Message_Showing($sMessage, "");
+			echo $sMessage;
+		}
+	}
+
+	// Get list of filters
+	function GetFilterList() {
+
+		// Initialize
+		$sFilterList = "";
+
+		// Field MainGroup
+		$sWrk = "";
+		$sWrk = ($this->MainGroup->DropDownValue <> EWR_INIT_VALUE) ? $this->MainGroup->DropDownValue : "";
+		if (is_array($sWrk))
+			$sWrk = implode("||", $sWrk);
+		if ($sWrk <> "")
+			$sWrk = "\"sv_MainGroup\":\"" . ewr_JsEncode2($sWrk) . "\"";
+		if ($sWrk <> "") {
+			if ($sFilterList <> "") $sFilterList .= ",";
+			$sFilterList .= $sWrk;
+		}
+
+		// Field SubGroup
+		$sWrk = "";
+		$sWrk = ($this->SubGroup->DropDownValue <> EWR_INIT_VALUE) ? $this->SubGroup->DropDownValue : "";
+		if (is_array($sWrk))
+			$sWrk = implode("||", $sWrk);
+		if ($sWrk <> "")
+			$sWrk = "\"sv_SubGroup\":\"" . ewr_JsEncode2($sWrk) . "\"";
+		if ($sWrk <> "") {
+			if ($sFilterList <> "") $sFilterList .= ",";
+			$sFilterList .= $sWrk;
+		}
+
+		// Field Article
+		$sWrk = "";
+		$sWrk = ($this->Article->DropDownValue <> EWR_INIT_VALUE) ? $this->Article->DropDownValue : "";
+		if (is_array($sWrk))
+			$sWrk = implode("||", $sWrk);
+		if ($sWrk <> "")
+			$sWrk = "\"sv_Article\":\"" . ewr_JsEncode2($sWrk) . "\"";
+		if ($sWrk <> "") {
+			if ($sFilterList <> "") $sFilterList .= ",";
+			$sFilterList .= $sWrk;
+		}
+
+		// Return filter list in json
+		if ($sFilterList <> "")
+			return "{" . $sFilterList . "}";
+		else
+			return "null";
+	}
+
+	// Restore list of filters
+	function RestoreFilterList() {
+
+		// Return if not reset filter
+		if (@$_POST["cmd"] <> "resetfilter")
+			return FALSE;
+		$filter = json_decode(@$_POST["filter"], TRUE);
+		return $this->SetupFilterList($filter);
+	}
+
+	// Setup list of filters
+	function SetupFilterList($filter) {
+		if (!is_array($filter))
+			return FALSE;
+
+		// Field MainGroup
+		$bRestoreFilter = FALSE;
+		if (array_key_exists("sv_MainGroup", $filter)) {
+			$sWrk = $filter["sv_MainGroup"];
+			if (strpos($sWrk, "||") !== FALSE)
+				$sWrk = explode("||", $sWrk);
+			$this->SetSessionDropDownValue($sWrk, @$filter["so_MainGroup"], "MainGroup");
+			$bRestoreFilter = TRUE;
+		}
+		if (!$bRestoreFilter) { // Clear filter
+			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "MainGroup");
+		}
+
+		// Field SubGroup
+		$bRestoreFilter = FALSE;
+		if (array_key_exists("sv_SubGroup", $filter)) {
+			$sWrk = $filter["sv_SubGroup"];
+			if (strpos($sWrk, "||") !== FALSE)
+				$sWrk = explode("||", $sWrk);
+			$this->SetSessionDropDownValue($sWrk, @$filter["so_SubGroup"], "SubGroup");
+			$bRestoreFilter = TRUE;
+		}
+		if (!$bRestoreFilter) { // Clear filter
+			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "SubGroup");
+		}
+
+		// Field Article
+		$bRestoreFilter = FALSE;
+		if (array_key_exists("sv_Article", $filter)) {
+			$sWrk = $filter["sv_Article"];
+			if (strpos($sWrk, "||") !== FALSE)
+				$sWrk = explode("||", $sWrk);
+			$this->SetSessionDropDownValue($sWrk, @$filter["so_Article"], "Article");
+			$bRestoreFilter = TRUE;
+		}
+		if (!$bRestoreFilter) { // Clear filter
+			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "Article");
+		}
+		return TRUE;
 	}
 
 	// Return popup filter
@@ -1537,33 +2235,37 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		if ($bResetSort) {
 			$this->setOrderBy("");
 			$this->setStartGroup(1);
+			$this->MainGroup->setSort("");
+			$this->SubGroup->setSort("");
 			$this->Kode->setSort("");
-			$this->ArticleNama->setSort("");
 			$this->No->setSort("");
 			$this->ArticleID->setSort("");
+			$this->Article->setSort("");
+			$this->ArticleNama->setSort("");
 			$this->Tgl->setSort("");
 			$this->Keterangan->setSort("");
 			$this->NoRef->setSort("");
 			$this->MasukQty->setSort("");
 			$this->KeluarQty->setSort("");
 			$this->SaldoQty->setSort("");
-			$this->MainGroup->setSort("");
 
 		// Check for an Order parameter
 		} elseif ($orderBy <> "") {
 			$this->CurrentOrder = $orderBy;
 			$this->CurrentOrderType = $orderType;
+			$this->UpdateSort($this->MainGroup, $bCtrl); // MainGroup
+			$this->UpdateSort($this->SubGroup, $bCtrl); // SubGroup
 			$this->UpdateSort($this->Kode, $bCtrl); // Kode
-			$this->UpdateSort($this->ArticleNama, $bCtrl); // ArticleNama
 			$this->UpdateSort($this->No, $bCtrl); // No
 			$this->UpdateSort($this->ArticleID, $bCtrl); // ArticleID
+			$this->UpdateSort($this->Article, $bCtrl); // Article
+			$this->UpdateSort($this->ArticleNama, $bCtrl); // ArticleNama
 			$this->UpdateSort($this->Tgl, $bCtrl); // Tgl
 			$this->UpdateSort($this->Keterangan, $bCtrl); // Keterangan
 			$this->UpdateSort($this->NoRef, $bCtrl); // NoRef
 			$this->UpdateSort($this->MasukQty, $bCtrl); // MasukQty
 			$this->UpdateSort($this->KeluarQty, $bCtrl); // KeluarQty
 			$this->UpdateSort($this->SaldoQty, $bCtrl); // SaldoQty
-			$this->UpdateSort($this->MainGroup, $bCtrl); // MainGroup
 			$sSortSql = $this->SortSql();
 			$this->setOrderBy($sSortSql);
 			$this->setStartGroup(1);
@@ -1904,6 +2606,41 @@ var EWR_PAGE_ID = r05_mutasi_summary.PageID;
 </script>
 <?php } ?>
 <?php if ($Page->Export == "" && !$Page->DrillDown && !$grDashboardReport) { ?>
+<script type="text/javascript">
+
+// Form object
+var CurrentForm = fr05_mutasisummary = new ewr_Form("fr05_mutasisummary");
+
+// Validate method
+fr05_mutasisummary.Validate = function() {
+	if (!this.ValidateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
+
+	// Call Form Custom Validate event
+	if (!this.Form_CustomValidate(fobj))
+		return false;
+	return true;
+}
+
+// Form_CustomValidate method
+fr05_mutasisummary.Form_CustomValidate = 
+ function(fobj) { // DO NOT CHANGE THIS LINE!
+
+ 	// Your custom validation code here, return false if invalid.
+ 	return true;
+ }
+<?php if (EWR_CLIENT_VALIDATE) { ?>
+fr05_mutasisummary.ValidateRequired = true; // Uses JavaScript validation
+<?php } else { ?>
+fr05_mutasisummary.ValidateRequired = false; // No JavaScript validation
+<?php } ?>
+
+// Use Ajax
+fr05_mutasisummary.Lists["sv_MainGroup"] = {"LinkField":"sv_MainGroup","Ajax":true,"DisplayFields":["sv_MainGroup","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
+fr05_mutasisummary.Lists["sv_SubGroup"] = {"LinkField":"sv_SubGroup","Ajax":true,"DisplayFields":["sv_SubGroup","","",""],"ParentFields":["sv_MainGroup"],"FilterFields":["sv_MainGroup"],"Options":[],"Template":""};
+fr05_mutasisummary.Lists["sv_Article"] = {"LinkField":"sv_Article","Ajax":true,"DisplayFields":["sv_Article","","",""],"ParentFields":["sv_MainGroup","sv_SubGroup"],"FilterFields":["sv_MainGroup","sv_SubGroup"],"Options":[],"Template":""};
+</script>
 <?php } ?>
 <?php if ($Page->Export == "" && !$Page->DrillDown && !$grDashboardReport) { ?>
 <script type="text/javascript">
@@ -1942,6 +2679,144 @@ if (!$Page->DrillDownInPanel) {
 <?php if ($Page->Export <> "pdf") { ?>
 <div id="report_summary">
 <?php } ?>
+<?php if ($Page->Export == "" && !$Page->DrillDown && !$grDashboardReport) { ?>
+<!-- Search form (begin) -->
+<form name="fr05_mutasisummary" id="fr05_mutasisummary" class="form-inline ewForm ewExtFilterForm" action="<?php echo ewr_CurrentPage() ?>">
+<?php $SearchPanelClass = ($Page->Filter <> "") ? " in" : " in"; ?>
+<div id="fr05_mutasisummary_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
+<input type="hidden" name="cmd" value="search">
+<div id="r_1" class="ewRow">
+<div id="c_MainGroup" class="ewCell form-group">
+	<label for="sv_MainGroup" class="ewSearchCaption ewLabel"><?php echo $Page->MainGroup->FldCaption() ?></label>
+	<span class="ewSearchField">
+<?php $Page->MainGroup->EditAttrs["onchange"] = "ewr_UpdateOpt.call(this, ['sv_SubGroup','sv_Article','sv_Kode[]','sv_ArticleNama']); " . @$Page->MainGroup->EditAttrs["onchange"]; ?>
+<?php ewr_PrependClass($Page->MainGroup->EditAttrs["class"], "form-control"); ?>
+<select data-table="r05_mutasi" data-field="x_MainGroup" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->MainGroup->DisplayValueSeparator) ? json_encode($Page->MainGroup->DisplayValueSeparator) : $Page->MainGroup->DisplayValueSeparator) ?>" id="sv_MainGroup" name="sv_MainGroup"<?php echo $Page->MainGroup->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->MainGroup->AdvancedFilters) ? count($Page->MainGroup->AdvancedFilters) : 0;
+	$cntd = is_array($Page->MainGroup->DropDownList) ? count($Page->MainGroup->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->MainGroup->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->MainGroup->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->MainGroup->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->MainGroup->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
+<input type="hidden" name="s_sv_MainGroup" id="s_sv_MainGroup" value="<?php echo $Page->MainGroup->LookupFilterQuery() ?>">
+<script type="text/javascript">
+fr05_mutasisummary.Lists["sv_MainGroup"].Options = <?php echo ewr_ArrayToJson($Page->MainGroup->LookupFilterOptions) ?>;
+</script>
+</span>
+</div>
+</div>
+<div id="r_2" class="ewRow">
+<div id="c_SubGroup" class="ewCell form-group">
+	<label for="sv_SubGroup" class="ewSearchCaption ewLabel"><?php echo $Page->SubGroup->FldCaption() ?></label>
+	<span class="ewSearchField">
+<?php $Page->SubGroup->EditAttrs["onchange"] = "ewr_UpdateOpt.call(this, ['sv_Article','sv_Kode[]','sv_ArticleNama']); " . @$Page->SubGroup->EditAttrs["onchange"]; ?>
+<?php ewr_PrependClass($Page->SubGroup->EditAttrs["class"], "form-control"); ?>
+<select data-table="r05_mutasi" data-field="x_SubGroup" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->SubGroup->DisplayValueSeparator) ? json_encode($Page->SubGroup->DisplayValueSeparator) : $Page->SubGroup->DisplayValueSeparator) ?>" id="sv_SubGroup" name="sv_SubGroup"<?php echo $Page->SubGroup->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->SubGroup->AdvancedFilters) ? count($Page->SubGroup->AdvancedFilters) : 0;
+	$cntd = is_array($Page->SubGroup->DropDownList) ? count($Page->SubGroup->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->SubGroup->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->SubGroup->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->SubGroup->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->SubGroup->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
+<input type="hidden" name="s_sv_SubGroup" id="s_sv_SubGroup" value="<?php echo $Page->SubGroup->LookupFilterQuery() ?>">
+<script type="text/javascript">
+fr05_mutasisummary.Lists["sv_SubGroup"].Options = <?php echo ewr_ArrayToJson($Page->SubGroup->LookupFilterOptions) ?>;
+</script>
+</span>
+</div>
+</div>
+<div id="r_3" class="ewRow">
+<div id="c_Article" class="ewCell form-group">
+	<label for="sv_Article" class="ewSearchCaption ewLabel"><?php echo $Page->Article->FldCaption() ?></label>
+	<span class="ewSearchField">
+<?php ewr_PrependClass($Page->Article->EditAttrs["class"], "form-control"); ?>
+<select data-table="r05_mutasi" data-field="x_Article" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->Article->DisplayValueSeparator) ? json_encode($Page->Article->DisplayValueSeparator) : $Page->Article->DisplayValueSeparator) ?>" id="sv_Article" name="sv_Article"<?php echo $Page->Article->EditAttributes() ?>>
+<option value=""><?php echo $ReportLanguage->Phrase("PleaseSelect") ?></option>
+<?php
+	$cntf = is_array($Page->Article->AdvancedFilters) ? count($Page->Article->AdvancedFilters) : 0;
+	$cntd = is_array($Page->Article->DropDownList) ? count($Page->Article->DropDownList) : 0;
+	$totcnt = $cntf + $cntd;
+	$wrkcnt = 0;
+	if ($cntf > 0) {
+		foreach ($Page->Article->AdvancedFilters as $filter) {
+			if ($filter->Enabled) {
+				$selwrk = ewr_MatchedFilterValue($Page->Article->DropDownValue, $filter->ID) ? " selected" : "";
+?>
+<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
+<?php
+				$wrkcnt += 1;
+			}
+		}
+	}
+	for ($i = 0; $i < $cntd; $i++) {
+		$selwrk = " selected";
+?>
+<option value="<?php echo $Page->Article->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->Article->DropDownList[$i], "", 0) ?></option>
+<?php
+		$wrkcnt += 1;
+	}
+?>
+</select>
+<input type="hidden" name="s_sv_Article" id="s_sv_Article" value="<?php echo $Page->Article->LookupFilterQuery() ?>">
+<script type="text/javascript">
+fr05_mutasisummary.Lists["sv_Article"].Options = <?php echo ewr_ArrayToJson($Page->Article->LookupFilterOptions) ?>;
+</script>
+</span>
+</div>
+</div>
+<div class="ewRow"><input type="submit" name="btnsubmit" id="btnsubmit" class="btn btn-primary" value="<?php echo $ReportLanguage->Phrase("Search") ?>">
+<input type="reset" name="btnreset" id="btnreset" class="btn hide" value="<?php echo $ReportLanguage->Phrase("Reset") ?>"></div>
+</div>
+</form>
+<script type="text/javascript">
+fr05_mutasisummary.Init();
+fr05_mutasisummary.FilterList = <?php echo $Page->GetFilterList() ?>;
+</script>
+<!-- Search form (end) -->
+<?php } ?>
+<?php if ($Page->ShowCurrentFilter) { ?>
+<?php $Page->ShowFilterList() ?>
+<?php } ?>
 <?php
 
 // Set the last group to display if not export all
@@ -1961,6 +2836,7 @@ $Page->RecIndex = 0;
 if ($Page->TotalGrps > 0) {
 	$Page->GetGrpRow(1);
 	$Page->GrpCounter[0] = 1;
+	$Page->GrpCounter[1] = 1;
 	$Page->GrpCount = 1;
 }
 $Page->GrpIdx = ewr_InitArray($Page->StopGrp - $Page->StartGrp + 1, -1);
@@ -2011,6 +2887,50 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <thead>
 	<!-- Table header -->
 	<tr class="ewTableHeader">
+<?php if ($Page->MainGroup->Visible) { ?>
+	<?php if ($Page->MainGroup->ShowGroupHeaderAsRow) { ?>
+	<td data-field="MainGroup">&nbsp;</td>
+	<?php } else { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="MainGroup"><div class="r05_mutasi_MainGroup"><span class="ewTableHeaderCaption"><?php echo $Page->MainGroup->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="MainGroup">
+<?php if ($Page->SortUrl($Page->MainGroup) == "") { ?>
+		<div class="ewTableHeaderBtn r05_mutasi_MainGroup">
+			<span class="ewTableHeaderCaption"><?php echo $Page->MainGroup->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r05_mutasi_MainGroup" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->MainGroup) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->MainGroup->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->MainGroup->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->MainGroup->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+	<?php } ?>
+<?php } ?>
+<?php if ($Page->SubGroup->Visible) { ?>
+	<?php if ($Page->SubGroup->ShowGroupHeaderAsRow) { ?>
+	<td data-field="SubGroup">&nbsp;</td>
+	<?php } else { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="SubGroup"><div class="r05_mutasi_SubGroup"><span class="ewTableHeaderCaption"><?php echo $Page->SubGroup->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="SubGroup">
+<?php if ($Page->SortUrl($Page->SubGroup) == "") { ?>
+		<div class="ewTableHeaderBtn r05_mutasi_SubGroup">
+			<span class="ewTableHeaderCaption"><?php echo $Page->SubGroup->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r05_mutasi_SubGroup" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->SubGroup) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->SubGroup->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->SubGroup->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->SubGroup->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+	<?php } ?>
+<?php } ?>
 <?php if ($Page->Kode->Visible) { ?>
 	<?php if ($Page->Kode->ShowGroupHeaderAsRow) { ?>
 	<td data-field="Kode">&nbsp;</td>
@@ -2027,28 +2947,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<div class="ewTableHeaderBtn ewPointer r05_mutasi_Kode" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Kode) ?>',2);">
 			<span class="ewTableHeaderCaption"><?php echo $Page->Kode->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->Kode->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Kode->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
-		</div>
-<?php } ?>
-	</td>
-<?php } ?>
-	<?php } ?>
-<?php } ?>
-<?php if ($Page->ArticleNama->Visible) { ?>
-	<?php if ($Page->ArticleNama->ShowGroupHeaderAsRow) { ?>
-	<td data-field="ArticleNama">&nbsp;</td>
-	<?php } else { ?>
-<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="ArticleNama"><div class="r05_mutasi_ArticleNama"><span class="ewTableHeaderCaption"><?php echo $Page->ArticleNama->FldCaption() ?></span></div></td>
-<?php } else { ?>
-	<td data-field="ArticleNama">
-<?php if ($Page->SortUrl($Page->ArticleNama) == "") { ?>
-		<div class="ewTableHeaderBtn r05_mutasi_ArticleNama">
-			<span class="ewTableHeaderCaption"><?php echo $Page->ArticleNama->FldCaption() ?></span>
-		</div>
-<?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer r05_mutasi_ArticleNama" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->ArticleNama) ?>',2);">
-			<span class="ewTableHeaderCaption"><?php echo $Page->ArticleNama->FldCaption() ?></span>
-			<span class="ewTableHeaderSort"><?php if ($Page->ArticleNama->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->ArticleNama->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
 <?php } ?>
 	</td>
@@ -2086,6 +2984,42 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<div class="ewTableHeaderBtn ewPointer r05_mutasi_ArticleID" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->ArticleID) ?>',2);">
 			<span class="ewTableHeaderCaption"><?php echo $Page->ArticleID->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->ArticleID->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->ArticleID->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
+<?php if ($Page->Article->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="Article"><div class="r05_mutasi_Article"><span class="ewTableHeaderCaption"><?php echo $Page->Article->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="Article">
+<?php if ($Page->SortUrl($Page->Article) == "") { ?>
+		<div class="ewTableHeaderBtn r05_mutasi_Article">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Article->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r05_mutasi_Article" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->Article) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->Article->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->Article->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->Article->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
+<?php if ($Page->ArticleNama->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="ArticleNama"><div class="r05_mutasi_ArticleNama"><span class="ewTableHeaderCaption"><?php echo $Page->ArticleNama->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="ArticleNama">
+<?php if ($Page->SortUrl($Page->ArticleNama) == "") { ?>
+		<div class="ewTableHeaderBtn r05_mutasi_ArticleNama">
+			<span class="ewTableHeaderCaption"><?php echo $Page->ArticleNama->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r05_mutasi_ArticleNama" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->ArticleNama) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->ArticleNama->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->ArticleNama->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->ArticleNama->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
 <?php } ?>
 	</td>
@@ -2199,24 +3133,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	</td>
 <?php } ?>
 <?php } ?>
-<?php if ($Page->MainGroup->Visible) { ?>
-<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="MainGroup"><div class="r05_mutasi_MainGroup"><span class="ewTableHeaderCaption"><?php echo $Page->MainGroup->FldCaption() ?></span></div></td>
-<?php } else { ?>
-	<td data-field="MainGroup">
-<?php if ($Page->SortUrl($Page->MainGroup) == "") { ?>
-		<div class="ewTableHeaderBtn r05_mutasi_MainGroup">
-			<span class="ewTableHeaderCaption"><?php echo $Page->MainGroup->FldCaption() ?></span>
-		</div>
-<?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer r05_mutasi_MainGroup" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->MainGroup) ?>',2);">
-			<span class="ewTableHeaderCaption"><?php echo $Page->MainGroup->FldCaption() ?></span>
-			<span class="ewTableHeaderSort"><?php if ($Page->MainGroup->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->MainGroup->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
-		</div>
-<?php } ?>
-	</td>
-<?php } ?>
-<?php } ?>
 	</tr>
 </thead>
 <tbody>
@@ -2226,7 +3142,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	}
 
 	// Build detail SQL
-	$sWhere = ewr_DetailFilterSql($Page->Kode, $Page->getSqlFirstGroupField(), $Page->Kode->GroupValue(), $Page->DBID);
+	$sWhere = ewr_DetailFilterSql($Page->MainGroup, $Page->getSqlFirstGroupField(), $Page->MainGroup->GroupValue(), $Page->DBID);
 	if ($Page->PageFirstGroupFilter <> "") $Page->PageFirstGroupFilter .= " OR ";
 	$Page->PageFirstGroupFilter .= $sWhere;
 	if ($Page->Filter != "")
@@ -2237,11 +3153,12 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	if ($rsdtlcnt > 0)
 		$Page->GetRow(1);
 	$Page->GrpIdx[$Page->GrpCount] = array(-1);
+	$Page->GrpIdx[$Page->GrpCount][] = array(-1);
 	while ($rs && !$rs->EOF) { // Loop detail records
 		$Page->RecCount++;
 		$Page->RecIndex++;
 ?>
-<?php if ($Page->Kode->Visible && $Page->ChkLvlBreak(1) && $Page->Kode->ShowGroupHeaderAsRow) { ?>
+<?php if ($Page->MainGroup->Visible && $Page->ChkLvlBreak(1) && $Page->MainGroup->ShowGroupHeaderAsRow) { ?>
 <?php
 
 		// Render header row
@@ -2250,14 +3167,97 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
 		$Page->RowTotalSubType = EWR_ROWTOTAL_HEADER;
 		$Page->RowGroupLevel = 1;
-		$Page->Kode->Count = $Page->GetSummaryCount(1);
+		$Page->MainGroup->Count = $Page->GetSummaryCount(1);
 		$Page->RenderRow();
 ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->MainGroup->Visible) { ?>
+		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes(); ?>><span class="ewGroupToggle icon-collapse"></span></td>
+<?php } ?>
+		<td data-field="MainGroup" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 1) ?>"<?php echo $Page->MainGroup->CellAttributes() ?>>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+		<span class="ewSummaryCaption r05_mutasi_MainGroup"><span class="ewTableHeaderCaption"><?php echo $Page->MainGroup->FldCaption() ?></span></span>
+<?php } else { ?>
+	<?php if ($Page->SortUrl($Page->MainGroup) == "") { ?>
+		<span class="ewSummaryCaption r05_mutasi_MainGroup">
+			<span class="ewTableHeaderCaption"><?php echo $Page->MainGroup->FldCaption() ?></span>
+		</span>
+	<?php } else { ?>
+		<span class="ewTableHeaderBtn ewPointer ewSummaryCaption r05_mutasi_MainGroup" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->MainGroup) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->MainGroup->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->MainGroup->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->MainGroup->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</span>
+	<?php } ?>
+<?php } ?>
+		<?php echo $ReportLanguage->Phrase("SummaryColon") ?>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_r05_mutasi_MainGroup"<?php echo $Page->MainGroup->ViewAttributes() ?>><?php echo $Page->MainGroup->GroupViewValue ?></span>
+		<span class="ewSummaryCount">(<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->MainGroup->Count,0,-2,-2,-2) ?></span>)</span>
+		</td>
+	</tr>
+<?php } ?>
+<?php if ($Page->SubGroup->Visible && $Page->ChkLvlBreak(2) && $Page->SubGroup->ShowGroupHeaderAsRow) { ?>
+<?php
+
+		// Render header row
+		$Page->ResetAttrs();
+		$Page->RowType = EWR_ROWTYPE_TOTAL;
+		$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
+		$Page->RowTotalSubType = EWR_ROWTOTAL_HEADER;
+		$Page->RowGroupLevel = 2;
+		$Page->SubGroup->Count = $Page->GetSummaryCount(2);
+		$Page->RenderRow();
+?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->MainGroup->Visible) { ?>
+		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes(); ?>></td>
+<?php } ?>
+<?php if ($Page->SubGroup->Visible) { ?>
+		<td data-field="SubGroup"<?php echo $Page->SubGroup->CellAttributes(); ?>><span class="ewGroupToggle icon-collapse"></span></td>
+<?php } ?>
+		<td data-field="SubGroup" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 2) ?>"<?php echo $Page->SubGroup->CellAttributes() ?>>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+		<span class="ewSummaryCaption r05_mutasi_SubGroup"><span class="ewTableHeaderCaption"><?php echo $Page->SubGroup->FldCaption() ?></span></span>
+<?php } else { ?>
+	<?php if ($Page->SortUrl($Page->SubGroup) == "") { ?>
+		<span class="ewSummaryCaption r05_mutasi_SubGroup">
+			<span class="ewTableHeaderCaption"><?php echo $Page->SubGroup->FldCaption() ?></span>
+		</span>
+	<?php } else { ?>
+		<span class="ewTableHeaderBtn ewPointer ewSummaryCaption r05_mutasi_SubGroup" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->SubGroup) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->SubGroup->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->SubGroup->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->SubGroup->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</span>
+	<?php } ?>
+<?php } ?>
+		<?php echo $ReportLanguage->Phrase("SummaryColon") ?>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r05_mutasi_SubGroup"<?php echo $Page->SubGroup->ViewAttributes() ?>><?php echo $Page->SubGroup->GroupViewValue ?></span>
+		<span class="ewSummaryCount">(<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->SubGroup->Count,0,-2,-2,-2) ?></span>)</span>
+		</td>
+	</tr>
+<?php } ?>
+<?php if ($Page->Kode->Visible && $Page->ChkLvlBreak(3) && $Page->Kode->ShowGroupHeaderAsRow) { ?>
+<?php
+
+		// Render header row
+		$Page->ResetAttrs();
+		$Page->RowType = EWR_ROWTYPE_TOTAL;
+		$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
+		$Page->RowTotalSubType = EWR_ROWTOTAL_HEADER;
+		$Page->RowGroupLevel = 3;
+		$Page->Kode->Count = $Page->GetSummaryCount(3);
+		$Page->RenderRow();
+?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->MainGroup->Visible) { ?>
+		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes(); ?>></td>
+<?php } ?>
+<?php if ($Page->SubGroup->Visible) { ?>
+		<td data-field="SubGroup"<?php echo $Page->SubGroup->CellAttributes(); ?>></td>
+<?php } ?>
 <?php if ($Page->Kode->Visible) { ?>
 		<td data-field="Kode"<?php echo $Page->Kode->CellAttributes(); ?>><span class="ewGroupToggle icon-collapse"></span></td>
 <?php } ?>
-		<td data-field="Kode" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 1) ?>"<?php echo $Page->Kode->CellAttributes() ?>>
+		<td data-field="Kode" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 3) ?>"<?php echo $Page->Kode->CellAttributes() ?>>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
 		<span class="ewSummaryCaption r05_mutasi_Kode"><span class="ewTableHeaderCaption"><?php echo $Page->Kode->FldCaption() ?></span></span>
 <?php } else { ?>
@@ -2273,48 +3273,8 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<?php } ?>
 <?php } ?>
 		<?php echo $ReportLanguage->Phrase("SummaryColon") ?>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_r05_mutasi_Kode"<?php echo $Page->Kode->ViewAttributes() ?>><?php echo $Page->Kode->GroupViewValue ?></span>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r05_mutasi_Kode"<?php echo $Page->Kode->ViewAttributes() ?>><?php echo $Page->Kode->GroupViewValue ?></span>
 		<span class="ewSummaryCount">(<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->Kode->Count,0,-2,-2,-2) ?></span>)</span>
-		</td>
-	</tr>
-<?php } ?>
-<?php if ($Page->ArticleNama->Visible && $Page->ChkLvlBreak(2) && $Page->ArticleNama->ShowGroupHeaderAsRow) { ?>
-<?php
-
-		// Render header row
-		$Page->ResetAttrs();
-		$Page->RowType = EWR_ROWTYPE_TOTAL;
-		$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
-		$Page->RowTotalSubType = EWR_ROWTOTAL_HEADER;
-		$Page->RowGroupLevel = 2;
-		$Page->ArticleNama->Count = $Page->GetSummaryCount(2);
-		$Page->RenderRow();
-?>
-	<tr<?php echo $Page->RowAttributes(); ?>>
-<?php if ($Page->Kode->Visible) { ?>
-		<td data-field="Kode"<?php echo $Page->Kode->CellAttributes(); ?>></td>
-<?php } ?>
-<?php if ($Page->ArticleNama->Visible) { ?>
-		<td data-field="ArticleNama"<?php echo $Page->ArticleNama->CellAttributes(); ?>><span class="ewGroupToggle icon-collapse"></span></td>
-<?php } ?>
-		<td data-field="ArticleNama" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 2) ?>"<?php echo $Page->ArticleNama->CellAttributes() ?>>
-<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-		<span class="ewSummaryCaption r05_mutasi_ArticleNama"><span class="ewTableHeaderCaption"><?php echo $Page->ArticleNama->FldCaption() ?></span></span>
-<?php } else { ?>
-	<?php if ($Page->SortUrl($Page->ArticleNama) == "") { ?>
-		<span class="ewSummaryCaption r05_mutasi_ArticleNama">
-			<span class="ewTableHeaderCaption"><?php echo $Page->ArticleNama->FldCaption() ?></span>
-		</span>
-	<?php } else { ?>
-		<span class="ewTableHeaderBtn ewPointer ewSummaryCaption r05_mutasi_ArticleNama" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->ArticleNama) ?>',2);">
-			<span class="ewTableHeaderCaption"><?php echo $Page->ArticleNama->FldCaption() ?></span>
-			<span class="ewTableHeaderSort"><?php if ($Page->ArticleNama->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->ArticleNama->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
-		</span>
-	<?php } ?>
-<?php } ?>
-		<?php echo $ReportLanguage->Phrase("SummaryColon") ?>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r05_mutasi_ArticleNama"<?php echo $Page->ArticleNama->ViewAttributes() ?>><?php echo $Page->ArticleNama->GroupViewValue ?></span>
-		<span class="ewSummaryCount">(<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->ArticleNama->Count,0,-2,-2,-2) ?></span>)</span>
 		</td>
 	</tr>
 <?php } ?>
@@ -2326,20 +3286,28 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		$Page->RenderRow();
 ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->MainGroup->Visible) { ?>
+	<?php if ($Page->MainGroup->ShowGroupHeaderAsRow) { ?>
+		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes(); ?>>&nbsp;</td>
+	<?php } else { ?>
+		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes(); ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_r05_mutasi_MainGroup"<?php echo $Page->MainGroup->ViewAttributes() ?>><?php echo $Page->MainGroup->GroupViewValue ?></span></td>
+	<?php } ?>
+<?php } ?>
+<?php if ($Page->SubGroup->Visible) { ?>
+	<?php if ($Page->SubGroup->ShowGroupHeaderAsRow) { ?>
+		<td data-field="SubGroup"<?php echo $Page->SubGroup->CellAttributes(); ?>>&nbsp;</td>
+	<?php } else { ?>
+		<td data-field="SubGroup"<?php echo $Page->SubGroup->CellAttributes(); ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r05_mutasi_SubGroup"<?php echo $Page->SubGroup->ViewAttributes() ?>><?php echo $Page->SubGroup->GroupViewValue ?></span></td>
+	<?php } ?>
+<?php } ?>
 <?php if ($Page->Kode->Visible) { ?>
 	<?php if ($Page->Kode->ShowGroupHeaderAsRow) { ?>
 		<td data-field="Kode"<?php echo $Page->Kode->CellAttributes(); ?>>&nbsp;</td>
 	<?php } else { ?>
 		<td data-field="Kode"<?php echo $Page->Kode->CellAttributes(); ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_r05_mutasi_Kode"<?php echo $Page->Kode->ViewAttributes() ?>><?php echo $Page->Kode->GroupViewValue ?></span></td>
-	<?php } ?>
-<?php } ?>
-<?php if ($Page->ArticleNama->Visible) { ?>
-	<?php if ($Page->ArticleNama->ShowGroupHeaderAsRow) { ?>
-		<td data-field="ArticleNama"<?php echo $Page->ArticleNama->CellAttributes(); ?>>&nbsp;</td>
-	<?php } else { ?>
-		<td data-field="ArticleNama"<?php echo $Page->ArticleNama->CellAttributes(); ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r05_mutasi_ArticleNama"<?php echo $Page->ArticleNama->ViewAttributes() ?>><?php echo $Page->ArticleNama->GroupViewValue ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r05_mutasi_Kode"<?php echo $Page->Kode->ViewAttributes() ?>><?php echo $Page->Kode->GroupViewValue ?></span></td>
 	<?php } ?>
 <?php } ?>
 <?php if ($Page->No->Visible) { ?>
@@ -2349,6 +3317,14 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->ArticleID->Visible) { ?>
 		<td data-field="ArticleID"<?php echo $Page->ArticleID->CellAttributes() ?>>
 <span<?php echo $Page->ArticleID->ViewAttributes() ?>><?php echo $Page->ArticleID->ListViewValue() ?></span></td>
+<?php } ?>
+<?php if ($Page->Article->Visible) { ?>
+		<td data-field="Article"<?php echo $Page->Article->CellAttributes() ?>>
+<span<?php echo $Page->Article->ViewAttributes() ?>><?php echo $Page->Article->ListViewValue() ?></span></td>
+<?php } ?>
+<?php if ($Page->ArticleNama->Visible) { ?>
+		<td data-field="ArticleNama"<?php echo $Page->ArticleNama->CellAttributes() ?>>
+<span<?php echo $Page->ArticleNama->ViewAttributes() ?>><?php echo $Page->ArticleNama->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->Tgl->Visible) { ?>
 		<td data-field="Tgl"<?php echo $Page->Tgl->CellAttributes() ?>>
@@ -2374,10 +3350,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="SaldoQty"<?php echo $Page->SaldoQty->CellAttributes() ?>>
 <span<?php echo $Page->SaldoQty->ViewAttributes() ?>><?php echo $Page->SaldoQty->ListViewValue() ?></span></td>
 <?php } ?>
-<?php if ($Page->MainGroup->Visible) { ?>
-		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes() ?>>
-<span<?php echo $Page->MainGroup->ViewAttributes() ?>><?php echo $Page->MainGroup->ListViewValue() ?></span></td>
-<?php } ?>
 	</tr>
 <?php
 
@@ -2390,46 +3362,59 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		// Show Footers
 ?>
 <?php
-	} // End detail records loop
+		if ($Page->ChkLvlBreak(3)) {
+			$cnt = count(@$Page->GrpIdx[$Page->GrpCount][$Page->GrpCounter[0]]);
+			$Page->GrpIdx[$Page->GrpCount][$Page->GrpCounter[0]][$cnt] = $Page->RecCount;
+		}
+		if ($Page->ChkLvlBreak(3) && $Page->Kode->Visible) {
 ?>
 <?php
-		if ($Page->Kode->Visible) {
-?>
-<?php
-			$Page->Kode->Count = $Page->GetSummaryCount(1, FALSE);
-			$Page->ArticleNama->Count = $Page->GetSummaryCount(2, FALSE);
-			$Page->MasukQty->Count = $Page->Cnt[1][6];
-			$Page->MasukQty->SumValue = $Page->Smry[1][6]; // Load SUM
-			$Page->KeluarQty->Count = $Page->Cnt[1][7];
-			$Page->KeluarQty->SumValue = $Page->Smry[1][7]; // Load SUM
+			$Page->MainGroup->Count = $Page->GetSummaryCount(1, FALSE);
+			$Page->SubGroup->Count = $Page->GetSummaryCount(2, FALSE);
+			$Page->Kode->Count = $Page->GetSummaryCount(3, FALSE);
+			$Page->MasukQty->Count = $Page->Cnt[3][8];
+			$Page->MasukQty->SumValue = $Page->Smry[3][8]; // Load SUM
+			$Page->KeluarQty->Count = $Page->Cnt[3][9];
+			$Page->KeluarQty->SumValue = $Page->Smry[3][9]; // Load SUM
 			$Page->ResetAttrs();
 			$Page->RowType = EWR_ROWTYPE_TOTAL;
 			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
 			$Page->RowTotalSubType = EWR_ROWTOTAL_FOOTER;
-			$Page->RowGroupLevel = 1;
+			$Page->RowGroupLevel = 3;
 			$Page->RenderRow();
 ?>
 <?php if ($Page->Kode->ShowCompactSummaryFooter) { ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
-<?php if ($Page->Kode->Visible) { ?>
-		<td data-field="Kode"<?php echo $Page->Kode->CellAttributes() ?>>
-	<?php if ($Page->Kode->ShowGroupHeaderAsRow) { ?>
+<?php if ($Page->MainGroup->Visible) { ?>
+		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes() ?>>
+	<?php if ($Page->MainGroup->ShowGroupHeaderAsRow) { ?>
 		&nbsp;
 	<?php } elseif ($Page->RowGroupLevel <> 1) { ?>
 		&nbsp;
 	<?php } else { ?>
-		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->Kode->Count,0,-2,-2,-2) ?></span></span>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->MainGroup->Count,0,-2,-2,-2) ?></span></span>
 	<?php } ?>
 		</td>
 <?php } ?>
-<?php if ($Page->ArticleNama->Visible) { ?>
-		<td data-field="ArticleNama"<?php echo $Page->Kode->CellAttributes() ?>>
-	<?php if ($Page->ArticleNama->ShowGroupHeaderAsRow) { ?>
+<?php if ($Page->SubGroup->Visible) { ?>
+		<td data-field="SubGroup"<?php echo $Page->SubGroup->CellAttributes() ?>>
+	<?php if ($Page->SubGroup->ShowGroupHeaderAsRow) { ?>
 		&nbsp;
 	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
 		&nbsp;
 	<?php } else { ?>
-		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->ArticleNama->Count,0,-2,-2,-2) ?></span></span>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->SubGroup->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->Kode->Visible) { ?>
+		<td data-field="Kode"<?php echo $Page->Kode->CellAttributes() ?>>
+	<?php if ($Page->Kode->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 3) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->Kode->Count,0,-2,-2,-2) ?></span></span>
 	<?php } ?>
 		</td>
 <?php } ?>
@@ -2438,6 +3423,12 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 <?php if ($Page->ArticleID->Visible) { ?>
 		<td data-field="ArticleID"<?php echo $Page->Kode->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->Article->Visible) { ?>
+		<td data-field="Article"<?php echo $Page->Kode->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->ArticleNama->Visible) { ?>
+		<td data-field="ArticleNama"<?php echo $Page->Kode->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->Tgl->Visible) { ?>
 		<td data-field="Tgl"<?php echo $Page->Kode->CellAttributes() ?>></td>
@@ -2457,25 +3448,40 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->SaldoQty->Visible) { ?>
 		<td data-field="SaldoQty"<?php echo $Page->Kode->CellAttributes() ?>></td>
 <?php } ?>
-<?php if ($Page->MainGroup->Visible) { ?>
-		<td data-field="MainGroup"<?php echo $Page->Kode->CellAttributes() ?>></td>
-<?php } ?>
 	</tr>
 <?php } else { ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
-<?php if ($Page->GrpColumnCount + $Page->DtlColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->MainGroup->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->Kode->GroupViewValue, $Page->Kode->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[1][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+<?php if ($Page->MainGroup->Visible) { ?>
+		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->SubGroup->Visible) { ?>
+		<td data-field="SubGroup"<?php echo $Page->SubGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->SubGrpColumnCount + $Page->DtlColumnCount - 1 > 0) { ?>
+		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount - 1) ?>"<?php echo $Page->SaldoQty->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->Kode->GroupViewValue, $Page->Kode->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[3][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
 <?php } ?>
 	</tr>
 	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->MainGroup->Visible) { ?>
+		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->SubGroup->Visible) { ?>
+		<td data-field="SubGroup"<?php echo $Page->SubGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
 <?php if ($Page->GrpColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->GrpColumnCount - 0) ?>"<?php echo $Page->Kode->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+		<td colspan="<?php echo ($Page->GrpColumnCount - 2) ?>"<?php echo $Page->Kode->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
 <?php } ?>
 <?php if ($Page->No->Visible) { ?>
 		<td data-field="No"<?php echo $Page->Kode->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->ArticleID->Visible) { ?>
 		<td data-field="ArticleID"<?php echo $Page->Kode->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->Article->Visible) { ?>
+		<td data-field="Article"<?php echo $Page->Kode->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->ArticleNama->Visible) { ?>
+		<td data-field="ArticleNama"<?php echo $Page->Kode->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->Tgl->Visible) { ?>
 		<td data-field="Tgl"<?php echo $Page->Kode->CellAttributes() ?>>&nbsp;</td>
@@ -2487,18 +3493,301 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="NoRef"<?php echo $Page->Kode->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->MasukQty->Visible) { ?>
-		<td data-field="MasukQty"<?php echo $Page->MainGroup->CellAttributes() ?>>
+		<td data-field="MasukQty"<?php echo $Page->SaldoQty->CellAttributes() ?>>
 <span<?php echo $Page->MasukQty->ViewAttributes() ?>><?php echo $Page->MasukQty->SumViewValue ?></span></td>
 <?php } ?>
 <?php if ($Page->KeluarQty->Visible) { ?>
-		<td data-field="KeluarQty"<?php echo $Page->MainGroup->CellAttributes() ?>>
+		<td data-field="KeluarQty"<?php echo $Page->SaldoQty->CellAttributes() ?>>
 <span<?php echo $Page->KeluarQty->ViewAttributes() ?>><?php echo $Page->KeluarQty->SumViewValue ?></span></td>
 <?php } ?>
 <?php if ($Page->SaldoQty->Visible) { ?>
 		<td data-field="SaldoQty"<?php echo $Page->Kode->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
+	</tr>
+<?php } ?>
+<?php
+
+			// Reset level 3 summary
+			$Page->ResetLevelSummary(3);
+		} // End show footer check
+		if ($Page->ChkLvlBreak(3)) {
+			$Page->GrpCounter[1]++;
+		}
+?>
+<?php
+		if ($Page->ChkLvlBreak(2) && $Page->SubGroup->Visible) {
+?>
+<?php
+			$Page->MainGroup->Count = $Page->GetSummaryCount(1, FALSE);
+			$Page->SubGroup->Count = $Page->GetSummaryCount(2, FALSE);
+			$Page->Kode->Count = $Page->GetSummaryCount(3, FALSE);
+			$Page->MasukQty->Count = $Page->Cnt[2][8];
+			$Page->MasukQty->SumValue = $Page->Smry[2][8]; // Load SUM
+			$Page->KeluarQty->Count = $Page->Cnt[2][9];
+			$Page->KeluarQty->SumValue = $Page->Smry[2][9]; // Load SUM
+			$Page->ResetAttrs();
+			$Page->RowType = EWR_ROWTYPE_TOTAL;
+			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
+			$Page->RowTotalSubType = EWR_ROWTOTAL_FOOTER;
+			$Page->RowGroupLevel = 2;
+			$Page->RenderRow();
+?>
+<?php if ($Page->SubGroup->ShowCompactSummaryFooter) { ?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->MainGroup->Visible) { ?>
-		<td data-field="MainGroup"<?php echo $Page->Kode->CellAttributes() ?>>&nbsp;</td>
+		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes() ?>>
+	<?php if ($Page->MainGroup->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 1) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->MainGroup->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->SubGroup->Visible) { ?>
+		<td data-field="SubGroup"<?php echo $Page->SubGroup->CellAttributes() ?>>
+	<?php if ($Page->SubGroup->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->SubGroup->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->Kode->Visible) { ?>
+		<td data-field="Kode"<?php echo $Page->SubGroup->CellAttributes() ?>>
+	<?php if ($Page->Kode->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 3) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->Kode->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->No->Visible) { ?>
+		<td data-field="No"<?php echo $Page->SubGroup->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->ArticleID->Visible) { ?>
+		<td data-field="ArticleID"<?php echo $Page->SubGroup->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->Article->Visible) { ?>
+		<td data-field="Article"<?php echo $Page->SubGroup->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->ArticleNama->Visible) { ?>
+		<td data-field="ArticleNama"<?php echo $Page->SubGroup->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->Tgl->Visible) { ?>
+		<td data-field="Tgl"<?php echo $Page->SubGroup->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->Keterangan->Visible) { ?>
+		<td data-field="Keterangan"<?php echo $Page->SubGroup->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->NoRef->Visible) { ?>
+		<td data-field="NoRef"<?php echo $Page->SubGroup->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->MasukQty->Visible) { ?>
+		<td data-field="MasukQty"<?php echo $Page->SubGroup->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span<?php echo $Page->MasukQty->ViewAttributes() ?>><?php echo $Page->MasukQty->SumViewValue ?></span></span></td>
+<?php } ?>
+<?php if ($Page->KeluarQty->Visible) { ?>
+		<td data-field="KeluarQty"<?php echo $Page->SubGroup->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span<?php echo $Page->KeluarQty->ViewAttributes() ?>><?php echo $Page->KeluarQty->SumViewValue ?></span></span></td>
+<?php } ?>
+<?php if ($Page->SaldoQty->Visible) { ?>
+		<td data-field="SaldoQty"<?php echo $Page->SubGroup->CellAttributes() ?>></td>
+<?php } ?>
+	</tr>
+<?php } else { ?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->MainGroup->Visible) { ?>
+		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->SubGrpColumnCount + $Page->DtlColumnCount > 0) { ?>
+		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->SaldoQty->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->SubGroup->GroupViewValue, $Page->SubGroup->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[2][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+<?php } ?>
+	</tr>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->MainGroup->Visible) { ?>
+		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->GrpColumnCount > 0) { ?>
+		<td colspan="<?php echo ($Page->GrpColumnCount - 1) ?>"<?php echo $Page->SubGroup->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+<?php } ?>
+<?php if ($Page->No->Visible) { ?>
+		<td data-field="No"<?php echo $Page->SubGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->ArticleID->Visible) { ?>
+		<td data-field="ArticleID"<?php echo $Page->SubGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->Article->Visible) { ?>
+		<td data-field="Article"<?php echo $Page->SubGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->ArticleNama->Visible) { ?>
+		<td data-field="ArticleNama"<?php echo $Page->SubGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->Tgl->Visible) { ?>
+		<td data-field="Tgl"<?php echo $Page->SubGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->Keterangan->Visible) { ?>
+		<td data-field="Keterangan"<?php echo $Page->SubGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->NoRef->Visible) { ?>
+		<td data-field="NoRef"<?php echo $Page->SubGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->MasukQty->Visible) { ?>
+		<td data-field="MasukQty"<?php echo $Page->SaldoQty->CellAttributes() ?>>
+<span<?php echo $Page->MasukQty->ViewAttributes() ?>><?php echo $Page->MasukQty->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->KeluarQty->Visible) { ?>
+		<td data-field="KeluarQty"<?php echo $Page->SaldoQty->CellAttributes() ?>>
+<span<?php echo $Page->KeluarQty->ViewAttributes() ?>><?php echo $Page->KeluarQty->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->SaldoQty->Visible) { ?>
+		<td data-field="SaldoQty"<?php echo $Page->SubGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+	</tr>
+<?php } ?>
+<?php
+
+			// Reset level 2 summary
+			$Page->ResetLevelSummary(2);
+		} // End show footer check
+		if ($Page->ChkLvlBreak(2)) {
+			$Page->GrpCounter[0]++;
+			if (!$rs->EOF)
+				$Page->GrpIdx[$Page->GrpCount][$Page->GrpCounter[0]] = array(-1);
+			$Page->GrpCounter[1] = 1;
+		}
+?>
+<?php
+	} // End detail records loop
+?>
+<?php
+		if ($Page->MainGroup->Visible) {
+?>
+<?php
+			$Page->MainGroup->Count = $Page->GetSummaryCount(1, FALSE);
+			$Page->SubGroup->Count = $Page->GetSummaryCount(2, FALSE);
+			$Page->Kode->Count = $Page->GetSummaryCount(3, FALSE);
+			$Page->MasukQty->Count = $Page->Cnt[1][8];
+			$Page->MasukQty->SumValue = $Page->Smry[1][8]; // Load SUM
+			$Page->KeluarQty->Count = $Page->Cnt[1][9];
+			$Page->KeluarQty->SumValue = $Page->Smry[1][9]; // Load SUM
+			$Page->ResetAttrs();
+			$Page->RowType = EWR_ROWTYPE_TOTAL;
+			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
+			$Page->RowTotalSubType = EWR_ROWTOTAL_FOOTER;
+			$Page->RowGroupLevel = 1;
+			$Page->RenderRow();
+?>
+<?php if ($Page->MainGroup->ShowCompactSummaryFooter) { ?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->MainGroup->Visible) { ?>
+		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes() ?>>
+	<?php if ($Page->MainGroup->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 1) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->MainGroup->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->SubGroup->Visible) { ?>
+		<td data-field="SubGroup"<?php echo $Page->MainGroup->CellAttributes() ?>>
+	<?php if ($Page->SubGroup->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->SubGroup->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->Kode->Visible) { ?>
+		<td data-field="Kode"<?php echo $Page->MainGroup->CellAttributes() ?>>
+	<?php if ($Page->Kode->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 3) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->Kode->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->No->Visible) { ?>
+		<td data-field="No"<?php echo $Page->MainGroup->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->ArticleID->Visible) { ?>
+		<td data-field="ArticleID"<?php echo $Page->MainGroup->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->Article->Visible) { ?>
+		<td data-field="Article"<?php echo $Page->MainGroup->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->ArticleNama->Visible) { ?>
+		<td data-field="ArticleNama"<?php echo $Page->MainGroup->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->Tgl->Visible) { ?>
+		<td data-field="Tgl"<?php echo $Page->MainGroup->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->Keterangan->Visible) { ?>
+		<td data-field="Keterangan"<?php echo $Page->MainGroup->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->NoRef->Visible) { ?>
+		<td data-field="NoRef"<?php echo $Page->MainGroup->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->MasukQty->Visible) { ?>
+		<td data-field="MasukQty"<?php echo $Page->MainGroup->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span<?php echo $Page->MasukQty->ViewAttributes() ?>><?php echo $Page->MasukQty->SumViewValue ?></span></span></td>
+<?php } ?>
+<?php if ($Page->KeluarQty->Visible) { ?>
+		<td data-field="KeluarQty"<?php echo $Page->MainGroup->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span<?php echo $Page->KeluarQty->ViewAttributes() ?>><?php echo $Page->KeluarQty->SumViewValue ?></span></span></td>
+<?php } ?>
+<?php if ($Page->SaldoQty->Visible) { ?>
+		<td data-field="SaldoQty"<?php echo $Page->MainGroup->CellAttributes() ?>></td>
+<?php } ?>
+	</tr>
+<?php } else { ?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->GrpColumnCount + $Page->DtlColumnCount > 0) { ?>
+		<td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->SaldoQty->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->MainGroup->GroupViewValue, $Page->MainGroup->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[1][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+<?php } ?>
+	</tr>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->GrpColumnCount > 0) { ?>
+		<td colspan="<?php echo ($Page->GrpColumnCount - 0) ?>"<?php echo $Page->MainGroup->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+<?php } ?>
+<?php if ($Page->No->Visible) { ?>
+		<td data-field="No"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->ArticleID->Visible) { ?>
+		<td data-field="ArticleID"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->Article->Visible) { ?>
+		<td data-field="Article"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->ArticleNama->Visible) { ?>
+		<td data-field="ArticleNama"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->Tgl->Visible) { ?>
+		<td data-field="Tgl"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->Keterangan->Visible) { ?>
+		<td data-field="Keterangan"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->NoRef->Visible) { ?>
+		<td data-field="NoRef"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->MasukQty->Visible) { ?>
+		<td data-field="MasukQty"<?php echo $Page->SaldoQty->CellAttributes() ?>>
+<span<?php echo $Page->MasukQty->ViewAttributes() ?>><?php echo $Page->MasukQty->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->KeluarQty->Visible) { ?>
+		<td data-field="KeluarQty"<?php echo $Page->SaldoQty->CellAttributes() ?>>
+<span<?php echo $Page->KeluarQty->ViewAttributes() ?>><?php echo $Page->KeluarQty->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->SaldoQty->Visible) { ?>
+		<td data-field="SaldoQty"<?php echo $Page->MainGroup->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 	</tr>
 <?php } ?>
@@ -2521,6 +3810,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	if ($Page->ShowHeader)
 		$Page->Page_Breaking($Page->ShowHeader, $Page->PageBreakContent);
 	$Page->GrpCount++;
+	$Page->GrpCounter[1] = 1;
 	$Page->GrpCounter[0] = 1;
 
 	// Handle EOF

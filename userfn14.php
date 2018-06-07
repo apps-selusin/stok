@@ -145,9 +145,23 @@ function f_GetNoSO($JualID) {
 function f_UpdateKode($ArticleID) {
 
 	// cari nilai Kode berdasarkan $ArticleID
-	$q = "select Kode from t06_article where id = ".$ArticleID."";
-	$mKode = ew_ExecuteScalar($q);
-	$q = "update t13_mutasi set Kode = '".$mKode."' where ArticleID = ".$ArticleID."";
+	// $q = "select Kode from t06_article where id = ".$ArticleID."";
+	// $mKode = ew_ExecuteScalar($q);
+	// $q = "update t13_mutasi set Kode = '".$mKode."' where ArticleID = ".$ArticleID."";
+
+	$q = "
+		update
+			t13_mutasi a
+			left join t06_article b on b.id = a.articleid
+			left join t05_subgroup c on c.id = b.SubGroupID
+			left join t04_maingroup d on d.id = c.MainGroupID
+		set
+			a.kode = b.kode,
+			a.maingroup = CONCAT(d.Kode, ' - ', d.Nama),
+			a.subgroup = CONCAT(c.Kode, ' - ', c.Nama),
+			a.article = CONCAT(b.Kode, ' - ', b.Nama)
+		where
+			a.ArticleID = ".$ArticleID."";
 	ew_Execute($q);
 }
 ?>

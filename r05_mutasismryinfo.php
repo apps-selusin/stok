@@ -14,6 +14,9 @@ class crr05_mutasi extends crTableBase {
 	var $Url;
 	var $No;
 	var $ArticleID;
+	var $MainGroup;
+	var $SubGroup;
+	var $Article;
 	var $Kode;
 	var $ArticleNama;
 	var $NoUrut;
@@ -27,7 +30,6 @@ class crr05_mutasi extends crTableBase {
 	var $KeluarHarga;
 	var $SaldoQty;
 	var $SaldoHarga;
-	var $MainGroup;
 
 	//
 	// Table class constructor
@@ -87,10 +89,46 @@ class crr05_mutasi extends crTableBase {
 		$this->ArticleID->SqlOrderBy = "";
 		$this->fields['ArticleID'] = &$this->ArticleID;
 
+		// MainGroup
+		$this->MainGroup = new crField('r05_mutasi', 'r05_mutasi', 'x_MainGroup', 'MainGroup', '`MainGroup`', 200, EWR_DATATYPE_STRING, -1);
+		$this->MainGroup->Sortable = TRUE; // Allow sort
+		$this->MainGroup->GroupingFieldId = 1;
+		$this->MainGroup->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
+		$this->MainGroup->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
+		$this->MainGroup->DateFilter = "";
+		$this->MainGroup->SqlSelect = "";
+		$this->MainGroup->SqlOrderBy = "";
+		$this->MainGroup->FldGroupByType = "";
+		$this->MainGroup->FldGroupInt = "0";
+		$this->MainGroup->FldGroupSql = "";
+		$this->fields['MainGroup'] = &$this->MainGroup;
+
+		// SubGroup
+		$this->SubGroup = new crField('r05_mutasi', 'r05_mutasi', 'x_SubGroup', 'SubGroup', '`SubGroup`', 200, EWR_DATATYPE_STRING, -1);
+		$this->SubGroup->Sortable = TRUE; // Allow sort
+		$this->SubGroup->GroupingFieldId = 2;
+		$this->SubGroup->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
+		$this->SubGroup->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
+		$this->SubGroup->DateFilter = "";
+		$this->SubGroup->SqlSelect = "";
+		$this->SubGroup->SqlOrderBy = "";
+		$this->SubGroup->FldGroupByType = "";
+		$this->SubGroup->FldGroupInt = "0";
+		$this->SubGroup->FldGroupSql = "";
+		$this->fields['SubGroup'] = &$this->SubGroup;
+
+		// Article
+		$this->Article = new crField('r05_mutasi', 'r05_mutasi', 'x_Article', 'Article', '`Article`', 200, EWR_DATATYPE_STRING, -1);
+		$this->Article->Sortable = TRUE; // Allow sort
+		$this->Article->DateFilter = "";
+		$this->Article->SqlSelect = "";
+		$this->Article->SqlOrderBy = "";
+		$this->fields['Article'] = &$this->Article;
+
 		// Kode
 		$this->Kode = new crField('r05_mutasi', 'r05_mutasi', 'x_Kode', 'Kode', '`Kode`', 200, EWR_DATATYPE_STRING, -1);
 		$this->Kode->Sortable = TRUE; // Allow sort
-		$this->Kode->GroupingFieldId = 1;
+		$this->Kode->GroupingFieldId = 3;
 		$this->Kode->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
 		$this->Kode->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
 		$this->Kode->DateFilter = "";
@@ -104,15 +142,9 @@ class crr05_mutasi extends crTableBase {
 		// ArticleNama
 		$this->ArticleNama = new crField('r05_mutasi', 'r05_mutasi', 'x_ArticleNama', 'ArticleNama', '`ArticleNama`', 200, EWR_DATATYPE_STRING, -1);
 		$this->ArticleNama->Sortable = TRUE; // Allow sort
-		$this->ArticleNama->GroupingFieldId = 2;
-		$this->ArticleNama->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
-		$this->ArticleNama->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
 		$this->ArticleNama->DateFilter = "";
 		$this->ArticleNama->SqlSelect = "";
 		$this->ArticleNama->SqlOrderBy = "";
-		$this->ArticleNama->FldGroupByType = "";
-		$this->ArticleNama->FldGroupInt = "0";
-		$this->ArticleNama->FldGroupSql = "";
 		$this->fields['ArticleNama'] = &$this->ArticleNama;
 
 		// NoUrut
@@ -211,14 +243,6 @@ class crr05_mutasi extends crTableBase {
 		$this->SaldoHarga->SqlSelect = "";
 		$this->SaldoHarga->SqlOrderBy = "";
 		$this->fields['SaldoHarga'] = &$this->SaldoHarga;
-
-		// MainGroup
-		$this->MainGroup = new crField('r05_mutasi', 'r05_mutasi', 'x_MainGroup', 'MainGroup', '`MainGroup`', 200, EWR_DATATYPE_STRING, -1);
-		$this->MainGroup->Sortable = TRUE; // Allow sort
-		$this->MainGroup->DateFilter = "";
-		$this->MainGroup->SqlSelect = "";
-		$this->MainGroup->SqlOrderBy = "";
-		$this->fields['MainGroup'] = &$this->MainGroup;
 	}
 
 	// Set Field Visibility
@@ -305,7 +329,7 @@ class crr05_mutasi extends crTableBase {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() {
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (select nama from t06_article where id = articleid) AS `ArticleNama`, 0 AS `No`, substr(kode,1,1) AS `MainGroup` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (select nama from t06_article where id = articleid) AS `ArticleNama`, 0 AS `No` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -366,7 +390,7 @@ class crr05_mutasi extends crTableBase {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() {
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`Kode` ASC, `ArticleNama` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`MainGroup` ASC, `SubGroup` ASC, `Kode` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -383,7 +407,7 @@ class crr05_mutasi extends crTableBase {
 	var $_SqlFirstGroupField = "";
 
 	function getSqlFirstGroupField() {
-		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`Kode`";
+		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`MainGroup`";
 	}
 
 	function SqlFirstGroupField() { // For backward compatibility
@@ -413,7 +437,7 @@ class crr05_mutasi extends crTableBase {
 	var $_SqlOrderByGroup = "";
 
 	function getSqlOrderByGroup() {
-		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`Kode` ASC";
+		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`MainGroup` ASC";
 	}
 
 	function SqlOrderByGroup() { // For backward compatibility
@@ -504,6 +528,39 @@ class crr05_mutasi extends crTableBase {
 	function SetupLookupFilters($fld) {
 		global $grLanguage;
 		switch ($fld->FldVar) {
+		case "x_MainGroup":
+			$fld->LookupFilters = array("d" => "DB", "f0" => '`MainGroup` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter), "af" => json_encode($fld->AdvancedFilters));
+		$sWhereWrk = "";
+		$fld->LookupFilters += array(
+			"select" => "SELECT DISTINCT `MainGroup`, `MainGroup` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `t13_mutasi`",
+			"where" => $sWhereWrk,
+			"orderby" => "`MainGroup` ASC"
+		);
+		$this->Lookup_Selecting($fld, $fld->LookupFilters["where"]); // Call Lookup selecting
+		$fld->LookupFilters["s"] = ewr_BuildReportSql($fld->LookupFilters["select"], $fld->LookupFilters["where"], "", "", $fld->LookupFilters["orderby"], "", "");
+			break;
+		case "x_SubGroup":
+			$fld->LookupFilters = array("d" => "DB", "f0" => '`SubGroup` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter), "f1" => '`MainGroup` = {filter_value}', "t1" => "200", "fn1" => "", "af" => json_encode($fld->AdvancedFilters));
+		$sWhereWrk = "{filter}";
+		$fld->LookupFilters += array(
+			"select" => "SELECT DISTINCT `SubGroup`, `SubGroup` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `t13_mutasi`",
+			"where" => $sWhereWrk,
+			"orderby" => "`SubGroup` ASC"
+		);
+		$this->Lookup_Selecting($fld, $fld->LookupFilters["where"]); // Call Lookup selecting
+		$fld->LookupFilters["s"] = ewr_BuildReportSql($fld->LookupFilters["select"], $fld->LookupFilters["where"], "", "", $fld->LookupFilters["orderby"], "", "");
+			break;
+		case "x_Article":
+			$fld->LookupFilters = array("d" => "DB", "f0" => '`Article` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter), "f1" => '`MainGroup` = {filter_value}', "t1" => "200", "fn1" => "", "f2" => '`SubGroup` = {filter_value}', "t2" => "200", "fn2" => "", "af" => json_encode($fld->AdvancedFilters));
+		$sWhereWrk = "{filter}";
+		$fld->LookupFilters += array(
+			"select" => "SELECT DISTINCT `Article`, `Article` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `t13_mutasi`",
+			"where" => $sWhereWrk,
+			"orderby" => "`Article` ASC"
+		);
+		$this->Lookup_Selecting($fld, $fld->LookupFilters["where"]); // Call Lookup selecting
+		$fld->LookupFilters["s"] = ewr_BuildReportSql($fld->LookupFilters["select"], $fld->LookupFilters["where"], "", "", $fld->LookupFilters["orderby"], "", "");
+			break;
 		}
 	}
 

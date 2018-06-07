@@ -397,9 +397,8 @@ class crr02_stok extends crTableBase {
 		switch ($fld->FldVar) {
 		case "x_MainGroup":
 			$fld->LookupFilters = array("d" => "DB", "f0" => '`MainGroup` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter), "af" => json_encode($fld->AdvancedFilters));
-		$sWhereWrk = "{filter}";
+		$sWhereWrk = "";
 		$fld->LookupFilters += array(
-			"dx1" => '`MainGroup`',
 			"select" => "SELECT DISTINCT `MainGroup`, `MainGroup` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v02_stok`",
 			"where" => $sWhereWrk,
 			"orderby" => "`MainGroup` ASC"
@@ -411,7 +410,6 @@ class crr02_stok extends crTableBase {
 			$fld->LookupFilters = array("d" => "DB", "f0" => '`SubGroup` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter), "f1" => '`MainGroup` = {filter_value}', "t1" => "200", "fn1" => "", "af" => json_encode($fld->AdvancedFilters));
 		$sWhereWrk = "{filter}";
 		$fld->LookupFilters += array(
-			"dx1" => '`SubGroup`',
 			"select" => "SELECT DISTINCT `SubGroup`, `SubGroup` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v02_stok`",
 			"where" => $sWhereWrk,
 			"orderby" => "`SubGroup` ASC"
@@ -423,7 +421,6 @@ class crr02_stok extends crTableBase {
 			$fld->LookupFilters = array("d" => "DB", "f0" => '`Article` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter), "f1" => '`MainGroup` = {filter_value}', "t1" => "200", "fn1" => "", "f2" => '`SubGroup` = {filter_value}', "t2" => "200", "fn2" => "", "af" => json_encode($fld->AdvancedFilters));
 		$sWhereWrk = "{filter}";
 		$fld->LookupFilters += array(
-			"dx1" => '`Article`',
 			"select" => "SELECT DISTINCT `Article`, `Article` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v02_stok`",
 			"where" => $sWhereWrk,
 			"orderby" => "`Article` ASC"
