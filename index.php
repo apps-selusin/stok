@@ -303,8 +303,10 @@ class cdefault {
 			$this->setFailureMessage($Language->Phrase("SessionExpired"));
 		if (!$Security->IsLoggedIn()) $Security->AutoLogin();
 		$Security->LoadUserLevel(); // Load User Level
+		if ($Security->AllowList(CurrentProjectID() . 'cf02_home.php'))
+		$this->Page_Terminate("cf02_home.php"); // Exit and go to default page
 		if ($Security->AllowList(CurrentProjectID() . 'cf01_home.php'))
-		$this->Page_Terminate("cf01_home.php"); // Exit and go to default page
+			$this->Page_Terminate("cf01_home.php");
 		if ($Security->AllowList(CurrentProjectID() . 't01_company'))
 			$this->Page_Terminate("t01_companylist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't02_vendor'))
@@ -347,8 +349,6 @@ class cdefault {
 			$this->Page_Terminate("t98_userlevelpermissionslist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't99_audittrail'))
 			$this->Page_Terminate("t99_audittraillist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'cf02_home.php'))
-			$this->Page_Terminate("cf02_home.php");
 		if ($Security->IsLoggedIn()) {
 			$this->setFailureMessage(ew_DeniedMsg() . "<br><br><a href=\"logout.php\">" . $Language->Phrase("BackToLogin") . "</a>");
 		} else {

@@ -639,6 +639,7 @@ class ct08_beli_delete extends ct08_beli {
 		if ($this->ArticleID->VirtualValue <> "") {
 			$this->ArticleID->ViewValue = $this->ArticleID->VirtualValue;
 		} else {
+			$this->ArticleID->ViewValue = $this->ArticleID->CurrentValue;
 		if (strval($this->ArticleID->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->ArticleID->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `v05_article`";
@@ -966,6 +967,7 @@ ft08_belidelete.Lists["x_VendorID"] = {"LinkField":"x_id","Ajax":true,"AutoFill"
 ft08_belidelete.Lists["x_VendorID"].Data = "<?php echo $t08_beli_delete->VendorID->LookupFilterQuery(FALSE, "delete") ?>";
 ft08_belidelete.Lists["x_ArticleID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Kode","x_Nama","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"v05_article"};
 ft08_belidelete.Lists["x_ArticleID"].Data = "<?php echo $t08_beli_delete->ArticleID->LookupFilterQuery(FALSE, "delete") ?>";
+ft08_belidelete.AutoSuggests["x_ArticleID"] = <?php echo json_encode(array("data" => "ajax=autosuggest&" . $t08_beli_delete->ArticleID->LookupFilterQuery(TRUE, "delete"))) ?>;
 ft08_belidelete.Lists["x_SatuanID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_satuan"};
 ft08_belidelete.Lists["x_SatuanID"].Data = "<?php echo $t08_beli_delete->SatuanID->LookupFilterQuery(FALSE, "delete") ?>";
 ft08_belidelete.AutoSuggests["x_SatuanID"] = <?php echo json_encode(array("data" => "ajax=autosuggest&" . $t08_beli_delete->SatuanID->LookupFilterQuery(TRUE, "delete"))) ?>;

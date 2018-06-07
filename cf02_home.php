@@ -349,15 +349,15 @@ Page_Rendering();
 $db =& DbHelper(); 
 
 function show_table($r) {
-	echo "<table border='0'>";
+	echo "<table class='table table-striped table-bordered table-hover table-condensed'>";
+	echo "<tr><th>No.</th><th colspan='4'>Keterangan</th></tr>";
 	while (!$r->EOF) {
 		$no = $r->fields["No"];
-		echo "<tr><td>".$no.".</td><td colspan='3'>".$r->fields["Keterangan"]."</td></tr>";
-		echo "<tr><td>&nbsp;</td><td>";
-		echo "<table border='1'>";
+		echo "<tr><td>".$no.".</td><td colspan='4'>".$r->fields["Keterangan"]."</td></tr>";
 		while ($no == $r->fields["No"]) {
 			echo "
 			<tr>
+				<td>&nbsp;</td>
 				<td>&nbsp;</td>
 				<td>".$r->fields["TanggalJam"]."</td>
 				<td>".$r->fields["Status2"]."</td>
@@ -365,8 +365,7 @@ function show_table($r) {
 			</tr>";
 			$r->MoveNext();
 		}
-		echo "</table></td></tr>";
-		echo "<tr><td>&nbsp;</td></tr>";
+		echo "<tr><td colspan='5'>&nbsp;</td></tr>";
 	}
 	echo "</table>";
 }
@@ -389,33 +388,30 @@ function show_table($r) {
 <div class="row">
 
 	<div class="col-lg-12 col-md-12 col-sm-12">
-	<div class="panel panel-default">
-		<div class="panel-heading"><strong><a data-toggle="collapse" href="#log">Log</a></strong></div>
-		<div class="panel-body">
-			<?php
-			// $sql = "SELECT tgl, jdl, ket, done FROM t95_homedetail where kat = '5log'
-			// 	order by `tgl` DESC, `kat` ASC, `no_jdl` ASC, `no_ket` ASC";
-			// $r = Conn()->Execute($sql);
-			// show_table($r);
-			$q = "
-				select distinct
-					a.No,
-					a.Keterangan,
-					a.TanggalJam,
-					b.Status as Status2
-				from
-					t92_log a
-					left join t91_log_status b on a.Status = b.id
-				order by
-					no desc,
-					tanggaljam asc";
-			$r = Conn()->Execute($q);
-			// show_table($r);
-			// echo $db->ExecuteHtml($sql, ["fieldcaption" => TRUE, "tablename" => ["products", "categories"]]);
-			echo $db->ExecuteHtml($q, ["fieldcaption" => TRUE, "tablename" => ["t92_log", "t91_log_status"]]); 
-			?>
+		<div class="panel panel-default">
+			<div class="panel-heading"><strong><a class='collapsed' data-toggle="collapse" href="#log">Log</a></strong></div>
+			<div id="log" class="panel-collapse collapse in">
+			<div class="panel-body">
+				<?php
+				$q = "
+					select distinct
+						a.No,
+						a.Keterangan,
+						a.TanggalJam,
+						b.Status as Status2,
+						a.Keterangan2
+					from
+						t92_log a
+						left join t91_log_status b on a.Status = b.id
+					order by
+						no desc,
+						tanggaljam asc";
+				$r = Conn()->Execute($q);
+				show_table($r);
+				?>
+			</div>
+			</div>
 		</div>
-	</div>
 	</div>
 
 </div>

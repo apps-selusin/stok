@@ -370,6 +370,15 @@
   <project>
     <phrase id="bodytitle" value="STOK Apps." />
     <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
+    <menu id="31">
+      <phrase id="menutext" value="t 91 log status" />
+    </menu>
+    <menu id="32">
+      <phrase id="menutext" value="t 92 log" />
+    </menu>
+    <menu id="33">
+      <phrase id="menutext" value="v 05 article" />
+    </menu>
     <menu id="23">
       <phrase id="menutext" value="v 04 jual" />
     </menu>
@@ -575,6 +584,66 @@
       </field>
       <field id="subtotal">
         <phrase id="fldcaption" value="Sub Total" />
+      </field>
+    </table>
+    <table id="r05_mutasi">
+      <phrase id="tblcaption" value="Mutasi" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="tabelid">
+        <phrase id="fldcaption" value="Tabel ID" />
+      </field>
+      <field id="url">
+        <phrase id="fldcaption" value="Url" />
+      </field>
+      <field id="no">
+        <phrase id="fldcaption" value="#" />
+      </field>
+      <field id="articleid">
+        <phrase id="fldcaption" value="Article ID" />
+      </field>
+      <field id="kode">
+        <phrase id="fldcaption" value="Article No." />
+      </field>
+      <field id="articlenama">
+        <phrase id="fldcaption" value="Description" />
+      </field>
+      <field id="nourut">
+        <phrase id="fldcaption" value="No Urut" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="Tgl." />
+      </field>
+      <field id="jam">
+        <phrase id="fldcaption" value="Jam" />
+      </field>
+      <field id="keterangan">
+        <phrase id="fldcaption" value="Keterangan" />
+      </field>
+      <field id="noref">
+        <phrase id="fldcaption" value="No. Ref." />
+      </field>
+      <field id="masukqty">
+        <phrase id="fldcaption" value="Masuk" />
+      </field>
+      <field id="masukharga">
+        <phrase id="fldcaption" value="Masuk Harga" />
+      </field>
+      <field id="keluarqty">
+        <phrase id="fldcaption" value="Keluar" />
+      </field>
+      <field id="keluarharga">
+        <phrase id="fldcaption" value="Keluar Harga" />
+      </field>
+      <field id="saldoqty">
+        <phrase id="fldcaption" value="Saldo" />
+      </field>
+      <field id="saldoharga">
+        <phrase id="fldcaption" value="Saldo Harga" />
+      </field>
+      <field id="maingroup">
+        <phrase id="fldcaption" value="Main Group" />
       </field>
     </table>
     <table id="t01_company">
@@ -858,6 +927,39 @@
       <field id="kode">
         <phrase id="fldcaption" value="Kode" />
       </field>
+      <field id="maingroup">
+        <phrase id="fldcaption" value="Main Group" />
+      </field>
+    </table>
+    <table id="t91_log_status">
+      <phrase id="tblcaption" value="t 91 log status" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
+      </field>
+    </table>
+    <table id="t92_log">
+      <phrase id="tblcaption" value="t 92 log" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="no">
+        <phrase id="fldcaption" value="No" />
+      </field>
+      <field id="keterangan">
+        <phrase id="fldcaption" value="Keterangan" />
+      </field>
+      <field id="status">
+        <phrase id="fldcaption" value="Status" />
+      </field>
+      <field id="tanggaljam">
+        <phrase id="fldcaption" value="Tanggal Jam" />
+      </field>
+      <field id="keterangan2">
+        <phrase id="fldcaption" value="Keterangan 2" />
+      </field>
     </table>
     <table id="t93_parameter">
       <phrase id="tblcaption" value="t 93 parameter" />
@@ -1132,61 +1234,31 @@
         <phrase id="fldcaption" value="Sub Total" />
       </field>
     </table>
-    <table id="r05_mutasi">
-      <phrase id="tblcaption" value="Mutasi" />
+    <table id="v05_article">
+      <phrase id="tblcaption" value="v 05 article" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
-      <field id="tabelid">
-        <phrase id="fldcaption" value="Tabel ID" />
-      </field>
-      <field id="url">
-        <phrase id="fldcaption" value="Url" />
-      </field>
-      <field id="no">
-        <phrase id="fldcaption" value="#" />
-      </field>
-      <field id="articleid">
-        <phrase id="fldcaption" value="Article ID" />
+      <field id="subgroupid">
+        <phrase id="fldcaption" value="Sub Group ID" />
       </field>
       <field id="kode">
-        <phrase id="fldcaption" value="Article No." />
+        <phrase id="fldcaption" value="Kode" />
       </field>
-      <field id="articlenama">
-        <phrase id="fldcaption" value="Description" />
+      <field id="nama">
+        <phrase id="fldcaption" value="Nama" />
       </field>
-      <field id="nourut">
-        <phrase id="fldcaption" value="No Urut" />
+      <field id="qty">
+        <phrase id="fldcaption" value="Qty" />
       </field>
-      <field id="tgl">
-        <phrase id="fldcaption" value="Tgl." />
+      <field id="satuanid">
+        <phrase id="fldcaption" value="Satuan ID" />
       </field>
-      <field id="jam">
-        <phrase id="fldcaption" value="Jam" />
+      <field id="harga">
+        <phrase id="fldcaption" value="Harga" />
       </field>
-      <field id="keterangan">
-        <phrase id="fldcaption" value="Keterangan" />
-      </field>
-      <field id="noref">
-        <phrase id="fldcaption" value="No. Ref." />
-      </field>
-      <field id="masukqty">
-        <phrase id="fldcaption" value="Masuk" />
-      </field>
-      <field id="masukharga">
-        <phrase id="fldcaption" value="Masuk Harga" />
-      </field>
-      <field id="keluarqty">
-        <phrase id="fldcaption" value="Keluar" />
-      </field>
-      <field id="keluarharga">
-        <phrase id="fldcaption" value="Keluar Harga" />
-      </field>
-      <field id="saldoqty">
-        <phrase id="fldcaption" value="Saldo" />
-      </field>
-      <field id="saldoharga">
-        <phrase id="fldcaption" value="Saldo Harga" />
+      <field id="hargajual">
+        <phrase id="fldcaption" value="Harga Jual" />
       </field>
     </table>
   </project>

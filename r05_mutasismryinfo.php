@@ -27,6 +27,7 @@ class crr05_mutasi extends crTableBase {
 	var $KeluarHarga;
 	var $SaldoQty;
 	var $SaldoHarga;
+	var $MainGroup;
 
 	//
 	// Table class constructor
@@ -126,7 +127,7 @@ class crr05_mutasi extends crTableBase {
 		// Tgl
 		$this->Tgl = new crField('r05_mutasi', 'r05_mutasi', 'x_Tgl', 'Tgl', '`Tgl`', 133, EWR_DATATYPE_DATE, 7);
 		$this->Tgl->Sortable = TRUE; // Allow sort
-		$this->Tgl->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectField");
+		$this->Tgl->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_SEPARATOR"], $ReportLanguage->Phrase("IncorrectDateDMY"));
 		$this->Tgl->DateFilter = "";
 		$this->Tgl->SqlSelect = "";
 		$this->Tgl->SqlOrderBy = "";
@@ -210,6 +211,14 @@ class crr05_mutasi extends crTableBase {
 		$this->SaldoHarga->SqlSelect = "";
 		$this->SaldoHarga->SqlOrderBy = "";
 		$this->fields['SaldoHarga'] = &$this->SaldoHarga;
+
+		// MainGroup
+		$this->MainGroup = new crField('r05_mutasi', 'r05_mutasi', 'x_MainGroup', 'MainGroup', '`MainGroup`', 200, EWR_DATATYPE_STRING, -1);
+		$this->MainGroup->Sortable = TRUE; // Allow sort
+		$this->MainGroup->DateFilter = "";
+		$this->MainGroup->SqlSelect = "";
+		$this->MainGroup->SqlOrderBy = "";
+		$this->fields['MainGroup'] = &$this->MainGroup;
 	}
 
 	// Set Field Visibility
@@ -296,7 +305,7 @@ class crr05_mutasi extends crTableBase {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() {
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (select nama from t06_article where id = articleid) AS `ArticleNama`, 0 AS `No` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (select nama from t06_article where id = articleid) AS `ArticleNama`, 0 AS `No`, substr(kode,1,1) AS `MainGroup` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -495,17 +504,6 @@ class crr05_mutasi extends crTableBase {
 	function SetupLookupFilters($fld) {
 		global $grLanguage;
 		switch ($fld->FldVar) {
-		case "x_Kode":
-			$fld->LookupFilters = array("d" => "DB", "f0" => '`Kode` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter), "af" => json_encode($fld->AdvancedFilters));
-		$sWhereWrk = "";
-		$fld->LookupFilters += array(
-			"select" => "SELECT DISTINCT `Kode`, `Kode` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `t13_mutasi`",
-			"where" => $sWhereWrk,
-			"orderby" => "`Kode` ASC"
-		);
-		$this->Lookup_Selecting($fld, $fld->LookupFilters["where"]); // Call Lookup selecting
-		$fld->LookupFilters["s"] = ewr_BuildReportSql($fld->LookupFilters["select"], $fld->LookupFilters["where"], "", "", $fld->LookupFilters["orderby"], "", "");
-			break;
 		}
 	}
 

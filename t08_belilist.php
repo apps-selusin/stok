@@ -2001,6 +2001,7 @@ class ct08_beli_list extends ct08_beli {
 		if ($this->ArticleID->VirtualValue <> "") {
 			$this->ArticleID->ViewValue = $this->ArticleID->VirtualValue;
 		} else {
+			$this->ArticleID->ViewValue = $this->ArticleID->CurrentValue;
 		if (strval($this->ArticleID->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->ArticleID->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `v05_article`";
@@ -2150,30 +2151,31 @@ class ct08_beli_list extends ct08_beli {
 			$this->VendorID->EditValue = $arwrk;
 
 			// ArticleID
+			$this->ArticleID->EditAttrs["class"] = "form-control";
 			$this->ArticleID->EditCustomAttributes = "";
-			if (trim(strval($this->ArticleID->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
+			$this->ArticleID->EditValue = ew_HtmlEncode($this->ArticleID->CurrentValue);
+			if (strval($this->ArticleID->CurrentValue) <> "") {
 				$sFilterWrk = "`id`" . ew_SearchString("=", $this->ArticleID->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `v05_article`";
+			$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `v05_article`";
 			$sWhereWrk = "";
 			$this->ArticleID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$arwrk[2] = ew_HtmlEncode($rswrk->fields('Disp2Fld'));
-				$this->ArticleID->ViewValue = $this->ArticleID->DisplayValue($arwrk);
+				$rswrk = Conn()->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$arwrk = array();
+					$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
+					$arwrk[2] = ew_HtmlEncode($rswrk->fields('Disp2Fld'));
+					$this->ArticleID->EditValue = $this->ArticleID->DisplayValue($arwrk);
+					$rswrk->Close();
+				} else {
+					$this->ArticleID->EditValue = ew_HtmlEncode($this->ArticleID->CurrentValue);
+				}
 			} else {
-				$this->ArticleID->ViewValue = $Language->Phrase("PleaseSelect");
+				$this->ArticleID->EditValue = NULL;
 			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->ArticleID->EditValue = $arwrk;
+			$this->ArticleID->PlaceHolder = ew_RemoveHtml($this->ArticleID->FldCaption());
 
 			// Harga
 			$this->Harga->EditAttrs["class"] = "form-control";
@@ -2295,30 +2297,31 @@ class ct08_beli_list extends ct08_beli {
 			$this->VendorID->EditValue = $arwrk;
 
 			// ArticleID
+			$this->ArticleID->EditAttrs["class"] = "form-control";
 			$this->ArticleID->EditCustomAttributes = "";
-			if (trim(strval($this->ArticleID->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
+			$this->ArticleID->EditValue = ew_HtmlEncode($this->ArticleID->CurrentValue);
+			if (strval($this->ArticleID->CurrentValue) <> "") {
 				$sFilterWrk = "`id`" . ew_SearchString("=", $this->ArticleID->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `v05_article`";
+			$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `v05_article`";
 			$sWhereWrk = "";
 			$this->ArticleID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
 			ew_AddFilter($sWhereWrk, $sFilterWrk);
 			$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
 			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$arwrk[2] = ew_HtmlEncode($rswrk->fields('Disp2Fld'));
-				$this->ArticleID->ViewValue = $this->ArticleID->DisplayValue($arwrk);
+				$rswrk = Conn()->Execute($sSqlWrk);
+				if ($rswrk && !$rswrk->EOF) { // Lookup values found
+					$arwrk = array();
+					$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
+					$arwrk[2] = ew_HtmlEncode($rswrk->fields('Disp2Fld'));
+					$this->ArticleID->EditValue = $this->ArticleID->DisplayValue($arwrk);
+					$rswrk->Close();
+				} else {
+					$this->ArticleID->EditValue = ew_HtmlEncode($this->ArticleID->CurrentValue);
+				}
 			} else {
-				$this->ArticleID->ViewValue = $Language->Phrase("PleaseSelect");
+				$this->ArticleID->EditValue = NULL;
 			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->ArticleID->EditValue = $arwrk;
+			$this->ArticleID->PlaceHolder = ew_RemoveHtml($this->ArticleID->FldCaption());
 
 			// Harga
 			$this->Harga->EditAttrs["class"] = "form-control";
@@ -2923,6 +2926,18 @@ class ct08_beli_list extends ct08_beli {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
+		case "x_ArticleID":
+			$sSqlWrk = "";
+			$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld` FROM `v05_article`";
+			$sWhereWrk = "`Kode` LIKE '{query_value}%' OR CONCAT(COALESCE(`Kode`, ''),'" . ew_ValueSeparator(1, $this->ArticleID) . "',COALESCE(`Nama`,'')) LIKE '{query_value}%'";
+			$fld->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "");
+			$sSqlWrk = "";
+			$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
+			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			if ($sSqlWrk <> "")
+				$fld->LookupFilters["s"] .= $sSqlWrk;
+			break;
 		case "x_SatuanID":
 			$sSqlWrk = "";
 			$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld` FROM `t07_satuan`";
@@ -3157,6 +3172,7 @@ ft08_belilist.Lists["x_VendorID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":f
 ft08_belilist.Lists["x_VendorID"].Data = "<?php echo $t08_beli_list->VendorID->LookupFilterQuery(FALSE, "list") ?>";
 ft08_belilist.Lists["x_ArticleID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":true,"DisplayFields":["x_Kode","x_Nama","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"v05_article"};
 ft08_belilist.Lists["x_ArticleID"].Data = "<?php echo $t08_beli_list->ArticleID->LookupFilterQuery(FALSE, "list") ?>";
+ft08_belilist.AutoSuggests["x_ArticleID"] = <?php echo json_encode(array("data" => "ajax=autosuggest&" . $t08_beli_list->ArticleID->LookupFilterQuery(TRUE, "list"))) ?>;
 ft08_belilist.Lists["x_SatuanID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_Nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t07_satuan"};
 ft08_belilist.Lists["x_SatuanID"].Data = "<?php echo $t08_beli_list->SatuanID->LookupFilterQuery(FALSE, "list") ?>";
 ft08_belilist.AutoSuggests["x_SatuanID"] = <?php echo json_encode(array("data" => "ajax=autosuggest&" . $t08_beli_list->SatuanID->LookupFilterQuery(TRUE, "list"))) ?>;
@@ -3490,12 +3506,19 @@ ew_CreateDateTimePicker("ft08_belilist", "x<?php echo $t08_beli_list->RowIndex ?
 	<?php if ($t08_beli->ArticleID->Visible) { // ArticleID ?>
 		<td data-name="ArticleID">
 <span id="el<?php echo $t08_beli_list->RowCnt ?>_t08_beli_ArticleID" class="form-group t08_beli_ArticleID">
-<?php $t08_beli->ArticleID->EditAttrs["onchange"] = "ew_AutoFill(this); " . @$t08_beli->ArticleID->EditAttrs["onchange"]; ?>
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t08_beli_list->RowIndex ?>_ArticleID"><?php echo (strval($t08_beli->ArticleID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t08_beli->ArticleID->ViewValue); ?></span>
+<?php
+$wrkonchange = trim("ew_AutoFill(this); " . @$t08_beli->ArticleID->EditAttrs["onchange"]);
+if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
+$t08_beli->ArticleID->EditAttrs["onchange"] = "";
+?>
+<span id="as_x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" style="white-space: nowrap; z-index: <?php echo (9000 - $t08_beli_list->RowCnt * 10) ?>">
+	<input type="text" name="sv_x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" id="sv_x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" value="<?php echo $t08_beli->ArticleID->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($t08_beli->ArticleID->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t08_beli->ArticleID->getPlaceHolder()) ?>"<?php echo $t08_beli->ArticleID->EditAttributes() ?>>
 </span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t08_beli->ArticleID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t08_beli_list->RowIndex ?>_ArticleID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t08_beli->ArticleID->ReadOnly || $t08_beli->ArticleID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t08_beli" data-field="x_ArticleID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t08_beli->ArticleID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" id="x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" value="<?php echo $t08_beli->ArticleID->CurrentValue ?>"<?php echo $t08_beli->ArticleID->EditAttributes() ?>>
+<input type="hidden" data-table="t08_beli" data-field="x_ArticleID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t08_beli->ArticleID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" id="x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" value="<?php echo ew_HtmlEncode($t08_beli->ArticleID->CurrentValue) ?>"<?php echo $wrkonchange ?>>
+<script type="text/javascript">
+ft08_belilist.CreateAutoSuggest({"id":"x<?php echo $t08_beli_list->RowIndex ?>_ArticleID","forceSelect":true});
+</script>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t08_beli->ArticleID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t08_beli_list->RowIndex ?>_ArticleID',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t08_beli->ArticleID->ReadOnly || $t08_beli->ArticleID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="ln_x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" id="ln_x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" value="x<?php echo $t08_beli_list->RowIndex ?>_Harga,x<?php echo $t08_beli_list->RowIndex ?>_SatuanID">
 </span>
 <input type="hidden" data-table="t08_beli" data-field="x_ArticleID" name="o<?php echo $t08_beli_list->RowIndex ?>_ArticleID" id="o<?php echo $t08_beli_list->RowIndex ?>_ArticleID" value="<?php echo ew_HtmlEncode($t08_beli->ArticleID->OldValue) ?>">
@@ -3699,12 +3722,19 @@ ew_CreateDateTimePicker("ft08_belilist", "x<?php echo $t08_beli_list->RowIndex ?
 		<td data-name="ArticleID"<?php echo $t08_beli->ArticleID->CellAttributes() ?>>
 <?php if ($t08_beli->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t08_beli_list->RowCnt ?>_t08_beli_ArticleID" class="form-group t08_beli_ArticleID">
-<?php $t08_beli->ArticleID->EditAttrs["onchange"] = "ew_AutoFill(this); " . @$t08_beli->ArticleID->EditAttrs["onchange"]; ?>
-<span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x<?php echo $t08_beli_list->RowIndex ?>_ArticleID"><?php echo (strval($t08_beli->ArticleID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t08_beli->ArticleID->ViewValue); ?></span>
+<?php
+$wrkonchange = trim("ew_AutoFill(this); " . @$t08_beli->ArticleID->EditAttrs["onchange"]);
+if ($wrkonchange <> "") $wrkonchange = " onchange=\"" . ew_JsEncode2($wrkonchange) . "\"";
+$t08_beli->ArticleID->EditAttrs["onchange"] = "";
+?>
+<span id="as_x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" style="white-space: nowrap; z-index: <?php echo (9000 - $t08_beli_list->RowCnt * 10) ?>">
+	<input type="text" name="sv_x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" id="sv_x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" value="<?php echo $t08_beli->ArticleID->EditValue ?>" size="30" placeholder="<?php echo ew_HtmlEncode($t08_beli->ArticleID->getPlaceHolder()) ?>" data-placeholder="<?php echo ew_HtmlEncode($t08_beli->ArticleID->getPlaceHolder()) ?>"<?php echo $t08_beli->ArticleID->EditAttributes() ?>>
 </span>
-<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t08_beli->ArticleID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t08_beli_list->RowIndex ?>_ArticleID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t08_beli->ArticleID->ReadOnly || $t08_beli->ArticleID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
-<input type="hidden" data-table="t08_beli" data-field="x_ArticleID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t08_beli->ArticleID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" id="x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" value="<?php echo $t08_beli->ArticleID->CurrentValue ?>"<?php echo $t08_beli->ArticleID->EditAttributes() ?>>
+<input type="hidden" data-table="t08_beli" data-field="x_ArticleID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t08_beli->ArticleID->DisplayValueSeparatorAttribute() ?>" name="x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" id="x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" value="<?php echo ew_HtmlEncode($t08_beli->ArticleID->CurrentValue) ?>"<?php echo $wrkonchange ?>>
+<script type="text/javascript">
+ft08_belilist.CreateAutoSuggest({"id":"x<?php echo $t08_beli_list->RowIndex ?>_ArticleID","forceSelect":true});
+</script>
+<button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t08_beli->ArticleID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x<?php echo $t08_beli_list->RowIndex ?>_ArticleID',m:0,n:10,srch:false});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t08_beli->ArticleID->ReadOnly || $t08_beli->ArticleID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" name="ln_x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" id="ln_x<?php echo $t08_beli_list->RowIndex ?>_ArticleID" value="x<?php echo $t08_beli_list->RowIndex ?>_Harga,x<?php echo $t08_beli_list->RowIndex ?>_SatuanID">
 </span>
 <?php } ?>

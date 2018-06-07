@@ -436,12 +436,12 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		$item = &$this->SearchOptions->Add("searchtoggle");
 		$SearchToggleClass = $this->FilterApplied ? " active" : " active";
 		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $ReportLanguage->Phrase("SearchBtn", TRUE) . "\" data-caption=\"" . $ReportLanguage->Phrase("SearchBtn", TRUE) . "\" data-toggle=\"button\" data-form=\"fr05_mutasisummary\">" . $ReportLanguage->Phrase("SearchBtn") . "</button>";
-		$item->Visible = TRUE;
+		$item->Visible = FALSE;
 
 		// Reset filter
 		$item = &$this->SearchOptions->Add("resetfilter");
 		$item->Body = "<button type=\"button\" class=\"btn btn-default\" title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ResetAllFilter", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ResetAllFilter", TRUE)) . "\" onclick=\"location='" . ewr_CurrentPage() . "?cmd=reset'\">" . $ReportLanguage->Phrase("ResetAllFilter") . "</button>";
-		$item->Visible = TRUE && $this->FilterApplied;
+		$item->Visible = FALSE && $this->FilterApplied;
 
 		// Button group for reset filter
 		$this->SearchOptions->UseButtonGroup = TRUE;
@@ -582,12 +582,13 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		$this->MasukQty->SetVisibility();
 		$this->KeluarQty->SetVisibility();
 		$this->SaldoQty->SetVisibility();
+		$this->MainGroup->SetVisibility();
 
 		// Aggregate variables
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 9;
+		$nDtls = 10;
 		$nGrps = 3;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -600,7 +601,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(FALSE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -608,12 +609,6 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		// Set up Breadcrumb
 		if ($this->Export == "")
 			$this->SetupBreadcrumb();
-
-		// Check if search command
-		$this->SearchCommand = (@$_GET["cmd"] == "search");
-
-		// Load default filter values
-		$this->LoadDefaultFilters();
 
 		// Load custom filters
 		$this->Page_FilterLoad();
@@ -630,21 +625,16 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		// Extended filter
 		$sExtendedFilter = "";
 
-		// Restore filter list
-		$this->RestoreFilterList();
-
-		// Build extended filter
-		$sExtendedFilter = $this->GetExtendedFilter();
-		ewr_AddFilter($this->Filter, $sExtendedFilter);
-
 		// Build popup filter
 		$sPopupFilter = $this->GetPopupFilter();
 
 		//ewr_SetDebugMsg("popup filter: " . $sPopupFilter);
 		ewr_AddFilter($this->Filter, $sPopupFilter);
 
-		// Check if filter applied
-		$this->FilterApplied = $this->CheckFilter();
+		// No filter
+		$this->FilterApplied = FALSE;
+		$this->FilterOptions->GetItem("savecurrentfilter")->Visible = FALSE;
+		$this->FilterOptions->GetItem("deletefilter")->Visible = FALSE;
 
 		// Call Page Selecting event
 		$this->Page_Selecting($this->Filter);
@@ -912,6 +902,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 				$this->FirstRowData['KeluarHarga'] = ewr_Conv($rs->fields('KeluarHarga'), 4);
 				$this->FirstRowData['SaldoQty'] = ewr_Conv($rs->fields('SaldoQty'), 4);
 				$this->FirstRowData['SaldoHarga'] = ewr_Conv($rs->fields('SaldoHarga'), 4);
+				$this->FirstRowData['MainGroup'] = ewr_Conv($rs->fields('MainGroup'), 200);
 			}
 		} else { // Get next row
 			$rs->MoveNext();
@@ -940,6 +931,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->KeluarHarga->setDbValue($rs->fields('KeluarHarga'));
 			$this->SaldoQty->setDbValue($rs->fields('SaldoQty'));
 			$this->SaldoHarga->setDbValue($rs->fields('SaldoHarga'));
+			$this->MainGroup->setDbValue($rs->fields('MainGroup'));
 			$this->Val[1] = $this->No->CurrentValue;
 			$this->Val[2] = $this->ArticleID->CurrentValue;
 			$this->Val[3] = $this->Tgl->CurrentValue;
@@ -948,6 +940,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->Val[6] = $this->MasukQty->CurrentValue;
 			$this->Val[7] = $this->KeluarQty->CurrentValue;
 			$this->Val[8] = $this->SaldoQty->CurrentValue;
+			$this->Val[9] = $this->MainGroup->CurrentValue;
 		} else {
 			$this->id->setDbValue("");
 			$this->TabelID->setDbValue("");
@@ -967,6 +960,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->KeluarHarga->setDbValue("");
 			$this->SaldoQty->setDbValue("");
 			$this->SaldoHarga->setDbValue("");
+			$this->MainGroup->setDbValue("");
 		}
 	}
 
@@ -1055,13 +1049,6 @@ class crr05_mutasi_summary extends crr05_mutasi {
 					$arValues = $_POST["sel_$sName"];
 					if (trim($arValues[0]) == "") // Select all
 						$arValues = EWR_INIT_VALUE;
-					$this->PopupName = $sName;
-					if (ewr_IsAdvancedFilterValue($arValues) || $arValues == EWR_INIT_VALUE)
-						$this->PopupValue = $arValues;
-					if (!ewr_MatchedArray($arValues, $_SESSION["sel_$sName"])) {
-						if ($this->HasSessionFilterValues($sName))
-							$this->ClearExtFilter = $sName; // Clear extended filter for this field
-					}
 					$_SESSION["sel_$sName"] = $arValues;
 					$_SESSION["rf_$sName"] = @$_POST["rf_$sName"];
 					$_SESSION["rt_$sName"] = @$_POST["rt_$sName"];
@@ -1149,6 +1136,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 				$this->GrandCnt[7] = $this->TotCount;
 				$this->GrandSmry[7] = $rsagg->fields("sum_keluarqty");
 				$this->GrandCnt[8] = $this->TotCount;
+				$this->GrandCnt[9] = $this->TotCount;
 				$rsagg->Close();
 				$bGotSummary = TRUE;
 			}
@@ -1238,6 +1226,9 @@ class crr05_mutasi_summary extends crr05_mutasi {
 
 			// SaldoQty
 			$this->SaldoQty->HrefValue = "";
+
+			// MainGroup
+			$this->MainGroup->HrefValue = "";
 		} else {
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER) {
 			$this->RowAttrs["data-group"] = $this->Kode->GroupValue(); // Set up group attribute
@@ -1300,6 +1291,10 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->SaldoQty->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 			$this->SaldoQty->CellAttrs["style"] = "text-align:right;";
 
+			// MainGroup
+			$this->MainGroup->ViewValue = $this->MainGroup->CurrentValue;
+			$this->MainGroup->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
 			// Kode
 			$this->Kode->HrefValue = "";
 
@@ -1329,6 +1324,9 @@ class crr05_mutasi_summary extends crr05_mutasi {
 
 			// SaldoQty
 			$this->SaldoQty->HrefValue = "";
+
+			// MainGroup
+			$this->MainGroup->HrefValue = "";
 		}
 
 		// Call Cell_Rendered event
@@ -1460,6 +1458,15 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$HrefValue = &$this->SaldoQty->HrefValue;
 			$LinkAttrs = &$this->SaldoQty->LinkAttrs;
 			$this->Cell_Rendered($this->SaldoQty, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// MainGroup
+			$CurrentValue = $this->MainGroup->CurrentValue;
+			$ViewValue = &$this->MainGroup->ViewValue;
+			$ViewAttrs = &$this->MainGroup->ViewAttrs;
+			$CellAttrs = &$this->MainGroup->CellAttrs;
+			$HrefValue = &$this->MainGroup->HrefValue;
+			$LinkAttrs = &$this->MainGroup->LinkAttrs;
+			$this->Cell_Rendered($this->MainGroup, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 		}
 
 		// Call Row_Rendered event
@@ -1482,6 +1489,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		if ($this->MasukQty->Visible) $this->DtlColumnCount += 1;
 		if ($this->KeluarQty->Visible) $this->DtlColumnCount += 1;
 		if ($this->SaldoQty->Visible) $this->DtlColumnCount += 1;
+		if ($this->MainGroup->Visible) $this->DtlColumnCount += 1;
 	}
 
 	// Set up Breadcrumb
@@ -1504,480 +1512,6 @@ class crr05_mutasi_summary extends crr05_mutasi {
 		$url = $this->ExportPdfUrl;
 		$item->Body = "<a class=\"ewrExportLink ewPdf\" title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToPDF", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToPDF", TRUE)) . "\" href=\"javascript:void(0);\" onclick=\"ewr_ExportCharts(this, '" . $url . "', '" . $exportid . "');\">" . $ReportLanguage->Phrase("ExportToPDF") . "</a>";
 		$ReportOptions["ReportTypes"] = $ReportTypes;
-	}
-
-	// Return extended filter
-	function GetExtendedFilter() {
-		global $grFormError;
-		$sFilter = "";
-		if ($this->DrillDown)
-			return "";
-		$bPostBack = ewr_IsHttpPost();
-		$bRestoreSession = TRUE;
-		$bSetupFilter = FALSE;
-
-		// Reset extended filter if filter changed
-		if ($bPostBack) {
-
-		// Reset search command
-		} elseif (@$_GET["cmd"] == "reset") {
-
-			// Load default values
-			$this->SetSessionDropDownValue($this->Kode->DropDownValue, $this->Kode->SearchOperator, 'Kode'); // Field Kode
-
-			//$bSetupFilter = TRUE; // No need to set up, just use default
-		} else {
-			$bRestoreSession = !$this->SearchCommand;
-
-			// Field Kode
-			if ($this->GetDropDownValue($this->Kode)) {
-				$bSetupFilter = TRUE;
-			} elseif ($this->Kode->DropDownValue <> EWR_INIT_VALUE && !isset($_SESSION['sv_r05_mutasi_Kode'])) {
-				$bSetupFilter = TRUE;
-			}
-			if (!$this->ValidateForm()) {
-				$this->setFailureMessage($grFormError);
-				return $sFilter;
-			}
-		}
-
-		// Restore session
-		if ($bRestoreSession) {
-			$this->GetSessionDropDownValue($this->Kode); // Field Kode
-		}
-
-		// Call page filter validated event
-		$this->Page_FilterValidated();
-
-		// Build SQL
-		$this->BuildDropDownFilter($this->Kode, $sFilter, $this->Kode->SearchOperator, FALSE, TRUE); // Field Kode
-
-		// Save parms to session
-		$this->SetSessionDropDownValue($this->Kode->DropDownValue, $this->Kode->SearchOperator, 'Kode'); // Field Kode
-
-		// Setup filter
-		if ($bSetupFilter) {
-		}
-
-		// Field Kode
-		ewr_LoadDropDownList($this->Kode->DropDownList, $this->Kode->DropDownValue);
-		return $sFilter;
-	}
-
-	// Build dropdown filter
-	function BuildDropDownFilter(&$fld, &$FilterClause, $FldOpr, $Default = FALSE, $SaveFilter = FALSE) {
-		$FldVal = ($Default) ? $fld->DefaultDropDownValue : $fld->DropDownValue;
-		$sSql = "";
-		if (is_array($FldVal)) {
-			foreach ($FldVal as $val) {
-				$sWrk = $this->GetDropDownFilter($fld, $val, $FldOpr);
-
-				// Call Page Filtering event
-				if (substr($val, 0, 2) <> "@@")
-					$this->Page_Filtering($fld, $sWrk, "dropdown", $FldOpr, $val);
-				if ($sWrk <> "") {
-					if ($sSql <> "")
-						$sSql .= " OR " . $sWrk;
-					else
-						$sSql = $sWrk;
-				}
-			}
-		} else {
-			$sSql = $this->GetDropDownFilter($fld, $FldVal, $FldOpr);
-
-			// Call Page Filtering event
-			if (substr($FldVal, 0, 2) <> "@@")
-				$this->Page_Filtering($fld, $sSql, "dropdown", $FldOpr, $FldVal);
-		}
-		if ($sSql <> "") {
-			ewr_AddFilter($FilterClause, $sSql);
-			if ($SaveFilter) $fld->CurrentFilter = $sSql;
-		}
-	}
-
-	function GetDropDownFilter(&$fld, $FldVal, $FldOpr) {
-		$FldName = $fld->FldName;
-		$FldExpression = $fld->FldExpression;
-		$FldDataType = $fld->FldDataType;
-		$FldDelimiter = $fld->FldDelimiter;
-		$FldVal = strval($FldVal);
-		if ($FldOpr == "") $FldOpr = "=";
-		$sWrk = "";
-		if (ewr_SameStr($FldVal, EWR_NULL_VALUE)) {
-			$sWrk = $FldExpression . " IS NULL";
-		} elseif (ewr_SameStr($FldVal, EWR_NOT_NULL_VALUE)) {
-			$sWrk = $FldExpression . " IS NOT NULL";
-		} elseif (ewr_SameStr($FldVal, EWR_EMPTY_VALUE)) {
-			$sWrk = $FldExpression . " = ''";
-		} elseif (ewr_SameStr($FldVal, EWR_ALL_VALUE)) {
-			$sWrk = "1 = 1";
-		} else {
-			if (substr($FldVal, 0, 2) == "@@") {
-				$sWrk = $this->GetCustomFilter($fld, $FldVal, $this->DBID);
-			} elseif ($FldDelimiter <> "" && trim($FldVal) <> "" && ($FldDataType == EWR_DATATYPE_STRING || $FldDataType == EWR_DATATYPE_MEMO)) {
-				$sWrk = ewr_GetMultiSearchSql($FldExpression, trim($FldVal), $this->DBID);
-			} else {
-				if ($FldVal <> "" && $FldVal <> EWR_INIT_VALUE) {
-					if ($FldDataType == EWR_DATATYPE_DATE && $FldOpr <> "") {
-						$sWrk = ewr_DateFilterString($FldExpression, $FldOpr, $FldVal, $FldDataType, $this->DBID);
-					} else {
-						$sWrk = ewr_FilterString($FldOpr, $FldVal, $FldDataType, $this->DBID);
-						if ($sWrk <> "") $sWrk = $FldExpression . $sWrk;
-					}
-				}
-			}
-		}
-		return $sWrk;
-	}
-
-	// Get custom filter
-	function GetCustomFilter(&$fld, $FldVal, $dbid = 0) {
-		$sWrk = "";
-		if (is_array($fld->AdvancedFilters)) {
-			foreach ($fld->AdvancedFilters as $filter) {
-				if ($filter->ID == $FldVal && $filter->Enabled) {
-					$sFld = $fld->FldExpression;
-					$sFn = $filter->FunctionName;
-					$wrkid = (substr($filter->ID, 0, 2) == "@@") ? substr($filter->ID,2) : $filter->ID;
-					if ($sFn <> "")
-						$sWrk = $sFn($sFld, $dbid);
-					else
-						$sWrk = "";
-					$this->Page_Filtering($fld, $sWrk, "custom", $wrkid);
-					break;
-				}
-			}
-		}
-		return $sWrk;
-	}
-
-	// Build extended filter
-	function BuildExtendedFilter(&$fld, &$FilterClause, $Default = FALSE, $SaveFilter = FALSE) {
-		$sWrk = ewr_GetExtendedFilter($fld, $Default, $this->DBID);
-		if (!$Default)
-			$this->Page_Filtering($fld, $sWrk, "extended", $fld->SearchOperator, $fld->SearchValue, $fld->SearchCondition, $fld->SearchOperator2, $fld->SearchValue2);
-		if ($sWrk <> "") {
-			ewr_AddFilter($FilterClause, $sWrk);
-			if ($SaveFilter) $fld->CurrentFilter = $sWrk;
-		}
-	}
-
-	// Get drop down value from querystring
-	function GetDropDownValue(&$fld) {
-		$parm = substr($fld->FldVar, 2);
-		if (ewr_IsHttpPost())
-			return FALSE; // Skip post back
-		if (isset($_GET["so_$parm"]))
-			$fld->SearchOperator = @$_GET["so_$parm"];
-		if (isset($_GET["sv_$parm"])) {
-			$fld->DropDownValue = @$_GET["sv_$parm"];
-			return TRUE;
-		}
-		return FALSE;
-	}
-
-	// Get filter values from querystring
-	function GetFilterValues(&$fld) {
-		$parm = substr($fld->FldVar, 2);
-		if (ewr_IsHttpPost())
-			return; // Skip post back
-		$got = FALSE;
-		if (isset($_GET["sv_$parm"])) {
-			$fld->SearchValue = @$_GET["sv_$parm"];
-			$got = TRUE;
-		}
-		if (isset($_GET["so_$parm"])) {
-			$fld->SearchOperator = @$_GET["so_$parm"];
-			$got = TRUE;
-		}
-		if (isset($_GET["sc_$parm"])) {
-			$fld->SearchCondition = @$_GET["sc_$parm"];
-			$got = TRUE;
-		}
-		if (isset($_GET["sv2_$parm"])) {
-			$fld->SearchValue2 = @$_GET["sv2_$parm"];
-			$got = TRUE;
-		}
-		if (isset($_GET["so2_$parm"])) {
-			$fld->SearchOperator2 = $_GET["so2_$parm"];
-			$got = TRUE;
-		}
-		return $got;
-	}
-
-	// Set default ext filter
-	function SetDefaultExtFilter(&$fld, $so1, $sv1, $sc, $so2, $sv2) {
-		$fld->DefaultSearchValue = $sv1; // Default ext filter value 1
-		$fld->DefaultSearchValue2 = $sv2; // Default ext filter value 2 (if operator 2 is enabled)
-		$fld->DefaultSearchOperator = $so1; // Default search operator 1
-		$fld->DefaultSearchOperator2 = $so2; // Default search operator 2 (if operator 2 is enabled)
-		$fld->DefaultSearchCondition = $sc; // Default search condition (if operator 2 is enabled)
-	}
-
-	// Apply default ext filter
-	function ApplyDefaultExtFilter(&$fld) {
-		$fld->SearchValue = $fld->DefaultSearchValue;
-		$fld->SearchValue2 = $fld->DefaultSearchValue2;
-		$fld->SearchOperator = $fld->DefaultSearchOperator;
-		$fld->SearchOperator2 = $fld->DefaultSearchOperator2;
-		$fld->SearchCondition = $fld->DefaultSearchCondition;
-	}
-
-	// Check if Text Filter applied
-	function TextFilterApplied(&$fld) {
-		return (strval($fld->SearchValue) <> strval($fld->DefaultSearchValue) ||
-			strval($fld->SearchValue2) <> strval($fld->DefaultSearchValue2) ||
-			(strval($fld->SearchValue) <> "" &&
-				strval($fld->SearchOperator) <> strval($fld->DefaultSearchOperator)) ||
-			(strval($fld->SearchValue2) <> "" &&
-				strval($fld->SearchOperator2) <> strval($fld->DefaultSearchOperator2)) ||
-			strval($fld->SearchCondition) <> strval($fld->DefaultSearchCondition));
-	}
-
-	// Check if Non-Text Filter applied
-	function NonTextFilterApplied(&$fld) {
-		if (is_array($fld->DropDownValue)) {
-			if (is_array($fld->DefaultDropDownValue)) {
-				if (count($fld->DefaultDropDownValue) <> count($fld->DropDownValue))
-					return TRUE;
-				else
-					return (count(array_diff($fld->DefaultDropDownValue, $fld->DropDownValue)) <> 0);
-			} else {
-				return TRUE;
-			}
-		} else {
-			if (is_array($fld->DefaultDropDownValue))
-				return TRUE;
-			else
-				$v1 = strval($fld->DefaultDropDownValue);
-			if ($v1 == EWR_INIT_VALUE)
-				$v1 = "";
-			$v2 = strval($fld->DropDownValue);
-			if ($v2 == EWR_INIT_VALUE || $v2 == EWR_ALL_VALUE)
-				$v2 = "";
-			return ($v1 <> $v2);
-		}
-	}
-
-	// Get dropdown value from session
-	function GetSessionDropDownValue(&$fld) {
-		$parm = substr($fld->FldVar, 2);
-		$this->GetSessionValue($fld->DropDownValue, 'sv_r05_mutasi_' . $parm);
-		$this->GetSessionValue($fld->SearchOperator, 'so_r05_mutasi_' . $parm);
-	}
-
-	// Get filter values from session
-	function GetSessionFilterValues(&$fld) {
-		$parm = substr($fld->FldVar, 2);
-		$this->GetSessionValue($fld->SearchValue, 'sv_r05_mutasi_' . $parm);
-		$this->GetSessionValue($fld->SearchOperator, 'so_r05_mutasi_' . $parm);
-		$this->GetSessionValue($fld->SearchCondition, 'sc_r05_mutasi_' . $parm);
-		$this->GetSessionValue($fld->SearchValue2, 'sv2_r05_mutasi_' . $parm);
-		$this->GetSessionValue($fld->SearchOperator2, 'so2_r05_mutasi_' . $parm);
-	}
-
-	// Get value from session
-	function GetSessionValue(&$sv, $sn) {
-		if (array_key_exists($sn, $_SESSION))
-			$sv = $_SESSION[$sn];
-	}
-
-	// Set dropdown value to session
-	function SetSessionDropDownValue($sv, $so, $parm) {
-		$_SESSION['sv_r05_mutasi_' . $parm] = $sv;
-		$_SESSION['so_r05_mutasi_' . $parm] = $so;
-	}
-
-	// Set filter values to session
-	function SetSessionFilterValues($sv1, $so1, $sc, $sv2, $so2, $parm) {
-		$_SESSION['sv_r05_mutasi_' . $parm] = $sv1;
-		$_SESSION['so_r05_mutasi_' . $parm] = $so1;
-		$_SESSION['sc_r05_mutasi_' . $parm] = $sc;
-		$_SESSION['sv2_r05_mutasi_' . $parm] = $sv2;
-		$_SESSION['so2_r05_mutasi_' . $parm] = $so2;
-	}
-
-	// Check if has Session filter values
-	function HasSessionFilterValues($parm) {
-		return ((@$_SESSION['sv_' . $parm] <> "" && @$_SESSION['sv_' . $parm] <> EWR_INIT_VALUE) ||
-			(@$_SESSION['sv_' . $parm] <> "" && @$_SESSION['sv_' . $parm] <> EWR_INIT_VALUE) ||
-			(@$_SESSION['sv2_' . $parm] <> "" && @$_SESSION['sv2_' . $parm] <> EWR_INIT_VALUE));
-	}
-
-	// Dropdown filter exist
-	function DropDownFilterExist(&$fld, $FldOpr) {
-		$sWrk = "";
-		$this->BuildDropDownFilter($fld, $sWrk, $FldOpr);
-		return ($sWrk <> "");
-	}
-
-	// Extended filter exist
-	function ExtendedFilterExist(&$fld) {
-		$sExtWrk = "";
-		$this->BuildExtendedFilter($fld, $sExtWrk);
-		return ($sExtWrk <> "");
-	}
-
-	// Validate form
-	function ValidateForm() {
-		global $ReportLanguage, $grFormError;
-
-		// Initialize form error message
-		$grFormError = "";
-
-		// Check if validation required
-		if (!EWR_SERVER_VALIDATE)
-			return ($grFormError == "");
-
-		// Return validate result
-		$ValidateForm = ($grFormError == "");
-
-		// Call Form_CustomValidate event
-		$sFormCustomError = "";
-		$ValidateForm = $ValidateForm && $this->Form_CustomValidate($sFormCustomError);
-		if ($sFormCustomError <> "") {
-			$grFormError .= ($grFormError <> "") ? "<p>&nbsp;</p>" : "";
-			$grFormError .= $sFormCustomError;
-		}
-		return $ValidateForm;
-	}
-
-	// Clear selection stored in session
-	function ClearSessionSelection($parm) {
-		$_SESSION["sel_r05_mutasi_$parm"] = "";
-		$_SESSION["rf_r05_mutasi_$parm"] = "";
-		$_SESSION["rt_r05_mutasi_$parm"] = "";
-	}
-
-	// Load selection from session
-	function LoadSelectionFromSession($parm) {
-		$fld = &$this->FieldByParm($parm);
-		$fld->SelectionList = @$_SESSION["sel_r05_mutasi_$parm"];
-		$fld->RangeFrom = @$_SESSION["rf_r05_mutasi_$parm"];
-		$fld->RangeTo = @$_SESSION["rt_r05_mutasi_$parm"];
-	}
-
-	// Load default value for filters
-	function LoadDefaultFilters() {
-		/**
-		* Set up default values for non Text filters
-		*/
-
-		// Field Kode
-		$this->Kode->DefaultDropDownValue = EWR_INIT_VALUE;
-		if (!$this->SearchCommand) $this->Kode->DropDownValue = $this->Kode->DefaultDropDownValue;
-		/**
-		* Set up default values for extended filters
-		* function SetDefaultExtFilter(&$fld, $so1, $sv1, $sc, $so2, $sv2)
-		* Parameters:
-		* $fld - Field object
-		* $so1 - Default search operator 1
-		* $sv1 - Default ext filter value 1
-		* $sc - Default search condition (if operator 2 is enabled)
-		* $so2 - Default search operator 2 (if operator 2 is enabled)
-		* $sv2 - Default ext filter value 2 (if operator 2 is enabled)
-		*/
-		/**
-		* Set up default values for popup filters
-		*/
-	}
-
-	// Check if filter applied
-	function CheckFilter() {
-
-		// Check Kode extended filter
-		if ($this->NonTextFilterApplied($this->Kode))
-			return TRUE;
-		return FALSE;
-	}
-
-	// Show list of filters
-	function ShowFilterList($showDate = FALSE) {
-		global $ReportLanguage;
-
-		// Initialize
-		$sFilterList = "";
-
-		// Field Kode
-		$sExtWrk = "";
-		$sWrk = "";
-		$this->BuildDropDownFilter($this->Kode, $sExtWrk, $this->Kode->SearchOperator);
-		$sFilter = "";
-		if ($sExtWrk <> "")
-			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
-		elseif ($sWrk <> "")
-			$sFilter .= "<span class=\"ewFilterValue\">$sWrk</span>";
-		if ($sFilter <> "")
-			$sFilterList .= "<div><span class=\"ewFilterCaption\">" . $this->Kode->FldCaption() . "</span>" . $sFilter . "</div>";
-		$divstyle = "";
-		$divdataclass = "";
-
-		// Show Filters
-		if ($sFilterList <> "" || $showDate) {
-			$sMessage = "<div" . $divstyle . $divdataclass . "><div id=\"ewrFilterList\" class=\"alert alert-info\">";
-			if ($showDate)
-				$sMessage .= "<div id=\"ewrCurrentDate\">" . $ReportLanguage->Phrase("ReportGeneratedDate") . ewr_FormatDateTime(date("Y-m-d H:i:s"), 1) . "</div>";
-			if ($sFilterList <> "")
-				$sMessage .= "<div id=\"ewrCurrentFilters\">" . $ReportLanguage->Phrase("CurrentFilters") . "</div>" . $sFilterList;
-			$sMessage .= "</div></div>";
-			$this->Message_Showing($sMessage, "");
-			echo $sMessage;
-		}
-	}
-
-	// Get list of filters
-	function GetFilterList() {
-
-		// Initialize
-		$sFilterList = "";
-
-		// Field Kode
-		$sWrk = "";
-		$sWrk = ($this->Kode->DropDownValue <> EWR_INIT_VALUE) ? $this->Kode->DropDownValue : "";
-		if (is_array($sWrk))
-			$sWrk = implode("||", $sWrk);
-		if ($sWrk <> "")
-			$sWrk = "\"sv_Kode\":\"" . ewr_JsEncode2($sWrk) . "\"";
-		if ($sWrk <> "") {
-			if ($sFilterList <> "") $sFilterList .= ",";
-			$sFilterList .= $sWrk;
-		}
-
-		// Return filter list in json
-		if ($sFilterList <> "")
-			return "{" . $sFilterList . "}";
-		else
-			return "null";
-	}
-
-	// Restore list of filters
-	function RestoreFilterList() {
-
-		// Return if not reset filter
-		if (@$_POST["cmd"] <> "resetfilter")
-			return FALSE;
-		$filter = json_decode(@$_POST["filter"], TRUE);
-		return $this->SetupFilterList($filter);
-	}
-
-	// Setup list of filters
-	function SetupFilterList($filter) {
-		if (!is_array($filter))
-			return FALSE;
-
-		// Field Kode
-		$bRestoreFilter = FALSE;
-		if (array_key_exists("sv_Kode", $filter)) {
-			$sWrk = $filter["sv_Kode"];
-			if (strpos($sWrk, "||") !== FALSE)
-				$sWrk = explode("||", $sWrk);
-			$this->SetSessionDropDownValue($sWrk, @$filter["so_Kode"], "Kode");
-			$bRestoreFilter = TRUE;
-		}
-		if (!$bRestoreFilter) { // Clear filter
-			$this->SetSessionDropDownValue(EWR_INIT_VALUE, "", "Kode");
-		}
-		return TRUE;
 	}
 
 	// Return popup filter
@@ -2013,6 +1547,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->MasukQty->setSort("");
 			$this->KeluarQty->setSort("");
 			$this->SaldoQty->setSort("");
+			$this->MainGroup->setSort("");
 
 		// Check for an Order parameter
 		} elseif ($orderBy <> "") {
@@ -2028,6 +1563,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 			$this->UpdateSort($this->MasukQty, $bCtrl); // MasukQty
 			$this->UpdateSort($this->KeluarQty, $bCtrl); // KeluarQty
 			$this->UpdateSort($this->SaldoQty, $bCtrl); // SaldoQty
+			$this->UpdateSort($this->MainGroup, $bCtrl); // MainGroup
 			$sSortSql = $this->SortSql();
 			$this->setOrderBy($sSortSql);
 			$this->setStartGroup(1);
@@ -2368,39 +1904,6 @@ var EWR_PAGE_ID = r05_mutasi_summary.PageID;
 </script>
 <?php } ?>
 <?php if ($Page->Export == "" && !$Page->DrillDown && !$grDashboardReport) { ?>
-<script type="text/javascript">
-
-// Form object
-var CurrentForm = fr05_mutasisummary = new ewr_Form("fr05_mutasisummary");
-
-// Validate method
-fr05_mutasisummary.Validate = function() {
-	if (!this.ValidateRequired)
-		return true; // Ignore validation
-	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
-
-	// Call Form Custom Validate event
-	if (!this.Form_CustomValidate(fobj))
-		return false;
-	return true;
-}
-
-// Form_CustomValidate method
-fr05_mutasisummary.Form_CustomValidate = 
- function(fobj) { // DO NOT CHANGE THIS LINE!
-
- 	// Your custom validation code here, return false if invalid.
- 	return true;
- }
-<?php if (EWR_CLIENT_VALIDATE) { ?>
-fr05_mutasisummary.ValidateRequired = true; // Uses JavaScript validation
-<?php } else { ?>
-fr05_mutasisummary.ValidateRequired = false; // No JavaScript validation
-<?php } ?>
-
-// Use Ajax
-fr05_mutasisummary.Lists["sv_Kode[]"] = {"LinkField":"sv_Kode","Ajax":true,"DisplayFields":["sv_Kode","","",""],"ParentFields":[],"FilterFields":[],"Options":[],"Template":""};
-</script>
 <?php } ?>
 <?php if ($Page->Export == "" && !$Page->DrillDown && !$grDashboardReport) { ?>
 <script type="text/javascript">
@@ -2438,65 +1941,6 @@ if (!$Page->DrillDownInPanel) {
 <!-- Summary Report begins -->
 <?php if ($Page->Export <> "pdf") { ?>
 <div id="report_summary">
-<?php } ?>
-<?php if ($Page->Export == "" && !$Page->DrillDown && !$grDashboardReport) { ?>
-<!-- Search form (begin) -->
-<form name="fr05_mutasisummary" id="fr05_mutasisummary" class="form-inline ewForm ewExtFilterForm" action="<?php echo ewr_CurrentPage() ?>">
-<?php $SearchPanelClass = ($Page->Filter <> "") ? " in" : " in"; ?>
-<div id="fr05_mutasisummary_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
-<input type="hidden" name="cmd" value="search">
-<div id="r_1" class="ewRow">
-<div id="c_Kode" class="ewCell form-group">
-	<label for="sv_Kode" class="ewSearchCaption ewLabel"><?php echo $Page->Kode->FldCaption() ?></label>
-	<span class="ewSearchField">
-<?php $selwrk = ewr_MatchedFilterValue($Page->Kode->DropDownValue, EWR_ALL_VALUE) ? " selected" : ""; ?>
-<?php ewr_PrependClass($Page->Kode->EditAttrs["class"], "form-control"); ?>
-<select data-table="r05_mutasi" data-field="x_Kode" data-value-separator="<?php echo ewr_HtmlEncode(is_array($Page->Kode->DisplayValueSeparator) ? json_encode($Page->Kode->DisplayValueSeparator) : $Page->Kode->DisplayValueSeparator) ?>" id="sv_Kode[]" name="sv_Kode[]" multiple="multiple"<?php echo $Page->Kode->EditAttributes() ?>>
-<option value="<?php echo EWR_ALL_VALUE; ?>"<?php echo $selwrk ?>><?php echo $ReportLanguage->Phrase("SelectAll") ?></option>
-<?php
-	$cntf = is_array($Page->Kode->AdvancedFilters) ? count($Page->Kode->AdvancedFilters) : 0;
-	$cntd = is_array($Page->Kode->DropDownList) ? count($Page->Kode->DropDownList) : 0;
-	$totcnt = $cntf + $cntd;
-	$wrkcnt = 0;
-	if ($cntf > 0) {
-		foreach ($Page->Kode->AdvancedFilters as $filter) {
-			if ($filter->Enabled) {
-				$selwrk = ewr_MatchedFilterValue($Page->Kode->DropDownValue, $filter->ID) ? " selected" : "";
-?>
-<option value="<?php echo $filter->ID ?>"<?php echo $selwrk ?>><?php echo $filter->Name ?></option>
-<?php
-				$wrkcnt += 1;
-			}
-		}
-	}
-	for ($i = 0; $i < $cntd; $i++) {
-		$selwrk = " selected";
-?>
-<option value="<?php echo $Page->Kode->DropDownList[$i] ?>"<?php echo $selwrk ?>><?php echo ewr_DropDownDisplayValue($Page->Kode->DropDownList[$i], "", 0) ?></option>
-<?php
-		$wrkcnt += 1;
-	}
-?>
-</select>
-<input type="hidden" name="s_sv_Kode" id="s_sv_Kode" value="<?php echo $Page->Kode->LookupFilterQuery() ?>">
-<script type="text/javascript">
-fr05_mutasisummary.Lists["sv_Kode[]"].Options = <?php echo ewr_ArrayToJson($Page->Kode->LookupFilterOptions) ?>;
-</script>
-</span>
-</div>
-</div>
-<div class="ewRow"><input type="submit" name="btnsubmit" id="btnsubmit" class="btn btn-primary" value="<?php echo $ReportLanguage->Phrase("Search") ?>">
-<input type="reset" name="btnreset" id="btnreset" class="btn hide" value="<?php echo $ReportLanguage->Phrase("Reset") ?>"></div>
-</div>
-</form>
-<script type="text/javascript">
-fr05_mutasisummary.Init();
-fr05_mutasisummary.FilterList = <?php echo $Page->GetFilterList() ?>;
-</script>
-<!-- Search form (end) -->
-<?php } ?>
-<?php if ($Page->ShowCurrentFilter) { ?>
-<?php $Page->ShowFilterList() ?>
 <?php } ?>
 <?php
 
@@ -2755,6 +2199,24 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	</td>
 <?php } ?>
 <?php } ?>
+<?php if ($Page->MainGroup->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="MainGroup"><div class="r05_mutasi_MainGroup"><span class="ewTableHeaderCaption"><?php echo $Page->MainGroup->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="MainGroup">
+<?php if ($Page->SortUrl($Page->MainGroup) == "") { ?>
+		<div class="ewTableHeaderBtn r05_mutasi_MainGroup">
+			<span class="ewTableHeaderCaption"><?php echo $Page->MainGroup->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r05_mutasi_MainGroup" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->MainGroup) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->MainGroup->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->MainGroup->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->MainGroup->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
 	</tr>
 </thead>
 <tbody>
@@ -2912,6 +2374,10 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="SaldoQty"<?php echo $Page->SaldoQty->CellAttributes() ?>>
 <span<?php echo $Page->SaldoQty->ViewAttributes() ?>><?php echo $Page->SaldoQty->ListViewValue() ?></span></td>
 <?php } ?>
+<?php if ($Page->MainGroup->Visible) { ?>
+		<td data-field="MainGroup"<?php echo $Page->MainGroup->CellAttributes() ?>>
+<span<?php echo $Page->MainGroup->ViewAttributes() ?>><?php echo $Page->MainGroup->ListViewValue() ?></span></td>
+<?php } ?>
 	</tr>
 <?php
 
@@ -2991,11 +2457,14 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->SaldoQty->Visible) { ?>
 		<td data-field="SaldoQty"<?php echo $Page->Kode->CellAttributes() ?>></td>
 <?php } ?>
+<?php if ($Page->MainGroup->Visible) { ?>
+		<td data-field="MainGroup"<?php echo $Page->Kode->CellAttributes() ?>></td>
+<?php } ?>
 	</tr>
 <?php } else { ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->GrpColumnCount + $Page->DtlColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->SaldoQty->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->Kode->GroupViewValue, $Page->Kode->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[1][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+		<td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->MainGroup->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->Kode->GroupViewValue, $Page->Kode->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[1][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
 <?php } ?>
 	</tr>
 	<tr<?php echo $Page->RowAttributes(); ?>>
@@ -3018,15 +2487,18 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="NoRef"<?php echo $Page->Kode->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->MasukQty->Visible) { ?>
-		<td data-field="MasukQty"<?php echo $Page->SaldoQty->CellAttributes() ?>>
+		<td data-field="MasukQty"<?php echo $Page->MainGroup->CellAttributes() ?>>
 <span<?php echo $Page->MasukQty->ViewAttributes() ?>><?php echo $Page->MasukQty->SumViewValue ?></span></td>
 <?php } ?>
 <?php if ($Page->KeluarQty->Visible) { ?>
-		<td data-field="KeluarQty"<?php echo $Page->SaldoQty->CellAttributes() ?>>
+		<td data-field="KeluarQty"<?php echo $Page->MainGroup->CellAttributes() ?>>
 <span<?php echo $Page->KeluarQty->ViewAttributes() ?>><?php echo $Page->KeluarQty->SumViewValue ?></span></td>
 <?php } ?>
 <?php if ($Page->SaldoQty->Visible) { ?>
 		<td data-field="SaldoQty"<?php echo $Page->Kode->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->MainGroup->Visible) { ?>
+		<td data-field="MainGroup"<?php echo $Page->Kode->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 	</tr>
 <?php } ?>

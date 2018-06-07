@@ -81,10 +81,8 @@ class ct08_beli extends cTable {
 		$this->fields['VendorID'] = &$this->VendorID;
 
 		// ArticleID
-		$this->ArticleID = new cField('t08_beli', 't08_beli', 'x_ArticleID', 'ArticleID', '`ArticleID`', '`ArticleID`', 3, -1, FALSE, '`EV__ArticleID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'SELECT');
+		$this->ArticleID = new cField('t08_beli', 't08_beli', 'x_ArticleID', 'ArticleID', '`ArticleID`', '`ArticleID`', 3, -1, FALSE, '`EV__ArticleID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'TEXT');
 		$this->ArticleID->Sortable = TRUE; // Allow sort
-		$this->ArticleID->UsePleaseSelect = TRUE; // Use PleaseSelect by default
-		$this->ArticleID->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
 		$this->ArticleID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['ArticleID'] = &$this->ArticleID;
 
@@ -799,6 +797,7 @@ class ct08_beli extends cTable {
 		if ($this->ArticleID->VirtualValue <> "") {
 			$this->ArticleID->ViewValue = $this->ArticleID->VirtualValue;
 		} else {
+			$this->ArticleID->ViewValue = $this->ArticleID->CurrentValue;
 		if (strval($this->ArticleID->CurrentValue) <> "") {
 			$sFilterWrk = "`id`" . ew_SearchString("=", $this->ArticleID->CurrentValue, EW_DATATYPE_NUMBER, "");
 		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `v05_article`";
@@ -953,6 +952,8 @@ class ct08_beli extends cTable {
 		// ArticleID
 		$this->ArticleID->EditAttrs["class"] = "form-control";
 		$this->ArticleID->EditCustomAttributes = "";
+		$this->ArticleID->EditValue = $this->ArticleID->CurrentValue;
+		$this->ArticleID->PlaceHolder = ew_RemoveHtml($this->ArticleID->FldCaption());
 
 		// Harga
 		$this->Harga->EditAttrs["class"] = "form-control";
