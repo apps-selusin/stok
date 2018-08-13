@@ -1231,7 +1231,7 @@ ew_CreateDateTimePicker("ft95_homedetailadd", "x_tgl", {"ignoreReadonly":true,"u
 		<div class="<?php echo $t95_homedetail_add->RightColumnClass ?>"><div<?php echo $t95_homedetail->kat->CellAttributes() ?>>
 <span id="el_t95_homedetail_kat">
 <span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_kat"><?php echo (strval($t95_homedetail->kat->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t95_homedetail->kat->ViewValue); ?></span>
+	<span onclick="jQuery(this).parent().next(":not([disabled])").click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_kat"><?php echo (strval($t95_homedetail->kat->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t95_homedetail->kat->ViewValue); ?></span>
 </span>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t95_homedetail->kat->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_kat',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t95_homedetail->kat->ReadOnly || $t95_homedetail->kat->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" data-table="t95_homedetail" data-field="x_kat" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t95_homedetail->kat->DisplayValueSeparatorAttribute() ?>" name="x_kat" id="x_kat" value="<?php echo $t95_homedetail->kat->CurrentValue ?>"<?php echo $t95_homedetail->kat->EditAttributes() ?>>

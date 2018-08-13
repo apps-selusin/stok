@@ -30,6 +30,7 @@ class crr03_hutang extends crTableBase {
 		$this->DBID = 'DB';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0;
+		$this->ExportPageOrientation = "portrait"; // Page orientation (PDF only)
 
 		// nohutang
 		$this->nohutang = new crField('r03_hutang', 'r03_hutang', 'x_nohutang', 'nohutang', '`nohutang`', 200, EWR_DATATYPE_STRING, -1);
@@ -353,6 +354,39 @@ class crr03_hutang extends crTableBase {
 
 	function setSqlSelectCount($v) {
 		$this->_SqlSelectCount = $v;
+	}
+
+	// Get record count
+	public function getRecordCount($sql)
+	{
+		$cnt = -1;
+		$rs = NULL;
+		$sql = preg_replace('/\/\*BeginOrderBy\*\/[\s\S]+\/\*EndOrderBy\*\//', "", $sql); // Remove ORDER BY clause (MSSQL)
+		$pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
+
+		// Skip Custom View / SubQuery and SELECT DISTINCT
+		if (($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
+			preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) && !preg_match('/^\s*select\s+distinct\s+/i', $sql)) {
+			$sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+		} else {
+			$sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+		}
+		$conn = &$this->Connection();
+		if ($rs = $conn->execute($sqlwrk)) {
+			if (!$rs->EOF && $rs->FieldCount() > 0) {
+				$cnt = $rs->fields[0];
+				$rs->close();
+			}
+			return (int)$cnt;
+		}
+
+		// Unable to get count, get record count directly
+		if ($rs = $conn->execute($sql)) {
+			$cnt = $rs->RecordCount();
+			$rs->close();
+			return (int)$cnt;
+		}
+		return $cnt;
 	}
 
 	// Sort URL

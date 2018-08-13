@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/6/8" version="11.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/8/13" version="11.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -378,6 +378,9 @@
     </menu>
     <menu id="33">
       <phrase id="menutext" value="v 05 article" />
+    </menu>
+    <menu id="34">
+      <phrase id="menutext" value="v 06 jual lapstok" />
     </menu>
     <menu id="23">
       <phrase id="menutext" value="v 04 jual" />
@@ -1271,6 +1274,15 @@
       </field>
       <field id="hargajual">
         <phrase id="fldcaption" value="Harga Jual" />
+      </field>
+    </table>
+    <table id="v06_jual_lapstok">
+      <phrase id="tblcaption" value="v 06 jual lapstok" />
+      <field id="articleid">
+        <phrase id="fldcaption" value="articleid" />
+      </field>
+      <field id="sumqty">
+        <phrase id="fldcaption" value="sumqty" />
       </field>
     </table>
   </project>

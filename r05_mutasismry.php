@@ -851,11 +851,7 @@ class crr05_mutasi_summary extends crr05_mutasi {
 
 	// Get group count
 	function GetGrpCnt($sql) {
-		$conn = &$this->Connection();
-		$rsgrpcnt = $conn->Execute($sql);
-		$grpcnt = ($rsgrpcnt) ? $rsgrpcnt->RecordCount() : 0;
-		if ($rsgrpcnt) $rsgrpcnt->Close();
-		return $grpcnt;
+		return $this->getRecordCount($sql);
 	}
 
 	// Get group recordset

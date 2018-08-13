@@ -1392,7 +1392,7 @@ $t12_jualdetail_add->ShowMessage();
 <span id="el_t12_jualdetail_ArticleID">
 <?php $t12_jualdetail->ArticleID->EditAttrs["onchange"] = "ew_AutoFill(this); " . @$t12_jualdetail->ArticleID->EditAttrs["onchange"]; ?>
 <span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_ArticleID"><?php echo (strval($t12_jualdetail->ArticleID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t12_jualdetail->ArticleID->ViewValue); ?></span>
+	<span onclick="jQuery(this).parent().next(":not([disabled])").click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_ArticleID"><?php echo (strval($t12_jualdetail->ArticleID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t12_jualdetail->ArticleID->ViewValue); ?></span>
 </span>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t12_jualdetail->ArticleID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_ArticleID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t12_jualdetail->ArticleID->ReadOnly || $t12_jualdetail->ArticleID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" data-table="t12_jualdetail" data-field="x_ArticleID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t12_jualdetail->ArticleID->DisplayValueSeparatorAttribute() ?>" name="x_ArticleID" id="x_ArticleID" value="<?php echo $t12_jualdetail->ArticleID->CurrentValue ?>"<?php echo $t12_jualdetail->ArticleID->EditAttributes() ?>>

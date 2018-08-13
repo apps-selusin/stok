@@ -821,11 +821,7 @@ class crr01_beli_summary extends crr01_beli {
 
 	// Get group count
 	function GetGrpCnt($sql) {
-		$conn = &$this->Connection();
-		$rsgrpcnt = $conn->Execute($sql);
-		$grpcnt = ($rsgrpcnt) ? $rsgrpcnt->RecordCount() : 0;
-		if ($rsgrpcnt) $rsgrpcnt->Close();
-		return $grpcnt;
+		return $this->getRecordCount($sql);
 	}
 
 	// Get group recordset

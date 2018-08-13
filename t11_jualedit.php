@@ -1441,7 +1441,7 @@ ew_CreateDateTimePicker("ft11_jualedit", "x_TglSO", {"ignoreReadonly":true,"useC
 		<div class="<?php echo $t11_jual_edit->RightColumnClass ?>"><div<?php echo $t11_jual->CustomerID->CellAttributes() ?>>
 <span id="el_t11_jual_CustomerID">
 <span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_CustomerID"><?php echo (strval($t11_jual->CustomerID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t11_jual->CustomerID->ViewValue); ?></span>
+	<span onclick="jQuery(this).parent().next(":not([disabled])").click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_CustomerID"><?php echo (strval($t11_jual->CustomerID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t11_jual->CustomerID->ViewValue); ?></span>
 </span>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t11_jual->CustomerID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_CustomerID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t11_jual->CustomerID->ReadOnly || $t11_jual->CustomerID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" data-table="t11_jual" data-field="x_CustomerID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t11_jual->CustomerID->DisplayValueSeparatorAttribute() ?>" name="x_CustomerID" id="x_CustomerID" value="<?php echo $t11_jual->CustomerID->CurrentValue ?>"<?php echo $t11_jual->CustomerID->EditAttributes() ?>>

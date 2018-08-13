@@ -1323,7 +1323,7 @@ $t92_log_edit->ShowMessage();
 		<div class="<?php echo $t92_log_edit->RightColumnClass ?>"><div<?php echo $t92_log->Status->CellAttributes() ?>>
 <span id="el_t92_log_Status">
 <span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_Status"><?php echo (strval($t92_log->Status->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t92_log->Status->ViewValue); ?></span>
+	<span onclick="jQuery(this).parent().next(":not([disabled])").click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_Status"><?php echo (strval($t92_log->Status->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t92_log->Status->ViewValue); ?></span>
 </span>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t92_log->Status->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_Status',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t92_log->Status->ReadOnly || $t92_log->Status->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" data-table="t92_log" data-field="x_Status" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t92_log->Status->DisplayValueSeparatorAttribute() ?>" name="x_Status" id="x_Status" value="<?php echo $t92_log->Status->CurrentValue ?>"<?php echo $t92_log->Status->EditAttributes() ?>>

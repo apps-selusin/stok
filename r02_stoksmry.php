@@ -835,11 +835,7 @@ class crr02_stok_summary extends crr02_stok {
 
 	// Get group count
 	function GetGrpCnt($sql) {
-		$conn = &$this->Connection();
-		$rsgrpcnt = $conn->Execute($sql);
-		$grpcnt = ($rsgrpcnt) ? $rsgrpcnt->RecordCount() : 0;
-		if ($rsgrpcnt) $rsgrpcnt->Close();
-		return $grpcnt;
+		return $this->getRecordCount($sql);
 	}
 
 	// Get group recordset

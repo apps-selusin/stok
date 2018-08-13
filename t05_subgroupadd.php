@@ -1105,7 +1105,7 @@ $t05_subgroup_add->ShowMessage();
 		<div class="<?php echo $t05_subgroup_add->RightColumnClass ?>"><div<?php echo $t05_subgroup->MainGroupID->CellAttributes() ?>>
 <span id="el_t05_subgroup_MainGroupID">
 <span class="ewLookupList">
-	<span onclick="jQuery(this).parent().next().click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_MainGroupID"><?php echo (strval($t05_subgroup->MainGroupID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t05_subgroup->MainGroupID->ViewValue); ?></span>
+	<span onclick="jQuery(this).parent().next(":not([disabled])").click();" tabindex="-1" class="form-control ewLookupText" id="lu_x_MainGroupID"><?php echo (strval($t05_subgroup->MainGroupID->ViewValue) == "" ? $Language->Phrase("PleaseSelect") : $t05_subgroup->MainGroupID->ViewValue); ?></span>
 </span>
 <button type="button" title="<?php echo ew_HtmlEncode(str_replace("%s", ew_RemoveHtml($t05_subgroup->MainGroupID->FldCaption()), $Language->Phrase("LookupLink", TRUE))) ?>" onclick="ew_ModalLookupShow({lnk:this,el:'x_MainGroupID',m:0,n:10});" class="ewLookupBtn btn btn-default btn-sm"<?php echo (($t05_subgroup->MainGroupID->ReadOnly || $t05_subgroup->MainGroupID->Disabled) ? " disabled" : "")?>><span class="glyphicon glyphicon-search ewIcon"></span></button>
 <input type="hidden" data-table="t05_subgroup" data-field="x_MainGroupID" data-multiple="0" data-lookup="1" data-value-separator="<?php echo $t05_subgroup->MainGroupID->DisplayValueSeparatorAttribute() ?>" name="x_MainGroupID" id="x_MainGroupID" value="<?php echo $t05_subgroup->MainGroupID->CurrentValue ?>"<?php echo $t05_subgroup->MainGroupID->EditAttributes() ?>>
