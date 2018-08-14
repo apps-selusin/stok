@@ -990,10 +990,10 @@
         <phrase id="fldcaption" value="id" />
       </field>
       <field id="tglso">
-        <phrase id="fldcaption" value="Tgl. SO" />
+        <phrase id="fldcaption" value="Tanggal" />
       </field>
       <field id="noso">
-        <phrase id="fldcaption" value="No. SO" />
+        <phrase id="fldcaption" value="No. Invoice" />
       </field>
       <field id="customerid">
         <phrase id="fldcaption" value="Customer" />

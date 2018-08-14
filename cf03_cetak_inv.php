@@ -346,14 +346,14 @@ Page_Rendering();
 <?php include_once "header.php" ?>
 <form method="post" action="cf03_cetak_inv02.php">
 	Pilih No. Invoice :
-	<select name="t11_jual_id">
+	<select name="t11_jual_noso">
 		<option value="0">No. Invoice</option>
 		<?php
 		$q = "select * from t11_jual order by TglSO desc";
 		$r = Conn()->Execute($q);
 		while (!$r->EOF) {
 			?>
-			<option value="<?php echo $r->fields['NoSO']?>"><?php echo $r->fields["NoSO"]?></option>
+			<option value="<?php echo $r->fields["NoSO"]?>"><?php echo $r->fields["NoSO"]?></option>
 			<?php
 			$r->MoveNext();
 		}
