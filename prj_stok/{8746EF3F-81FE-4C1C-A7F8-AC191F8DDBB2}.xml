@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<configuration date="2018/08/13" author="e.World Technology Ltd.">
-  <project id="{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}" file="C:\xampp\htdocs\stok\prj_stok.pmp" name="prj_stok" product="PHPMaker" version="14.0" datetime="2018/08/13 15:34:23" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" relatedid="{A2EF3792-3541-4459-9D68-D8F1DBA083C2}">
+<configuration date="2018/08/14" author="e.World Technology Ltd.">
+  <project id="{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}" file="C:\xampp\htdocs\stok\prj_stok.pmp" name="prj_stok" product="PHPMaker" version="14.0" datetime="2018/08/14 18:51:10" languagefolder="phplang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" relatedid="{A2EF3792-3541-4459-9D68-D8F1DBA083C2}">
     <table id="cf01_home_php" name="cf01_home.php" caption="Home" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t01_company" name="t01_company" caption="Company" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="t02_vendor" name="t02_vendor" caption="Vendor" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
@@ -30,6 +30,8 @@
     <table id="v03_hutang" name="v03_hutang" caption="v 03 hutang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="v04_jual" name="v04_jual" caption="v 04 jual" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="v05_article" name="v05_article" caption="v 05 article" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
-    <table id="cf02_home_php" name="cf02_home.php" caption="Home" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="cf02_home_php" name="cf02_home.php" caption="Home" userlevel="-2,&quot;Anonymous&quot;,8;0,&quot;Default&quot;,0" priv="1" />
+    <table id="v06_jual_lapstok" name="v06_jual_lapstok" caption="v 06 jual lapstok" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="cf03_cetak_inv_php" name="cf03_cetak_inv.php" caption="Invoice" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
   </project>
 </configuration>

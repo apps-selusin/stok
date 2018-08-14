@@ -1278,9 +1278,9 @@ class ct11_jual extends cTable {
 
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
+		//$this->TglSO->ReadOnly = true;
+		//$this->NoSO->ReadOnly = true;
 
-		$this->TglSO->ReadOnly = true;
-		$this->NoSO->ReadOnly = true;
 		$this->Total->ReadOnly = true;
 
 		// Kondisi saat form Tambah sedang terbuka (tidak dalam mode konfirmasi)

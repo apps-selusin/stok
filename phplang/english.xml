@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/8/13" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/8/14" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -618,35 +618,23 @@
   <project>
     <phrase id="bodytitle" value="STOK Apps." />
     <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
-    <menu id="10099">
-      <phrase id="menutext" value="v 05 article" />
-    </menu>
     <menu id="10098">
       <phrase id="menutext" value="Home" />
-    </menu>
-    <menu id="1">
-      <phrase id="menutext" value="Home" />
-    </menu>
-    <menu id="10091">
-      <phrase id="menutext" value="Hutang Detail" />
     </menu>
     <menu id="19">
       <phrase id="menutext" value="Pembelian" />
     </menu>
-    <menu id="10092">
-      <phrase id="menutext" value="Penjualan Detail" />
+    <menu id="10100">
+      <phrase id="menutext" value="v 06 jual lapstok" />
+    </menu>
+    <menu id="10099">
+      <phrase id="menutext" value="v 05 article" />
     </menu>
     <menu id="10021">
       <phrase id="menutext" value="Hutang" />
     </menu>
-    <menu id="10093">
-      <phrase id="menutext" value="Mutasi" />
-    </menu>
     <menu id="10027">
       <phrase id="menutext" value="Penjualan" />
-    </menu>
-    <menu id="10094">
-      <phrase id="menutext" value="v 02 stok" />
     </menu>
     <menu id="10013">
       <phrase id="menutext" value="Laporan" />
@@ -666,8 +654,14 @@
     <menu id="10032">
       <phrase id="menutext" value="Penjualan" />
     </menu>
-    <menu id="10095">
-      <phrase id="menutext" value="v 03 hutang" />
+    <menu id="1">
+      <phrase id="menutext" value="Home" />
+    </menu>
+    <menu id="10164">
+      <phrase id="menutext" value="Cetak" />
+    </menu>
+    <menu id="10165">
+      <phrase id="menutext" value="Invoice" />
     </menu>
     <menu id="6">
       <phrase id="menutext" value="Setup" />
@@ -725,6 +719,21 @@
     </menu>
     <menu id="5">
       <phrase id="menutext" value="Activity Log" />
+    </menu>
+    <menu id="10091">
+      <phrase id="menutext" value="Hutang Detail" />
+    </menu>
+    <menu id="10092">
+      <phrase id="menutext" value="Penjualan Detail" />
+    </menu>
+    <menu id="10093">
+      <phrase id="menutext" value="Mutasi" />
+    </menu>
+    <menu id="10094">
+      <phrase id="menutext" value="v 02 stok" />
+    </menu>
+    <menu id="10095">
+      <phrase id="menutext" value="v 03 hutang" />
     </menu>
     <menu id="10034">
       <phrase id="menutext" value="v 04 jual" />
@@ -1443,6 +1452,18 @@
     </table>
     <table id="cf02_home_php">
       <phrase id="tblcaption" value="Home" />
+    </table>
+    <table id="v06_jual_lapstok">
+      <phrase id="tblcaption" value="v 06 jual lapstok" />
+      <field id="articleid">
+        <phrase id="fldcaption" value="articleid" />
+      </field>
+      <field id="sumqty">
+        <phrase id="fldcaption" value="sumqty" />
+      </field>
+    </table>
+    <table id="cf03_cetak_inv_php">
+      <phrase id="tblcaption" value="Invoice" />
     </table>
   </project>
 </ew-language>
