@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/8/14" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/8/15" version="14.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -624,17 +624,20 @@
     <menu id="19">
       <phrase id="menutext" value="Pembelian" />
     </menu>
+    <menu id="10021">
+      <phrase id="menutext" value="Hutang" />
+    </menu>
     <menu id="10100">
       <phrase id="menutext" value="v 06 jual lapstok" />
+    </menu>
+    <menu id="10027">
+      <phrase id="menutext" value="Penjualan" />
     </menu>
     <menu id="10099">
       <phrase id="menutext" value="v 05 article" />
     </menu>
-    <menu id="10021">
-      <phrase id="menutext" value="Hutang" />
-    </menu>
-    <menu id="10027">
-      <phrase id="menutext" value="Penjualan" />
+    <menu id="10166">
+      <phrase id="menutext" value="Piutang" />
     </menu>
     <menu id="10013">
       <phrase id="menutext" value="Laporan" />
@@ -653,9 +656,6 @@
     </menu>
     <menu id="10032">
       <phrase id="menutext" value="Penjualan" />
-    </menu>
-    <menu id="1">
-      <phrase id="menutext" value="Home" />
     </menu>
     <menu id="10164">
       <phrase id="menutext" value="Cetak" />
@@ -719,6 +719,9 @@
     </menu>
     <menu id="5">
       <phrase id="menutext" value="Activity Log" />
+    </menu>
+    <menu id="1">
+      <phrase id="menutext" value="Home" />
     </menu>
     <menu id="10091">
       <phrase id="menutext" value="Hutang Detail" />
@@ -822,6 +825,12 @@
     <table id="cf01_home_php">
       <phrase id="tblcaption" value="Home" />
     </table>
+    <table id="cf02_home_php">
+      <phrase id="tblcaption" value="Home" />
+    </table>
+    <table id="cf03_cetak_inv_php">
+      <phrase id="tblcaption" value="Invoice" />
+    </table>
     <table id="t01_company">
       <phrase id="tblcaption" value="Company" />
       <field id="id">
@@ -921,10 +930,10 @@
         <phrase id="fldcaption" value="id" />
       </field>
       <field id="tglpo">
-        <phrase id="fldcaption" value="Tgl PO" />
+        <phrase id="fldcaption" value="Tgl. PO" />
       </field>
       <field id="nopo">
-        <phrase id="fldcaption" value="No PO" />
+        <phrase id="fldcaption" value="No. PO" />
       </field>
       <field id="vendorid">
         <phrase id="fldcaption" value="Vendor" />
@@ -1108,6 +1117,27 @@
       </field>
       <field id="article">
         <phrase id="fldcaption" value="Article" />
+      </field>
+    </table>
+    <table id="t14_piutang">
+      <phrase id="tblcaption" value="Piutang" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="nopiutang">
+        <phrase id="fldcaption" value="No. Piutang" />
+      </field>
+      <field id="jualid">
+        <phrase id="fldcaption" value="No. &amp; Tgl. Invoice" />
+      </field>
+      <field id="jumlahpiutang">
+        <phrase id="fldcaption" value="Jumlah Piutang" />
+      </field>
+      <field id="jumlahbayar">
+        <phrase id="fldcaption" value="Jumlah Bayar" />
+      </field>
+      <field id="saldopiutang">
+        <phrase id="fldcaption" value="Saldo Piutang" />
       </field>
     </table>
     <table id="t91_log_status">
@@ -1450,9 +1480,6 @@
         <phrase id="fldcaption" value="Harga Jual" />
       </field>
     </table>
-    <table id="cf02_home_php">
-      <phrase id="tblcaption" value="Home" />
-    </table>
     <table id="v06_jual_lapstok">
       <phrase id="tblcaption" value="v 06 jual lapstok" />
       <field id="articleid">
@@ -1461,9 +1488,6 @@
       <field id="sumqty">
         <phrase id="fldcaption" value="sumqty" />
       </field>
-    </table>
-    <table id="cf03_cetak_inv_php">
-      <phrase id="tblcaption" value="Invoice" />
     </table>
   </project>
 </ew-language>

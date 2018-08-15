@@ -1,12 +1,12 @@
 <?php
 
 // Global variable for table object
-$t12_jualdetail = NULL;
+$t14_piutang = NULL;
 
 //
-// Table class for t12_jualdetail
+// Table class for t14_piutang
 //
-class ct12_jualdetail extends cTable {
+class ct14_piutang extends cTable {
 	var $AuditTrailOnAdd = TRUE;
 	var $AuditTrailOnEdit = TRUE;
 	var $AuditTrailOnDelete = TRUE;
@@ -14,12 +14,11 @@ class ct12_jualdetail extends cTable {
 	var $AuditTrailOnViewData = FALSE;
 	var $AuditTrailOnSearch = FALSE;
 	var $id;
+	var $NoPiutang;
 	var $JualID;
-	var $ArticleID;
-	var $HargaJual;
-	var $Qty;
-	var $SatuanID;
-	var $SubTotal;
+	var $JumlahPiutang;
+	var $JumlahBayar;
+	var $SaldoPiutang;
 
 	//
 	// Table class constructor
@@ -29,12 +28,12 @@ class ct12_jualdetail extends cTable {
 
 		// Language object
 		if (!isset($Language)) $Language = new cLanguage();
-		$this->TableVar = 't12_jualdetail';
-		$this->TableName = 't12_jualdetail';
+		$this->TableVar = 't14_piutang';
+		$this->TableName = 't14_piutang';
 		$this->TableType = 'TABLE';
 
 		// Update Table
-		$this->UpdateTable = "`t12_jualdetail`";
+		$this->UpdateTable = "`t14_piutang`";
 		$this->DBID = 'DB';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -44,9 +43,9 @@ class ct12_jualdetail extends cTable {
 		$this->ExportExcelPageSize = ""; // Page size (PHPExcel only)
 		$this->ExportWordPageOrientation = "portrait"; // Page orientation (PHPWord only)
 		$this->ExportWordColumnWidth = NULL; // Cell width (PHPWord only)
-		$this->DetailAdd = TRUE; // Allow detail add
-		$this->DetailEdit = TRUE; // Allow detail edit
-		$this->DetailView = TRUE; // Allow detail view
+		$this->DetailAdd = FALSE; // Allow detail add
+		$this->DetailEdit = FALSE; // Allow detail edit
+		$this->DetailView = FALSE; // Allow detail view
 		$this->ShowMultipleDetails = FALSE; // Show multiple details
 		$this->GridAddRowCount = 5;
 		$this->AllowAddDeleteRow = TRUE; // Allow add/delete row
@@ -54,49 +53,40 @@ class ct12_jualdetail extends cTable {
 		$this->BasicSearch = new cBasicSearch($this->TableVar);
 
 		// id
-		$this->id = new cField('t12_jualdetail', 't12_jualdetail', 'x_id', 'id', '`id`', '`id`', 3, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
+		$this->id = new cField('t14_piutang', 't14_piutang', 'x_id', 'id', '`id`', '`id`', 3, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
 		$this->id->Sortable = TRUE; // Allow sort
 		$this->id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['id'] = &$this->id;
 
+		// NoPiutang
+		$this->NoPiutang = new cField('t14_piutang', 't14_piutang', 'x_NoPiutang', 'NoPiutang', '`NoPiutang`', '`NoPiutang`', 200, -1, FALSE, '`NoPiutang`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->NoPiutang->Sortable = TRUE; // Allow sort
+		$this->fields['NoPiutang'] = &$this->NoPiutang;
+
 		// JualID
-		$this->JualID = new cField('t12_jualdetail', 't12_jualdetail', 'x_JualID', 'JualID', '`JualID`', '`JualID`', 3, -1, FALSE, '`JualID`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->JualID = new cField('t14_piutang', 't14_piutang', 'x_JualID', 'JualID', '`JualID`', '`JualID`', 3, -1, FALSE, '`JualID`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->JualID->Sortable = TRUE; // Allow sort
 		$this->JualID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['JualID'] = &$this->JualID;
 
-		// ArticleID
-		$this->ArticleID = new cField('t12_jualdetail', 't12_jualdetail', 'x_ArticleID', 'ArticleID', '`ArticleID`', '`ArticleID`', 3, -1, FALSE, '`EV__ArticleID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'SELECT');
-		$this->ArticleID->Sortable = TRUE; // Allow sort
-		$this->ArticleID->UsePleaseSelect = TRUE; // Use PleaseSelect by default
-		$this->ArticleID->PleaseSelectText = $Language->Phrase("PleaseSelect"); // PleaseSelect text
-		$this->ArticleID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['ArticleID'] = &$this->ArticleID;
+		// JumlahPiutang
+		$this->JumlahPiutang = new cField('t14_piutang', 't14_piutang', 'x_JumlahPiutang', 'JumlahPiutang', '`JumlahPiutang`', '`JumlahPiutang`', 4, -1, FALSE, '`JumlahPiutang`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->JumlahPiutang->Sortable = TRUE; // Allow sort
+		$this->JumlahPiutang->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['JumlahPiutang'] = &$this->JumlahPiutang;
 
-		// HargaJual
-		$this->HargaJual = new cField('t12_jualdetail', 't12_jualdetail', 'x_HargaJual', 'HargaJual', '`HargaJual`', '`HargaJual`', 4, -1, FALSE, '`HargaJual`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->HargaJual->Sortable = TRUE; // Allow sort
-		$this->HargaJual->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
-		$this->fields['HargaJual'] = &$this->HargaJual;
+		// JumlahBayar
+		$this->JumlahBayar = new cField('t14_piutang', 't14_piutang', 'x_JumlahBayar', 'JumlahBayar', '`JumlahBayar`', '`JumlahBayar`', 4, -1, FALSE, '`JumlahBayar`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->JumlahBayar->Sortable = TRUE; // Allow sort
+		$this->JumlahBayar->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['JumlahBayar'] = &$this->JumlahBayar;
 
-		// Qty
-		$this->Qty = new cField('t12_jualdetail', 't12_jualdetail', 'x_Qty', 'Qty', '`Qty`', '`Qty`', 4, -1, FALSE, '`Qty`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->Qty->Sortable = TRUE; // Allow sort
-		$this->Qty->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
-		$this->fields['Qty'] = &$this->Qty;
-
-		// SatuanID
-		$this->SatuanID = new cField('t12_jualdetail', 't12_jualdetail', 'x_SatuanID', 'SatuanID', '(SELECT satuanid  FROM t06_article a where articleid = a.id)', '(SELECT satuanid  FROM t06_article a where articleid = a.id)', 3, -1, FALSE, '`EV__SatuanID`', TRUE, TRUE, TRUE, 'FORMATTED TEXT', 'TEXT');
-		$this->SatuanID->FldIsCustom = TRUE; // Custom field
-		$this->SatuanID->Sortable = TRUE; // Allow sort
-		$this->SatuanID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['SatuanID'] = &$this->SatuanID;
-
-		// SubTotal
-		$this->SubTotal = new cField('t12_jualdetail', 't12_jualdetail', 'x_SubTotal', 'SubTotal', '`SubTotal`', '`SubTotal`', 4, -1, FALSE, '`SubTotal`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->SubTotal->Sortable = TRUE; // Allow sort
-		$this->SubTotal->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
-		$this->fields['SubTotal'] = &$this->SubTotal;
+		// SaldoPiutang
+		$this->SaldoPiutang = new cField('t14_piutang', 't14_piutang', 'x_SaldoPiutang', 'SaldoPiutang', '(select jumlahpiutang - jumlahbayar)', '(select jumlahpiutang - jumlahbayar)', 5, -1, FALSE, '(select jumlahpiutang - jumlahbayar)', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->SaldoPiutang->FldIsCustom = TRUE; // Custom field
+		$this->SaldoPiutang->Sortable = TRUE; // Allow sort
+		$this->SaldoPiutang->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
+		$this->fields['SaldoPiutang'] = &$this->SaldoPiutang;
 	}
 
 	// Field Visibility
@@ -142,85 +132,16 @@ class ct12_jualdetail extends cTable {
 			} else {
 				$this->setSessionOrderBy($sSortField . " " . $sThisSort); // Save to Session
 			}
-			$sSortFieldList = ($ofld->FldVirtualExpression <> "") ? $ofld->FldVirtualExpression : $sSortField;
-			if ($ctrl) {
-				$sOrderByList = $this->getSessionOrderByList();
-				if (strpos($sOrderByList, $sSortFieldList . " " . $sLastSort) !== FALSE) {
-					$sOrderByList = str_replace($sSortFieldList . " " . $sLastSort, $sSortFieldList . " " . $sThisSort, $sOrderByList);
-				} else {
-					if ($sOrderByList <> "") $sOrderByList .= ", ";
-					$sOrderByList .= $sSortFieldList . " " . $sThisSort;
-				}
-				$this->setSessionOrderByList($sOrderByList); // Save to Session
-			} else {
-				$this->setSessionOrderByList($sSortFieldList . " " . $sThisSort); // Save to Session
-			}
 		} else {
 			if (!$ctrl) $ofld->setSort("");
 		}
-	}
-
-	// Session ORDER BY for List page
-	function getSessionOrderByList() {
-		return @$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST];
-	}
-
-	function setSessionOrderByList($v) {
-		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_ORDER_BY_LIST] = $v;
-	}
-
-	// Current master table name
-	function getCurrentMasterTable() {
-		return @$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_MASTER_TABLE];
-	}
-
-	function setCurrentMasterTable($v) {
-		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_MASTER_TABLE] = $v;
-	}
-
-	// Session master WHERE clause
-	function GetMasterFilter() {
-
-		// Master filter
-		$sMasterFilter = "";
-		if ($this->getCurrentMasterTable() == "t11_jual") {
-			if ($this->JualID->getSessionValue() <> "")
-				$sMasterFilter .= "`id`=" . ew_QuotedValue($this->JualID->getSessionValue(), EW_DATATYPE_NUMBER, "DB");
-			else
-				return "";
-		}
-		return $sMasterFilter;
-	}
-
-	// Session detail WHERE clause
-	function GetDetailFilter() {
-
-		// Detail filter
-		$sDetailFilter = "";
-		if ($this->getCurrentMasterTable() == "t11_jual") {
-			if ($this->JualID->getSessionValue() <> "")
-				$sDetailFilter .= "`JualID`=" . ew_QuotedValue($this->JualID->getSessionValue(), EW_DATATYPE_NUMBER, "DB");
-			else
-				return "";
-		}
-		return $sDetailFilter;
-	}
-
-	// Master filter
-	function SqlMasterFilter_t11_jual() {
-		return "`id`=@id@";
-	}
-
-	// Detail filter
-	function SqlDetailFilter_t11_jual() {
-		return "`JualID`=@JualID@";
 	}
 
 	// Table level SQL
 	var $_SqlFrom = "";
 
 	function getSqlFrom() { // From
-		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t12_jualdetail`";
+		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t14_piutang`";
 	}
 
 	function SqlFrom() { // For backward compatibility
@@ -233,7 +154,7 @@ class ct12_jualdetail extends cTable {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() { // Select
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (SELECT satuanid  FROM t06_article a where articleid = a.id) AS `SatuanID` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (select jumlahpiutang - jumlahbayar) AS `SaldoPiutang` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -242,23 +163,6 @@ class ct12_jualdetail extends cTable {
 
 	function setSqlSelect($v) {
 		$this->_SqlSelect = $v;
-	}
-	var $_SqlSelectList = "";
-
-	function getSqlSelectList() { // Select for List page
-		$select = "";
-		$select = "SELECT * FROM (" .
-			"SELECT *, (SELECT satuanid  FROM t06_article a where articleid = a.id) AS `SatuanID`, (SELECT CONCAT(COALESCE(`Kode`, ''),'" . ew_ValueSeparator(1, $this->ArticleID) . "',COALESCE(`Nama`,'')) FROM `t06_article` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t12_jualdetail`.`ArticleID` LIMIT 1) AS `EV__ArticleID`, (SELECT `Nama` FROM `t07_satuan` `EW_TMP_LOOKUPTABLE` WHERE `EW_TMP_LOOKUPTABLE`.`id` = `t12_jualdetail`.`SatuanID` LIMIT 1) AS `EV__SatuanID` FROM `t12_jualdetail`" .
-			") `EW_TMP_TABLE`";
-		return ($this->_SqlSelectList <> "") ? $this->_SqlSelectList : $select;
-	}
-
-	function SqlSelectList() { // For backward compatibility
-		return $this->getSqlSelectList();
-	}
-
-	function setSqlSelectList($v) {
-		$this->_SqlSelectList = $v;
 	}
 	var $_SqlWhere = "";
 
@@ -305,7 +209,7 @@ class ct12_jualdetail extends cTable {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() { // Order By
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`NoPiutang` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -371,44 +275,16 @@ class ct12_jualdetail extends cTable {
 		ew_AddFilter($sFilter, $this->CurrentFilter);
 		$sFilter = $this->ApplyUserIDFilters($sFilter);
 		$this->Recordset_Selecting($sFilter);
-		if ($this->UseVirtualFields()) {
-			$sSelect = $this->getSqlSelectList();
-			$sSort = $this->UseSessionForListSQL ? $this->getSessionOrderByList() : "";
-		} else {
-			$sSelect = $this->getSqlSelect();
-			$sSort = $this->UseSessionForListSQL ? $this->getSessionOrderBy() : "";
-		}
+		$sSelect = $this->getSqlSelect();
+		$sSort = $this->UseSessionForListSQL ? $this->getSessionOrderBy() : "";
 		return ew_BuildSelectSql($sSelect, $this->getSqlWhere(), $this->getSqlGroupBy(),
 			$this->getSqlHaving(), $this->getSqlOrderBy(), $sFilter, $sSort);
 	}
 
 	// Get ORDER BY clause
 	function GetOrderBy() {
-		$sSort = ($this->UseVirtualFields()) ? $this->getSessionOrderByList() : $this->getSessionOrderBy();
+		$sSort = $this->getSessionOrderBy();
 		return ew_BuildSelectSql("", "", "", "", $this->getSqlOrderBy(), "", $sSort);
-	}
-
-	// Check if virtual fields is used in SQL
-	function UseVirtualFields() {
-		$sWhere = $this->UseSessionForListSQL ? $this->getSessionWhere() : $this->CurrentFilter;
-		$sOrderBy = $this->UseSessionForListSQL ? $this->getSessionOrderByList() : "";
-		if ($sWhere <> "")
-			$sWhere = " " . str_replace(array("(",")"), array("",""), $sWhere) . " ";
-		if ($sOrderBy <> "")
-			$sOrderBy = " " . str_replace(array("(",")"), array("",""), $sOrderBy) . " ";
-		if ($this->ArticleID->AdvancedSearch->SearchValue <> "" ||
-			$this->ArticleID->AdvancedSearch->SearchValue2 <> "" ||
-			strpos($sWhere, " " . $this->ArticleID->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		if (strpos($sOrderBy, " " . $this->ArticleID->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		if ($this->SatuanID->AdvancedSearch->SearchValue <> "" ||
-			$this->SatuanID->AdvancedSearch->SearchValue2 <> "" ||
-			strpos($sWhere, " " . $this->SatuanID->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		if (strpos($sOrderBy, " " . $this->SatuanID->FldVirtualExpression . " ") !== FALSE)
-			return TRUE;
-		return FALSE;
 	}
 
 	// Try to get record count
@@ -459,10 +335,7 @@ class ct12_jualdetail extends cTable {
 		$select = $this->TableType == 'CUSTOMVIEW' ? $this->getSqlSelect() : "SELECT * FROM " . $this->getSqlFrom();
 		$groupBy = $this->TableType == 'CUSTOMVIEW' ? $this->getSqlGroupBy() : "";
 		$having = $this->TableType == 'CUSTOMVIEW' ? $this->getSqlHaving() : "";
-		if ($this->UseVirtualFields())
-			$sql = ew_BuildSelectSql($this->getSqlSelectList(), $this->getSqlWhere(), $groupBy, $having, "", $filter, "");
-		else
-			$sql = ew_BuildSelectSql($select, $this->getSqlWhere(), $groupBy, $having, "", $filter, "");
+		$sql = ew_BuildSelectSql($select, $this->getSqlWhere(), $groupBy, $having, "", $filter, "");
 		$cnt = $this->TryGetRecordCount($sql);
 		if ($cnt == -1) {
 			$conn = &$this->Connection();
@@ -591,7 +464,7 @@ class ct12_jualdetail extends cTable {
 		if (@$_SESSION[$name] <> "") {
 			return $_SESSION[$name];
 		} else {
-			return "t12_jualdetaillist.php";
+			return "t14_piutanglist.php";
 		}
 	}
 
@@ -602,11 +475,11 @@ class ct12_jualdetail extends cTable {
 	// Get modal caption
 	function GetModalCaption($pageName) {
 		global $Language;
-		if ($pageName == "t12_jualdetailview.php")
+		if ($pageName == "t14_piutangview.php")
 			return $Language->Phrase("View");
-		elseif ($pageName == "t12_jualdetailedit.php")
+		elseif ($pageName == "t14_piutangedit.php")
 			return $Language->Phrase("Edit");
-		elseif ($pageName == "t12_jualdetailadd.php")
+		elseif ($pageName == "t14_piutangadd.php")
 			return $Language->Phrase("Add");
 		else
 			return "";
@@ -614,30 +487,30 @@ class ct12_jualdetail extends cTable {
 
 	// List URL
 	function GetListUrl() {
-		return "t12_jualdetaillist.php";
+		return "t14_piutanglist.php";
 	}
 
 	// View URL
 	function GetViewUrl($parm = "") {
 		if ($parm <> "")
-			$url = $this->KeyUrl("t12_jualdetailview.php", $this->UrlParm($parm));
+			$url = $this->KeyUrl("t14_piutangview.php", $this->UrlParm($parm));
 		else
-			$url = $this->KeyUrl("t12_jualdetailview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+			$url = $this->KeyUrl("t14_piutangview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
 		return $this->AddMasterUrl($url);
 	}
 
 	// Add URL
 	function GetAddUrl($parm = "") {
 		if ($parm <> "")
-			$url = "t12_jualdetailadd.php?" . $this->UrlParm($parm);
+			$url = "t14_piutangadd.php?" . $this->UrlParm($parm);
 		else
-			$url = "t12_jualdetailadd.php";
+			$url = "t14_piutangadd.php";
 		return $this->AddMasterUrl($url);
 	}
 
 	// Edit URL
 	function GetEditUrl($parm = "") {
-		$url = $this->KeyUrl("t12_jualdetailedit.php", $this->UrlParm($parm));
+		$url = $this->KeyUrl("t14_piutangedit.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -649,7 +522,7 @@ class ct12_jualdetail extends cTable {
 
 	// Copy URL
 	function GetCopyUrl($parm = "") {
-		$url = $this->KeyUrl("t12_jualdetailadd.php", $this->UrlParm($parm));
+		$url = $this->KeyUrl("t14_piutangadd.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -661,15 +534,11 @@ class ct12_jualdetail extends cTable {
 
 	// Delete URL
 	function GetDeleteUrl() {
-		return $this->KeyUrl("t12_jualdetaildelete.php", $this->UrlParm());
+		return $this->KeyUrl("t14_piutangdelete.php", $this->UrlParm());
 	}
 
 	// Add master url
 	function AddMasterUrl($url) {
-		if ($this->getCurrentMasterTable() == "t11_jual" && strpos($url, EW_TABLE_SHOW_MASTER . "=") === FALSE) {
-			$url .= (strpos($url, "?") !== FALSE ? "&" : "?") . EW_TABLE_SHOW_MASTER . "=" . $this->getCurrentMasterTable();
-			$url .= "&fk_id=" . urlencode($this->JualID->CurrentValue);
-		}
 		return $url;
 	}
 
@@ -767,12 +636,11 @@ class ct12_jualdetail extends cTable {
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
 		$this->id->setDbValue($rs->fields('id'));
+		$this->NoPiutang->setDbValue($rs->fields('NoPiutang'));
 		$this->JualID->setDbValue($rs->fields('JualID'));
-		$this->ArticleID->setDbValue($rs->fields('ArticleID'));
-		$this->HargaJual->setDbValue($rs->fields('HargaJual'));
-		$this->Qty->setDbValue($rs->fields('Qty'));
-		$this->SatuanID->setDbValue($rs->fields('SatuanID'));
-		$this->SubTotal->setDbValue($rs->fields('SubTotal'));
+		$this->JumlahPiutang->setDbValue($rs->fields('JumlahPiutang'));
+		$this->JumlahBayar->setDbValue($rs->fields('JumlahBayar'));
+		$this->SaldoPiutang->setDbValue($rs->fields('SaldoPiutang'));
 	}
 
 	// Render list row values
@@ -784,129 +652,92 @@ class ct12_jualdetail extends cTable {
 
 	// Common render codes
 		// id
+		// NoPiutang
 		// JualID
-		// ArticleID
-		// HargaJual
-		// Qty
-		// SatuanID
-		// SubTotal
+		// JumlahPiutang
+		// JumlahBayar
+		// SaldoPiutang
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
+		// NoPiutang
+		$this->NoPiutang->ViewValue = $this->NoPiutang->CurrentValue;
+		$this->NoPiutang->ViewCustomAttributes = "";
+
 		// JualID
 		$this->JualID->ViewValue = $this->JualID->CurrentValue;
+		if (strval($this->JualID->CurrentValue) <> "") {
+			$sFilterWrk = "`id`" . ew_SearchString("=", $this->JualID->CurrentValue, EW_DATATYPE_NUMBER, "");
+		$sSqlWrk = "SELECT `id`, `NoSO` AS `DispFld`, `TglSO` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t11_jual`";
+		$sWhereWrk = "";
+		$this->JualID->LookupFilters = array("df2" => "7");
+		ew_AddFilter($sWhereWrk, $sFilterWrk);
+		$this->Lookup_Selecting($this->JualID, $sWhereWrk); // Call Lookup Selecting
+		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
+			$rswrk = Conn()->Execute($sSqlWrk);
+			if ($rswrk && !$rswrk->EOF) { // Lookup values found
+				$arwrk = array();
+				$arwrk[1] = $rswrk->fields('DispFld');
+				$arwrk[2] = ew_FormatDateTime($rswrk->fields('Disp2Fld'), 7);
+				$this->JualID->ViewValue = $this->JualID->DisplayValue($arwrk);
+				$rswrk->Close();
+			} else {
+				$this->JualID->ViewValue = $this->JualID->CurrentValue;
+			}
+		} else {
+			$this->JualID->ViewValue = NULL;
+		}
 		$this->JualID->ViewCustomAttributes = "";
 
-		// ArticleID
-		if ($this->ArticleID->VirtualValue <> "") {
-			$this->ArticleID->ViewValue = $this->ArticleID->VirtualValue;
-		} else {
-		if (strval($this->ArticleID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->ArticleID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Kode` AS `DispFld`, `Nama` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t06_article`";
-		$sWhereWrk = "";
-		$this->ArticleID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$arwrk[2] = $rswrk->fields('Disp2Fld');
-				$this->ArticleID->ViewValue = $this->ArticleID->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->ArticleID->ViewValue = $this->ArticleID->CurrentValue;
-			}
-		} else {
-			$this->ArticleID->ViewValue = NULL;
-		}
-		}
-		$this->ArticleID->ViewCustomAttributes = "";
+		// JumlahPiutang
+		$this->JumlahPiutang->ViewValue = $this->JumlahPiutang->CurrentValue;
+		$this->JumlahPiutang->ViewValue = ew_FormatNumber($this->JumlahPiutang->ViewValue, 2, -2, -2, -2);
+		$this->JumlahPiutang->CellCssStyle .= "text-align: right;";
+		$this->JumlahPiutang->ViewCustomAttributes = "";
 
-		// HargaJual
-		$this->HargaJual->ViewValue = $this->HargaJual->CurrentValue;
-		$this->HargaJual->ViewValue = ew_FormatNumber($this->HargaJual->ViewValue, 2, -2, -2, -2);
-		$this->HargaJual->CellCssStyle .= "text-align: right;";
-		$this->HargaJual->ViewCustomAttributes = "";
+		// JumlahBayar
+		$this->JumlahBayar->ViewValue = $this->JumlahBayar->CurrentValue;
+		$this->JumlahBayar->ViewValue = ew_FormatNumber($this->JumlahBayar->ViewValue, 2, -2, -2, -2);
+		$this->JumlahBayar->CellCssStyle .= "text-align: right;";
+		$this->JumlahBayar->ViewCustomAttributes = "";
 
-		// Qty
-		$this->Qty->ViewValue = $this->Qty->CurrentValue;
-		$this->Qty->ViewValue = ew_FormatNumber($this->Qty->ViewValue, 2, -2, -2, -2);
-		$this->Qty->CellCssStyle .= "text-align: right;";
-		$this->Qty->ViewCustomAttributes = "";
-
-		// SatuanID
-		if ($this->SatuanID->VirtualValue <> "") {
-			$this->SatuanID->ViewValue = $this->SatuanID->VirtualValue;
-		} else {
-			$this->SatuanID->ViewValue = $this->SatuanID->CurrentValue;
-		if (strval($this->SatuanID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->SatuanID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `Nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t07_satuan`";
-		$sWhereWrk = "";
-		$this->SatuanID->LookupFilters = array("dx1" => '`Nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->SatuanID, $sWhereWrk); // Call Lookup Selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->SatuanID->ViewValue = $this->SatuanID->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->SatuanID->ViewValue = $this->SatuanID->CurrentValue;
-			}
-		} else {
-			$this->SatuanID->ViewValue = NULL;
-		}
-		}
-		$this->SatuanID->ViewCustomAttributes = "";
-
-		// SubTotal
-		$this->SubTotal->ViewValue = $this->SubTotal->CurrentValue;
-		$this->SubTotal->ViewValue = ew_FormatNumber($this->SubTotal->ViewValue, 2, -2, -2, -2);
-		$this->SubTotal->CellCssStyle .= "text-align: right;";
-		$this->SubTotal->ViewCustomAttributes = "";
+		// SaldoPiutang
+		$this->SaldoPiutang->ViewValue = $this->SaldoPiutang->CurrentValue;
+		$this->SaldoPiutang->ViewValue = ew_FormatNumber($this->SaldoPiutang->ViewValue, 2, -2, -2, -2);
+		$this->SaldoPiutang->CellCssStyle .= "text-align: right;";
+		$this->SaldoPiutang->ViewCustomAttributes = "";
 
 		// id
 		$this->id->LinkCustomAttributes = "";
 		$this->id->HrefValue = "";
 		$this->id->TooltipValue = "";
 
+		// NoPiutang
+		$this->NoPiutang->LinkCustomAttributes = "";
+		$this->NoPiutang->HrefValue = "";
+		$this->NoPiutang->TooltipValue = "";
+
 		// JualID
 		$this->JualID->LinkCustomAttributes = "";
 		$this->JualID->HrefValue = "";
 		$this->JualID->TooltipValue = "";
 
-		// ArticleID
-		$this->ArticleID->LinkCustomAttributes = "";
-		$this->ArticleID->HrefValue = "";
-		$this->ArticleID->TooltipValue = "";
+		// JumlahPiutang
+		$this->JumlahPiutang->LinkCustomAttributes = "";
+		$this->JumlahPiutang->HrefValue = "";
+		$this->JumlahPiutang->TooltipValue = "";
 
-		// HargaJual
-		$this->HargaJual->LinkCustomAttributes = "";
-		$this->HargaJual->HrefValue = "";
-		$this->HargaJual->TooltipValue = "";
+		// JumlahBayar
+		$this->JumlahBayar->LinkCustomAttributes = "";
+		$this->JumlahBayar->HrefValue = "";
+		$this->JumlahBayar->TooltipValue = "";
 
-		// Qty
-		$this->Qty->LinkCustomAttributes = "";
-		$this->Qty->HrefValue = "";
-		$this->Qty->TooltipValue = "";
-
-		// SatuanID
-		$this->SatuanID->LinkCustomAttributes = "";
-		$this->SatuanID->HrefValue = "";
-		$this->SatuanID->TooltipValue = "";
-
-		// SubTotal
-		$this->SubTotal->LinkCustomAttributes = "";
-		$this->SubTotal->HrefValue = "";
-		$this->SubTotal->TooltipValue = "";
+		// SaldoPiutang
+		$this->SaldoPiutang->LinkCustomAttributes = "";
+		$this->SaldoPiutang->HrefValue = "";
+		$this->SaldoPiutang->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -928,48 +759,38 @@ class ct12_jualdetail extends cTable {
 		$this->id->EditValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
+		// NoPiutang
+		$this->NoPiutang->EditAttrs["class"] = "form-control";
+		$this->NoPiutang->EditCustomAttributes = "";
+		$this->NoPiutang->EditValue = $this->NoPiutang->CurrentValue;
+		$this->NoPiutang->PlaceHolder = ew_RemoveHtml($this->NoPiutang->FldCaption());
+
 		// JualID
 		$this->JualID->EditAttrs["class"] = "form-control";
 		$this->JualID->EditCustomAttributes = "";
-		if ($this->JualID->getSessionValue() <> "") {
-			$this->JualID->CurrentValue = $this->JualID->getSessionValue();
-		$this->JualID->ViewValue = $this->JualID->CurrentValue;
-		$this->JualID->ViewCustomAttributes = "";
-		} else {
 		$this->JualID->EditValue = $this->JualID->CurrentValue;
 		$this->JualID->PlaceHolder = ew_RemoveHtml($this->JualID->FldCaption());
-		}
 
-		// ArticleID
-		$this->ArticleID->EditAttrs["class"] = "form-control";
-		$this->ArticleID->EditCustomAttributes = "";
+		// JumlahPiutang
+		$this->JumlahPiutang->EditAttrs["class"] = "form-control";
+		$this->JumlahPiutang->EditCustomAttributes = "";
+		$this->JumlahPiutang->EditValue = $this->JumlahPiutang->CurrentValue;
+		$this->JumlahPiutang->PlaceHolder = ew_RemoveHtml($this->JumlahPiutang->FldCaption());
+		if (strval($this->JumlahPiutang->EditValue) <> "" && is_numeric($this->JumlahPiutang->EditValue)) $this->JumlahPiutang->EditValue = ew_FormatNumber($this->JumlahPiutang->EditValue, -2, -2, -2, -2);
 
-		// HargaJual
-		$this->HargaJual->EditAttrs["class"] = "form-control";
-		$this->HargaJual->EditCustomAttributes = "";
-		$this->HargaJual->EditValue = $this->HargaJual->CurrentValue;
-		$this->HargaJual->PlaceHolder = ew_RemoveHtml($this->HargaJual->FldCaption());
-		if (strval($this->HargaJual->EditValue) <> "" && is_numeric($this->HargaJual->EditValue)) $this->HargaJual->EditValue = ew_FormatNumber($this->HargaJual->EditValue, -2, -2, -2, -2);
+		// JumlahBayar
+		$this->JumlahBayar->EditAttrs["class"] = "form-control";
+		$this->JumlahBayar->EditCustomAttributes = "";
+		$this->JumlahBayar->EditValue = $this->JumlahBayar->CurrentValue;
+		$this->JumlahBayar->PlaceHolder = ew_RemoveHtml($this->JumlahBayar->FldCaption());
+		if (strval($this->JumlahBayar->EditValue) <> "" && is_numeric($this->JumlahBayar->EditValue)) $this->JumlahBayar->EditValue = ew_FormatNumber($this->JumlahBayar->EditValue, -2, -2, -2, -2);
 
-		// Qty
-		$this->Qty->EditAttrs["class"] = "form-control";
-		$this->Qty->EditCustomAttributes = "";
-		$this->Qty->EditValue = $this->Qty->CurrentValue;
-		$this->Qty->PlaceHolder = ew_RemoveHtml($this->Qty->FldCaption());
-		if (strval($this->Qty->EditValue) <> "" && is_numeric($this->Qty->EditValue)) $this->Qty->EditValue = ew_FormatNumber($this->Qty->EditValue, -2, -2, -2, -2);
-
-		// SatuanID
-		$this->SatuanID->EditAttrs["class"] = "form-control";
-		$this->SatuanID->EditCustomAttributes = "";
-		$this->SatuanID->EditValue = $this->SatuanID->CurrentValue;
-		$this->SatuanID->PlaceHolder = ew_RemoveHtml($this->SatuanID->FldCaption());
-
-		// SubTotal
-		$this->SubTotal->EditAttrs["class"] = "form-control";
-		$this->SubTotal->EditCustomAttributes = "";
-		$this->SubTotal->EditValue = $this->SubTotal->CurrentValue;
-		$this->SubTotal->PlaceHolder = ew_RemoveHtml($this->SubTotal->FldCaption());
-		if (strval($this->SubTotal->EditValue) <> "" && is_numeric($this->SubTotal->EditValue)) $this->SubTotal->EditValue = ew_FormatNumber($this->SubTotal->EditValue, -2, -2, -2, -2);
+		// SaldoPiutang
+		$this->SaldoPiutang->EditAttrs["class"] = "form-control";
+		$this->SaldoPiutang->EditCustomAttributes = "";
+		$this->SaldoPiutang->EditValue = $this->SaldoPiutang->CurrentValue;
+		$this->SaldoPiutang->PlaceHolder = ew_RemoveHtml($this->SaldoPiutang->FldCaption());
+		if (strval($this->SaldoPiutang->EditValue) <> "" && is_numeric($this->SaldoPiutang->EditValue)) $this->SaldoPiutang->EditValue = ew_FormatNumber($this->SaldoPiutang->EditValue, -2, -2, -2, -2);
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -998,20 +819,19 @@ class ct12_jualdetail extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
+					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
+					if ($this->NoPiutang->Exportable) $Doc->ExportCaption($this->NoPiutang);
 					if ($this->JualID->Exportable) $Doc->ExportCaption($this->JualID);
-					if ($this->ArticleID->Exportable) $Doc->ExportCaption($this->ArticleID);
-					if ($this->HargaJual->Exportable) $Doc->ExportCaption($this->HargaJual);
-					if ($this->Qty->Exportable) $Doc->ExportCaption($this->Qty);
-					if ($this->SatuanID->Exportable) $Doc->ExportCaption($this->SatuanID);
-					if ($this->SubTotal->Exportable) $Doc->ExportCaption($this->SubTotal);
+					if ($this->JumlahPiutang->Exportable) $Doc->ExportCaption($this->JumlahPiutang);
+					if ($this->JumlahBayar->Exportable) $Doc->ExportCaption($this->JumlahBayar);
+					if ($this->SaldoPiutang->Exportable) $Doc->ExportCaption($this->SaldoPiutang);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
+					if ($this->NoPiutang->Exportable) $Doc->ExportCaption($this->NoPiutang);
 					if ($this->JualID->Exportable) $Doc->ExportCaption($this->JualID);
-					if ($this->ArticleID->Exportable) $Doc->ExportCaption($this->ArticleID);
-					if ($this->HargaJual->Exportable) $Doc->ExportCaption($this->HargaJual);
-					if ($this->Qty->Exportable) $Doc->ExportCaption($this->Qty);
-					if ($this->SatuanID->Exportable) $Doc->ExportCaption($this->SatuanID);
-					if ($this->SubTotal->Exportable) $Doc->ExportCaption($this->SubTotal);
+					if ($this->JumlahPiutang->Exportable) $Doc->ExportCaption($this->JumlahPiutang);
+					if ($this->JumlahBayar->Exportable) $Doc->ExportCaption($this->JumlahBayar);
+					if ($this->SaldoPiutang->Exportable) $Doc->ExportCaption($this->SaldoPiutang);
 				}
 				$Doc->EndExportRow();
 			}
@@ -1043,20 +863,19 @@ class ct12_jualdetail extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
+						if ($this->id->Exportable) $Doc->ExportField($this->id);
+						if ($this->NoPiutang->Exportable) $Doc->ExportField($this->NoPiutang);
 						if ($this->JualID->Exportable) $Doc->ExportField($this->JualID);
-						if ($this->ArticleID->Exportable) $Doc->ExportField($this->ArticleID);
-						if ($this->HargaJual->Exportable) $Doc->ExportField($this->HargaJual);
-						if ($this->Qty->Exportable) $Doc->ExportField($this->Qty);
-						if ($this->SatuanID->Exportable) $Doc->ExportField($this->SatuanID);
-						if ($this->SubTotal->Exportable) $Doc->ExportField($this->SubTotal);
+						if ($this->JumlahPiutang->Exportable) $Doc->ExportField($this->JumlahPiutang);
+						if ($this->JumlahBayar->Exportable) $Doc->ExportField($this->JumlahBayar);
+						if ($this->SaldoPiutang->Exportable) $Doc->ExportField($this->SaldoPiutang);
 					} else {
 						if ($this->id->Exportable) $Doc->ExportField($this->id);
+						if ($this->NoPiutang->Exportable) $Doc->ExportField($this->NoPiutang);
 						if ($this->JualID->Exportable) $Doc->ExportField($this->JualID);
-						if ($this->ArticleID->Exportable) $Doc->ExportField($this->ArticleID);
-						if ($this->HargaJual->Exportable) $Doc->ExportField($this->HargaJual);
-						if ($this->Qty->Exportable) $Doc->ExportField($this->Qty);
-						if ($this->SatuanID->Exportable) $Doc->ExportField($this->SatuanID);
-						if ($this->SubTotal->Exportable) $Doc->ExportField($this->SubTotal);
+						if ($this->JumlahPiutang->Exportable) $Doc->ExportField($this->JumlahPiutang);
+						if ($this->JumlahBayar->Exportable) $Doc->ExportField($this->JumlahBayar);
+						if ($this->SaldoPiutang->Exportable) $Doc->ExportField($this->SaldoPiutang);
 					}
 					$Doc->EndExportRow($RowCnt);
 				}
@@ -1076,29 +895,6 @@ class ct12_jualdetail extends cTable {
 	function GetAutoFill($id, $val) {
 		$rsarr = array();
 		$rowcnt = 0;
-		if (preg_match('/^x(\d)*_ArticleID$/', $id)) {
-			$conn = &$this->Connection();
-			$sSqlWrk = "SELECT `HargaJual` AS FIELD0, `SatuanID` AS FIELD1 FROM `t06_article`";
-			$sWhereWrk = "(`id` = " . ew_QuotedValue($val, EW_DATATYPE_NUMBER, $this->DBID) . ")";
-			$this->ArticleID->LookupFilters = array("dx1" => '`Kode`', "dx2" => '`Nama`');
-			$this->Lookup_Selecting($this->ArticleID, $sWhereWrk); // Call Lookup Selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($rs = ew_LoadRecordset($sSqlWrk, $conn)) {
-				while ($rs && !$rs->EOF) {
-					$ar = array();
-					$this->HargaJual->setDbValue($rs->fields[0]);
-					$this->SatuanID->setDbValue($rs->fields[1]);
-					$this->RowType == EW_ROWTYPE_EDIT;
-					$this->RenderEditRow();
-					$ar[] = ($this->HargaJual->AutoFillOriginalValue) ? $this->HargaJual->CurrentValue : $this->HargaJual->EditValue;
-					$ar[] = ($this->SatuanID->AutoFillOriginalValue) ? $this->SatuanID->CurrentValue : $this->SatuanID->EditValue;
-					$rowcnt += 1;
-					$rsarr[] = $ar;
-					$rs->MoveNext();
-				}
-				$rs->Close();
-			}
-		}
 
 		// Output
 		if (is_array($rsarr) && $rowcnt > 0) {
@@ -1123,7 +919,7 @@ class ct12_jualdetail extends cTable {
 
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
-		$table = 't12_jualdetail';
+		$table = 't14_piutang';
 		$usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
@@ -1132,7 +928,7 @@ class ct12_jualdetail extends cTable {
 	function WriteAuditTrailOnAdd(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnAdd) return;
-		$table = 't12_jualdetail';
+		$table = 't14_piutang';
 
 		// Get key value
 		$key = "";
@@ -1166,7 +962,7 @@ class ct12_jualdetail extends cTable {
 	function WriteAuditTrailOnEdit(&$rsold, &$rsnew) {
 		global $Language;
 		if (!$this->AuditTrailOnEdit) return;
-		$table = 't12_jualdetail';
+		$table = 't14_piutang';
 
 		// Get key value
 		$key = "";
@@ -1213,7 +1009,7 @@ class ct12_jualdetail extends cTable {
 	function WriteAuditTrailOnDelete(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnDelete) return;
-		$table = 't12_jualdetail';
+		$table = 't14_piutang';
 
 		// Get key value
 		$key = "";
@@ -1296,71 +1092,6 @@ class ct12_jualdetail extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"
-		// tabel t11_jual
-		// simpan akumulasi subtotal ke jual master
-
-		$tot_det = ew_ExecuteScalar("SELECT SUM(subtotal) FROM t12_jualdetail WHERE jualid = ".$rsnew["JualID"]."");
-		ew_Execute("UPDATE t11_jual SET total = ".$tot_det." WHERE id = ".$rsnew["JualID"]."");
-
-		// tabel t14_piutang
-		// periksa dulu apakah sudah ada di tabel piutang dengan jualid yang baru saja
-		// ditambah
-
-		$reccount = ew_ExecuteScalar("SELECT COUNT(jualid) FROM t14_piutang WHERE jualid = ".$rsnew["JualID"]."");
-
-		//$q = "select * from t14_piutang where jualid = ".$rsnew["JualID"]."";
-		//$r = Conn()->Execute($q);
-		//if ($r->EOF) {
-
-		if ($reccount > 0) {
-
-			// data sudah ada
-			ew_Execute("UPDATE t14_piutang SET jumlahpiutang = ".$tot_det." WHERE jualid = ".$rsnew["JualID"]."");
-		}
-		else {
-
-			// setup nomor piutang baru
-			$NoPiutang = f_GetNextNoPiutang();
-
-			// insert ke tabel piutang dengan nomor SO baru
-			ew_Execute("insert into t14_piutang (nopiutang, jualid, jumlahpiutang) values
-			('".$NoPiutang."', ".$rsnew["JualID"].", ".$tot_det.")");
-		}
-
-		// tabel t13_mutasi
-		// cari nomor urut terbaru di tabel mutasi
-
-		$NoUrut = f_GetNextNoUrut($rsnew["ArticleID"]);
-
-		// cari nomor so berdasarkan jualid
-		$NoSO = f_GetNoSO($rsnew["JualID"]);
-
-		// tambah data otomatis ke tabel mutasi
-		$q = "insert into t13_mutasi (
-			TabelID,
-			Url,
-			ArticleID,
-			NoUrut,
-			Tgl,
-			Jam,
-			Keterangan,
-			NoRef,
-			KeluarQty,
-			SaldoQty
-			) values (
-			".$rsnew["id"].",
-			't12_jualdetailview.php?showdetail=&id=".$rsnew["id"]."',
-			".$rsnew["ArticleID"].",
-			".$NoUrut.",
-			'".date("Y-m-d")."',
-			'".date("H:i")."',
-			'Jual',
-			'".$NoSO."',
-			".$rsnew["Qty"].",
-			".-1 * $rsnew["Qty"]."
-			)";
-		ew_Execute($q);
-		f_UpdateSaldo($rsnew["ArticleID"]);
 	}
 
 	// Row Updating event
@@ -1376,30 +1107,6 @@ class ct12_jualdetail extends cTable {
 	function Row_Updated($rsold, &$rsnew) {
 
 		//echo "Row Updated";
-		// tabel t11_jual
-		// update akumulasi subtotal ke master
-
-		$tot_det = ew_ExecuteScalar("SELECT SUM(subtotal) FROM t12_jualdetail WHERE jualid = ".$rsold["JualID"]."");
-		ew_Execute("UPDATE t11_jual SET total = ".$tot_det." WHERE id = ".$rsold["JualID"]."");
-
-		// table t14_piutang
-		// update data di tabel piutang
-		// disesuaikan dengan data di tabel jual detail
-
-		$q = "update t14_piutang set jumlahpiutang = ".$tot_det." where jualid = ".$rsold["JualID"]."";
-		ew_Execute($q);
-
-		// tabel t13_mutasi
-		// update data otomatis di tabel mutasi berdasarkan keterangan dan tabelid
-
-		$q = "update t13_mutasi set
-			KeluarQty = ".$rsnew["Qty"].",
-			SaldoQty = ".-1 * $rsnew["Qty"]."
-			where
-			Keterangan = 'Jual'
-			and TabelID = ".$rsold["id"]."";
-		ew_Execute($q);
-		f_UpdateSaldo($rsold["ArticleID"]);
 	}
 
 	// Row Update Conflict event
@@ -1454,30 +1161,6 @@ class ct12_jualdetail extends cTable {
 	function Row_Deleted(&$rs) {
 
 		//echo "Row Deleted";
-		// tabel t11_jual
-		// update akumulasi subtotal ke master
-
-		$rec_cnt_det = ew_ExecuteScalar("SELECT COUNT(subtotal) FROM t12_jualdetail WHERE jualid = ".$rs["JualID"]."");
-		if ($rec_cnt_det > 0) {
-			$tot_det = ew_ExecuteScalar("SELECT SUM(subtotal) FROM t12_jualdetail WHERE jualid = ".$rs["JualID"]."");
-			ew_Execute("UPDATE t11_jual SET total = ".$tot_det." WHERE id = ".$rs["JualID"]."");
-		}
-		else {
-			$tot_det = 0;
-			ew_Execute("UPDATE t11_jual SET total = 0 WHERE id = ".$rs["JualID"]."");
-		}
-
-		// tabel t14_piutang
-		ew_Execute("UPDATE t14_piutang SET jumlahpiutang = ".$tot_det." WHERE jualid = ".$rs["JualID"]."");
-
-		// tabel t13_mutasi
-		// delete data otomatis di tabel mutasi berdasarkan keterangan dan tabelid
-
-		$q = "delete from t13_mutasi where
-			Keterangan = 'Jual'
-			and TabelID = ".$rs["id"]."";
-		ew_Execute($q);
-		f_UpdateSaldo($rs["ArticleID"]);
 	}
 
 	// Email Sending event
@@ -1507,8 +1190,6 @@ class ct12_jualdetail extends cTable {
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
 
-		$this->SatuanID->ReadOnly = true;
-		$this->SubTotal->ReadOnly = true;
 	}
 
 	// User ID Filtering event

@@ -307,6 +307,8 @@ class cdefault {
 		$this->Page_Terminate("cf02_home.php"); // Exit and go to default page
 		if ($Security->AllowList(CurrentProjectID() . 'cf01_home.php'))
 			$this->Page_Terminate("cf01_home.php");
+		if ($Security->AllowList(CurrentProjectID() . 'cf03_cetak_inv.php'))
+			$this->Page_Terminate("cf03_cetak_inv.php");
 		if ($Security->AllowList(CurrentProjectID() . 't01_company'))
 			$this->Page_Terminate("t01_companylist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't02_vendor'))
@@ -331,6 +333,8 @@ class cdefault {
 			$this->Page_Terminate("t11_juallist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't12_jualdetail'))
 			$this->Page_Terminate("t12_jualdetaillist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't14_piutang'))
+			$this->Page_Terminate("t14_piutanglist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't91_log_status'))
 			$this->Page_Terminate("t91_log_statuslist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't92_log'))
@@ -349,8 +353,6 @@ class cdefault {
 			$this->Page_Terminate("t98_userlevelpermissionslist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't99_audittrail'))
 			$this->Page_Terminate("t99_audittraillist.php");
-		if ($Security->AllowList(CurrentProjectID() . 'cf03_cetak_inv.php'))
-			$this->Page_Terminate("cf03_cetak_inv.php");
 		if ($Security->IsLoggedIn()) {
 			$this->setFailureMessage(ew_DeniedMsg() . "<br><br><a href=\"logout.php\">" . $Language->Phrase("BackToLogin") . "</a>");
 		} else {
