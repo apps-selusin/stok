@@ -645,28 +645,8 @@ class ct98_userlevelpermissions_list extends ct98_userlevelpermissions {
 					$option->HideAllOptions();
 			}
 
-			// Get default search criteria
-			ew_AddFilter($this->DefaultSearchWhere, $this->BasicSearchWhere(TRUE));
-
-			// Get basic search values
-			$this->LoadBasicSearchValues();
-
-			// Process filter list
-			$this->ProcessFilterList();
-
-			// Restore search parms from Session if not searching / reset / export
-			if (($this->Export <> "" || $this->Command <> "search" && $this->Command <> "reset" && $this->Command <> "resetall") && $this->Command <> "json" && $this->CheckSearchParms())
-				$this->RestoreSearchParms();
-
-			// Call Recordset SearchValidated event
-			$this->Recordset_SearchValidated();
-
 			// Set up sorting order
 			$this->SetupSortOrder();
-
-			// Get basic search criteria
-			if ($gsSearchError == "")
-				$sSrchBasic = $this->BasicSearchWhere();
 		}
 
 		// Restore display records
@@ -679,31 +659,6 @@ class ct98_userlevelpermissions_list extends ct98_userlevelpermissions {
 		// Load Sorting Order
 		if ($this->Command <> "json")
 			$this->LoadSortOrder();
-
-		// Load search default if no existing search criteria
-		if (!$this->CheckSearchParms()) {
-
-			// Load basic search from default
-			$this->BasicSearch->LoadDefault();
-			if ($this->BasicSearch->Keyword != "")
-				$sSrchBasic = $this->BasicSearchWhere();
-		}
-
-		// Build search criteria
-		ew_AddFilter($this->SearchWhere, $sSrchAdvanced);
-		ew_AddFilter($this->SearchWhere, $sSrchBasic);
-
-		// Call Recordset_Searching event
-		$this->Recordset_Searching($this->SearchWhere);
-
-		// Save search criteria
-		if ($this->Command == "search" && !$this->RestoreSearch) {
-			$this->setSearchWhere($this->SearchWhere); // Save to Session
-			$this->StartRec = 1; // Reset start record counter
-			$this->setStartRecordNumber($this->StartRec);
-		} elseif ($this->Command <> "json") {
-			$this->SearchWhere = $this->getSearchWhere();
-		}
 
 		// Build filter
 		$sFilter = "";
@@ -803,230 +758,6 @@ class ct98_userlevelpermissions_list extends ct98_userlevelpermissions {
 		return TRUE;
 	}
 
-	// Get list of filters
-	function GetFilterList() {
-		global $UserProfile;
-
-		// Initialize
-		$sFilterList = "";
-		$sSavedFilterList = "";
-		$sFilterList = ew_Concat($sFilterList, $this->userlevelid->AdvancedSearch->ToJson(), ","); // Field userlevelid
-		$sFilterList = ew_Concat($sFilterList, $this->_tablename->AdvancedSearch->ToJson(), ","); // Field tablename
-		$sFilterList = ew_Concat($sFilterList, $this->permission->AdvancedSearch->ToJson(), ","); // Field permission
-		if ($this->BasicSearch->Keyword <> "") {
-			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
-			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
-		}
-		$sFilterList = preg_replace('/,$/', "", $sFilterList);
-
-		// Return filter list in json
-		if ($sFilterList <> "")
-			$sFilterList = "\"data\":{" . $sFilterList . "}";
-		if ($sSavedFilterList <> "") {
-			if ($sFilterList <> "")
-				$sFilterList .= ",";
-			$sFilterList .= "\"filters\":" . $sSavedFilterList;
-		}
-		return ($sFilterList <> "") ? "{" . $sFilterList . "}" : "null";
-	}
-
-	// Process filter list
-	function ProcessFilterList() {
-		global $UserProfile;
-		if (@$_POST["ajax"] == "savefilters") { // Save filter request (Ajax)
-			$filters = @$_POST["filters"];
-			$UserProfile->SetSearchFilters(CurrentUserName(), "ft98_userlevelpermissionslistsrch", $filters);
-
-			// Clean output buffer
-			if (!EW_DEBUG_ENABLED && ob_get_length())
-				ob_end_clean();
-			echo ew_ArrayToJson(array(array("success" => TRUE))); // Success
-			$this->Page_Terminate();
-			exit();
-		} elseif (@$_POST["cmd"] == "resetfilter") {
-			$this->RestoreFilterList();
-		}
-	}
-
-	// Restore list of filters
-	function RestoreFilterList() {
-
-		// Return if not reset filter
-		if (@$_POST["cmd"] <> "resetfilter")
-			return FALSE;
-		$filter = json_decode(@$_POST["filter"], TRUE);
-		$this->Command = "search";
-
-		// Field userlevelid
-		$this->userlevelid->AdvancedSearch->SearchValue = @$filter["x_userlevelid"];
-		$this->userlevelid->AdvancedSearch->SearchOperator = @$filter["z_userlevelid"];
-		$this->userlevelid->AdvancedSearch->SearchCondition = @$filter["v_userlevelid"];
-		$this->userlevelid->AdvancedSearch->SearchValue2 = @$filter["y_userlevelid"];
-		$this->userlevelid->AdvancedSearch->SearchOperator2 = @$filter["w_userlevelid"];
-		$this->userlevelid->AdvancedSearch->Save();
-
-		// Field tablename
-		$this->_tablename->AdvancedSearch->SearchValue = @$filter["x__tablename"];
-		$this->_tablename->AdvancedSearch->SearchOperator = @$filter["z__tablename"];
-		$this->_tablename->AdvancedSearch->SearchCondition = @$filter["v__tablename"];
-		$this->_tablename->AdvancedSearch->SearchValue2 = @$filter["y__tablename"];
-		$this->_tablename->AdvancedSearch->SearchOperator2 = @$filter["w__tablename"];
-		$this->_tablename->AdvancedSearch->Save();
-
-		// Field permission
-		$this->permission->AdvancedSearch->SearchValue = @$filter["x_permission"];
-		$this->permission->AdvancedSearch->SearchOperator = @$filter["z_permission"];
-		$this->permission->AdvancedSearch->SearchCondition = @$filter["v_permission"];
-		$this->permission->AdvancedSearch->SearchValue2 = @$filter["y_permission"];
-		$this->permission->AdvancedSearch->SearchOperator2 = @$filter["w_permission"];
-		$this->permission->AdvancedSearch->Save();
-		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
-		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
-	}
-
-	// Return basic search SQL
-	function BasicSearchSQL($arKeywords, $type) {
-		$sWhere = "";
-		$this->BuildBasicSearchSQL($sWhere, $this->_tablename, $arKeywords, $type);
-		return $sWhere;
-	}
-
-	// Build basic search SQL
-	function BuildBasicSearchSQL(&$Where, &$Fld, $arKeywords, $type) {
-		global $EW_BASIC_SEARCH_IGNORE_PATTERN;
-		$sDefCond = ($type == "OR") ? "OR" : "AND";
-		$arSQL = array(); // Array for SQL parts
-		$arCond = array(); // Array for search conditions
-		$cnt = count($arKeywords);
-		$j = 0; // Number of SQL parts
-		for ($i = 0; $i < $cnt; $i++) {
-			$Keyword = $arKeywords[$i];
-			$Keyword = trim($Keyword);
-			if ($EW_BASIC_SEARCH_IGNORE_PATTERN <> "") {
-				$Keyword = preg_replace($EW_BASIC_SEARCH_IGNORE_PATTERN, "\\", $Keyword);
-				$ar = explode("\\", $Keyword);
-			} else {
-				$ar = array($Keyword);
-			}
-			foreach ($ar as $Keyword) {
-				if ($Keyword <> "") {
-					$sWrk = "";
-					if ($Keyword == "OR" && $type == "") {
-						if ($j > 0)
-							$arCond[$j-1] = "OR";
-					} elseif ($Keyword == EW_NULL_VALUE) {
-						$sWrk = $Fld->FldExpression . " IS NULL";
-					} elseif ($Keyword == EW_NOT_NULL_VALUE) {
-						$sWrk = $Fld->FldExpression . " IS NOT NULL";
-					} elseif ($Fld->FldIsVirtual) {
-						$sWrk = $Fld->FldVirtualExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
-					} elseif ($Fld->FldDataType != EW_DATATYPE_NUMBER || is_numeric($Keyword)) {
-						$sWrk = $Fld->FldBasicSearchExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
-					}
-					if ($sWrk <> "") {
-						$arSQL[$j] = $sWrk;
-						$arCond[$j] = $sDefCond;
-						$j += 1;
-					}
-				}
-			}
-		}
-		$cnt = count($arSQL);
-		$bQuoted = FALSE;
-		$sSql = "";
-		if ($cnt > 0) {
-			for ($i = 0; $i < $cnt-1; $i++) {
-				if ($arCond[$i] == "OR") {
-					if (!$bQuoted) $sSql .= "(";
-					$bQuoted = TRUE;
-				}
-				$sSql .= $arSQL[$i];
-				if ($bQuoted && $arCond[$i] <> "OR") {
-					$sSql .= ")";
-					$bQuoted = FALSE;
-				}
-				$sSql .= " " . $arCond[$i] . " ";
-			}
-			$sSql .= $arSQL[$cnt-1];
-			if ($bQuoted)
-				$sSql .= ")";
-		}
-		if ($sSql <> "") {
-			if ($Where <> "") $Where .= " OR ";
-			$Where .= "(" . $sSql . ")";
-		}
-	}
-
-	// Return basic search WHERE clause based on search keyword and type
-	function BasicSearchWhere($Default = FALSE) {
-		global $Security;
-		$sSearchStr = "";
-		if (!$Security->CanSearch()) return "";
-		$sSearchKeyword = ($Default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
-		$sSearchType = ($Default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
-
-		// Get search SQL
-		if ($sSearchKeyword <> "") {
-			$ar = $this->BasicSearch->KeywordList($Default);
-
-			// Search keyword in any fields
-			if (($sSearchType == "OR" || $sSearchType == "AND") && $this->BasicSearch->BasicSearchAnyFields) {
-				foreach ($ar as $sKeyword) {
-					if ($sKeyword <> "") {
-						if ($sSearchStr <> "") $sSearchStr .= " " . $sSearchType . " ";
-						$sSearchStr .= "(" . $this->BasicSearchSQL(array($sKeyword), $sSearchType) . ")";
-					}
-				}
-			} else {
-				$sSearchStr = $this->BasicSearchSQL($ar, $sSearchType);
-			}
-			if (!$Default && in_array($this->Command, array("", "reset", "resetall"))) $this->Command = "search";
-		}
-		if (!$Default && $this->Command == "search") {
-			$this->BasicSearch->setKeyword($sSearchKeyword);
-			$this->BasicSearch->setType($sSearchType);
-		}
-		return $sSearchStr;
-	}
-
-	// Check if search parm exists
-	function CheckSearchParms() {
-
-		// Check basic search
-		if ($this->BasicSearch->IssetSession())
-			return TRUE;
-		return FALSE;
-	}
-
-	// Clear all search parameters
-	function ResetSearchParms() {
-
-		// Clear search WHERE clause
-		$this->SearchWhere = "";
-		$this->setSearchWhere($this->SearchWhere);
-
-		// Clear basic search parameters
-		$this->ResetBasicSearchParms();
-	}
-
-	// Load advanced search default values
-	function LoadAdvancedSearchDefault() {
-		return FALSE;
-	}
-
-	// Clear all basic search parameters
-	function ResetBasicSearchParms() {
-		$this->BasicSearch->UnsetSession();
-	}
-
-	// Restore all search parameters
-	function RestoreSearchParms() {
-		$this->RestoreSearch = TRUE;
-
-		// Restore basic search values
-		$this->BasicSearch->Load();
-	}
-
 	// Set up sort parameters
 	function SetupSortOrder() {
 
@@ -1063,10 +794,6 @@ class ct98_userlevelpermissions_list extends ct98_userlevelpermissions {
 
 		// Check if reset command
 		if (substr($this->Command,0,5) == "reset") {
-
-			// Reset search criteria
-			if ($this->Command == "reset" || $this->Command == "resetall")
-				$this->ResetSearchParms();
 
 			// Reset sorting order
 			if ($this->Command == "resetsort") {
@@ -1252,10 +979,10 @@ class ct98_userlevelpermissions_list extends ct98_userlevelpermissions {
 		// Filter button
 		$item = &$this->FilterOptions->Add("savecurrentfilter");
 		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ft98_userlevelpermissionslistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
-		$item->Visible = TRUE;
+		$item->Visible = FALSE;
 		$item = &$this->FilterOptions->Add("deletefilter");
 		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ft98_userlevelpermissionslistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
-		$item->Visible = TRUE;
+		$item->Visible = FALSE;
 		$this->FilterOptions->UseDropDownButton = TRUE;
 		$this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
 		$this->FilterOptions->DropDownButtonPhrase = $Language->Phrase("Filters");
@@ -1379,17 +1106,6 @@ class ct98_userlevelpermissions_list extends ct98_userlevelpermissions {
 		$this->SearchOptions->Tag = "div";
 		$this->SearchOptions->TagClassName = "ewSearchOption";
 
-		// Search button
-		$item = &$this->SearchOptions->Add("searchtoggle");
-		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : " active";
-		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ft98_userlevelpermissionslistsrch\">" . $Language->Phrase("SearchLink") . "</button>";
-		$item->Visible = TRUE;
-
-		// Show all button
-		$item = &$this->SearchOptions->Add("showall");
-		$item->Body = "<a class=\"btn btn-default ewShowAll\" title=\"" . $Language->Phrase("ShowAll") . "\" data-caption=\"" . $Language->Phrase("ShowAll") . "\" href=\"" . $this->PageUrl() . "cmd=reset\">" . $Language->Phrase("ShowAllBtn") . "</a>";
-		$item->Visible = ($this->SearchWhere <> $this->DefaultSearchWhere && $this->SearchWhere <> "0=101");
-
 		// Button group for search
 		$this->SearchOptions->UseDropDownButton = FALSE;
 		$this->SearchOptions->UseImageAndText = TRUE;
@@ -1453,13 +1169,6 @@ class ct98_userlevelpermissions_list extends ct98_userlevelpermissions {
 			$this->StartRec = intval(($this->StartRec-1)/$this->DisplayRecs)*$this->DisplayRecs+1; // Point to page boundary
 			$this->setStartRecordNumber($this->StartRec);
 		}
-	}
-
-	// Load basic search values
-	function LoadBasicSearchValues() {
-		$this->BasicSearch->Keyword = @$_GET[EW_TABLE_BASIC_SEARCH];
-		if ($this->BasicSearch->Keyword <> "" && $this->Command == "") $this->Command = "search";
-		$this->BasicSearch->Type = @$_GET[EW_TABLE_BASIC_SEARCH_TYPE];
 	}
 
 	// Load recordset
@@ -1866,11 +1575,8 @@ class ct98_userlevelpermissions_list extends ct98_userlevelpermissions {
 		$sQry = "export=html";
 
 		// Build QueryString for search
-		if ($this->BasicSearch->getKeyword() <> "") {
-			$sQry .= "&" . EW_TABLE_BASIC_SEARCH . "=" . urlencode($this->BasicSearch->getKeyword()) . "&" . EW_TABLE_BASIC_SEARCH_TYPE . "=" . urlencode($this->BasicSearch->getType());
-		}
-
 		// Build QueryString for pager
+
 		$sQry .= "&" . EW_TABLE_REC_PER_PAGE . "=" . urlencode($this->getRecordsPerPage()) . "&" . EW_TABLE_START_REC . "=" . urlencode($this->getStartRecordNumber());
 		return $sQry;
 	}
@@ -2086,7 +1792,6 @@ ft98_userlevelpermissionslist.ValidateRequired = <?php echo json_encode(EW_CLIEN
 // Dynamic selection lists
 // Form object for search
 
-var CurrentSearchForm = ft98_userlevelpermissionslistsrch = new ew_Form("ft98_userlevelpermissionslistsrch");
 </script>
 <script type="text/javascript">
 
@@ -2097,12 +1802,6 @@ var CurrentSearchForm = ft98_userlevelpermissionslistsrch = new ew_Form("ft98_us
 <div class="ewToolbar">
 <?php if ($t98_userlevelpermissions_list->TotalRecs > 0 && $t98_userlevelpermissions_list->ExportOptions->Visible()) { ?>
 <?php $t98_userlevelpermissions_list->ExportOptions->Render("body") ?>
-<?php } ?>
-<?php if ($t98_userlevelpermissions_list->SearchOptions->Visible()) { ?>
-<?php $t98_userlevelpermissions_list->SearchOptions->Render("body") ?>
-<?php } ?>
-<?php if ($t98_userlevelpermissions_list->FilterOptions->Visible()) { ?>
-<?php $t98_userlevelpermissions_list->FilterOptions->Render("body") ?>
 <?php } ?>
 <div class="clearfix"></div>
 </div>
@@ -2133,44 +1832,8 @@ var CurrentSearchForm = ft98_userlevelpermissionslistsrch = new ew_Form("ft98_us
 		else
 			$t98_userlevelpermissions_list->setWarningMessage($Language->Phrase("NoRecord"));
 	}
-
-	// Audit trail on search
-	if ($t98_userlevelpermissions_list->AuditTrailOnSearch && $t98_userlevelpermissions_list->Command == "search" && !$t98_userlevelpermissions_list->RestoreSearch) {
-		$searchparm = ew_ServerVar("QUERY_STRING");
-		$searchsql = $t98_userlevelpermissions_list->getSessionWhere();
-		$t98_userlevelpermissions_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
-	}
 $t98_userlevelpermissions_list->RenderOtherOptions();
 ?>
-<?php if ($Security->CanSearch()) { ?>
-<?php if ($t98_userlevelpermissions->Export == "" && $t98_userlevelpermissions->CurrentAction == "") { ?>
-<form name="ft98_userlevelpermissionslistsrch" id="ft98_userlevelpermissionslistsrch" class="form-inline ewForm ewExtSearchForm" action="<?php echo ew_CurrentPage() ?>">
-<?php $SearchPanelClass = ($t98_userlevelpermissions_list->SearchWhere <> "") ? " in" : " in"; ?>
-<div id="ft98_userlevelpermissionslistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
-<input type="hidden" name="cmd" value="search">
-<input type="hidden" name="t" value="t98_userlevelpermissions">
-	<div class="ewBasicSearch">
-<div id="xsr_1" class="ewRow">
-	<div class="ewQuickSearch input-group">
-	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="form-control" value="<?php echo ew_HtmlEncode($t98_userlevelpermissions_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo ew_HtmlEncode($Language->Phrase("Search")) ?>">
-	<input type="hidden" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" id="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="<?php echo ew_HtmlEncode($t98_userlevelpermissions_list->BasicSearch->getType()) ?>">
-	<div class="input-group-btn">
-		<button type="button" data-toggle="dropdown" class="btn btn-default"><span id="searchtype"><?php echo $t98_userlevelpermissions_list->BasicSearch->getTypeNameShort() ?></span><span class="caret"></span></button>
-		<ul class="dropdown-menu pull-right" role="menu">
-			<li<?php if ($t98_userlevelpermissions_list->BasicSearch->getType() == "") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this)"><?php echo $Language->Phrase("QuickSearchAuto") ?></a></li>
-			<li<?php if ($t98_userlevelpermissions_list->BasicSearch->getType() == "=") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'=')"><?php echo $Language->Phrase("QuickSearchExact") ?></a></li>
-			<li<?php if ($t98_userlevelpermissions_list->BasicSearch->getType() == "AND") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'AND')"><?php echo $Language->Phrase("QuickSearchAll") ?></a></li>
-			<li<?php if ($t98_userlevelpermissions_list->BasicSearch->getType() == "OR") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'OR')"><?php echo $Language->Phrase("QuickSearchAny") ?></a></li>
-		</ul>
-	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit"><?php echo $Language->Phrase("SearchBtn") ?></button>
-	</div>
-	</div>
-</div>
-	</div>
-</div>
-</form>
-<?php } ?>
-<?php } ?>
 <?php $t98_userlevelpermissions_list->ShowPageHeader(); ?>
 <?php
 $t98_userlevelpermissions_list->ShowMessage();
@@ -2285,7 +1948,7 @@ $t98_userlevelpermissions_list->ListOptions->Render("header", "left");
 		<th data-name="_tablename" class="<?php echo $t98_userlevelpermissions->_tablename->HeaderCellClass() ?>"><div id="elh_t98_userlevelpermissions__tablename" class="t98_userlevelpermissions__tablename"><div class="ewTableHeaderCaption"><?php echo $t98_userlevelpermissions->_tablename->FldCaption() ?></div></div></th>
 	<?php } else { ?>
 		<th data-name="_tablename" class="<?php echo $t98_userlevelpermissions->_tablename->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t98_userlevelpermissions->SortUrl($t98_userlevelpermissions->_tablename) ?>',2);"><div id="elh_t98_userlevelpermissions__tablename" class="t98_userlevelpermissions__tablename">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t98_userlevelpermissions->_tablename->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($t98_userlevelpermissions->_tablename->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t98_userlevelpermissions->_tablename->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t98_userlevelpermissions->_tablename->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t98_userlevelpermissions->_tablename->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t98_userlevelpermissions->_tablename->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
 		</div></div></th>
 	<?php } ?>
 <?php } ?>
@@ -2501,8 +2164,6 @@ if ($t98_userlevelpermissions_list->Recordset)
 <?php } ?>
 <?php if ($t98_userlevelpermissions->Export == "") { ?>
 <script type="text/javascript">
-ft98_userlevelpermissionslistsrch.FilterList = <?php echo $t98_userlevelpermissions_list->GetFilterList() ?>;
-ft98_userlevelpermissionslistsrch.Init();
 ft98_userlevelpermissionslist.Init();
 </script>
 <?php } ?>

@@ -665,28 +665,8 @@ class ct09_hutang_list extends ct09_hutang {
 					$option->HideAllOptions();
 			}
 
-			// Get default search criteria
-			ew_AddFilter($this->DefaultSearchWhere, $this->BasicSearchWhere(TRUE));
-
-			// Get basic search values
-			$this->LoadBasicSearchValues();
-
-			// Process filter list
-			$this->ProcessFilterList();
-
-			// Restore search parms from Session if not searching / reset / export
-			if (($this->Export <> "" || $this->Command <> "search" && $this->Command <> "reset" && $this->Command <> "resetall") && $this->Command <> "json" && $this->CheckSearchParms())
-				$this->RestoreSearchParms();
-
-			// Call Recordset SearchValidated event
-			$this->Recordset_SearchValidated();
-
 			// Set up sorting order
 			$this->SetupSortOrder();
-
-			// Get basic search criteria
-			if ($gsSearchError == "")
-				$sSrchBasic = $this->BasicSearchWhere();
 		}
 
 		// Restore display records
@@ -699,31 +679,6 @@ class ct09_hutang_list extends ct09_hutang {
 		// Load Sorting Order
 		if ($this->Command <> "json")
 			$this->LoadSortOrder();
-
-		// Load search default if no existing search criteria
-		if (!$this->CheckSearchParms()) {
-
-			// Load basic search from default
-			$this->BasicSearch->LoadDefault();
-			if ($this->BasicSearch->Keyword != "")
-				$sSrchBasic = $this->BasicSearchWhere();
-		}
-
-		// Build search criteria
-		ew_AddFilter($this->SearchWhere, $sSrchAdvanced);
-		ew_AddFilter($this->SearchWhere, $sSrchBasic);
-
-		// Call Recordset_Searching event
-		$this->Recordset_Searching($this->SearchWhere);
-
-		// Save search criteria
-		if ($this->Command == "search" && !$this->RestoreSearch) {
-			$this->setSearchWhere($this->SearchWhere); // Save to Session
-			$this->StartRec = 1; // Reset start record counter
-			$this->setStartRecordNumber($this->StartRec);
-		} elseif ($this->Command <> "json") {
-			$this->SearchWhere = $this->getSearchWhere();
-		}
 
 		// Build filter
 		$sFilter = "";
@@ -822,257 +777,6 @@ class ct09_hutang_list extends ct09_hutang {
 		return TRUE;
 	}
 
-	// Get list of filters
-	function GetFilterList() {
-		global $UserProfile;
-
-		// Initialize
-		$sFilterList = "";
-		$sSavedFilterList = "";
-		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJson(), ","); // Field id
-		$sFilterList = ew_Concat($sFilterList, $this->NoHutang->AdvancedSearch->ToJson(), ","); // Field NoHutang
-		$sFilterList = ew_Concat($sFilterList, $this->BeliID->AdvancedSearch->ToJson(), ","); // Field BeliID
-		$sFilterList = ew_Concat($sFilterList, $this->JumlahHutang->AdvancedSearch->ToJson(), ","); // Field JumlahHutang
-		$sFilterList = ew_Concat($sFilterList, $this->JumlahBayar->AdvancedSearch->ToJson(), ","); // Field JumlahBayar
-		$sFilterList = ew_Concat($sFilterList, $this->SaldoHutang->AdvancedSearch->ToJson(), ","); // Field SaldoHutang
-		if ($this->BasicSearch->Keyword <> "") {
-			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
-			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
-		}
-		$sFilterList = preg_replace('/,$/', "", $sFilterList);
-
-		// Return filter list in json
-		if ($sFilterList <> "")
-			$sFilterList = "\"data\":{" . $sFilterList . "}";
-		if ($sSavedFilterList <> "") {
-			if ($sFilterList <> "")
-				$sFilterList .= ",";
-			$sFilterList .= "\"filters\":" . $sSavedFilterList;
-		}
-		return ($sFilterList <> "") ? "{" . $sFilterList . "}" : "null";
-	}
-
-	// Process filter list
-	function ProcessFilterList() {
-		global $UserProfile;
-		if (@$_POST["ajax"] == "savefilters") { // Save filter request (Ajax)
-			$filters = @$_POST["filters"];
-			$UserProfile->SetSearchFilters(CurrentUserName(), "ft09_hutanglistsrch", $filters);
-
-			// Clean output buffer
-			if (!EW_DEBUG_ENABLED && ob_get_length())
-				ob_end_clean();
-			echo ew_ArrayToJson(array(array("success" => TRUE))); // Success
-			$this->Page_Terminate();
-			exit();
-		} elseif (@$_POST["cmd"] == "resetfilter") {
-			$this->RestoreFilterList();
-		}
-	}
-
-	// Restore list of filters
-	function RestoreFilterList() {
-
-		// Return if not reset filter
-		if (@$_POST["cmd"] <> "resetfilter")
-			return FALSE;
-		$filter = json_decode(@$_POST["filter"], TRUE);
-		$this->Command = "search";
-
-		// Field id
-		$this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
-		$this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
-		$this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
-		$this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
-		$this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
-		$this->id->AdvancedSearch->Save();
-
-		// Field NoHutang
-		$this->NoHutang->AdvancedSearch->SearchValue = @$filter["x_NoHutang"];
-		$this->NoHutang->AdvancedSearch->SearchOperator = @$filter["z_NoHutang"];
-		$this->NoHutang->AdvancedSearch->SearchCondition = @$filter["v_NoHutang"];
-		$this->NoHutang->AdvancedSearch->SearchValue2 = @$filter["y_NoHutang"];
-		$this->NoHutang->AdvancedSearch->SearchOperator2 = @$filter["w_NoHutang"];
-		$this->NoHutang->AdvancedSearch->Save();
-
-		// Field BeliID
-		$this->BeliID->AdvancedSearch->SearchValue = @$filter["x_BeliID"];
-		$this->BeliID->AdvancedSearch->SearchOperator = @$filter["z_BeliID"];
-		$this->BeliID->AdvancedSearch->SearchCondition = @$filter["v_BeliID"];
-		$this->BeliID->AdvancedSearch->SearchValue2 = @$filter["y_BeliID"];
-		$this->BeliID->AdvancedSearch->SearchOperator2 = @$filter["w_BeliID"];
-		$this->BeliID->AdvancedSearch->Save();
-
-		// Field JumlahHutang
-		$this->JumlahHutang->AdvancedSearch->SearchValue = @$filter["x_JumlahHutang"];
-		$this->JumlahHutang->AdvancedSearch->SearchOperator = @$filter["z_JumlahHutang"];
-		$this->JumlahHutang->AdvancedSearch->SearchCondition = @$filter["v_JumlahHutang"];
-		$this->JumlahHutang->AdvancedSearch->SearchValue2 = @$filter["y_JumlahHutang"];
-		$this->JumlahHutang->AdvancedSearch->SearchOperator2 = @$filter["w_JumlahHutang"];
-		$this->JumlahHutang->AdvancedSearch->Save();
-
-		// Field JumlahBayar
-		$this->JumlahBayar->AdvancedSearch->SearchValue = @$filter["x_JumlahBayar"];
-		$this->JumlahBayar->AdvancedSearch->SearchOperator = @$filter["z_JumlahBayar"];
-		$this->JumlahBayar->AdvancedSearch->SearchCondition = @$filter["v_JumlahBayar"];
-		$this->JumlahBayar->AdvancedSearch->SearchValue2 = @$filter["y_JumlahBayar"];
-		$this->JumlahBayar->AdvancedSearch->SearchOperator2 = @$filter["w_JumlahBayar"];
-		$this->JumlahBayar->AdvancedSearch->Save();
-
-		// Field SaldoHutang
-		$this->SaldoHutang->AdvancedSearch->SearchValue = @$filter["x_SaldoHutang"];
-		$this->SaldoHutang->AdvancedSearch->SearchOperator = @$filter["z_SaldoHutang"];
-		$this->SaldoHutang->AdvancedSearch->SearchCondition = @$filter["v_SaldoHutang"];
-		$this->SaldoHutang->AdvancedSearch->SearchValue2 = @$filter["y_SaldoHutang"];
-		$this->SaldoHutang->AdvancedSearch->SearchOperator2 = @$filter["w_SaldoHutang"];
-		$this->SaldoHutang->AdvancedSearch->Save();
-		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
-		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
-	}
-
-	// Return basic search SQL
-	function BasicSearchSQL($arKeywords, $type) {
-		$sWhere = "";
-		$this->BuildBasicSearchSQL($sWhere, $this->NoHutang, $arKeywords, $type);
-		return $sWhere;
-	}
-
-	// Build basic search SQL
-	function BuildBasicSearchSQL(&$Where, &$Fld, $arKeywords, $type) {
-		global $EW_BASIC_SEARCH_IGNORE_PATTERN;
-		$sDefCond = ($type == "OR") ? "OR" : "AND";
-		$arSQL = array(); // Array for SQL parts
-		$arCond = array(); // Array for search conditions
-		$cnt = count($arKeywords);
-		$j = 0; // Number of SQL parts
-		for ($i = 0; $i < $cnt; $i++) {
-			$Keyword = $arKeywords[$i];
-			$Keyword = trim($Keyword);
-			if ($EW_BASIC_SEARCH_IGNORE_PATTERN <> "") {
-				$Keyword = preg_replace($EW_BASIC_SEARCH_IGNORE_PATTERN, "\\", $Keyword);
-				$ar = explode("\\", $Keyword);
-			} else {
-				$ar = array($Keyword);
-			}
-			foreach ($ar as $Keyword) {
-				if ($Keyword <> "") {
-					$sWrk = "";
-					if ($Keyword == "OR" && $type == "") {
-						if ($j > 0)
-							$arCond[$j-1] = "OR";
-					} elseif ($Keyword == EW_NULL_VALUE) {
-						$sWrk = $Fld->FldExpression . " IS NULL";
-					} elseif ($Keyword == EW_NOT_NULL_VALUE) {
-						$sWrk = $Fld->FldExpression . " IS NOT NULL";
-					} elseif ($Fld->FldIsVirtual) {
-						$sWrk = $Fld->FldVirtualExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
-					} elseif ($Fld->FldDataType != EW_DATATYPE_NUMBER || is_numeric($Keyword)) {
-						$sWrk = $Fld->FldBasicSearchExpression . ew_Like(ew_QuotedValue("%" . $Keyword . "%", EW_DATATYPE_STRING, $this->DBID), $this->DBID);
-					}
-					if ($sWrk <> "") {
-						$arSQL[$j] = $sWrk;
-						$arCond[$j] = $sDefCond;
-						$j += 1;
-					}
-				}
-			}
-		}
-		$cnt = count($arSQL);
-		$bQuoted = FALSE;
-		$sSql = "";
-		if ($cnt > 0) {
-			for ($i = 0; $i < $cnt-1; $i++) {
-				if ($arCond[$i] == "OR") {
-					if (!$bQuoted) $sSql .= "(";
-					$bQuoted = TRUE;
-				}
-				$sSql .= $arSQL[$i];
-				if ($bQuoted && $arCond[$i] <> "OR") {
-					$sSql .= ")";
-					$bQuoted = FALSE;
-				}
-				$sSql .= " " . $arCond[$i] . " ";
-			}
-			$sSql .= $arSQL[$cnt-1];
-			if ($bQuoted)
-				$sSql .= ")";
-		}
-		if ($sSql <> "") {
-			if ($Where <> "") $Where .= " OR ";
-			$Where .= "(" . $sSql . ")";
-		}
-	}
-
-	// Return basic search WHERE clause based on search keyword and type
-	function BasicSearchWhere($Default = FALSE) {
-		global $Security;
-		$sSearchStr = "";
-		if (!$Security->CanSearch()) return "";
-		$sSearchKeyword = ($Default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
-		$sSearchType = ($Default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
-
-		// Get search SQL
-		if ($sSearchKeyword <> "") {
-			$ar = $this->BasicSearch->KeywordList($Default);
-
-			// Search keyword in any fields
-			if (($sSearchType == "OR" || $sSearchType == "AND") && $this->BasicSearch->BasicSearchAnyFields) {
-				foreach ($ar as $sKeyword) {
-					if ($sKeyword <> "") {
-						if ($sSearchStr <> "") $sSearchStr .= " " . $sSearchType . " ";
-						$sSearchStr .= "(" . $this->BasicSearchSQL(array($sKeyword), $sSearchType) . ")";
-					}
-				}
-			} else {
-				$sSearchStr = $this->BasicSearchSQL($ar, $sSearchType);
-			}
-			if (!$Default && in_array($this->Command, array("", "reset", "resetall"))) $this->Command = "search";
-		}
-		if (!$Default && $this->Command == "search") {
-			$this->BasicSearch->setKeyword($sSearchKeyword);
-			$this->BasicSearch->setType($sSearchType);
-		}
-		return $sSearchStr;
-	}
-
-	// Check if search parm exists
-	function CheckSearchParms() {
-
-		// Check basic search
-		if ($this->BasicSearch->IssetSession())
-			return TRUE;
-		return FALSE;
-	}
-
-	// Clear all search parameters
-	function ResetSearchParms() {
-
-		// Clear search WHERE clause
-		$this->SearchWhere = "";
-		$this->setSearchWhere($this->SearchWhere);
-
-		// Clear basic search parameters
-		$this->ResetBasicSearchParms();
-	}
-
-	// Load advanced search default values
-	function LoadAdvancedSearchDefault() {
-		return FALSE;
-	}
-
-	// Clear all basic search parameters
-	function ResetBasicSearchParms() {
-		$this->BasicSearch->UnsetSession();
-	}
-
-	// Restore all search parameters
-	function RestoreSearchParms() {
-		$this->RestoreSearch = TRUE;
-
-		// Restore basic search values
-		$this->BasicSearch->Load();
-	}
-
 	// Set up sort parameters
 	function SetupSortOrder() {
 
@@ -1112,10 +816,6 @@ class ct09_hutang_list extends ct09_hutang {
 
 		// Check if reset command
 		if (substr($this->Command,0,5) == "reset") {
-
-			// Reset search criteria
-			if ($this->Command == "reset" || $this->Command == "resetall")
-				$this->ResetSearchParms();
 
 			// Reset sorting order
 			if ($this->Command == "resetsort") {
@@ -1322,10 +1022,10 @@ class ct09_hutang_list extends ct09_hutang {
 		// Filter button
 		$item = &$this->FilterOptions->Add("savecurrentfilter");
 		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ft09_hutanglistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
-		$item->Visible = TRUE;
+		$item->Visible = FALSE;
 		$item = &$this->FilterOptions->Add("deletefilter");
 		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ft09_hutanglistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
-		$item->Visible = TRUE;
+		$item->Visible = FALSE;
 		$this->FilterOptions->UseDropDownButton = TRUE;
 		$this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
 		$this->FilterOptions->DropDownButtonPhrase = $Language->Phrase("Filters");
@@ -1449,17 +1149,6 @@ class ct09_hutang_list extends ct09_hutang {
 		$this->SearchOptions->Tag = "div";
 		$this->SearchOptions->TagClassName = "ewSearchOption";
 
-		// Search button
-		$item = &$this->SearchOptions->Add("searchtoggle");
-		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : " active";
-		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ft09_hutanglistsrch\">" . $Language->Phrase("SearchLink") . "</button>";
-		$item->Visible = TRUE;
-
-		// Show all button
-		$item = &$this->SearchOptions->Add("showall");
-		$item->Body = "<a class=\"btn btn-default ewShowAll\" title=\"" . $Language->Phrase("ShowAll") . "\" data-caption=\"" . $Language->Phrase("ShowAll") . "\" href=\"" . $this->PageUrl() . "cmd=reset\">" . $Language->Phrase("ShowAllBtn") . "</a>";
-		$item->Visible = ($this->SearchWhere <> $this->DefaultSearchWhere && $this->SearchWhere <> "0=101");
-
 		// Button group for search
 		$this->SearchOptions->UseDropDownButton = FALSE;
 		$this->SearchOptions->UseImageAndText = TRUE;
@@ -1523,13 +1212,6 @@ class ct09_hutang_list extends ct09_hutang {
 			$this->StartRec = intval(($this->StartRec-1)/$this->DisplayRecs)*$this->DisplayRecs+1; // Point to page boundary
 			$this->setStartRecordNumber($this->StartRec);
 		}
-	}
-
-	// Load basic search values
-	function LoadBasicSearchValues() {
-		$this->BasicSearch->Keyword = @$_GET[EW_TABLE_BASIC_SEARCH];
-		if ($this->BasicSearch->Keyword <> "" && $this->Command == "") $this->Command = "search";
-		$this->BasicSearch->Type = @$_GET[EW_TABLE_BASIC_SEARCH_TYPE];
 	}
 
 	// Load recordset
@@ -2046,11 +1728,8 @@ class ct09_hutang_list extends ct09_hutang {
 		$sQry = "export=html";
 
 		// Build QueryString for search
-		if ($this->BasicSearch->getKeyword() <> "") {
-			$sQry .= "&" . EW_TABLE_BASIC_SEARCH . "=" . urlencode($this->BasicSearch->getKeyword()) . "&" . EW_TABLE_BASIC_SEARCH_TYPE . "=" . urlencode($this->BasicSearch->getType());
-		}
-
 		// Build QueryString for pager
+
 		$sQry .= "&" . EW_TABLE_REC_PER_PAGE . "=" . urlencode($this->getRecordsPerPage()) . "&" . EW_TABLE_START_REC . "=" . urlencode($this->getStartRecordNumber());
 		return $sQry;
 	}
@@ -2269,7 +1948,6 @@ ft09_hutanglist.Lists["x_BeliID"].Data = "<?php echo $t09_hutang_list->BeliID->L
 ft09_hutanglist.AutoSuggests["x_BeliID"] = <?php echo json_encode(array("data" => "ajax=autosuggest&" . $t09_hutang_list->BeliID->LookupFilterQuery(TRUE, "list"))) ?>;
 
 // Form object for search
-var CurrentSearchForm = ft09_hutanglistsrch = new ew_Form("ft09_hutanglistsrch");
 </script>
 <script type="text/javascript">
 
@@ -2280,12 +1958,6 @@ var CurrentSearchForm = ft09_hutanglistsrch = new ew_Form("ft09_hutanglistsrch")
 <div class="ewToolbar">
 <?php if ($t09_hutang_list->TotalRecs > 0 && $t09_hutang_list->ExportOptions->Visible()) { ?>
 <?php $t09_hutang_list->ExportOptions->Render("body") ?>
-<?php } ?>
-<?php if ($t09_hutang_list->SearchOptions->Visible()) { ?>
-<?php $t09_hutang_list->SearchOptions->Render("body") ?>
-<?php } ?>
-<?php if ($t09_hutang_list->FilterOptions->Visible()) { ?>
-<?php $t09_hutang_list->FilterOptions->Render("body") ?>
 <?php } ?>
 <div class="clearfix"></div>
 </div>
@@ -2316,44 +1988,8 @@ var CurrentSearchForm = ft09_hutanglistsrch = new ew_Form("ft09_hutanglistsrch")
 		else
 			$t09_hutang_list->setWarningMessage($Language->Phrase("NoRecord"));
 	}
-
-	// Audit trail on search
-	if ($t09_hutang_list->AuditTrailOnSearch && $t09_hutang_list->Command == "search" && !$t09_hutang_list->RestoreSearch) {
-		$searchparm = ew_ServerVar("QUERY_STRING");
-		$searchsql = $t09_hutang_list->getSessionWhere();
-		$t09_hutang_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
-	}
 $t09_hutang_list->RenderOtherOptions();
 ?>
-<?php if ($Security->CanSearch()) { ?>
-<?php if ($t09_hutang->Export == "" && $t09_hutang->CurrentAction == "") { ?>
-<form name="ft09_hutanglistsrch" id="ft09_hutanglistsrch" class="form-inline ewForm ewExtSearchForm" action="<?php echo ew_CurrentPage() ?>">
-<?php $SearchPanelClass = ($t09_hutang_list->SearchWhere <> "") ? " in" : " in"; ?>
-<div id="ft09_hutanglistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
-<input type="hidden" name="cmd" value="search">
-<input type="hidden" name="t" value="t09_hutang">
-	<div class="ewBasicSearch">
-<div id="xsr_1" class="ewRow">
-	<div class="ewQuickSearch input-group">
-	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="form-control" value="<?php echo ew_HtmlEncode($t09_hutang_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo ew_HtmlEncode($Language->Phrase("Search")) ?>">
-	<input type="hidden" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" id="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="<?php echo ew_HtmlEncode($t09_hutang_list->BasicSearch->getType()) ?>">
-	<div class="input-group-btn">
-		<button type="button" data-toggle="dropdown" class="btn btn-default"><span id="searchtype"><?php echo $t09_hutang_list->BasicSearch->getTypeNameShort() ?></span><span class="caret"></span></button>
-		<ul class="dropdown-menu pull-right" role="menu">
-			<li<?php if ($t09_hutang_list->BasicSearch->getType() == "") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this)"><?php echo $Language->Phrase("QuickSearchAuto") ?></a></li>
-			<li<?php if ($t09_hutang_list->BasicSearch->getType() == "=") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'=')"><?php echo $Language->Phrase("QuickSearchExact") ?></a></li>
-			<li<?php if ($t09_hutang_list->BasicSearch->getType() == "AND") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'AND')"><?php echo $Language->Phrase("QuickSearchAll") ?></a></li>
-			<li<?php if ($t09_hutang_list->BasicSearch->getType() == "OR") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'OR')"><?php echo $Language->Phrase("QuickSearchAny") ?></a></li>
-		</ul>
-	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit"><?php echo $Language->Phrase("SearchBtn") ?></button>
-	</div>
-	</div>
-</div>
-	</div>
-</div>
-</form>
-<?php } ?>
-<?php } ?>
 <?php $t09_hutang_list->ShowPageHeader(); ?>
 <?php
 $t09_hutang_list->ShowMessage();
@@ -2459,7 +2095,7 @@ $t09_hutang_list->ListOptions->Render("header", "left");
 		<th data-name="NoHutang" class="<?php echo $t09_hutang->NoHutang->HeaderCellClass() ?>"><div id="elh_t09_hutang_NoHutang" class="t09_hutang_NoHutang"><div class="ewTableHeaderCaption"><?php echo $t09_hutang->NoHutang->FldCaption() ?></div></div></th>
 	<?php } else { ?>
 		<th data-name="NoHutang" class="<?php echo $t09_hutang->NoHutang->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t09_hutang->SortUrl($t09_hutang->NoHutang) ?>',2);"><div id="elh_t09_hutang_NoHutang" class="t09_hutang_NoHutang">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_hutang->NoHutang->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($t09_hutang->NoHutang->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_hutang->NoHutang->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t09_hutang->NoHutang->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t09_hutang->NoHutang->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t09_hutang->NoHutang->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
 		</div></div></th>
 	<?php } ?>
 <?php } ?>
@@ -2772,8 +2408,6 @@ if ($t09_hutang_list->Recordset)
 <?php } ?>
 <?php if ($t09_hutang->Export == "") { ?>
 <script type="text/javascript">
-ft09_hutanglistsrch.FilterList = <?php echo $t09_hutang_list->GetFilterList() ?>;
-ft09_hutanglistsrch.Init();
 ft09_hutanglist.Init();
 </script>
 <?php } ?>
