@@ -673,7 +673,7 @@
       <phrase id="menutext" value="Home" />
     </menu>
     <menu id="10097">
-      <phrase id="menutext" value="Log" />
+      <phrase id="menutext" value="Progress Log" />
     </menu>
     <menu id="10096">
       <phrase id="menutext" value="Log Status" />

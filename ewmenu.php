@@ -18,9 +18,6 @@ $RootMenu->AddMenuItem(10165, "mi_cf03_cetak_inv_php", $Language->MenuPhrase("10
 $RootMenu->AddMenuItem(6, "mci_Setup", $Language->MenuPhrase("6", "MenuText"), "", -1, "", IsLoggedIn(), FALSE, TRUE, "");
 $RootMenu->AddMenuItem(10085, "mci_Home", $Language->MenuPhrase("10085", "MenuText"), "", 6, "", IsLoggedIn(), FALSE, TRUE, "");
 $RootMenu->AddMenuItem(10097, "mi_t92_log", $Language->MenuPhrase("10097", "MenuText"), "t92_loglist.php", 10085, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t92_log'), FALSE, FALSE, "");
-$RootMenu->AddMenuItem(10096, "mi_t91_log_status", $Language->MenuPhrase("10096", "MenuText"), "t91_log_statuslist.php", 10085, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t91_log_status'), FALSE, FALSE, "");
-$RootMenu->AddMenuItem(10036, "mi_t94_home", $Language->MenuPhrase("10036", "MenuText"), "t94_homelist.php", 10085, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t94_home'), FALSE, FALSE, "");
-$RootMenu->AddMenuItem(10037, "mi_t95_homedetail", $Language->MenuPhrase("10037", "MenuText"), "t95_homedetaillist.php", 10085, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t95_homedetail'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(10086, "mi_t93_parameter", $Language->MenuPhrase("10086", "MenuText"), "t93_parameterlist.php", 6, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t93_parameter'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(7, "mi_t01_company", $Language->MenuPhrase("7", "MenuText"), "t01_companylist.php", 6, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t01_company'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(8, "mi_t02_vendor", $Language->MenuPhrase("8", "MenuText"), "t02_vendorlist.php", 6, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}t02_vendor'), FALSE, FALSE, "");
