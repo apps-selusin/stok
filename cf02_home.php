@@ -385,6 +385,38 @@ function show_table($r) {
 }
 </style>
 
+
+<div class="panel panel-default">
+	<div class="panel-heading">Piutang</div>
+	<?php
+	$sql = "SELECT DISTINCT " .
+	"`categories`.`CategoryName` AS `CategoryName`," .
+	"`products`.`ProductName` AS `ProductName`," .
+	"`products`.`QuantityPerUnit` AS `QuantityPerUnit`" .
+	" FROM `categories` JOIN `products` ON (`categories`.`CategoryID` = `products`.`CategoryID`)" .
+	" WHERE " .
+	"`products`.`UnitsInStock` <= 0";
+	$q = "select * from t14_piutang";
+	echo $db->ExecuteHtml($q, ["fieldcaption" => TRUE, "tablename" => ["t14_piutang"]]); // Execute a SQL and show as HTML table
+	?>
+</div>
+
+<div class="panel panel-default">
+	<div class="panel-heading">Hutang</div>
+	<?php
+	$sql = "SELECT DISTINCT " .
+	"`categories`.`CategoryName` AS `CategoryName`," .
+	"`products`.`ProductName` AS `ProductName`," .
+	"`products`.`QuantityPerUnit` AS `QuantityPerUnit`," .
+	"`products`.`UnitsInStock` AS `UnitsInStock`" .
+	" FROM `categories` JOIN `products` ON (`categories`.`CategoryID` = `products`.`CategoryID`)" .
+	" WHERE " .
+	"`products`.`Discontinued` = '1'";
+	$q = "select * from t09_hutang";
+	echo $db->ExecuteHtml($q, ["fieldcaption" => TRUE, "tablename" => ["t09_hutang"]]); // Execute a SQL and show as HTML table
+?>
+</div>
+
 <div class="row">
 
 	<div class="col-lg-12 col-md-12 col-sm-12">
