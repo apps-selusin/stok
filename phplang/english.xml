@@ -618,9 +618,6 @@
   <project>
     <phrase id="bodytitle" value="STOK Apps." />
     <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
-    <menu id="10167">
-      <phrase id="menutext" value="Piutang Detail" />
-    </menu>
     <menu id="10098">
       <phrase id="menutext" value="Home" />
     </menu>
@@ -630,17 +627,14 @@
     <menu id="10021">
       <phrase id="menutext" value="Hutang" />
     </menu>
-    <menu id="10100">
-      <phrase id="menutext" value="v 06 jual lapstok" />
-    </menu>
     <menu id="10027">
       <phrase id="menutext" value="Penjualan" />
     </menu>
-    <menu id="10099">
-      <phrase id="menutext" value="v 05 article" />
-    </menu>
     <menu id="10166">
       <phrase id="menutext" value="Piutang" />
+    </menu>
+    <menu id="10100">
+      <phrase id="menutext" value="v 06 jual lapstok" />
     </menu>
     <menu id="10013">
       <phrase id="menutext" value="Laporan" />
@@ -660,11 +654,17 @@
     <menu id="10032">
       <phrase id="menutext" value="Penjualan" />
     </menu>
+    <menu id="10036">
+      <phrase id="menutext" value="Piutang" />
+    </menu>
     <menu id="10164">
       <phrase id="menutext" value="Cetak" />
     </menu>
     <menu id="10165">
       <phrase id="menutext" value="Invoice" />
+    </menu>
+    <menu id="10099">
+      <phrase id="menutext" value="v 05 article" />
     </menu>
     <menu id="6">
       <phrase id="menutext" value="Setup" />
@@ -677,9 +677,6 @@
     </menu>
     <menu id="10096">
       <phrase id="menutext" value="Log Status" />
-    </menu>
-    <menu id="10036">
-      <phrase id="menutext" value="Head" />
     </menu>
     <menu id="10037">
       <phrase id="menutext" value="Detail" />
@@ -741,23 +738,32 @@
     <menu id="10095">
       <phrase id="menutext" value="v 03 hutang" />
     </menu>
-    <menu id="10034">
-      <phrase id="menutext" value="v 04 jual" />
-    </menu>
-    <menu id="10035">
-      <phrase id="menutext" value="t 11 jual old" />
-    </menu>
     <menu id="10024">
       <phrase id="menutext" value="v 01 beli" />
     </menu>
-    <menu id="10088">
+    <menu id="10031">
+      <phrase id="menutext" value="t 91 log status" />
+    </menu>
+    <menu id="10033">
+      <phrase id="menutext" value="v 05 article" />
+    </menu>
+    <menu id="10169">
       <phrase id="menutext" value="t 11 jual" />
     </menu>
-    <menu id="10089">
+    <menu id="10170">
       <phrase id="menutext" value="t 09 hutang" />
     </menu>
-    <menu id="10090">
+    <menu id="10171">
       <phrase id="menutext" value="v 01 beli" />
+    </menu>
+    <menu id="10167">
+      <phrase id="menutext" value="t 92 log" />
+    </menu>
+    <menu id="10034">
+      <phrase id="menutext" value="v 06 jual lapstok" />
+    </menu>
+    <menu id="10035">
+      <phrase id="menutext" value="v 07 piutang" />
     </menu>
     <menu id="10023">
       <phrase id="menutext" value="v 04 jual" />
@@ -768,7 +774,7 @@
     <menu id="10026">
       <phrase id="menutext" value="t 94 home" />
     </menu>
-    <menu id="10087">
+    <menu id="10168">
       <phrase id="menutext" value="t 95 homedetail" />
     </menu>
     <menu id="10028">
@@ -1508,6 +1514,33 @@
       </field>
       <field id="sumqty">
         <phrase id="fldcaption" value="sumqty" />
+      </field>
+    </table>
+    <table id="v07_piutang">
+      <phrase id="tblcaption" value="v 07 piutang" />
+      <field id="nopiutang">
+        <phrase id="fldcaption" value="nopiutang" />
+      </field>
+      <field id="tglso">
+        <phrase id="fldcaption" value="tglso" />
+      </field>
+      <field id="noso">
+        <phrase id="fldcaption" value="noso" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="nama" />
+      </field>
+      <field id="customerpo">
+        <phrase id="fldcaption" value="customerpo" />
+      </field>
+      <field id="jumlahpiutang">
+        <phrase id="fldcaption" value="jumlahpiutang" />
+      </field>
+      <field id="jumlahbayar">
+        <phrase id="fldcaption" value="jumlahbayar" />
+      </field>
+      <field id="sisapiutang">
+        <phrase id="fldcaption" value="sisapiutang" />
       </field>
     </table>
   </project>

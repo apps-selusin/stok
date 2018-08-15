@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<configuration date="2018/08/13" author="e.World Technology Ltd.">
-  <project id="{A2EF3792-3541-4459-9D68-D8F1DBA083C2}" file="C:\xampp\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="11.0" datetime="2018/08/13 15:30:43" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
+<configuration date="2018/08/15" author="e.World Technology Ltd.">
+  <project id="{A2EF3792-3541-4459-9D68-D8F1DBA083C2}" file="C:\xampp\htdocs\stok\prj_stok.prp" name="prj_stok" product="PHPReportMaker" version="11.0" datetime="2018/08/15 15:53:40" languagefolder="phprptlang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0">
     <table id="r01_beli" name="r01_beli" caption="Pembelian" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="r02_stok" name="r02_stok" caption="Stok" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="r03_hutang" name="r03_hutang" caption="Hutang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
@@ -35,5 +35,7 @@
     <table id="v04_jual" name="v04_jual" caption="v 04 jual" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="v05_article" name="v05_article" caption="v 05 article" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
     <table id="v06_jual_lapstok" name="v06_jual_lapstok" caption="v 06 jual lapstok" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="v07_piutang" name="v07_piutang" caption="v 07 piutang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
+    <table id="r06_piutang" name="r06_piutang" caption="Piutang" userlevel="-2,&quot;Anonymous&quot;,0;0,&quot;Default&quot;,0" priv="1" />
   </project>
 </configuration>

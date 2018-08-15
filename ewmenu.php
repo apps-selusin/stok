@@ -13,6 +13,7 @@ $RootMenu->AddMenuItem(10030, "mri_r055fmutasi", $Language->MenuPhrase("10030", 
 $RootMenu->AddMenuItem(10014, "mri_r015fbeli", $Language->MenuPhrase("10014", "MenuText"), "r01_belismry.php", 10013, "{A2EF3792-3541-4459-9D68-D8F1DBA083C2}", AllowListMenu('{A2EF3792-3541-4459-9D68-D8F1DBA083C2}r01_beli'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(10020, "mri_r035fhutang", $Language->MenuPhrase("10020", "MenuText"), "r03_hutangsmry.php", 10013, "{A2EF3792-3541-4459-9D68-D8F1DBA083C2}", AllowListMenu('{A2EF3792-3541-4459-9D68-D8F1DBA083C2}r03_hutang'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(10032, "mri_r045fjual", $Language->MenuPhrase("10032", "MenuText"), "r04_jualsmry.php", 10013, "{A2EF3792-3541-4459-9D68-D8F1DBA083C2}", AllowListMenu('{A2EF3792-3541-4459-9D68-D8F1DBA083C2}r04_jual'), FALSE, FALSE, "");
+$RootMenu->AddMenuItem(10036, "mri_r065fpiutang", $Language->MenuPhrase("10036", "MenuText"), "r06_piutangsmry.php", 10013, "{A2EF3792-3541-4459-9D68-D8F1DBA083C2}", AllowListMenu('{A2EF3792-3541-4459-9D68-D8F1DBA083C2}r06_piutang'), FALSE, FALSE, "");
 $RootMenu->AddMenuItem(10164, "mci_Cetak", $Language->MenuPhrase("10164", "MenuText"), "", -1, "", IsLoggedIn(), FALSE, TRUE, "");
 $RootMenu->AddMenuItem(10165, "mi_cf03_cetak_inv_php", $Language->MenuPhrase("10165", "MenuText"), "cf03_cetak_inv.php", 10164, "", AllowListMenu('{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}cf03_cetak_inv.php'), FALSE, TRUE, "");
 $RootMenu->AddMenuItem(6, "mci_Setup", $Language->MenuPhrase("6", "MenuText"), "", -1, "", IsLoggedIn(), FALSE, TRUE, "");

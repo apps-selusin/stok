@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/8/13" version="11.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/8/15" version="11.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -381,6 +381,12 @@
     </menu>
     <menu id="34">
       <phrase id="menutext" value="v 06 jual lapstok" />
+    </menu>
+    <menu id="35">
+      <phrase id="menutext" value="v 07 piutang" />
+    </menu>
+    <menu id="36">
+      <phrase id="menutext" value="Piutang" />
     </menu>
     <menu id="23">
       <phrase id="menutext" value="v 04 jual" />
@@ -1283,6 +1289,60 @@
       </field>
       <field id="sumqty">
         <phrase id="fldcaption" value="sumqty" />
+      </field>
+    </table>
+    <table id="v07_piutang">
+      <phrase id="tblcaption" value="v 07 piutang" />
+      <field id="nopiutang">
+        <phrase id="fldcaption" value="nopiutang" />
+      </field>
+      <field id="tglso">
+        <phrase id="fldcaption" value="tglso" />
+      </field>
+      <field id="noso">
+        <phrase id="fldcaption" value="noso" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="nama" />
+      </field>
+      <field id="customerpo">
+        <phrase id="fldcaption" value="customerpo" />
+      </field>
+      <field id="jumlahpiutang">
+        <phrase id="fldcaption" value="jumlahpiutang" />
+      </field>
+      <field id="jumlahbayar">
+        <phrase id="fldcaption" value="jumlahbayar" />
+      </field>
+      <field id="sisapiutang">
+        <phrase id="fldcaption" value="sisapiutang" />
+      </field>
+    </table>
+    <table id="r06_piutang">
+      <phrase id="tblcaption" value="Piutang" />
+      <field id="nopiutang">
+        <phrase id="fldcaption" value="No. Piutang" />
+      </field>
+      <field id="tglso">
+        <phrase id="fldcaption" value="Tgl. Invoice" />
+      </field>
+      <field id="noso">
+        <phrase id="fldcaption" value="No. Invoice" />
+      </field>
+      <field id="nama">
+        <phrase id="fldcaption" value="Customer" />
+      </field>
+      <field id="customerpo">
+        <phrase id="fldcaption" value="No. PO Customer" />
+      </field>
+      <field id="jumlahpiutang">
+        <phrase id="fldcaption" value="Jumlah Piutang" />
+      </field>
+      <field id="jumlahbayar">
+        <phrase id="fldcaption" value="Jumlah Bayar" />
+      </field>
+      <field id="sisapiutang">
+        <phrase id="fldcaption" value="Sisa Piutang" />
       </field>
     </table>
   </project>
