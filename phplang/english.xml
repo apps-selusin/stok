@@ -1140,7 +1140,7 @@
         <phrase id="fldcaption" value="Jumlah Bayar" />
       </field>
       <field id="saldopiutang">
-        <phrase id="fldcaption" value="Saldo Piutang" />
+        <phrase id="fldcaption" value="Sisa Piutang" />
       </field>
     </table>
     <table id="t15_piutangdetail">
