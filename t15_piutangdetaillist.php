@@ -5,9 +5,9 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg14.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql14.php") ?>
 <?php include_once "phpfn14.php" ?>
+<?php include_once "t15_piutangdetailinfo.php" ?>
 <?php include_once "t14_piutanginfo.php" ?>
 <?php include_once "t96_employeesinfo.php" ?>
-<?php include_once "t15_piutangdetailgridcls.php" ?>
 <?php include_once "userfn14.php" ?>
 <?php
 
@@ -15,9 +15,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t14_piutang_list = NULL; // Initialize page object first
+$t15_piutangdetail_list = NULL; // Initialize page object first
 
-class ct14_piutang_list extends ct14_piutang {
+class ct15_piutangdetail_list extends ct15_piutangdetail {
 
 	// Page ID
 	var $PageID = 'list';
@@ -26,13 +26,13 @@ class ct14_piutang_list extends ct14_piutang {
 	var $ProjectID = '{8746EF3F-81FE-4C1C-A7F8-AC191F8DDBB2}';
 
 	// Table name
-	var $TableName = 't14_piutang';
+	var $TableName = 't15_piutangdetail';
 
 	// Page object name
-	var $PageObjName = 't14_piutang_list';
+	var $PageObjName = 't15_piutangdetail_list';
 
 	// Grid form hidden field names
-	var $FormName = 'ft14_piutanglist';
+	var $FormName = 'ft15_piutangdetaillist';
 	var $FormActionName = 'k_action';
 	var $FormKeyName = 'k_key';
 	var $FormOldKeyName = 'k_oldkey';
@@ -297,10 +297,10 @@ class ct14_piutang_list extends ct14_piutang {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t14_piutang)
-		if (!isset($GLOBALS["t14_piutang"]) || get_class($GLOBALS["t14_piutang"]) == "ct14_piutang") {
-			$GLOBALS["t14_piutang"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t14_piutang"];
+		// Table object (t15_piutangdetail)
+		if (!isset($GLOBALS["t15_piutangdetail"]) || get_class($GLOBALS["t15_piutangdetail"]) == "ct15_piutangdetail") {
+			$GLOBALS["t15_piutangdetail"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t15_piutangdetail"];
 		}
 
 		// Initialize URLs
@@ -311,12 +311,15 @@ class ct14_piutang_list extends ct14_piutang {
 		$this->ExportXmlUrl = $this->PageUrl() . "export=xml";
 		$this->ExportCsvUrl = $this->PageUrl() . "export=csv";
 		$this->ExportPdfUrl = $this->PageUrl() . "export=pdf";
-		$this->AddUrl = "t14_piutangadd.php?" . EW_TABLE_SHOW_DETAIL . "=";
+		$this->AddUrl = "t15_piutangdetailadd.php";
 		$this->InlineAddUrl = $this->PageUrl() . "a=add";
 		$this->GridAddUrl = $this->PageUrl() . "a=gridadd";
 		$this->GridEditUrl = $this->PageUrl() . "a=gridedit";
-		$this->MultiDeleteUrl = "t14_piutangdelete.php";
-		$this->MultiUpdateUrl = "t14_piutangupdate.php";
+		$this->MultiDeleteUrl = "t15_piutangdetaildelete.php";
+		$this->MultiUpdateUrl = "t15_piutangdetailupdate.php";
+
+		// Table object (t14_piutang)
+		if (!isset($GLOBALS['t14_piutang'])) $GLOBALS['t14_piutang'] = new ct14_piutang();
 
 		// Table object (t96_employees)
 		if (!isset($GLOBALS['t96_employees'])) $GLOBALS['t96_employees'] = new ct96_employees();
@@ -327,7 +330,7 @@ class ct14_piutang_list extends ct14_piutang {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't14_piutang', TRUE);
+			define("EW_TABLE_NAME", 't15_piutangdetail', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"]))
@@ -369,7 +372,7 @@ class ct14_piutang_list extends ct14_piutang {
 		// Filter options
 		$this->FilterOptions = new cListOptions();
 		$this->FilterOptions->Tag = "div";
-		$this->FilterOptions->TagClassName = "ewFilterOption ft14_piutanglistsrch";
+		$this->FilterOptions->TagClassName = "ewFilterOption ft15_piutangdetaillistsrch";
 
 		// List actions
 		$this->ListActions = new cListActions();
@@ -405,8 +408,11 @@ class ct14_piutang_list extends ct14_piutang {
 		// 
 		// Security = null;
 		// 
-		// Get export parameters
+		// Create form object
 
+		$objForm = new cFormObj();
+
+		// Get export parameters
 		$custom = "";
 		if (@$_GET["export"] <> "") {
 			$this->Export = $_GET["export"];
@@ -456,11 +462,9 @@ class ct14_piutang_list extends ct14_piutang {
 
 		// Setup export options
 		$this->SetupExportOptions();
-		$this->NoPiutang->SetVisibility();
-		$this->JualID->SetVisibility();
-		$this->JumlahPiutang->SetVisibility();
+		$this->NoBayar->SetVisibility();
+		$this->Tgl->SetVisibility();
 		$this->JumlahBayar->SetVisibility();
-		$this->SaldoPiutang->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -477,22 +481,6 @@ class ct14_piutang_list extends ct14_piutang {
 
 		// Process auto fill
 		if (@$_POST["ajax"] == "autofill") {
-
-			// Get the keys for master table
-			$sDetailTblVar = $this->getCurrentDetailTable();
-			if ($sDetailTblVar <> "") {
-				$DetailTblVar = explode(",", $sDetailTblVar);
-				if (in_array("t15_piutangdetail", $DetailTblVar)) {
-
-					// Process auto fill for detail table 't15_piutangdetail'
-					if (preg_match('/^ft15_piutangdetail(grid|add|addopt|edit|update|search)$/', @$_POST["form"])) {
-						if (!isset($GLOBALS["t15_piutangdetail_grid"])) $GLOBALS["t15_piutangdetail_grid"] = new ct15_piutangdetail_grid;
-						$GLOBALS["t15_piutangdetail_grid"]->Page_Init();
-						$this->Page_Terminate();
-						exit();
-					}
-				}
-			}
 			$results = $this->GetAutoFill(@$_POST["name"], @$_POST["q"]);
 			if ($results) {
 
@@ -507,6 +495,9 @@ class ct14_piutang_list extends ct14_piutang {
 
 		// Create Token
 		$this->CreateToken();
+
+		// Set up master detail parameters
+		$this->SetupMasterParms();
 
 		// Setup other options
 		$this->SetupOtherOptions();
@@ -537,13 +528,13 @@ class ct14_piutang_list extends ct14_piutang {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t14_piutang;
+		global $EW_EXPORT, $t15_piutangdetail;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t14_piutang);
+				$doc = new $class($t15_piutangdetail);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -642,6 +633,35 @@ class ct14_piutang_list extends ct14_piutang {
 			if ($this->Export == "")
 				$this->SetupBreadcrumb();
 
+			// Check QueryString parameters
+			if (@$_GET["a"] <> "") {
+				$this->CurrentAction = $_GET["a"];
+
+				// Clear inline mode
+				if ($this->CurrentAction == "cancel")
+					$this->ClearInlineMode();
+
+				// Switch to inline edit mode
+				if ($this->CurrentAction == "edit")
+					$this->InlineEditMode();
+
+				// Switch to inline add mode
+				if ($this->CurrentAction == "add" || $this->CurrentAction == "copy")
+					$this->InlineAddMode();
+			} else {
+				if (@$_POST["a_list"] <> "") {
+					$this->CurrentAction = $_POST["a_list"]; // Get action
+
+					// Inline Update
+					if (($this->CurrentAction == "update" || $this->CurrentAction == "overwrite") && @$_SESSION[EW_SESSION_INLINE_MODE] == "edit")
+						$this->InlineUpdate();
+
+					// Insert Inline
+					if ($this->CurrentAction == "insert" && @$_SESSION[EW_SESSION_INLINE_MODE] == "add")
+						$this->InlineInsert();
+				}
+			}
+
 			// Hide list options
 			if ($this->Export <> "") {
 				$this->ListOptions->HideAllOptions(array("sequence"));
@@ -729,8 +749,28 @@ class ct14_piutang_list extends ct14_piutang {
 		$sFilter = "";
 		if (!$Security->CanList())
 			$sFilter = "(0=1)"; // Filter all records
+
+		// Restore master/detail filter
+		$this->DbMasterFilter = $this->GetMasterFilter(); // Restore master filter
+		$this->DbDetailFilter = $this->GetDetailFilter(); // Restore detail filter
 		ew_AddFilter($sFilter, $this->DbDetailFilter);
 		ew_AddFilter($sFilter, $this->SearchWhere);
+
+		// Load master record
+		if ($this->CurrentMode <> "add" && $this->GetMasterFilter() <> "" && $this->getCurrentMasterTable() == "t14_piutang") {
+			global $t14_piutang;
+			$rsmaster = $t14_piutang->LoadRs($this->DbMasterFilter);
+			$this->MasterRecordExists = ($rsmaster && !$rsmaster->EOF);
+			if (!$this->MasterRecordExists) {
+				$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record found
+				$this->Page_Terminate("t14_piutanglist.php"); // Return to master page
+			} else {
+				$t14_piutang->LoadListRowValues($rsmaster);
+				$t14_piutang->RowType = EW_ROWTYPE_MASTER; // Master row
+				$t14_piutang->RenderListRow();
+				$rsmaster->Close();
+			}
+		}
 
 		// Set up filter
 		if ($this->Command == "json") {
@@ -784,6 +824,112 @@ class ct14_piutang_list extends ct14_piutang {
 		}
 	}
 
+	// Exit inline mode
+	function ClearInlineMode() {
+		$this->setKey("id", ""); // Clear inline edit key
+		$this->JumlahBayar->FormValue = ""; // Clear form value
+		$this->LastAction = $this->CurrentAction; // Save last action
+		$this->CurrentAction = ""; // Clear action
+		$_SESSION[EW_SESSION_INLINE_MODE] = ""; // Clear inline mode
+	}
+
+	// Switch to Inline Edit mode
+	function InlineEditMode() {
+		global $Security, $Language;
+		if (!$Security->CanEdit())
+			$this->Page_Terminate("login.php"); // Go to login page
+		$bInlineEdit = TRUE;
+		if (isset($_GET["id"])) {
+			$this->id->setQueryStringValue($_GET["id"]);
+		} else {
+			$bInlineEdit = FALSE;
+		}
+		if ($bInlineEdit) {
+			if ($this->LoadRow()) {
+				$this->setKey("id", $this->id->CurrentValue); // Set up inline edit key
+				$_SESSION[EW_SESSION_INLINE_MODE] = "edit"; // Enable inline edit
+			}
+		}
+	}
+
+	// Perform update to Inline Edit record
+	function InlineUpdate() {
+		global $Language, $objForm, $gsFormError;
+		$objForm->Index = 1;
+		$this->LoadFormValues(); // Get form values
+
+		// Validate form
+		$bInlineUpdate = TRUE;
+		if (!$this->ValidateForm()) {
+			$bInlineUpdate = FALSE; // Form error, reset action
+			$this->setFailureMessage($gsFormError);
+		} else {
+			$bInlineUpdate = FALSE;
+			$rowkey = strval($objForm->GetValue($this->FormKeyName));
+			if ($this->SetupKeyValues($rowkey)) { // Set up key values
+				if ($this->CheckInlineEditKey()) { // Check key
+					$this->SendEmail = TRUE; // Send email on update success
+					$bInlineUpdate = $this->EditRow(); // Update record
+				} else {
+					$bInlineUpdate = FALSE;
+				}
+			}
+		}
+		if ($bInlineUpdate) { // Update success
+			if ($this->getSuccessMessage() == "")
+				$this->setSuccessMessage($Language->Phrase("UpdateSuccess")); // Set up success message
+			$this->ClearInlineMode(); // Clear inline edit mode
+		} else {
+			if ($this->getFailureMessage() == "")
+				$this->setFailureMessage($Language->Phrase("UpdateFailed")); // Set update failed message
+			$this->EventCancelled = TRUE; // Cancel event
+			$this->CurrentAction = "edit"; // Stay in edit mode
+		}
+	}
+
+	// Check Inline Edit key
+	function CheckInlineEditKey() {
+
+		//CheckInlineEditKey = True
+		if (strval($this->getKey("id")) <> strval($this->id->CurrentValue))
+			return FALSE;
+		return TRUE;
+	}
+
+	// Switch to Inline Add mode
+	function InlineAddMode() {
+		global $Security, $Language;
+		if (!$Security->CanAdd())
+			$this->Page_Terminate("login.php"); // Return to login page
+		$this->CurrentAction = "add";
+		$_SESSION[EW_SESSION_INLINE_MODE] = "add"; // Enable inline add
+	}
+
+	// Perform update to Inline Add/Copy record
+	function InlineInsert() {
+		global $Language, $objForm, $gsFormError;
+		$this->LoadOldRecord(); // Load old record
+		$objForm->Index = 0;
+		$this->LoadFormValues(); // Get form values
+
+		// Validate form
+		if (!$this->ValidateForm()) {
+			$this->setFailureMessage($gsFormError); // Set validation error message
+			$this->EventCancelled = TRUE; // Set event cancelled
+			$this->CurrentAction = "add"; // Stay in add mode
+			return;
+		}
+		$this->SendEmail = TRUE; // Send email on add success
+		if ($this->AddRow($this->OldRecordset)) { // Add record
+			if ($this->getSuccessMessage() == "")
+				$this->setSuccessMessage($Language->Phrase("AddSuccess")); // Set up add success message
+			$this->ClearInlineMode(); // Clear inline add mode
+		} else { // Add failed
+			$this->EventCancelled = TRUE; // Set event cancelled
+			$this->CurrentAction = "add"; // Stay in add mode
+		}
+	}
+
 	// Build filter for all keys
 	function BuildKeyFilter() {
 		global $objForm;
@@ -830,11 +976,10 @@ class ct14_piutang_list extends ct14_piutang {
 		$sFilterList = "";
 		$sSavedFilterList = "";
 		$sFilterList = ew_Concat($sFilterList, $this->id->AdvancedSearch->ToJson(), ","); // Field id
-		$sFilterList = ew_Concat($sFilterList, $this->NoPiutang->AdvancedSearch->ToJson(), ","); // Field NoPiutang
-		$sFilterList = ew_Concat($sFilterList, $this->JualID->AdvancedSearch->ToJson(), ","); // Field JualID
-		$sFilterList = ew_Concat($sFilterList, $this->JumlahPiutang->AdvancedSearch->ToJson(), ","); // Field JumlahPiutang
+		$sFilterList = ew_Concat($sFilterList, $this->PiutangID->AdvancedSearch->ToJson(), ","); // Field PiutangID
+		$sFilterList = ew_Concat($sFilterList, $this->NoBayar->AdvancedSearch->ToJson(), ","); // Field NoBayar
+		$sFilterList = ew_Concat($sFilterList, $this->Tgl->AdvancedSearch->ToJson(), ","); // Field Tgl
 		$sFilterList = ew_Concat($sFilterList, $this->JumlahBayar->AdvancedSearch->ToJson(), ","); // Field JumlahBayar
-		$sFilterList = ew_Concat($sFilterList, $this->SaldoPiutang->AdvancedSearch->ToJson(), ","); // Field SaldoPiutang
 		if ($this->BasicSearch->Keyword <> "") {
 			$sWrk = "\"" . EW_TABLE_BASIC_SEARCH . "\":\"" . ew_JsEncode2($this->BasicSearch->Keyword) . "\",\"" . EW_TABLE_BASIC_SEARCH_TYPE . "\":\"" . ew_JsEncode2($this->BasicSearch->Type) . "\"";
 			$sFilterList = ew_Concat($sFilterList, $sWrk, ",");
@@ -857,7 +1002,7 @@ class ct14_piutang_list extends ct14_piutang {
 		global $UserProfile;
 		if (@$_POST["ajax"] == "savefilters") { // Save filter request (Ajax)
 			$filters = @$_POST["filters"];
-			$UserProfile->SetSearchFilters(CurrentUserName(), "ft14_piutanglistsrch", $filters);
+			$UserProfile->SetSearchFilters(CurrentUserName(), "ft15_piutangdetaillistsrch", $filters);
 
 			// Clean output buffer
 			if (!EW_DEBUG_ENABLED && ob_get_length())
@@ -887,29 +1032,29 @@ class ct14_piutang_list extends ct14_piutang {
 		$this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
 		$this->id->AdvancedSearch->Save();
 
-		// Field NoPiutang
-		$this->NoPiutang->AdvancedSearch->SearchValue = @$filter["x_NoPiutang"];
-		$this->NoPiutang->AdvancedSearch->SearchOperator = @$filter["z_NoPiutang"];
-		$this->NoPiutang->AdvancedSearch->SearchCondition = @$filter["v_NoPiutang"];
-		$this->NoPiutang->AdvancedSearch->SearchValue2 = @$filter["y_NoPiutang"];
-		$this->NoPiutang->AdvancedSearch->SearchOperator2 = @$filter["w_NoPiutang"];
-		$this->NoPiutang->AdvancedSearch->Save();
+		// Field PiutangID
+		$this->PiutangID->AdvancedSearch->SearchValue = @$filter["x_PiutangID"];
+		$this->PiutangID->AdvancedSearch->SearchOperator = @$filter["z_PiutangID"];
+		$this->PiutangID->AdvancedSearch->SearchCondition = @$filter["v_PiutangID"];
+		$this->PiutangID->AdvancedSearch->SearchValue2 = @$filter["y_PiutangID"];
+		$this->PiutangID->AdvancedSearch->SearchOperator2 = @$filter["w_PiutangID"];
+		$this->PiutangID->AdvancedSearch->Save();
 
-		// Field JualID
-		$this->JualID->AdvancedSearch->SearchValue = @$filter["x_JualID"];
-		$this->JualID->AdvancedSearch->SearchOperator = @$filter["z_JualID"];
-		$this->JualID->AdvancedSearch->SearchCondition = @$filter["v_JualID"];
-		$this->JualID->AdvancedSearch->SearchValue2 = @$filter["y_JualID"];
-		$this->JualID->AdvancedSearch->SearchOperator2 = @$filter["w_JualID"];
-		$this->JualID->AdvancedSearch->Save();
+		// Field NoBayar
+		$this->NoBayar->AdvancedSearch->SearchValue = @$filter["x_NoBayar"];
+		$this->NoBayar->AdvancedSearch->SearchOperator = @$filter["z_NoBayar"];
+		$this->NoBayar->AdvancedSearch->SearchCondition = @$filter["v_NoBayar"];
+		$this->NoBayar->AdvancedSearch->SearchValue2 = @$filter["y_NoBayar"];
+		$this->NoBayar->AdvancedSearch->SearchOperator2 = @$filter["w_NoBayar"];
+		$this->NoBayar->AdvancedSearch->Save();
 
-		// Field JumlahPiutang
-		$this->JumlahPiutang->AdvancedSearch->SearchValue = @$filter["x_JumlahPiutang"];
-		$this->JumlahPiutang->AdvancedSearch->SearchOperator = @$filter["z_JumlahPiutang"];
-		$this->JumlahPiutang->AdvancedSearch->SearchCondition = @$filter["v_JumlahPiutang"];
-		$this->JumlahPiutang->AdvancedSearch->SearchValue2 = @$filter["y_JumlahPiutang"];
-		$this->JumlahPiutang->AdvancedSearch->SearchOperator2 = @$filter["w_JumlahPiutang"];
-		$this->JumlahPiutang->AdvancedSearch->Save();
+		// Field Tgl
+		$this->Tgl->AdvancedSearch->SearchValue = @$filter["x_Tgl"];
+		$this->Tgl->AdvancedSearch->SearchOperator = @$filter["z_Tgl"];
+		$this->Tgl->AdvancedSearch->SearchCondition = @$filter["v_Tgl"];
+		$this->Tgl->AdvancedSearch->SearchValue2 = @$filter["y_Tgl"];
+		$this->Tgl->AdvancedSearch->SearchOperator2 = @$filter["w_Tgl"];
+		$this->Tgl->AdvancedSearch->Save();
 
 		// Field JumlahBayar
 		$this->JumlahBayar->AdvancedSearch->SearchValue = @$filter["x_JumlahBayar"];
@@ -918,14 +1063,6 @@ class ct14_piutang_list extends ct14_piutang {
 		$this->JumlahBayar->AdvancedSearch->SearchValue2 = @$filter["y_JumlahBayar"];
 		$this->JumlahBayar->AdvancedSearch->SearchOperator2 = @$filter["w_JumlahBayar"];
 		$this->JumlahBayar->AdvancedSearch->Save();
-
-		// Field SaldoPiutang
-		$this->SaldoPiutang->AdvancedSearch->SearchValue = @$filter["x_SaldoPiutang"];
-		$this->SaldoPiutang->AdvancedSearch->SearchOperator = @$filter["z_SaldoPiutang"];
-		$this->SaldoPiutang->AdvancedSearch->SearchCondition = @$filter["v_SaldoPiutang"];
-		$this->SaldoPiutang->AdvancedSearch->SearchValue2 = @$filter["y_SaldoPiutang"];
-		$this->SaldoPiutang->AdvancedSearch->SearchOperator2 = @$filter["w_SaldoPiutang"];
-		$this->SaldoPiutang->AdvancedSearch->Save();
 		$this->BasicSearch->setKeyword(@$filter[EW_TABLE_BASIC_SEARCH]);
 		$this->BasicSearch->setType(@$filter[EW_TABLE_BASIC_SEARCH_TYPE]);
 	}
@@ -933,7 +1070,7 @@ class ct14_piutang_list extends ct14_piutang {
 	// Return basic search SQL
 	function BasicSearchSQL($arKeywords, $type) {
 		$sWhere = "";
-		$this->BuildBasicSearchSQL($sWhere, $this->NoPiutang, $arKeywords, $type);
+		$this->BuildBasicSearchSQL($sWhere, $this->NoBayar, $arKeywords, $type);
 		return $sWhere;
 	}
 
@@ -1083,11 +1220,9 @@ class ct14_piutang_list extends ct14_piutang {
 		if (@$_GET["order"] <> "") {
 			$this->CurrentOrder = @$_GET["order"];
 			$this->CurrentOrderType = @$_GET["ordertype"];
-			$this->UpdateSort($this->NoPiutang, $bCtrl); // NoPiutang
-			$this->UpdateSort($this->JualID, $bCtrl); // JualID
-			$this->UpdateSort($this->JumlahPiutang, $bCtrl); // JumlahPiutang
+			$this->UpdateSort($this->NoBayar, $bCtrl); // NoBayar
+			$this->UpdateSort($this->Tgl, $bCtrl); // Tgl
 			$this->UpdateSort($this->JumlahBayar, $bCtrl); // JumlahBayar
-			$this->UpdateSort($this->SaldoPiutang, $bCtrl); // SaldoPiutang
 			$this->setStartRecordNumber(1); // Reset start position
 		}
 	}
@@ -1099,7 +1234,8 @@ class ct14_piutang_list extends ct14_piutang {
 			if ($this->getSqlOrderBy() <> "") {
 				$sOrderBy = $this->getSqlOrderBy();
 				$this->setSessionOrderBy($sOrderBy);
-				$this->NoPiutang->setSort("ASC");
+				$this->NoBayar->setSort("ASC");
+				$this->Tgl->setSort("ASC");
 			}
 		}
 	}
@@ -1117,15 +1253,21 @@ class ct14_piutang_list extends ct14_piutang {
 			if ($this->Command == "reset" || $this->Command == "resetall")
 				$this->ResetSearchParms();
 
+			// Reset master/detail keys
+			if ($this->Command == "resetall") {
+				$this->setCurrentMasterTable(""); // Clear master table
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+				$this->PiutangID->setSessionValue("");
+			}
+
 			// Reset sorting order
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
-				$this->NoPiutang->setSort("");
-				$this->JualID->setSort("");
-				$this->JumlahPiutang->setSort("");
+				$this->NoBayar->setSort("");
+				$this->Tgl->setSort("");
 				$this->JumlahBayar->setSort("");
-				$this->SaldoPiutang->setSort("");
 			}
 
 			// Reset start position
@@ -1144,27 +1286,17 @@ class ct14_piutang_list extends ct14_piutang {
 		$item->OnLeft = TRUE;
 		$item->Visible = FALSE;
 
-		// "detail_t15_piutangdetail"
-		$item = &$this->ListOptions->Add("detail_t15_piutangdetail");
+		// "edit"
+		$item = &$this->ListOptions->Add("edit");
 		$item->CssClass = "text-nowrap";
-		$item->Visible = $Security->AllowList(CurrentProjectID() . 't15_piutangdetail') && !$this->ShowMultipleDetails;
+		$item->Visible = $Security->CanEdit();
 		$item->OnLeft = TRUE;
-		$item->ShowInButtonGroup = FALSE;
-		if (!isset($GLOBALS["t15_piutangdetail_grid"])) $GLOBALS["t15_piutangdetail_grid"] = new ct15_piutangdetail_grid;
 
-		// Multiple details
-		if ($this->ShowMultipleDetails) {
-			$item = &$this->ListOptions->Add("details");
-			$item->CssClass = "text-nowrap";
-			$item->Visible = $this->ShowMultipleDetails;
-			$item->OnLeft = TRUE;
-			$item->ShowInButtonGroup = FALSE;
-		}
-
-		// Set up detail pages
-		$pages = new cSubPages();
-		$pages->Add("t15_piutangdetail");
-		$this->DetailPages = $pages;
+		// "copy"
+		$item = &$this->ListOptions->Add("copy");
+		$item->CssClass = "text-nowrap";
+		$item->Visible = $Security->CanAdd() && ($this->CurrentAction == "add");
+		$item->OnLeft = TRUE;
 
 		// List actions
 		$item = &$this->ListOptions->Add("listactions");
@@ -1176,7 +1308,7 @@ class ct14_piutang_list extends ct14_piutang {
 
 		// "checkbox"
 		$item = &$this->ListOptions->Add("checkbox");
-		$item->Visible = FALSE;
+		$item->Visible = $Security->CanDelete();
 		$item->OnLeft = TRUE;
 		$item->Header = "<input type=\"checkbox\" name=\"key\" id=\"key\" onclick=\"ew_SelectAllKey(this);\">";
 		$item->MoveTo(0);
@@ -1215,9 +1347,60 @@ class ct14_piutang_list extends ct14_piutang {
 		// Call ListOptions_Rendering event
 		$this->ListOptions_Rendering();
 
+		// Set up row action and key
+		if (is_numeric($this->RowIndex) && $this->CurrentMode <> "view") {
+			$objForm->Index = $this->RowIndex;
+			$ActionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
+			$OldKeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormOldKeyName);
+			$KeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormKeyName);
+			$BlankRowName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormBlankRowName);
+			if ($this->RowAction <> "")
+				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $ActionName . "\" id=\"" . $ActionName . "\" value=\"" . $this->RowAction . "\">";
+			if ($this->RowAction == "delete") {
+				$rowkey = $objForm->GetValue($this->FormKeyName);
+				$this->SetupKeyValues($rowkey);
+			}
+			if ($this->RowAction == "insert" && $this->CurrentAction == "F" && $this->EmptyRow())
+				$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $BlankRowName . "\" id=\"" . $BlankRowName . "\" value=\"1\">";
+		}
+
 		// "sequence"
 		$oListOpt = &$this->ListOptions->Items["sequence"];
 		$oListOpt->Body = ew_FormatSeqNo($this->RecCnt);
+
+		// "copy"
+		$oListOpt = &$this->ListOptions->Items["copy"];
+		if (($this->CurrentAction == "add" || $this->CurrentAction == "copy") && $this->RowType == EW_ROWTYPE_ADD) { // Inline Add/Copy
+			$this->ListOptions->CustomItem = "copy"; // Show copy column only
+			$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
+			$oListOpt->Body = "<div" . (($oListOpt->OnLeft) ? " style=\"text-align: right\"" : "") . ">" .
+				"<a class=\"ewGridLink ewInlineInsert\" title=\"" . ew_HtmlTitle($Language->Phrase("InsertLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InsertLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . $this->PageName() . "');\">" . $Language->Phrase("InsertLink") . "</a>&nbsp;" .
+				"<a class=\"ewGridLink ewInlineCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("CancelLink") . "</a>" .
+				"<input type=\"hidden\" name=\"a_list\" id=\"a_list\" value=\"insert\"></div>";
+			return;
+		}
+
+		// "edit"
+		$oListOpt = &$this->ListOptions->Items["edit"];
+		if ($this->CurrentAction == "edit" && $this->RowType == EW_ROWTYPE_EDIT) { // Inline-Edit
+			$this->ListOptions->CustomItem = "edit"; // Show edit column only
+			$cancelurl = $this->AddMasterUrl($this->PageUrl() . "a=cancel");
+				$oListOpt->Body = "<div" . (($oListOpt->OnLeft) ? " style=\"text-align: right\"" : "") . ">" .
+					"<a class=\"ewGridLink ewInlineUpdate\" title=\"" . ew_HtmlTitle($Language->Phrase("UpdateLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("UpdateLink")) . "\" href=\"\" onclick=\"return ewForms(this).Submit('" . ew_UrlAddHash($this->PageName(), "r" . $this->RowCnt . "_" . $this->TableVar) . "');\">" . $Language->Phrase("UpdateLink") . "</a>&nbsp;" .
+					"<a class=\"ewGridLink ewInlineCancel\" title=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->Phrase("CancelLink") . "</a>" .
+					"<input type=\"hidden\" name=\"a_list\" id=\"a_list\" value=\"update\"></div>";
+			$oListOpt->Body .= "<input type=\"hidden\" name=\"k" . $this->RowIndex . "_key\" id=\"k" . $this->RowIndex . "_key\" value=\"" . ew_HtmlEncode($this->id->CurrentValue) . "\">";
+			return;
+		}
+
+		// "edit"
+		$oListOpt = &$this->ListOptions->Items["edit"];
+		$editcaption = ew_HtmlTitle($Language->Phrase("EditLink"));
+		if ($Security->CanEdit()) {
+			$oListOpt->Body .= "<a class=\"ewRowLink ewInlineEdit\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineEditLink")) . "\" href=\"" . ew_HtmlEncode(ew_UrlAddHash($this->InlineEditUrl, "r" . $this->RowCnt . "_" . $this->TableVar)) . "\">" . $Language->Phrase("InlineEditLink") . "</a>";
+		} else {
+			$oListOpt->Body = "";
+		}
 
 		// Set up list action buttons
 		$oListOpt = &$this->ListOptions->GetItem("listactions");
@@ -1247,47 +1430,6 @@ class ct14_piutang_list extends ct14_piutang {
 				$oListOpt->Visible = TRUE;
 			}
 		}
-		$DetailViewTblVar = "";
-		$DetailCopyTblVar = "";
-		$DetailEditTblVar = "";
-
-		// "detail_t15_piutangdetail"
-		$oListOpt = &$this->ListOptions->Items["detail_t15_piutangdetail"];
-		if ($Security->AllowList(CurrentProjectID() . 't15_piutangdetail')) {
-			$body = $Language->Phrase("DetailLink") . $Language->TablePhrase("t15_piutangdetail", "TblCaption");
-			$body = "<a class=\"btn btn-default btn-sm ewRowLink ewDetail\" data-action=\"list\" href=\"" . ew_HtmlEncode("t15_piutangdetaillist.php?" . EW_TABLE_SHOW_MASTER . "=t14_piutang&fk_id=" . urlencode(strval($this->id->CurrentValue)) . "") . "\">" . $body . "</a>";
-			$links = "";
-			if ($links <> "") {
-				$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewDetail\" data-toggle=\"dropdown\"><b class=\"caret\"></b></button>";
-				$body .= "<ul class=\"dropdown-menu\">". $links . "</ul>";
-			}
-			$body = "<div class=\"btn-group\">" . $body . "</div>";
-			$oListOpt->Body = $body;
-			if ($this->ShowMultipleDetails) $oListOpt->Visible = FALSE;
-		}
-		if ($this->ShowMultipleDetails) {
-			$body = $Language->Phrase("MultipleMasterDetails");
-			$body = "<div class=\"btn-group\">";
-			$links = "";
-			if ($DetailViewTblVar <> "") {
-				$links .= "<li><a class=\"ewRowLink ewDetailView\" data-action=\"view\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailViewLink")) . "\" href=\"" . ew_HtmlEncode($this->GetViewUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailViewTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailViewLink")) . "</a></li>";
-			}
-			if ($DetailEditTblVar <> "") {
-				$links .= "<li><a class=\"ewRowLink ewDetailEdit\" data-action=\"edit\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailEditLink")) . "\" href=\"" . ew_HtmlEncode($this->GetEditUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailEditTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailEditLink")) . "</a></li>";
-			}
-			if ($DetailCopyTblVar <> "") {
-				$links .= "<li><a class=\"ewRowLink ewDetailCopy\" data-action=\"add\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("MasterDetailCopyLink")) . "\" href=\"" . ew_HtmlEncode($this->GetCopyUrl(EW_TABLE_SHOW_DETAIL . "=" . $DetailCopyTblVar)) . "\">" . ew_HtmlImageAndText($Language->Phrase("MasterDetailCopyLink")) . "</a></li>";
-			}
-			if ($links <> "") {
-				$body .= "<button class=\"dropdown-toggle btn btn-default btn-sm ewMasterDetail\" title=\"" . ew_HtmlTitle($Language->Phrase("MultipleMasterDetails")) . "\" data-toggle=\"dropdown\">" . $Language->Phrase("MultipleMasterDetails") . "<b class=\"caret\"></b></button>";
-				$body .= "<ul class=\"dropdown-menu ewMenu\">". $links . "</ul>";
-			}
-			$body .= "</div>";
-
-			// Multiple details
-			$oListOpt = &$this->ListOptions->Items["details"];
-			$oListOpt->Body = $body;
-		}
 
 		// "checkbox"
 		$oListOpt = &$this->ListOptions->Items["checkbox"];
@@ -1302,7 +1444,18 @@ class ct14_piutang_list extends ct14_piutang {
 	function SetupOtherOptions() {
 		global $Language, $Security;
 		$options = &$this->OtherOptions;
+		$option = $options["addedit"];
+
+		// Inline Add
+		$item = &$option->Add("inlineadd");
+		$item->Body = "<a class=\"ewAddEdit ewInlineAdd\" title=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("InlineAddLink")) . "\" href=\"" . ew_HtmlEncode($this->InlineAddUrl) . "\">" .$Language->Phrase("InlineAddLink") . "</a>";
+		$item->Visible = ($this->InlineAddUrl <> "" && $Security->CanAdd());
 		$option = $options["action"];
+
+		// Add multi delete
+		$item = &$option->Add("multidelete");
+		$item->Body = "<a class=\"ewAction ewMultiDelete\" title=\"" . ew_HtmlTitle($Language->Phrase("DeleteSelectedLink")) . "\" data-caption=\"" . ew_HtmlTitle($Language->Phrase("DeleteSelectedLink")) . "\" href=\"\" onclick=\"ew_SubmitAction(event,{f:document.ft15_piutangdetaillist,url:'" . $this->MultiDeleteUrl . "'});return false;\">" . $Language->Phrase("DeleteSelectedLink") . "</a>";
+		$item->Visible = ($Security->CanDelete());
 
 		// Set up options default
 		foreach ($options as &$option) {
@@ -1320,10 +1473,10 @@ class ct14_piutang_list extends ct14_piutang {
 
 		// Filter button
 		$item = &$this->FilterOptions->Add("savecurrentfilter");
-		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ft14_piutanglistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
+		$item->Body = "<a class=\"ewSaveFilter\" data-form=\"ft15_piutangdetaillistsrch\" href=\"#\">" . $Language->Phrase("SaveCurrentFilter") . "</a>";
 		$item->Visible = TRUE;
 		$item = &$this->FilterOptions->Add("deletefilter");
-		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ft14_piutanglistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
+		$item->Body = "<a class=\"ewDeleteFilter\" data-form=\"ft15_piutangdetaillistsrch\" href=\"#\">" . $Language->Phrase("DeleteFilter") . "</a>";
 		$item->Visible = TRUE;
 		$this->FilterOptions->UseDropDownButton = TRUE;
 		$this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
@@ -1347,7 +1500,7 @@ class ct14_piutang_list extends ct14_piutang {
 					$item = &$option->Add("custom_" . $listaction->Action);
 					$caption = $listaction->Caption;
 					$icon = ($listaction->Icon <> "") ? "<span class=\"" . ew_HtmlEncode($listaction->Icon) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\"></span> " : $caption;
-					$item->Body = "<a class=\"ewAction ewListAction\" title=\"" . ew_HtmlEncode($caption) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\" href=\"\" onclick=\"ew_SubmitAction(event,jQuery.extend({f:document.ft14_piutanglist}," . $listaction->ToJson(TRUE) . "));return false;\">" . $icon . "</a>";
+					$item->Body = "<a class=\"ewAction ewListAction\" title=\"" . ew_HtmlEncode($caption) . "\" data-caption=\"" . ew_HtmlEncode($caption) . "\" href=\"\" onclick=\"ew_SubmitAction(event,jQuery.extend({f:document.ft15_piutangdetaillist}," . $listaction->ToJson(TRUE) . "));return false;\">" . $icon . "</a>";
 					$item->Visible = $listaction->Allow;
 				}
 			}
@@ -1451,7 +1604,7 @@ class ct14_piutang_list extends ct14_piutang {
 		// Search button
 		$item = &$this->SearchOptions->Add("searchtoggle");
 		$SearchToggleClass = ($this->SearchWhere <> "") ? " active" : " active";
-		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ft14_piutanglistsrch\">" . $Language->Phrase("SearchLink") . "</button>";
+		$item->Body = "<button type=\"button\" class=\"btn btn-default ewSearchToggle" . $SearchToggleClass . "\" title=\"" . $Language->Phrase("SearchPanel") . "\" data-caption=\"" . $Language->Phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"ft15_piutangdetaillistsrch\">" . $Language->Phrase("SearchLink") . "</button>";
 		$item->Visible = TRUE;
 
 		// Show all button
@@ -1524,11 +1677,54 @@ class ct14_piutang_list extends ct14_piutang {
 		}
 	}
 
+	// Load default values
+	function LoadDefaultValues() {
+		$this->id->CurrentValue = NULL;
+		$this->id->OldValue = $this->id->CurrentValue;
+		$this->PiutangID->CurrentValue = NULL;
+		$this->PiutangID->OldValue = $this->PiutangID->CurrentValue;
+		$this->NoBayar->CurrentValue = NULL;
+		$this->NoBayar->OldValue = $this->NoBayar->CurrentValue;
+		$this->Tgl->CurrentValue = NULL;
+		$this->Tgl->OldValue = $this->Tgl->CurrentValue;
+		$this->JumlahBayar->CurrentValue = 0.00;
+	}
+
 	// Load basic search values
 	function LoadBasicSearchValues() {
 		$this->BasicSearch->Keyword = @$_GET[EW_TABLE_BASIC_SEARCH];
 		if ($this->BasicSearch->Keyword <> "" && $this->Command == "") $this->Command = "search";
 		$this->BasicSearch->Type = @$_GET[EW_TABLE_BASIC_SEARCH_TYPE];
+	}
+
+	// Load form values
+	function LoadFormValues() {
+
+		// Load from form
+		global $objForm;
+		if (!$this->NoBayar->FldIsDetailKey) {
+			$this->NoBayar->setFormValue($objForm->GetValue("x_NoBayar"));
+		}
+		if (!$this->Tgl->FldIsDetailKey) {
+			$this->Tgl->setFormValue($objForm->GetValue("x_Tgl"));
+			$this->Tgl->CurrentValue = ew_UnFormatDateTime($this->Tgl->CurrentValue, 7);
+		}
+		if (!$this->JumlahBayar->FldIsDetailKey) {
+			$this->JumlahBayar->setFormValue($objForm->GetValue("x_JumlahBayar"));
+		}
+		if (!$this->id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
+			$this->id->setFormValue($objForm->GetValue("x_id"));
+	}
+
+	// Restore form values
+	function RestoreFormValues() {
+		global $objForm;
+		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
+			$this->id->CurrentValue = $this->id->FormValue;
+		$this->NoBayar->CurrentValue = $this->NoBayar->FormValue;
+		$this->Tgl->CurrentValue = $this->Tgl->FormValue;
+		$this->Tgl->CurrentValue = ew_UnFormatDateTime($this->Tgl->CurrentValue, 7);
+		$this->JumlahBayar->CurrentValue = $this->JumlahBayar->FormValue;
 	}
 
 	// Load recordset
@@ -1591,22 +1787,21 @@ class ct14_piutang_list extends ct14_piutang {
 		if (!$rs || $rs->EOF)
 			return;
 		$this->id->setDbValue($row['id']);
-		$this->NoPiutang->setDbValue($row['NoPiutang']);
-		$this->JualID->setDbValue($row['JualID']);
-		$this->JumlahPiutang->setDbValue($row['JumlahPiutang']);
+		$this->PiutangID->setDbValue($row['PiutangID']);
+		$this->NoBayar->setDbValue($row['NoBayar']);
+		$this->Tgl->setDbValue($row['Tgl']);
 		$this->JumlahBayar->setDbValue($row['JumlahBayar']);
-		$this->SaldoPiutang->setDbValue($row['SaldoPiutang']);
 	}
 
 	// Return a row with default values
 	function NewRow() {
+		$this->LoadDefaultValues();
 		$row = array();
-		$row['id'] = NULL;
-		$row['NoPiutang'] = NULL;
-		$row['JualID'] = NULL;
-		$row['JumlahPiutang'] = NULL;
-		$row['JumlahBayar'] = NULL;
-		$row['SaldoPiutang'] = NULL;
+		$row['id'] = $this->id->CurrentValue;
+		$row['PiutangID'] = $this->PiutangID->CurrentValue;
+		$row['NoBayar'] = $this->NoBayar->CurrentValue;
+		$row['Tgl'] = $this->Tgl->CurrentValue;
+		$row['JumlahBayar'] = $this->JumlahBayar->CurrentValue;
 		return $row;
 	}
 
@@ -1616,11 +1811,10 @@ class ct14_piutang_list extends ct14_piutang {
 			return;
 		$row = is_array($rs) ? $rs : $rs->fields;
 		$this->id->DbValue = $row['id'];
-		$this->NoPiutang->DbValue = $row['NoPiutang'];
-		$this->JualID->DbValue = $row['JualID'];
-		$this->JumlahPiutang->DbValue = $row['JumlahPiutang'];
+		$this->PiutangID->DbValue = $row['PiutangID'];
+		$this->NoBayar->DbValue = $row['NoBayar'];
+		$this->Tgl->DbValue = $row['Tgl'];
 		$this->JumlahBayar->DbValue = $row['JumlahBayar'];
-		$this->SaldoPiutang->DbValue = $row['SaldoPiutang'];
 	}
 
 	// Load old record
@@ -1658,27 +1852,18 @@ class ct14_piutang_list extends ct14_piutang {
 		$this->DeleteUrl = $this->GetDeleteUrl();
 
 		// Convert decimal values if posted back
-		if ($this->JumlahPiutang->FormValue == $this->JumlahPiutang->CurrentValue && is_numeric(ew_StrToFloat($this->JumlahPiutang->CurrentValue)))
-			$this->JumlahPiutang->CurrentValue = ew_StrToFloat($this->JumlahPiutang->CurrentValue);
-
-		// Convert decimal values if posted back
 		if ($this->JumlahBayar->FormValue == $this->JumlahBayar->CurrentValue && is_numeric(ew_StrToFloat($this->JumlahBayar->CurrentValue)))
 			$this->JumlahBayar->CurrentValue = ew_StrToFloat($this->JumlahBayar->CurrentValue);
-
-		// Convert decimal values if posted back
-		if ($this->SaldoPiutang->FormValue == $this->SaldoPiutang->CurrentValue && is_numeric(ew_StrToFloat($this->SaldoPiutang->CurrentValue)))
-			$this->SaldoPiutang->CurrentValue = ew_StrToFloat($this->SaldoPiutang->CurrentValue);
 
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
 		// id
-		// NoPiutang
-		// JualID
-		// JumlahPiutang
+		// PiutangID
+		// NoBayar
+		// Tgl
 		// JumlahBayar
-		// SaldoPiutang
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
@@ -1686,82 +1871,266 @@ class ct14_piutang_list extends ct14_piutang {
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// NoPiutang
-		$this->NoPiutang->ViewValue = $this->NoPiutang->CurrentValue;
-		$this->NoPiutang->ViewCustomAttributes = "";
+		// PiutangID
+		$this->PiutangID->ViewValue = $this->PiutangID->CurrentValue;
+		$this->PiutangID->ViewCustomAttributes = "";
 
-		// JualID
-		$this->JualID->ViewValue = $this->JualID->CurrentValue;
-		if (strval($this->JualID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->JualID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `NoSO` AS `DispFld`, `TglSO` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t11_jual`";
-		$sWhereWrk = "";
-		$this->JualID->LookupFilters = array("df2" => "7");
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->JualID, $sWhereWrk); // Call Lookup Selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$arwrk[2] = ew_FormatDateTime($rswrk->fields('Disp2Fld'), 7);
-				$this->JualID->ViewValue = $this->JualID->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->JualID->ViewValue = $this->JualID->CurrentValue;
-			}
-		} else {
-			$this->JualID->ViewValue = NULL;
-		}
-		$this->JualID->ViewCustomAttributes = "";
+		// NoBayar
+		$this->NoBayar->ViewValue = $this->NoBayar->CurrentValue;
+		$this->NoBayar->ViewCustomAttributes = "";
 
-		// JumlahPiutang
-		$this->JumlahPiutang->ViewValue = $this->JumlahPiutang->CurrentValue;
-		$this->JumlahPiutang->ViewValue = ew_FormatNumber($this->JumlahPiutang->ViewValue, 2, -2, -2, -2);
-		$this->JumlahPiutang->CellCssStyle .= "text-align: left;";
-		$this->JumlahPiutang->ViewCustomAttributes = "";
+		// Tgl
+		$this->Tgl->ViewValue = $this->Tgl->CurrentValue;
+		$this->Tgl->ViewValue = ew_FormatDateTime($this->Tgl->ViewValue, 7);
+		$this->Tgl->ViewCustomAttributes = "";
 
 		// JumlahBayar
 		$this->JumlahBayar->ViewValue = $this->JumlahBayar->CurrentValue;
-		$this->JumlahBayar->ViewValue = ew_FormatNumber($this->JumlahBayar->ViewValue, 2, -2, -2, -2);
-		$this->JumlahBayar->CellCssStyle .= "text-align: left;";
 		$this->JumlahBayar->ViewCustomAttributes = "";
 
-		// SaldoPiutang
-		$this->SaldoPiutang->ViewValue = $this->SaldoPiutang->CurrentValue;
-		$this->SaldoPiutang->ViewValue = ew_FormatNumber($this->SaldoPiutang->ViewValue, 2, -2, -2, -2);
-		$this->SaldoPiutang->CellCssStyle .= "text-align: left;";
-		$this->SaldoPiutang->ViewCustomAttributes = "";
+			// NoBayar
+			$this->NoBayar->LinkCustomAttributes = "";
+			$this->NoBayar->HrefValue = "";
+			$this->NoBayar->TooltipValue = "";
 
-			// NoPiutang
-			$this->NoPiutang->LinkCustomAttributes = "";
-			$this->NoPiutang->HrefValue = "";
-			$this->NoPiutang->TooltipValue = "";
-
-			// JualID
-			$this->JualID->LinkCustomAttributes = "";
-			$this->JualID->HrefValue = "";
-			$this->JualID->TooltipValue = "";
-
-			// JumlahPiutang
-			$this->JumlahPiutang->LinkCustomAttributes = "";
-			$this->JumlahPiutang->HrefValue = "";
-			$this->JumlahPiutang->TooltipValue = "";
+			// Tgl
+			$this->Tgl->LinkCustomAttributes = "";
+			$this->Tgl->HrefValue = "";
+			$this->Tgl->TooltipValue = "";
 
 			// JumlahBayar
 			$this->JumlahBayar->LinkCustomAttributes = "";
 			$this->JumlahBayar->HrefValue = "";
 			$this->JumlahBayar->TooltipValue = "";
+		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
-			// SaldoPiutang
-			$this->SaldoPiutang->LinkCustomAttributes = "";
-			$this->SaldoPiutang->HrefValue = "";
-			$this->SaldoPiutang->TooltipValue = "";
+			// NoBayar
+			$this->NoBayar->EditAttrs["class"] = "form-control";
+			$this->NoBayar->EditCustomAttributes = "";
+			$this->NoBayar->EditValue = ew_HtmlEncode($this->NoBayar->CurrentValue);
+			$this->NoBayar->PlaceHolder = ew_RemoveHtml($this->NoBayar->FldCaption());
+
+			// Tgl
+			$this->Tgl->EditAttrs["class"] = "form-control";
+			$this->Tgl->EditCustomAttributes = "";
+			$this->Tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->Tgl->CurrentValue, 7));
+			$this->Tgl->PlaceHolder = ew_RemoveHtml($this->Tgl->FldCaption());
+
+			// JumlahBayar
+			$this->JumlahBayar->EditAttrs["class"] = "form-control";
+			$this->JumlahBayar->EditCustomAttributes = "";
+			$this->JumlahBayar->EditValue = ew_HtmlEncode($this->JumlahBayar->CurrentValue);
+			$this->JumlahBayar->PlaceHolder = ew_RemoveHtml($this->JumlahBayar->FldCaption());
+			if (strval($this->JumlahBayar->EditValue) <> "" && is_numeric($this->JumlahBayar->EditValue)) $this->JumlahBayar->EditValue = ew_FormatNumber($this->JumlahBayar->EditValue, -2, -1, -2, 0);
+
+			// Add refer script
+			// NoBayar
+
+			$this->NoBayar->LinkCustomAttributes = "";
+			$this->NoBayar->HrefValue = "";
+
+			// Tgl
+			$this->Tgl->LinkCustomAttributes = "";
+			$this->Tgl->HrefValue = "";
+
+			// JumlahBayar
+			$this->JumlahBayar->LinkCustomAttributes = "";
+			$this->JumlahBayar->HrefValue = "";
+		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
+
+			// NoBayar
+			$this->NoBayar->EditAttrs["class"] = "form-control";
+			$this->NoBayar->EditCustomAttributes = "";
+			$this->NoBayar->EditValue = ew_HtmlEncode($this->NoBayar->CurrentValue);
+			$this->NoBayar->PlaceHolder = ew_RemoveHtml($this->NoBayar->FldCaption());
+
+			// Tgl
+			$this->Tgl->EditAttrs["class"] = "form-control";
+			$this->Tgl->EditCustomAttributes = "";
+			$this->Tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->Tgl->CurrentValue, 7));
+			$this->Tgl->PlaceHolder = ew_RemoveHtml($this->Tgl->FldCaption());
+
+			// JumlahBayar
+			$this->JumlahBayar->EditAttrs["class"] = "form-control";
+			$this->JumlahBayar->EditCustomAttributes = "";
+			$this->JumlahBayar->EditValue = ew_HtmlEncode($this->JumlahBayar->CurrentValue);
+			$this->JumlahBayar->PlaceHolder = ew_RemoveHtml($this->JumlahBayar->FldCaption());
+			if (strval($this->JumlahBayar->EditValue) <> "" && is_numeric($this->JumlahBayar->EditValue)) $this->JumlahBayar->EditValue = ew_FormatNumber($this->JumlahBayar->EditValue, -2, -1, -2, 0);
+
+			// Edit refer script
+			// NoBayar
+
+			$this->NoBayar->LinkCustomAttributes = "";
+			$this->NoBayar->HrefValue = "";
+
+			// Tgl
+			$this->Tgl->LinkCustomAttributes = "";
+			$this->Tgl->HrefValue = "";
+
+			// JumlahBayar
+			$this->JumlahBayar->LinkCustomAttributes = "";
+			$this->JumlahBayar->HrefValue = "";
 		}
+		if ($this->RowType == EW_ROWTYPE_ADD || $this->RowType == EW_ROWTYPE_EDIT || $this->RowType == EW_ROWTYPE_SEARCH) // Add/Edit/Search row
+			$this->SetupFieldTitles();
 
 		// Call Row Rendered event
 		if ($this->RowType <> EW_ROWTYPE_AGGREGATEINIT)
 			$this->Row_Rendered();
+	}
+
+	// Validate form
+	function ValidateForm() {
+		global $Language, $gsFormError;
+
+		// Initialize form error message
+		$gsFormError = "";
+
+		// Check if validation required
+		if (!EW_SERVER_VALIDATE)
+			return ($gsFormError == "");
+		if (!$this->NoBayar->FldIsDetailKey && !is_null($this->NoBayar->FormValue) && $this->NoBayar->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->NoBayar->FldCaption(), $this->NoBayar->ReqErrMsg));
+		}
+		if (!$this->Tgl->FldIsDetailKey && !is_null($this->Tgl->FormValue) && $this->Tgl->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->Tgl->FldCaption(), $this->Tgl->ReqErrMsg));
+		}
+		if (!ew_CheckEuroDate($this->Tgl->FormValue)) {
+			ew_AddMessage($gsFormError, $this->Tgl->FldErrMsg());
+		}
+		if (!ew_CheckNumber($this->JumlahBayar->FormValue)) {
+			ew_AddMessage($gsFormError, $this->JumlahBayar->FldErrMsg());
+		}
+
+		// Return validate result
+		$ValidateForm = ($gsFormError == "");
+
+		// Call Form_CustomValidate event
+		$sFormCustomError = "";
+		$ValidateForm = $ValidateForm && $this->Form_CustomValidate($sFormCustomError);
+		if ($sFormCustomError <> "") {
+			ew_AddMessage($gsFormError, $sFormCustomError);
+		}
+		return $ValidateForm;
+	}
+
+	// Update record based on key values
+	function EditRow() {
+		global $Security, $Language;
+		$sFilter = $this->KeyFilter();
+		$sFilter = $this->ApplyUserIDFilters($sFilter);
+		$conn = &$this->Connection();
+		$this->CurrentFilter = $sFilter;
+		$sSql = $this->SQL();
+		$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+		$rs = $conn->Execute($sSql);
+		$conn->raiseErrorFn = '';
+		if ($rs === FALSE)
+			return FALSE;
+		if ($rs->EOF) {
+			$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
+			$EditRow = FALSE; // Update Failed
+		} else {
+
+			// Save old values
+			$rsold = &$rs->fields;
+			$this->LoadDbValues($rsold);
+			$rsnew = array();
+
+			// NoBayar
+			$this->NoBayar->SetDbValueDef($rsnew, $this->NoBayar->CurrentValue, "", $this->NoBayar->ReadOnly);
+
+			// Tgl
+			$this->Tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->Tgl->CurrentValue, 7), ew_CurrentDate(), $this->Tgl->ReadOnly);
+
+			// JumlahBayar
+			$this->JumlahBayar->SetDbValueDef($rsnew, $this->JumlahBayar->CurrentValue, 0, $this->JumlahBayar->ReadOnly);
+
+			// Call Row Updating event
+			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
+			if ($bUpdateRow) {
+				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+				if (count($rsnew) > 0)
+					$EditRow = $this->Update($rsnew, "", $rsold);
+				else
+					$EditRow = TRUE; // No field to update
+				$conn->raiseErrorFn = '';
+				if ($EditRow) {
+				}
+			} else {
+				if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
+
+					// Use the message, do nothing
+				} elseif ($this->CancelMessage <> "") {
+					$this->setFailureMessage($this->CancelMessage);
+					$this->CancelMessage = "";
+				} else {
+					$this->setFailureMessage($Language->Phrase("UpdateCancelled"));
+				}
+				$EditRow = FALSE;
+			}
+		}
+
+		// Call Row_Updated event
+		if ($EditRow)
+			$this->Row_Updated($rsold, $rsnew);
+		$rs->Close();
+		return $EditRow;
+	}
+
+	// Add record
+	function AddRow($rsold = NULL) {
+		global $Language, $Security;
+		$conn = &$this->Connection();
+
+		// Load db values from rsold
+		$this->LoadDbValues($rsold);
+		if ($rsold) {
+		}
+		$rsnew = array();
+
+		// NoBayar
+		$this->NoBayar->SetDbValueDef($rsnew, $this->NoBayar->CurrentValue, "", FALSE);
+
+		// Tgl
+		$this->Tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->Tgl->CurrentValue, 7), ew_CurrentDate(), FALSE);
+
+		// JumlahBayar
+		$this->JumlahBayar->SetDbValueDef($rsnew, $this->JumlahBayar->CurrentValue, 0, strval($this->JumlahBayar->CurrentValue) == "");
+
+		// PiutangID
+		if ($this->PiutangID->getSessionValue() <> "") {
+			$rsnew['PiutangID'] = $this->PiutangID->getSessionValue();
+		}
+
+		// Call Row Inserting event
+		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
+		$bInsertRow = $this->Row_Inserting($rs, $rsnew);
+		if ($bInsertRow) {
+			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
+			$AddRow = $this->Insert($rsnew);
+			$conn->raiseErrorFn = '';
+			if ($AddRow) {
+			}
+		} else {
+			if ($this->getSuccessMessage() <> "" || $this->getFailureMessage() <> "") {
+
+				// Use the message, do nothing
+			} elseif ($this->CancelMessage <> "") {
+				$this->setFailureMessage($this->CancelMessage);
+				$this->CancelMessage = "";
+			} else {
+				$this->setFailureMessage($Language->Phrase("InsertCancelled"));
+			}
+			$AddRow = FALSE;
+		}
+		if ($AddRow) {
+
+			// Call Row Inserted event
+			$rs = ($rsold == NULL) ? NULL : $rsold->fields;
+			$this->Row_Inserted($rs, $rsnew);
+		}
+		return $AddRow;
 	}
 
 	// Set up export options
@@ -1806,7 +2175,7 @@ class ct14_piutang_list extends ct14_piutang {
 		// Export to Email
 		$item = &$this->ExportOptions->Add("email");
 		$url = "";
-		$item->Body = "<button id=\"emf_t14_piutang\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_t14_piutang',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ft14_piutanglist,sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
+		$item->Body = "<button id=\"emf_t15_piutangdetail\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_t15_piutangdetail',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ft15_piutangdetaillist,sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
 		$item->Visible = TRUE;
 
 		// Drop down button for export
@@ -1878,6 +2247,25 @@ class ct14_piutang_list extends ct14_piutang {
 		// Call Page Exporting server event
 		$this->ExportDoc->ExportCustom = !$this->Page_Exporting();
 		$ParentTable = "";
+
+		// Export master record
+		if (EW_EXPORT_MASTER_RECORD && $this->GetMasterFilter() <> "" && $this->getCurrentMasterTable() == "t14_piutang") {
+			global $t14_piutang;
+			if (!isset($t14_piutang)) $t14_piutang = new ct14_piutang;
+			$rsmaster = $t14_piutang->LoadRs($this->DbMasterFilter); // Load master record
+			if ($rsmaster && !$rsmaster->EOF) {
+				$ExportStyle = $Doc->Style;
+				$Doc->SetStyle("v"); // Change to vertical
+				if ($this->Export <> "csv" || EW_EXPORT_MASTER_RECORD_FOR_CSV) {
+					$Doc->Table = &$t14_piutang;
+					$t14_piutang->ExportDocument($Doc, $rsmaster, 1, 1);
+					$Doc->ExportEmptyRow();
+					$Doc->Table = &$this;
+				}
+				$Doc->SetStyle($ExportStyle); // Restore
+				$rsmaster->Close();
+			}
+		}
 		$sHeader = $this->PageHeader;
 		$this->Page_DataRendering($sHeader);
 		$Doc->Text .= $sHeader;
@@ -2029,6 +2417,74 @@ class ct14_piutang_list extends ct14_piutang {
 		}
 	}
 
+	// Set up master/detail based on QueryString
+	function SetupMasterParms() {
+		$bValidMaster = FALSE;
+
+		// Get the keys for master table
+		if (isset($_GET[EW_TABLE_SHOW_MASTER])) {
+			$sMasterTblVar = $_GET[EW_TABLE_SHOW_MASTER];
+			if ($sMasterTblVar == "") {
+				$bValidMaster = TRUE;
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+			}
+			if ($sMasterTblVar == "t14_piutang") {
+				$bValidMaster = TRUE;
+				if (@$_GET["fk_id"] <> "") {
+					$GLOBALS["t14_piutang"]->id->setQueryStringValue($_GET["fk_id"]);
+					$this->PiutangID->setQueryStringValue($GLOBALS["t14_piutang"]->id->QueryStringValue);
+					$this->PiutangID->setSessionValue($this->PiutangID->QueryStringValue);
+					if (!is_numeric($GLOBALS["t14_piutang"]->id->QueryStringValue)) $bValidMaster = FALSE;
+				} else {
+					$bValidMaster = FALSE;
+				}
+			}
+		} elseif (isset($_POST[EW_TABLE_SHOW_MASTER])) {
+			$sMasterTblVar = $_POST[EW_TABLE_SHOW_MASTER];
+			if ($sMasterTblVar == "") {
+				$bValidMaster = TRUE;
+				$this->DbMasterFilter = "";
+				$this->DbDetailFilter = "";
+			}
+			if ($sMasterTblVar == "t14_piutang") {
+				$bValidMaster = TRUE;
+				if (@$_POST["fk_id"] <> "") {
+					$GLOBALS["t14_piutang"]->id->setFormValue($_POST["fk_id"]);
+					$this->PiutangID->setFormValue($GLOBALS["t14_piutang"]->id->FormValue);
+					$this->PiutangID->setSessionValue($this->PiutangID->FormValue);
+					if (!is_numeric($GLOBALS["t14_piutang"]->id->FormValue)) $bValidMaster = FALSE;
+				} else {
+					$bValidMaster = FALSE;
+				}
+			}
+		}
+		if ($bValidMaster) {
+
+			// Update URL
+			$this->AddUrl = $this->AddMasterUrl($this->AddUrl);
+			$this->InlineAddUrl = $this->AddMasterUrl($this->InlineAddUrl);
+			$this->GridAddUrl = $this->AddMasterUrl($this->GridAddUrl);
+			$this->GridEditUrl = $this->AddMasterUrl($this->GridEditUrl);
+
+			// Save current master table
+			$this->setCurrentMasterTable($sMasterTblVar);
+
+			// Reset start record counter (new master key)
+			if (!$this->IsAddOrEdit()) {
+				$this->StartRec = 1;
+				$this->setStartRecordNumber($this->StartRec);
+			}
+
+			// Clear previous master key from Session
+			if ($sMasterTblVar <> "t14_piutang") {
+				if ($this->PiutangID->CurrentValue == "") $this->PiutangID->setSessionValue("");
+			}
+		}
+		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
+		$this->DbDetailFilter = $this->GetDetailFilter(); // Get detail filter
+	}
+
 	// Set up Breadcrumb
 	function SetupBreadcrumb() {
 		global $Breadcrumb, $Language;
@@ -2096,6 +2552,12 @@ class ct14_piutang_list extends ct14_piutang {
 	function Page_Render() {
 
 		//echo "Page Render";
+		//var_dump(Page("t14_piutang"));
+
+		if (f_GetSisaPiutang(Page("t14_piutang")->id->CurrentValue) == 0) {
+			$this->OtherOptions["addedit"] = new cListOptions();
+			$this->OtherOptions["addedit"]->Body = "";
+		}
 	}
 
 	// Page Data Rendering event
@@ -2187,31 +2649,66 @@ class ct14_piutang_list extends ct14_piutang {
 <?php
 
 // Create page object
-if (!isset($t14_piutang_list)) $t14_piutang_list = new ct14_piutang_list();
+if (!isset($t15_piutangdetail_list)) $t15_piutangdetail_list = new ct15_piutangdetail_list();
 
 // Page init
-$t14_piutang_list->Page_Init();
+$t15_piutangdetail_list->Page_Init();
 
 // Page main
-$t14_piutang_list->Page_Main();
+$t15_piutangdetail_list->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t14_piutang_list->Page_Render();
+$t15_piutangdetail_list->Page_Render();
 ?>
 <?php include_once "header.php" ?>
-<?php if ($t14_piutang->Export == "") { ?>
+<?php if ($t15_piutangdetail->Export == "") { ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "list";
-var CurrentForm = ft14_piutanglist = new ew_Form("ft14_piutanglist", "list");
-ft14_piutanglist.FormKeyCountName = '<?php echo $t14_piutang_list->FormKeyCountName ?>';
+var CurrentForm = ft15_piutangdetaillist = new ew_Form("ft15_piutangdetaillist", "list");
+ft15_piutangdetaillist.FormKeyCountName = '<?php echo $t15_piutangdetail_list->FormKeyCountName ?>';
+
+// Validate form
+ft15_piutangdetaillist.Validate = function() {
+	if (!this.ValidateRequired)
+		return true; // Ignore validation
+	var $ = jQuery, fobj = this.GetForm(), $fobj = $(fobj);
+	if ($fobj.find("#a_confirm").val() == "F")
+		return true;
+	var elm, felm, uelm, addcnt = 0;
+	var $k = $fobj.find("#" + this.FormKeyCountName); // Get key_count
+	var rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1;
+	var startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+	var gridinsert = $fobj.find("#a_list").val() == "gridinsert";
+	for (var i = startcnt; i <= rowcnt; i++) {
+		var infix = ($k[0]) ? String(i) : "";
+		$fobj.data("rowindex", infix);
+			elm = this.GetElements("x" + infix + "_NoBayar");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t15_piutangdetail->NoBayar->FldCaption(), $t15_piutangdetail->NoBayar->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_Tgl");
+			if (elm && !ew_IsHidden(elm) && !ew_HasValue(elm))
+				return this.OnError(elm, "<?php echo ew_JsEncode2(str_replace("%s", $t15_piutangdetail->Tgl->FldCaption(), $t15_piutangdetail->Tgl->ReqErrMsg)) ?>");
+			elm = this.GetElements("x" + infix + "_Tgl");
+			if (elm && !ew_CheckEuroDate(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t15_piutangdetail->Tgl->FldErrMsg()) ?>");
+			elm = this.GetElements("x" + infix + "_JumlahBayar");
+			if (elm && !ew_CheckNumber(elm.value))
+				return this.OnError(elm, "<?php echo ew_JsEncode2($t15_piutangdetail->JumlahBayar->FldErrMsg()) ?>");
+
+			// Fire Form_CustomValidate event
+			if (!this.Form_CustomValidate(fobj))
+				return false;
+	}
+	return true;
+}
 
 // Form_CustomValidate event
-ft14_piutanglist.Form_CustomValidate = 
+ft15_piutangdetaillist.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid.
@@ -2219,89 +2716,97 @@ ft14_piutanglist.Form_CustomValidate =
  }
 
 // Use JavaScript validation or not
-ft14_piutanglist.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
+ft15_piutangdetaillist.ValidateRequired = <?php echo json_encode(EW_CLIENT_VALIDATE) ?>;
 
 // Dynamic selection lists
-ft14_piutanglist.Lists["x_JualID"] = {"LinkField":"x_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_NoSO","x_TglSO","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"t11_jual"};
-ft14_piutanglist.Lists["x_JualID"].Data = "<?php echo $t14_piutang_list->JualID->LookupFilterQuery(FALSE, "list") ?>";
-ft14_piutanglist.AutoSuggests["x_JualID"] = <?php echo json_encode(array("data" => "ajax=autosuggest&" . $t14_piutang_list->JualID->LookupFilterQuery(TRUE, "list"))) ?>;
-
 // Form object for search
-var CurrentSearchForm = ft14_piutanglistsrch = new ew_Form("ft14_piutanglistsrch");
+
+var CurrentSearchForm = ft15_piutangdetaillistsrch = new ew_Form("ft15_piutangdetaillistsrch");
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
 <?php } ?>
-<?php if ($t14_piutang->Export == "") { ?>
+<?php if ($t15_piutangdetail->Export == "") { ?>
 <div class="ewToolbar">
-<?php if ($t14_piutang_list->TotalRecs > 0 && $t14_piutang_list->ExportOptions->Visible()) { ?>
-<?php $t14_piutang_list->ExportOptions->Render("body") ?>
+<?php if ($t15_piutangdetail_list->TotalRecs > 0 && $t15_piutangdetail_list->ExportOptions->Visible()) { ?>
+<?php $t15_piutangdetail_list->ExportOptions->Render("body") ?>
 <?php } ?>
-<?php if ($t14_piutang_list->SearchOptions->Visible()) { ?>
-<?php $t14_piutang_list->SearchOptions->Render("body") ?>
+<?php if ($t15_piutangdetail_list->SearchOptions->Visible()) { ?>
+<?php $t15_piutangdetail_list->SearchOptions->Render("body") ?>
 <?php } ?>
-<?php if ($t14_piutang_list->FilterOptions->Visible()) { ?>
-<?php $t14_piutang_list->FilterOptions->Render("body") ?>
+<?php if ($t15_piutangdetail_list->FilterOptions->Visible()) { ?>
+<?php $t15_piutangdetail_list->FilterOptions->Render("body") ?>
 <?php } ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
+<?php if (($t15_piutangdetail->Export == "") || (EW_EXPORT_MASTER_RECORD && $t15_piutangdetail->Export == "print")) { ?>
 <?php
-	$bSelectLimit = $t14_piutang_list->UseSelectLimit;
-	if ($bSelectLimit) {
-		if ($t14_piutang_list->TotalRecs <= 0)
-			$t14_piutang_list->TotalRecs = $t14_piutang->ListRecordCount();
-	} else {
-		if (!$t14_piutang_list->Recordset && ($t14_piutang_list->Recordset = $t14_piutang_list->LoadRecordset()))
-			$t14_piutang_list->TotalRecs = $t14_piutang_list->Recordset->RecordCount();
+if ($t15_piutangdetail_list->DbMasterFilter <> "" && $t15_piutangdetail->getCurrentMasterTable() == "t14_piutang") {
+	if ($t15_piutangdetail_list->MasterRecordExists) {
+?>
+<?php include_once "t14_piutangmaster.php" ?>
+<?php
 	}
-	$t14_piutang_list->StartRec = 1;
-	if ($t14_piutang_list->DisplayRecs <= 0 || ($t14_piutang->Export <> "" && $t14_piutang->ExportAll)) // Display all records
-		$t14_piutang_list->DisplayRecs = $t14_piutang_list->TotalRecs;
-	if (!($t14_piutang->Export <> "" && $t14_piutang->ExportAll))
-		$t14_piutang_list->SetupStartRec(); // Set up start record position
+}
+?>
+<?php } ?>
+<?php
+	$bSelectLimit = $t15_piutangdetail_list->UseSelectLimit;
+	if ($bSelectLimit) {
+		if ($t15_piutangdetail_list->TotalRecs <= 0)
+			$t15_piutangdetail_list->TotalRecs = $t15_piutangdetail->ListRecordCount();
+	} else {
+		if (!$t15_piutangdetail_list->Recordset && ($t15_piutangdetail_list->Recordset = $t15_piutangdetail_list->LoadRecordset()))
+			$t15_piutangdetail_list->TotalRecs = $t15_piutangdetail_list->Recordset->RecordCount();
+	}
+	$t15_piutangdetail_list->StartRec = 1;
+	if ($t15_piutangdetail_list->DisplayRecs <= 0 || ($t15_piutangdetail->Export <> "" && $t15_piutangdetail->ExportAll)) // Display all records
+		$t15_piutangdetail_list->DisplayRecs = $t15_piutangdetail_list->TotalRecs;
+	if (!($t15_piutangdetail->Export <> "" && $t15_piutangdetail->ExportAll))
+		$t15_piutangdetail_list->SetupStartRec(); // Set up start record position
 	if ($bSelectLimit)
-		$t14_piutang_list->Recordset = $t14_piutang_list->LoadRecordset($t14_piutang_list->StartRec-1, $t14_piutang_list->DisplayRecs);
+		$t15_piutangdetail_list->Recordset = $t15_piutangdetail_list->LoadRecordset($t15_piutangdetail_list->StartRec-1, $t15_piutangdetail_list->DisplayRecs);
 
 	// Set no record found message
-	if ($t14_piutang->CurrentAction == "" && $t14_piutang_list->TotalRecs == 0) {
+	if ($t15_piutangdetail->CurrentAction == "" && $t15_piutangdetail_list->TotalRecs == 0) {
 		if (!$Security->CanList())
-			$t14_piutang_list->setWarningMessage(ew_DeniedMsg());
-		if ($t14_piutang_list->SearchWhere == "0=101")
-			$t14_piutang_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
+			$t15_piutangdetail_list->setWarningMessage(ew_DeniedMsg());
+		if ($t15_piutangdetail_list->SearchWhere == "0=101")
+			$t15_piutangdetail_list->setWarningMessage($Language->Phrase("EnterSearchCriteria"));
 		else
-			$t14_piutang_list->setWarningMessage($Language->Phrase("NoRecord"));
+			$t15_piutangdetail_list->setWarningMessage($Language->Phrase("NoRecord"));
 	}
 
 	// Audit trail on search
-	if ($t14_piutang_list->AuditTrailOnSearch && $t14_piutang_list->Command == "search" && !$t14_piutang_list->RestoreSearch) {
+	if ($t15_piutangdetail_list->AuditTrailOnSearch && $t15_piutangdetail_list->Command == "search" && !$t15_piutangdetail_list->RestoreSearch) {
 		$searchparm = ew_ServerVar("QUERY_STRING");
-		$searchsql = $t14_piutang_list->getSessionWhere();
-		$t14_piutang_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
+		$searchsql = $t15_piutangdetail_list->getSessionWhere();
+		$t15_piutangdetail_list->WriteAuditTrailOnSearch($searchparm, $searchsql);
 	}
-$t14_piutang_list->RenderOtherOptions();
+$t15_piutangdetail_list->RenderOtherOptions();
 ?>
 <?php if ($Security->CanSearch()) { ?>
-<?php if ($t14_piutang->Export == "" && $t14_piutang->CurrentAction == "") { ?>
-<form name="ft14_piutanglistsrch" id="ft14_piutanglistsrch" class="form-inline ewForm ewExtSearchForm" action="<?php echo ew_CurrentPage() ?>">
-<?php $SearchPanelClass = ($t14_piutang_list->SearchWhere <> "") ? " in" : " in"; ?>
-<div id="ft14_piutanglistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
+<?php if ($t15_piutangdetail->Export == "" && $t15_piutangdetail->CurrentAction == "") { ?>
+<form name="ft15_piutangdetaillistsrch" id="ft15_piutangdetaillistsrch" class="form-inline ewForm ewExtSearchForm" action="<?php echo ew_CurrentPage() ?>">
+<?php $SearchPanelClass = ($t15_piutangdetail_list->SearchWhere <> "") ? " in" : " in"; ?>
+<div id="ft15_piutangdetaillistsrch_SearchPanel" class="ewSearchPanel collapse<?php echo $SearchPanelClass ?>">
 <input type="hidden" name="cmd" value="search">
-<input type="hidden" name="t" value="t14_piutang">
+<input type="hidden" name="t" value="t15_piutangdetail">
 	<div class="ewBasicSearch">
 <div id="xsr_1" class="ewRow">
 	<div class="ewQuickSearch input-group">
-	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="form-control" value="<?php echo ew_HtmlEncode($t14_piutang_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo ew_HtmlEncode($Language->Phrase("Search")) ?>">
-	<input type="hidden" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" id="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="<?php echo ew_HtmlEncode($t14_piutang_list->BasicSearch->getType()) ?>">
+	<input type="text" name="<?php echo EW_TABLE_BASIC_SEARCH ?>" id="<?php echo EW_TABLE_BASIC_SEARCH ?>" class="form-control" value="<?php echo ew_HtmlEncode($t15_piutangdetail_list->BasicSearch->getKeyword()) ?>" placeholder="<?php echo ew_HtmlEncode($Language->Phrase("Search")) ?>">
+	<input type="hidden" name="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" id="<?php echo EW_TABLE_BASIC_SEARCH_TYPE ?>" value="<?php echo ew_HtmlEncode($t15_piutangdetail_list->BasicSearch->getType()) ?>">
 	<div class="input-group-btn">
-		<button type="button" data-toggle="dropdown" class="btn btn-default"><span id="searchtype"><?php echo $t14_piutang_list->BasicSearch->getTypeNameShort() ?></span><span class="caret"></span></button>
+		<button type="button" data-toggle="dropdown" class="btn btn-default"><span id="searchtype"><?php echo $t15_piutangdetail_list->BasicSearch->getTypeNameShort() ?></span><span class="caret"></span></button>
 		<ul class="dropdown-menu pull-right" role="menu">
-			<li<?php if ($t14_piutang_list->BasicSearch->getType() == "") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this)"><?php echo $Language->Phrase("QuickSearchAuto") ?></a></li>
-			<li<?php if ($t14_piutang_list->BasicSearch->getType() == "=") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'=')"><?php echo $Language->Phrase("QuickSearchExact") ?></a></li>
-			<li<?php if ($t14_piutang_list->BasicSearch->getType() == "AND") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'AND')"><?php echo $Language->Phrase("QuickSearchAll") ?></a></li>
-			<li<?php if ($t14_piutang_list->BasicSearch->getType() == "OR") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'OR')"><?php echo $Language->Phrase("QuickSearchAny") ?></a></li>
+			<li<?php if ($t15_piutangdetail_list->BasicSearch->getType() == "") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this)"><?php echo $Language->Phrase("QuickSearchAuto") ?></a></li>
+			<li<?php if ($t15_piutangdetail_list->BasicSearch->getType() == "=") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'=')"><?php echo $Language->Phrase("QuickSearchExact") ?></a></li>
+			<li<?php if ($t15_piutangdetail_list->BasicSearch->getType() == "AND") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'AND')"><?php echo $Language->Phrase("QuickSearchAll") ?></a></li>
+			<li<?php if ($t15_piutangdetail_list->BasicSearch->getType() == "OR") echo " class=\"active\""; ?>><a href="javascript:void(0);" onclick="ew_SetSearchType(this,'OR')"><?php echo $Language->Phrase("QuickSearchAny") ?></a></li>
 		</ul>
 	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit"><?php echo $Language->Phrase("SearchBtn") ?></button>
 	</div>
@@ -2312,71 +2817,71 @@ $t14_piutang_list->RenderOtherOptions();
 </form>
 <?php } ?>
 <?php } ?>
-<?php $t14_piutang_list->ShowPageHeader(); ?>
+<?php $t15_piutangdetail_list->ShowPageHeader(); ?>
 <?php
-$t14_piutang_list->ShowMessage();
+$t15_piutangdetail_list->ShowMessage();
 ?>
-<?php if ($t14_piutang_list->TotalRecs > 0 || $t14_piutang->CurrentAction <> "") { ?>
-<div class="box ewBox ewGrid<?php if ($t14_piutang_list->IsAddOrEdit()) { ?> ewGridAddEdit<?php } ?> t14_piutang">
-<?php if ($t14_piutang->Export == "") { ?>
+<?php if ($t15_piutangdetail_list->TotalRecs > 0 || $t15_piutangdetail->CurrentAction <> "") { ?>
+<div class="box ewBox ewGrid<?php if ($t15_piutangdetail_list->IsAddOrEdit()) { ?> ewGridAddEdit<?php } ?> t15_piutangdetail">
+<?php if ($t15_piutangdetail->Export == "") { ?>
 <div class="box-header ewGridUpperPanel">
-<?php if ($t14_piutang->CurrentAction <> "gridadd" && $t14_piutang->CurrentAction <> "gridedit") { ?>
+<?php if ($t15_piutangdetail->CurrentAction <> "gridadd" && $t15_piutangdetail->CurrentAction <> "gridedit") { ?>
 <form name="ewPagerForm" class="form-inline ewForm ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
-<?php if (!isset($t14_piutang_list->Pager)) $t14_piutang_list->Pager = new cPrevNextPager($t14_piutang_list->StartRec, $t14_piutang_list->DisplayRecs, $t14_piutang_list->TotalRecs, $t14_piutang_list->AutoHidePager) ?>
-<?php if ($t14_piutang_list->Pager->RecordCount > 0 && $t14_piutang_list->Pager->Visible) { ?>
+<?php if (!isset($t15_piutangdetail_list->Pager)) $t15_piutangdetail_list->Pager = new cPrevNextPager($t15_piutangdetail_list->StartRec, $t15_piutangdetail_list->DisplayRecs, $t15_piutangdetail_list->TotalRecs, $t15_piutangdetail_list->AutoHidePager) ?>
+<?php if ($t15_piutangdetail_list->Pager->RecordCount > 0 && $t15_piutangdetail_list->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t14_piutang_list->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t14_piutang_list->PageUrl() ?>start=<?php echo $t14_piutang_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t15_piutangdetail_list->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t15_piutangdetail_list->PageUrl() ?>start=<?php echo $t15_piutangdetail_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t14_piutang_list->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t14_piutang_list->PageUrl() ?>start=<?php echo $t14_piutang_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t15_piutangdetail_list->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t15_piutangdetail_list->PageUrl() ?>start=<?php echo $t15_piutangdetail_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t14_piutang_list->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t15_piutangdetail_list->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t14_piutang_list->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t14_piutang_list->PageUrl() ?>start=<?php echo $t14_piutang_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t15_piutangdetail_list->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t15_piutangdetail_list->PageUrl() ?>start=<?php echo $t15_piutangdetail_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t14_piutang_list->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t14_piutang_list->PageUrl() ?>start=<?php echo $t14_piutang_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t15_piutangdetail_list->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t15_piutangdetail_list->PageUrl() ?>start=<?php echo $t15_piutangdetail_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t14_piutang_list->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t15_piutangdetail_list->Pager->PageCount ?></span>
 </div>
 <?php } ?>
-<?php if ($t14_piutang_list->Pager->RecordCount > 0) { ?>
+<?php if ($t15_piutangdetail_list->Pager->RecordCount > 0) { ?>
 <div class="ewPager ewRec">
-	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $t14_piutang_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $t14_piutang_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $t14_piutang_list->Pager->RecordCount ?></span>
+	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $t15_piutangdetail_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $t15_piutangdetail_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $t15_piutangdetail_list->Pager->RecordCount ?></span>
 </div>
 <?php } ?>
-<?php if ($t14_piutang_list->TotalRecs > 0 && (!$t14_piutang_list->AutoHidePageSizeSelector || $t14_piutang_list->Pager->Visible)) { ?>
+<?php if ($t15_piutangdetail_list->TotalRecs > 0 && (!$t15_piutangdetail_list->AutoHidePageSizeSelector || $t15_piutangdetail_list->Pager->Visible)) { ?>
 <div class="ewPager">
-<input type="hidden" name="t" value="t14_piutang">
+<input type="hidden" name="t" value="t15_piutangdetail">
 <select name="<?php echo EW_TABLE_REC_PER_PAGE ?>" class="form-control input-sm ewTooltip" title="<?php echo $Language->Phrase("RecordsPerPage") ?>" onchange="this.form.submit();">
-<option value="10"<?php if ($t14_piutang_list->DisplayRecs == 10) { ?> selected<?php } ?>>10</option>
-<option value="20"<?php if ($t14_piutang_list->DisplayRecs == 20) { ?> selected<?php } ?>>20</option>
-<option value="50"<?php if ($t14_piutang_list->DisplayRecs == 50) { ?> selected<?php } ?>>50</option>
-<option value="100"<?php if ($t14_piutang_list->DisplayRecs == 100) { ?> selected<?php } ?>>100</option>
-<option value="200"<?php if ($t14_piutang_list->DisplayRecs == 200) { ?> selected<?php } ?>>200</option>
-<option value="ALL"<?php if ($t14_piutang->getRecordsPerPage() == -1) { ?> selected<?php } ?>><?php echo $Language->Phrase("AllRecords") ?></option>
+<option value="10"<?php if ($t15_piutangdetail_list->DisplayRecs == 10) { ?> selected<?php } ?>>10</option>
+<option value="20"<?php if ($t15_piutangdetail_list->DisplayRecs == 20) { ?> selected<?php } ?>>20</option>
+<option value="50"<?php if ($t15_piutangdetail_list->DisplayRecs == 50) { ?> selected<?php } ?>>50</option>
+<option value="100"<?php if ($t15_piutangdetail_list->DisplayRecs == 100) { ?> selected<?php } ?>>100</option>
+<option value="200"<?php if ($t15_piutangdetail_list->DisplayRecs == 200) { ?> selected<?php } ?>>200</option>
+<option value="ALL"<?php if ($t15_piutangdetail->getRecordsPerPage() == -1) { ?> selected<?php } ?>><?php echo $Language->Phrase("AllRecords") ?></option>
 </select>
 </div>
 <?php } ?>
@@ -2384,200 +2889,292 @@ $t14_piutang_list->ShowMessage();
 <?php } ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($t14_piutang_list->OtherOptions as &$option)
+	foreach ($t15_piutangdetail_list->OtherOptions as &$option)
 		$option->Render("body");
 ?>
 </div>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<form name="ft14_piutanglist" id="ft14_piutanglist" class="form-inline ewForm ewListForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t14_piutang_list->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t14_piutang_list->Token ?>">
+<form name="ft15_piutangdetaillist" id="ft15_piutangdetaillist" class="form-inline ewForm ewListForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t15_piutangdetail_list->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t15_piutangdetail_list->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t14_piutang">
-<div id="gmp_t14_piutang" class="<?php if (ew_IsResponsiveLayout()) { ?>table-responsive <?php } ?>ewGridMiddlePanel">
-<?php if ($t14_piutang_list->TotalRecs > 0 || $t14_piutang->CurrentAction == "gridedit") { ?>
-<table id="tbl_t14_piutanglist" class="table ewTable">
+<input type="hidden" name="t" value="t15_piutangdetail">
+<?php if ($t15_piutangdetail->getCurrentMasterTable() == "t14_piutang" && $t15_piutangdetail->CurrentAction <> "") { ?>
+<input type="hidden" name="<?php echo EW_TABLE_SHOW_MASTER ?>" value="t14_piutang">
+<input type="hidden" name="fk_id" value="<?php echo $t15_piutangdetail->PiutangID->getSessionValue() ?>">
+<?php } ?>
+<div id="gmp_t15_piutangdetail" class="<?php if (ew_IsResponsiveLayout()) { ?>table-responsive <?php } ?>ewGridMiddlePanel">
+<?php if ($t15_piutangdetail_list->TotalRecs > 0 || $t15_piutangdetail->CurrentAction == "add" || $t15_piutangdetail->CurrentAction == "copy" || $t15_piutangdetail->CurrentAction == "gridedit") { ?>
+<table id="tbl_t15_piutangdetaillist" class="table ewTable">
 <thead>
 	<tr class="ewTableHeader">
 <?php
 
 // Header row
-$t14_piutang_list->RowType = EW_ROWTYPE_HEADER;
+$t15_piutangdetail_list->RowType = EW_ROWTYPE_HEADER;
 
 // Render list options
-$t14_piutang_list->RenderListOptions();
+$t15_piutangdetail_list->RenderListOptions();
 
 // Render list options (header, left)
-$t14_piutang_list->ListOptions->Render("header", "left");
+$t15_piutangdetail_list->ListOptions->Render("header", "left");
 ?>
-<?php if ($t14_piutang->NoPiutang->Visible) { // NoPiutang ?>
-	<?php if ($t14_piutang->SortUrl($t14_piutang->NoPiutang) == "") { ?>
-		<th data-name="NoPiutang" class="<?php echo $t14_piutang->NoPiutang->HeaderCellClass() ?>"><div id="elh_t14_piutang_NoPiutang" class="t14_piutang_NoPiutang"><div class="ewTableHeaderCaption"><?php echo $t14_piutang->NoPiutang->FldCaption() ?></div></div></th>
+<?php if ($t15_piutangdetail->NoBayar->Visible) { // NoBayar ?>
+	<?php if ($t15_piutangdetail->SortUrl($t15_piutangdetail->NoBayar) == "") { ?>
+		<th data-name="NoBayar" class="<?php echo $t15_piutangdetail->NoBayar->HeaderCellClass() ?>"><div id="elh_t15_piutangdetail_NoBayar" class="t15_piutangdetail_NoBayar"><div class="ewTableHeaderCaption"><?php echo $t15_piutangdetail->NoBayar->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="NoPiutang" class="<?php echo $t14_piutang->NoPiutang->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t14_piutang->SortUrl($t14_piutang->NoPiutang) ?>',2);"><div id="elh_t14_piutang_NoPiutang" class="t14_piutang_NoPiutang">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t14_piutang->NoPiutang->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($t14_piutang->NoPiutang->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t14_piutang->NoPiutang->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="NoBayar" class="<?php echo $t15_piutangdetail->NoBayar->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t15_piutangdetail->SortUrl($t15_piutangdetail->NoBayar) ?>',2);"><div id="elh_t15_piutangdetail_NoBayar" class="t15_piutangdetail_NoBayar">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t15_piutangdetail->NoBayar->FldCaption() ?><?php echo $Language->Phrase("SrchLegend") ?></span><span class="ewTableHeaderSort"><?php if ($t15_piutangdetail->NoBayar->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t15_piutangdetail->NoBayar->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
 		</div></div></th>
 	<?php } ?>
 <?php } ?>
-<?php if ($t14_piutang->JualID->Visible) { // JualID ?>
-	<?php if ($t14_piutang->SortUrl($t14_piutang->JualID) == "") { ?>
-		<th data-name="JualID" class="<?php echo $t14_piutang->JualID->HeaderCellClass() ?>"><div id="elh_t14_piutang_JualID" class="t14_piutang_JualID"><div class="ewTableHeaderCaption"><?php echo $t14_piutang->JualID->FldCaption() ?></div></div></th>
+<?php if ($t15_piutangdetail->Tgl->Visible) { // Tgl ?>
+	<?php if ($t15_piutangdetail->SortUrl($t15_piutangdetail->Tgl) == "") { ?>
+		<th data-name="Tgl" class="<?php echo $t15_piutangdetail->Tgl->HeaderCellClass() ?>"><div id="elh_t15_piutangdetail_Tgl" class="t15_piutangdetail_Tgl"><div class="ewTableHeaderCaption"><?php echo $t15_piutangdetail->Tgl->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="JualID" class="<?php echo $t14_piutang->JualID->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t14_piutang->SortUrl($t14_piutang->JualID) ?>',2);"><div id="elh_t14_piutang_JualID" class="t14_piutang_JualID">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t14_piutang->JualID->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t14_piutang->JualID->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t14_piutang->JualID->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="Tgl" class="<?php echo $t15_piutangdetail->Tgl->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t15_piutangdetail->SortUrl($t15_piutangdetail->Tgl) ?>',2);"><div id="elh_t15_piutangdetail_Tgl" class="t15_piutangdetail_Tgl">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t15_piutangdetail->Tgl->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t15_piutangdetail->Tgl->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t15_piutangdetail->Tgl->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
 		</div></div></th>
 	<?php } ?>
 <?php } ?>
-<?php if ($t14_piutang->JumlahPiutang->Visible) { // JumlahPiutang ?>
-	<?php if ($t14_piutang->SortUrl($t14_piutang->JumlahPiutang) == "") { ?>
-		<th data-name="JumlahPiutang" class="<?php echo $t14_piutang->JumlahPiutang->HeaderCellClass() ?>"><div id="elh_t14_piutang_JumlahPiutang" class="t14_piutang_JumlahPiutang"><div class="ewTableHeaderCaption"><?php echo $t14_piutang->JumlahPiutang->FldCaption() ?></div></div></th>
+<?php if ($t15_piutangdetail->JumlahBayar->Visible) { // JumlahBayar ?>
+	<?php if ($t15_piutangdetail->SortUrl($t15_piutangdetail->JumlahBayar) == "") { ?>
+		<th data-name="JumlahBayar" class="<?php echo $t15_piutangdetail->JumlahBayar->HeaderCellClass() ?>"><div id="elh_t15_piutangdetail_JumlahBayar" class="t15_piutangdetail_JumlahBayar"><div class="ewTableHeaderCaption"><?php echo $t15_piutangdetail->JumlahBayar->FldCaption() ?></div></div></th>
 	<?php } else { ?>
-		<th data-name="JumlahPiutang" class="<?php echo $t14_piutang->JumlahPiutang->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t14_piutang->SortUrl($t14_piutang->JumlahPiutang) ?>',2);"><div id="elh_t14_piutang_JumlahPiutang" class="t14_piutang_JumlahPiutang">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t14_piutang->JumlahPiutang->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t14_piutang->JumlahPiutang->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t14_piutang->JumlahPiutang->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-		</div></div></th>
-	<?php } ?>
-<?php } ?>
-<?php if ($t14_piutang->JumlahBayar->Visible) { // JumlahBayar ?>
-	<?php if ($t14_piutang->SortUrl($t14_piutang->JumlahBayar) == "") { ?>
-		<th data-name="JumlahBayar" class="<?php echo $t14_piutang->JumlahBayar->HeaderCellClass() ?>"><div id="elh_t14_piutang_JumlahBayar" class="t14_piutang_JumlahBayar"><div class="ewTableHeaderCaption"><?php echo $t14_piutang->JumlahBayar->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="JumlahBayar" class="<?php echo $t14_piutang->JumlahBayar->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t14_piutang->SortUrl($t14_piutang->JumlahBayar) ?>',2);"><div id="elh_t14_piutang_JumlahBayar" class="t14_piutang_JumlahBayar">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t14_piutang->JumlahBayar->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t14_piutang->JumlahBayar->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t14_piutang->JumlahBayar->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
-		</div></div></th>
-	<?php } ?>
-<?php } ?>
-<?php if ($t14_piutang->SaldoPiutang->Visible) { // SaldoPiutang ?>
-	<?php if ($t14_piutang->SortUrl($t14_piutang->SaldoPiutang) == "") { ?>
-		<th data-name="SaldoPiutang" class="<?php echo $t14_piutang->SaldoPiutang->HeaderCellClass() ?>"><div id="elh_t14_piutang_SaldoPiutang" class="t14_piutang_SaldoPiutang"><div class="ewTableHeaderCaption"><?php echo $t14_piutang->SaldoPiutang->FldCaption() ?></div></div></th>
-	<?php } else { ?>
-		<th data-name="SaldoPiutang" class="<?php echo $t14_piutang->SaldoPiutang->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t14_piutang->SortUrl($t14_piutang->SaldoPiutang) ?>',2);"><div id="elh_t14_piutang_SaldoPiutang" class="t14_piutang_SaldoPiutang">
-			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t14_piutang->SaldoPiutang->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t14_piutang->SaldoPiutang->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t14_piutang->SaldoPiutang->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
+		<th data-name="JumlahBayar" class="<?php echo $t15_piutangdetail->JumlahBayar->HeaderCellClass() ?>"><div class="ewPointer" onclick="ew_Sort(event,'<?php echo $t15_piutangdetail->SortUrl($t15_piutangdetail->JumlahBayar) ?>',2);"><div id="elh_t15_piutangdetail_JumlahBayar" class="t15_piutangdetail_JumlahBayar">
+			<div class="ewTableHeaderBtn"><span class="ewTableHeaderCaption"><?php echo $t15_piutangdetail->JumlahBayar->FldCaption() ?></span><span class="ewTableHeaderSort"><?php if ($t15_piutangdetail->JumlahBayar->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($t15_piutangdetail->JumlahBayar->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span></div>
 		</div></div></th>
 	<?php } ?>
 <?php } ?>
 <?php
 
 // Render list options (header, right)
-$t14_piutang_list->ListOptions->Render("header", "right");
+$t15_piutangdetail_list->ListOptions->Render("header", "right");
 ?>
 	</tr>
 </thead>
 <tbody>
 <?php
-if ($t14_piutang->ExportAll && $t14_piutang->Export <> "") {
-	$t14_piutang_list->StopRec = $t14_piutang_list->TotalRecs;
-} else {
+	if ($t15_piutangdetail->CurrentAction == "add" || $t15_piutangdetail->CurrentAction == "copy") {
+		$t15_piutangdetail_list->RowIndex = 0;
+		$t15_piutangdetail_list->KeyCount = $t15_piutangdetail_list->RowIndex;
+		if ($t15_piutangdetail->CurrentAction == "add")
+			$t15_piutangdetail_list->LoadRowValues();
+		if ($t15_piutangdetail->EventCancelled) // Insert failed
+			$t15_piutangdetail_list->RestoreFormValues(); // Restore form values
 
-	// Set the last record to display
-	if ($t14_piutang_list->TotalRecs > $t14_piutang_list->StartRec + $t14_piutang_list->DisplayRecs - 1)
-		$t14_piutang_list->StopRec = $t14_piutang_list->StartRec + $t14_piutang_list->DisplayRecs - 1;
-	else
-		$t14_piutang_list->StopRec = $t14_piutang_list->TotalRecs;
-}
-$t14_piutang_list->RecCnt = $t14_piutang_list->StartRec - 1;
-if ($t14_piutang_list->Recordset && !$t14_piutang_list->Recordset->EOF) {
-	$t14_piutang_list->Recordset->MoveFirst();
-	$bSelectLimit = $t14_piutang_list->UseSelectLimit;
-	if (!$bSelectLimit && $t14_piutang_list->StartRec > 1)
-		$t14_piutang_list->Recordset->Move($t14_piutang_list->StartRec - 1);
-} elseif (!$t14_piutang->AllowAddDeleteRow && $t14_piutang_list->StopRec == 0) {
-	$t14_piutang_list->StopRec = $t14_piutang->GridAddRowCount;
-}
-
-// Initialize aggregate
-$t14_piutang->RowType = EW_ROWTYPE_AGGREGATEINIT;
-$t14_piutang->ResetAttrs();
-$t14_piutang_list->RenderRow();
-while ($t14_piutang_list->RecCnt < $t14_piutang_list->StopRec) {
-	$t14_piutang_list->RecCnt++;
-	if (intval($t14_piutang_list->RecCnt) >= intval($t14_piutang_list->StartRec)) {
-		$t14_piutang_list->RowCnt++;
-
-		// Set up key count
-		$t14_piutang_list->KeyCount = $t14_piutang_list->RowIndex;
-
-		// Init row class and style
-		$t14_piutang->ResetAttrs();
-		$t14_piutang->CssClass = "";
-		if ($t14_piutang->CurrentAction == "gridadd") {
-		} else {
-			$t14_piutang_list->LoadRowValues($t14_piutang_list->Recordset); // Load row values
-		}
-		$t14_piutang->RowType = EW_ROWTYPE_VIEW; // Render view
-
-		// Set up row id / data-rowindex
-		$t14_piutang->RowAttrs = array_merge($t14_piutang->RowAttrs, array('data-rowindex'=>$t14_piutang_list->RowCnt, 'id'=>'r' . $t14_piutang_list->RowCnt . '_t14_piutang', 'data-rowtype'=>$t14_piutang->RowType));
+		// Set row properties
+		$t15_piutangdetail->ResetAttrs();
+		$t15_piutangdetail->RowAttrs = array_merge($t15_piutangdetail->RowAttrs, array('data-rowindex'=>0, 'id'=>'r0_t15_piutangdetail', 'data-rowtype'=>EW_ROWTYPE_ADD));
+		$t15_piutangdetail->RowType = EW_ROWTYPE_ADD;
 
 		// Render row
-		$t14_piutang_list->RenderRow();
+		$t15_piutangdetail_list->RenderRow();
 
 		// Render list options
-		$t14_piutang_list->RenderListOptions();
+		$t15_piutangdetail_list->RenderListOptions();
+		$t15_piutangdetail_list->StartRowCnt = 0;
 ?>
-	<tr<?php echo $t14_piutang->RowAttributes() ?>>
+	<tr<?php echo $t15_piutangdetail->RowAttributes() ?>>
 <?php
 
 // Render list options (body, left)
-$t14_piutang_list->ListOptions->Render("body", "left", $t14_piutang_list->RowCnt);
+$t15_piutangdetail_list->ListOptions->Render("body", "left", $t15_piutangdetail_list->RowCnt);
 ?>
-	<?php if ($t14_piutang->NoPiutang->Visible) { // NoPiutang ?>
-		<td data-name="NoPiutang"<?php echo $t14_piutang->NoPiutang->CellAttributes() ?>>
-<span id="el<?php echo $t14_piutang_list->RowCnt ?>_t14_piutang_NoPiutang" class="t14_piutang_NoPiutang">
-<span<?php echo $t14_piutang->NoPiutang->ViewAttributes() ?>>
-<?php echo $t14_piutang->NoPiutang->ListViewValue() ?></span>
+	<?php if ($t15_piutangdetail->NoBayar->Visible) { // NoBayar ?>
+		<td data-name="NoBayar">
+<span id="el<?php echo $t15_piutangdetail_list->RowCnt ?>_t15_piutangdetail_NoBayar" class="form-group t15_piutangdetail_NoBayar">
+<input type="text" data-table="t15_piutangdetail" data-field="x_NoBayar" name="x<?php echo $t15_piutangdetail_list->RowIndex ?>_NoBayar" id="x<?php echo $t15_piutangdetail_list->RowIndex ?>_NoBayar" size="30" maxlength="8" placeholder="<?php echo ew_HtmlEncode($t15_piutangdetail->NoBayar->getPlaceHolder()) ?>" value="<?php echo $t15_piutangdetail->NoBayar->EditValue ?>"<?php echo $t15_piutangdetail->NoBayar->EditAttributes() ?>>
 </span>
+<input type="hidden" data-table="t15_piutangdetail" data-field="x_NoBayar" name="o<?php echo $t15_piutangdetail_list->RowIndex ?>_NoBayar" id="o<?php echo $t15_piutangdetail_list->RowIndex ?>_NoBayar" value="<?php echo ew_HtmlEncode($t15_piutangdetail->NoBayar->OldValue) ?>">
 </td>
 	<?php } ?>
-	<?php if ($t14_piutang->JualID->Visible) { // JualID ?>
-		<td data-name="JualID"<?php echo $t14_piutang->JualID->CellAttributes() ?>>
-<span id="el<?php echo $t14_piutang_list->RowCnt ?>_t14_piutang_JualID" class="t14_piutang_JualID">
-<span<?php echo $t14_piutang->JualID->ViewAttributes() ?>>
-<?php echo $t14_piutang->JualID->ListViewValue() ?></span>
+	<?php if ($t15_piutangdetail->Tgl->Visible) { // Tgl ?>
+		<td data-name="Tgl">
+<span id="el<?php echo $t15_piutangdetail_list->RowCnt ?>_t15_piutangdetail_Tgl" class="form-group t15_piutangdetail_Tgl">
+<input type="text" data-table="t15_piutangdetail" data-field="x_Tgl" data-format="7" name="x<?php echo $t15_piutangdetail_list->RowIndex ?>_Tgl" id="x<?php echo $t15_piutangdetail_list->RowIndex ?>_Tgl" placeholder="<?php echo ew_HtmlEncode($t15_piutangdetail->Tgl->getPlaceHolder()) ?>" value="<?php echo $t15_piutangdetail->Tgl->EditValue ?>"<?php echo $t15_piutangdetail->Tgl->EditAttributes() ?>>
 </span>
+<input type="hidden" data-table="t15_piutangdetail" data-field="x_Tgl" name="o<?php echo $t15_piutangdetail_list->RowIndex ?>_Tgl" id="o<?php echo $t15_piutangdetail_list->RowIndex ?>_Tgl" value="<?php echo ew_HtmlEncode($t15_piutangdetail->Tgl->OldValue) ?>">
 </td>
 	<?php } ?>
-	<?php if ($t14_piutang->JumlahPiutang->Visible) { // JumlahPiutang ?>
-		<td data-name="JumlahPiutang"<?php echo $t14_piutang->JumlahPiutang->CellAttributes() ?>>
-<span id="el<?php echo $t14_piutang_list->RowCnt ?>_t14_piutang_JumlahPiutang" class="t14_piutang_JumlahPiutang">
-<span<?php echo $t14_piutang->JumlahPiutang->ViewAttributes() ?>>
-<?php echo $t14_piutang->JumlahPiutang->ListViewValue() ?></span>
+	<?php if ($t15_piutangdetail->JumlahBayar->Visible) { // JumlahBayar ?>
+		<td data-name="JumlahBayar">
+<span id="el<?php echo $t15_piutangdetail_list->RowCnt ?>_t15_piutangdetail_JumlahBayar" class="form-group t15_piutangdetail_JumlahBayar">
+<input type="text" data-table="t15_piutangdetail" data-field="x_JumlahBayar" name="x<?php echo $t15_piutangdetail_list->RowIndex ?>_JumlahBayar" id="x<?php echo $t15_piutangdetail_list->RowIndex ?>_JumlahBayar" size="30" placeholder="<?php echo ew_HtmlEncode($t15_piutangdetail->JumlahBayar->getPlaceHolder()) ?>" value="<?php echo $t15_piutangdetail->JumlahBayar->EditValue ?>"<?php echo $t15_piutangdetail->JumlahBayar->EditAttributes() ?>>
 </span>
-</td>
-	<?php } ?>
-	<?php if ($t14_piutang->JumlahBayar->Visible) { // JumlahBayar ?>
-		<td data-name="JumlahBayar"<?php echo $t14_piutang->JumlahBayar->CellAttributes() ?>>
-<span id="el<?php echo $t14_piutang_list->RowCnt ?>_t14_piutang_JumlahBayar" class="t14_piutang_JumlahBayar">
-<span<?php echo $t14_piutang->JumlahBayar->ViewAttributes() ?>>
-<?php echo $t14_piutang->JumlahBayar->ListViewValue() ?></span>
-</span>
-</td>
-	<?php } ?>
-	<?php if ($t14_piutang->SaldoPiutang->Visible) { // SaldoPiutang ?>
-		<td data-name="SaldoPiutang"<?php echo $t14_piutang->SaldoPiutang->CellAttributes() ?>>
-<span id="el<?php echo $t14_piutang_list->RowCnt ?>_t14_piutang_SaldoPiutang" class="t14_piutang_SaldoPiutang">
-<span<?php echo $t14_piutang->SaldoPiutang->ViewAttributes() ?>>
-<?php echo $t14_piutang->SaldoPiutang->ListViewValue() ?></span>
-</span>
+<input type="hidden" data-table="t15_piutangdetail" data-field="x_JumlahBayar" name="o<?php echo $t15_piutangdetail_list->RowIndex ?>_JumlahBayar" id="o<?php echo $t15_piutangdetail_list->RowIndex ?>_JumlahBayar" value="<?php echo ew_HtmlEncode($t15_piutangdetail->JumlahBayar->OldValue) ?>">
 </td>
 	<?php } ?>
 <?php
 
 // Render list options (body, right)
-$t14_piutang_list->ListOptions->Render("body", "right", $t14_piutang_list->RowCnt);
+$t15_piutangdetail_list->ListOptions->Render("body", "right", $t15_piutangdetail_list->RowCnt);
 ?>
+<script type="text/javascript">
+ft15_piutangdetaillist.UpdateOpts(<?php echo $t15_piutangdetail_list->RowIndex ?>);
+</script>
 	</tr>
 <?php
+}
+?>
+<?php
+if ($t15_piutangdetail->ExportAll && $t15_piutangdetail->Export <> "") {
+	$t15_piutangdetail_list->StopRec = $t15_piutangdetail_list->TotalRecs;
+} else {
+
+	// Set the last record to display
+	if ($t15_piutangdetail_list->TotalRecs > $t15_piutangdetail_list->StartRec + $t15_piutangdetail_list->DisplayRecs - 1)
+		$t15_piutangdetail_list->StopRec = $t15_piutangdetail_list->StartRec + $t15_piutangdetail_list->DisplayRecs - 1;
+	else
+		$t15_piutangdetail_list->StopRec = $t15_piutangdetail_list->TotalRecs;
+}
+
+// Restore number of post back records
+if ($objForm) {
+	$objForm->Index = -1;
+	if ($objForm->HasValue($t15_piutangdetail_list->FormKeyCountName) && ($t15_piutangdetail->CurrentAction == "gridadd" || $t15_piutangdetail->CurrentAction == "gridedit" || $t15_piutangdetail->CurrentAction == "F")) {
+		$t15_piutangdetail_list->KeyCount = $objForm->GetValue($t15_piutangdetail_list->FormKeyCountName);
+		$t15_piutangdetail_list->StopRec = $t15_piutangdetail_list->StartRec + $t15_piutangdetail_list->KeyCount - 1;
 	}
-	if ($t14_piutang->CurrentAction <> "gridadd")
-		$t14_piutang_list->Recordset->MoveNext();
+}
+$t15_piutangdetail_list->RecCnt = $t15_piutangdetail_list->StartRec - 1;
+if ($t15_piutangdetail_list->Recordset && !$t15_piutangdetail_list->Recordset->EOF) {
+	$t15_piutangdetail_list->Recordset->MoveFirst();
+	$bSelectLimit = $t15_piutangdetail_list->UseSelectLimit;
+	if (!$bSelectLimit && $t15_piutangdetail_list->StartRec > 1)
+		$t15_piutangdetail_list->Recordset->Move($t15_piutangdetail_list->StartRec - 1);
+} elseif (!$t15_piutangdetail->AllowAddDeleteRow && $t15_piutangdetail_list->StopRec == 0) {
+	$t15_piutangdetail_list->StopRec = $t15_piutangdetail->GridAddRowCount;
+}
+
+// Initialize aggregate
+$t15_piutangdetail->RowType = EW_ROWTYPE_AGGREGATEINIT;
+$t15_piutangdetail->ResetAttrs();
+$t15_piutangdetail_list->RenderRow();
+$t15_piutangdetail_list->EditRowCnt = 0;
+if ($t15_piutangdetail->CurrentAction == "edit")
+	$t15_piutangdetail_list->RowIndex = 1;
+while ($t15_piutangdetail_list->RecCnt < $t15_piutangdetail_list->StopRec) {
+	$t15_piutangdetail_list->RecCnt++;
+	if (intval($t15_piutangdetail_list->RecCnt) >= intval($t15_piutangdetail_list->StartRec)) {
+		$t15_piutangdetail_list->RowCnt++;
+
+		// Set up key count
+		$t15_piutangdetail_list->KeyCount = $t15_piutangdetail_list->RowIndex;
+
+		// Init row class and style
+		$t15_piutangdetail->ResetAttrs();
+		$t15_piutangdetail->CssClass = "";
+		if ($t15_piutangdetail->CurrentAction == "gridadd") {
+			$t15_piutangdetail_list->LoadRowValues(); // Load default values
+		} else {
+			$t15_piutangdetail_list->LoadRowValues($t15_piutangdetail_list->Recordset); // Load row values
+		}
+		$t15_piutangdetail->RowType = EW_ROWTYPE_VIEW; // Render view
+		if ($t15_piutangdetail->CurrentAction == "edit") {
+			if ($t15_piutangdetail_list->CheckInlineEditKey() && $t15_piutangdetail_list->EditRowCnt == 0) { // Inline edit
+				$t15_piutangdetail->RowType = EW_ROWTYPE_EDIT; // Render edit
+			}
+		}
+		if ($t15_piutangdetail->CurrentAction == "edit" && $t15_piutangdetail->RowType == EW_ROWTYPE_EDIT && $t15_piutangdetail->EventCancelled) { // Update failed
+			$objForm->Index = 1;
+			$t15_piutangdetail_list->RestoreFormValues(); // Restore form values
+		}
+		if ($t15_piutangdetail->RowType == EW_ROWTYPE_EDIT) // Edit row
+			$t15_piutangdetail_list->EditRowCnt++;
+
+		// Set up row id / data-rowindex
+		$t15_piutangdetail->RowAttrs = array_merge($t15_piutangdetail->RowAttrs, array('data-rowindex'=>$t15_piutangdetail_list->RowCnt, 'id'=>'r' . $t15_piutangdetail_list->RowCnt . '_t15_piutangdetail', 'data-rowtype'=>$t15_piutangdetail->RowType));
+
+		// Render row
+		$t15_piutangdetail_list->RenderRow();
+
+		// Render list options
+		$t15_piutangdetail_list->RenderListOptions();
+?>
+	<tr<?php echo $t15_piutangdetail->RowAttributes() ?>>
+<?php
+
+// Render list options (body, left)
+$t15_piutangdetail_list->ListOptions->Render("body", "left", $t15_piutangdetail_list->RowCnt);
+?>
+	<?php if ($t15_piutangdetail->NoBayar->Visible) { // NoBayar ?>
+		<td data-name="NoBayar"<?php echo $t15_piutangdetail->NoBayar->CellAttributes() ?>>
+<?php if ($t15_piutangdetail->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $t15_piutangdetail_list->RowCnt ?>_t15_piutangdetail_NoBayar" class="form-group t15_piutangdetail_NoBayar">
+<input type="text" data-table="t15_piutangdetail" data-field="x_NoBayar" name="x<?php echo $t15_piutangdetail_list->RowIndex ?>_NoBayar" id="x<?php echo $t15_piutangdetail_list->RowIndex ?>_NoBayar" size="30" maxlength="8" placeholder="<?php echo ew_HtmlEncode($t15_piutangdetail->NoBayar->getPlaceHolder()) ?>" value="<?php echo $t15_piutangdetail->NoBayar->EditValue ?>"<?php echo $t15_piutangdetail->NoBayar->EditAttributes() ?>>
+</span>
+<?php } ?>
+<?php if ($t15_piutangdetail->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t15_piutangdetail_list->RowCnt ?>_t15_piutangdetail_NoBayar" class="t15_piutangdetail_NoBayar">
+<span<?php echo $t15_piutangdetail->NoBayar->ViewAttributes() ?>>
+<?php echo $t15_piutangdetail->NoBayar->ListViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+	<?php } ?>
+<?php if ($t15_piutangdetail->RowType == EW_ROWTYPE_EDIT || $t15_piutangdetail->CurrentMode == "edit") { ?>
+<input type="hidden" data-table="t15_piutangdetail" data-field="x_id" name="x<?php echo $t15_piutangdetail_list->RowIndex ?>_id" id="x<?php echo $t15_piutangdetail_list->RowIndex ?>_id" value="<?php echo ew_HtmlEncode($t15_piutangdetail->id->CurrentValue) ?>">
+<?php } ?>
+	<?php if ($t15_piutangdetail->Tgl->Visible) { // Tgl ?>
+		<td data-name="Tgl"<?php echo $t15_piutangdetail->Tgl->CellAttributes() ?>>
+<?php if ($t15_piutangdetail->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $t15_piutangdetail_list->RowCnt ?>_t15_piutangdetail_Tgl" class="form-group t15_piutangdetail_Tgl">
+<input type="text" data-table="t15_piutangdetail" data-field="x_Tgl" data-format="7" name="x<?php echo $t15_piutangdetail_list->RowIndex ?>_Tgl" id="x<?php echo $t15_piutangdetail_list->RowIndex ?>_Tgl" placeholder="<?php echo ew_HtmlEncode($t15_piutangdetail->Tgl->getPlaceHolder()) ?>" value="<?php echo $t15_piutangdetail->Tgl->EditValue ?>"<?php echo $t15_piutangdetail->Tgl->EditAttributes() ?>>
+</span>
+<?php } ?>
+<?php if ($t15_piutangdetail->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t15_piutangdetail_list->RowCnt ?>_t15_piutangdetail_Tgl" class="t15_piutangdetail_Tgl">
+<span<?php echo $t15_piutangdetail->Tgl->ViewAttributes() ?>>
+<?php echo $t15_piutangdetail->Tgl->ListViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+	<?php } ?>
+	<?php if ($t15_piutangdetail->JumlahBayar->Visible) { // JumlahBayar ?>
+		<td data-name="JumlahBayar"<?php echo $t15_piutangdetail->JumlahBayar->CellAttributes() ?>>
+<?php if ($t15_piutangdetail->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?php echo $t15_piutangdetail_list->RowCnt ?>_t15_piutangdetail_JumlahBayar" class="form-group t15_piutangdetail_JumlahBayar">
+<input type="text" data-table="t15_piutangdetail" data-field="x_JumlahBayar" name="x<?php echo $t15_piutangdetail_list->RowIndex ?>_JumlahBayar" id="x<?php echo $t15_piutangdetail_list->RowIndex ?>_JumlahBayar" size="30" placeholder="<?php echo ew_HtmlEncode($t15_piutangdetail->JumlahBayar->getPlaceHolder()) ?>" value="<?php echo $t15_piutangdetail->JumlahBayar->EditValue ?>"<?php echo $t15_piutangdetail->JumlahBayar->EditAttributes() ?>>
+</span>
+<?php } ?>
+<?php if ($t15_piutangdetail->RowType == EW_ROWTYPE_VIEW) { // View record ?>
+<span id="el<?php echo $t15_piutangdetail_list->RowCnt ?>_t15_piutangdetail_JumlahBayar" class="t15_piutangdetail_JumlahBayar">
+<span<?php echo $t15_piutangdetail->JumlahBayar->ViewAttributes() ?>>
+<?php echo $t15_piutangdetail->JumlahBayar->ListViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+	<?php } ?>
+<?php
+
+// Render list options (body, right)
+$t15_piutangdetail_list->ListOptions->Render("body", "right", $t15_piutangdetail_list->RowCnt);
+?>
+	</tr>
+<?php if ($t15_piutangdetail->RowType == EW_ROWTYPE_ADD || $t15_piutangdetail->RowType == EW_ROWTYPE_EDIT) { ?>
+<script type="text/javascript">
+ft15_piutangdetaillist.UpdateOpts(<?php echo $t15_piutangdetail_list->RowIndex ?>);
+</script>
+<?php } ?>
+<?php
+	}
+	if ($t15_piutangdetail->CurrentAction <> "gridadd")
+		$t15_piutangdetail_list->Recordset->MoveNext();
 }
 ?>
 </tbody>
 </table>
 <?php } ?>
-<?php if ($t14_piutang->CurrentAction == "") { ?>
+<?php if ($t15_piutangdetail->CurrentAction == "add" || $t15_piutangdetail->CurrentAction == "copy") { ?>
+<input type="hidden" name="<?php echo $t15_piutangdetail_list->FormKeyCountName ?>" id="<?php echo $t15_piutangdetail_list->FormKeyCountName ?>" value="<?php echo $t15_piutangdetail_list->KeyCount ?>">
+<?php } ?>
+<?php if ($t15_piutangdetail->CurrentAction == "edit") { ?>
+<input type="hidden" name="<?php echo $t15_piutangdetail_list->FormKeyCountName ?>" id="<?php echo $t15_piutangdetail_list->FormKeyCountName ?>" value="<?php echo $t15_piutangdetail_list->KeyCount ?>">
+<?php } ?>
+<?php if ($t15_piutangdetail->CurrentAction == "") { ?>
 <input type="hidden" name="a_list" id="a_list" value="">
 <?php } ?>
 </div>
@@ -2585,68 +3182,68 @@ $t14_piutang_list->ListOptions->Render("body", "right", $t14_piutang_list->RowCn
 <?php
 
 // Close recordset
-if ($t14_piutang_list->Recordset)
-	$t14_piutang_list->Recordset->Close();
+if ($t15_piutangdetail_list->Recordset)
+	$t15_piutangdetail_list->Recordset->Close();
 ?>
-<?php if ($t14_piutang->Export == "") { ?>
+<?php if ($t15_piutangdetail->Export == "") { ?>
 <div class="box-footer ewGridLowerPanel">
-<?php if ($t14_piutang->CurrentAction <> "gridadd" && $t14_piutang->CurrentAction <> "gridedit") { ?>
+<?php if ($t15_piutangdetail->CurrentAction <> "gridadd" && $t15_piutangdetail->CurrentAction <> "gridedit") { ?>
 <form name="ewPagerForm" class="ewForm form-inline ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
-<?php if (!isset($t14_piutang_list->Pager)) $t14_piutang_list->Pager = new cPrevNextPager($t14_piutang_list->StartRec, $t14_piutang_list->DisplayRecs, $t14_piutang_list->TotalRecs, $t14_piutang_list->AutoHidePager) ?>
-<?php if ($t14_piutang_list->Pager->RecordCount > 0 && $t14_piutang_list->Pager->Visible) { ?>
+<?php if (!isset($t15_piutangdetail_list->Pager)) $t15_piutangdetail_list->Pager = new cPrevNextPager($t15_piutangdetail_list->StartRec, $t15_piutangdetail_list->DisplayRecs, $t15_piutangdetail_list->TotalRecs, $t15_piutangdetail_list->AutoHidePager) ?>
+<?php if ($t15_piutangdetail_list->Pager->RecordCount > 0 && $t15_piutangdetail_list->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t14_piutang_list->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t14_piutang_list->PageUrl() ?>start=<?php echo $t14_piutang_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t15_piutangdetail_list->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t15_piutangdetail_list->PageUrl() ?>start=<?php echo $t15_piutangdetail_list->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t14_piutang_list->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t14_piutang_list->PageUrl() ?>start=<?php echo $t14_piutang_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t15_piutangdetail_list->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t15_piutangdetail_list->PageUrl() ?>start=<?php echo $t15_piutangdetail_list->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t14_piutang_list->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t15_piutangdetail_list->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t14_piutang_list->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t14_piutang_list->PageUrl() ?>start=<?php echo $t14_piutang_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t15_piutangdetail_list->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t15_piutangdetail_list->PageUrl() ?>start=<?php echo $t15_piutangdetail_list->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t14_piutang_list->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t14_piutang_list->PageUrl() ?>start=<?php echo $t14_piutang_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t15_piutangdetail_list->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t15_piutangdetail_list->PageUrl() ?>start=<?php echo $t15_piutangdetail_list->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t14_piutang_list->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t15_piutangdetail_list->Pager->PageCount ?></span>
 </div>
 <?php } ?>
-<?php if ($t14_piutang_list->Pager->RecordCount > 0) { ?>
+<?php if ($t15_piutangdetail_list->Pager->RecordCount > 0) { ?>
 <div class="ewPager ewRec">
-	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $t14_piutang_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $t14_piutang_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $t14_piutang_list->Pager->RecordCount ?></span>
+	<span><?php echo $Language->Phrase("Record") ?>&nbsp;<?php echo $t15_piutangdetail_list->Pager->FromIndex ?>&nbsp;<?php echo $Language->Phrase("To") ?>&nbsp;<?php echo $t15_piutangdetail_list->Pager->ToIndex ?>&nbsp;<?php echo $Language->Phrase("Of") ?>&nbsp;<?php echo $t15_piutangdetail_list->Pager->RecordCount ?></span>
 </div>
 <?php } ?>
-<?php if ($t14_piutang_list->TotalRecs > 0 && (!$t14_piutang_list->AutoHidePageSizeSelector || $t14_piutang_list->Pager->Visible)) { ?>
+<?php if ($t15_piutangdetail_list->TotalRecs > 0 && (!$t15_piutangdetail_list->AutoHidePageSizeSelector || $t15_piutangdetail_list->Pager->Visible)) { ?>
 <div class="ewPager">
-<input type="hidden" name="t" value="t14_piutang">
+<input type="hidden" name="t" value="t15_piutangdetail">
 <select name="<?php echo EW_TABLE_REC_PER_PAGE ?>" class="form-control input-sm ewTooltip" title="<?php echo $Language->Phrase("RecordsPerPage") ?>" onchange="this.form.submit();">
-<option value="10"<?php if ($t14_piutang_list->DisplayRecs == 10) { ?> selected<?php } ?>>10</option>
-<option value="20"<?php if ($t14_piutang_list->DisplayRecs == 20) { ?> selected<?php } ?>>20</option>
-<option value="50"<?php if ($t14_piutang_list->DisplayRecs == 50) { ?> selected<?php } ?>>50</option>
-<option value="100"<?php if ($t14_piutang_list->DisplayRecs == 100) { ?> selected<?php } ?>>100</option>
-<option value="200"<?php if ($t14_piutang_list->DisplayRecs == 200) { ?> selected<?php } ?>>200</option>
-<option value="ALL"<?php if ($t14_piutang->getRecordsPerPage() == -1) { ?> selected<?php } ?>><?php echo $Language->Phrase("AllRecords") ?></option>
+<option value="10"<?php if ($t15_piutangdetail_list->DisplayRecs == 10) { ?> selected<?php } ?>>10</option>
+<option value="20"<?php if ($t15_piutangdetail_list->DisplayRecs == 20) { ?> selected<?php } ?>>20</option>
+<option value="50"<?php if ($t15_piutangdetail_list->DisplayRecs == 50) { ?> selected<?php } ?>>50</option>
+<option value="100"<?php if ($t15_piutangdetail_list->DisplayRecs == 100) { ?> selected<?php } ?>>100</option>
+<option value="200"<?php if ($t15_piutangdetail_list->DisplayRecs == 200) { ?> selected<?php } ?>>200</option>
+<option value="ALL"<?php if ($t15_piutangdetail->getRecordsPerPage() == -1) { ?> selected<?php } ?>><?php echo $Language->Phrase("AllRecords") ?></option>
 </select>
 </div>
 <?php } ?>
@@ -2654,7 +3251,7 @@ if ($t14_piutang_list->Recordset)
 <?php } ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($t14_piutang_list->OtherOptions as &$option)
+	foreach ($t15_piutangdetail_list->OtherOptions as &$option)
 		$option->Render("body", "bottom");
 ?>
 </div>
@@ -2663,10 +3260,10 @@ if ($t14_piutang_list->Recordset)
 <?php } ?>
 </div>
 <?php } ?>
-<?php if ($t14_piutang_list->TotalRecs == 0 && $t14_piutang->CurrentAction == "") { // Show other options ?>
+<?php if ($t15_piutangdetail_list->TotalRecs == 0 && $t15_piutangdetail->CurrentAction == "") { // Show other options ?>
 <div class="ewListOtherOptions">
 <?php
-	foreach ($t14_piutang_list->OtherOptions as &$option) {
+	foreach ($t15_piutangdetail_list->OtherOptions as &$option) {
 		$option->ButtonClass = "";
 		$option->Render("body", "");
 	}
@@ -2674,27 +3271,29 @@ if ($t14_piutang_list->Recordset)
 </div>
 <div class="clearfix"></div>
 <?php } ?>
-<?php if ($t14_piutang->Export == "") { ?>
+<?php if ($t15_piutangdetail->Export == "") { ?>
 <script type="text/javascript">
-ft14_piutanglistsrch.FilterList = <?php echo $t14_piutang_list->GetFilterList() ?>;
-ft14_piutanglistsrch.Init();
-ft14_piutanglist.Init();
+ft15_piutangdetaillistsrch.FilterList = <?php echo $t15_piutangdetail_list->GetFilterList() ?>;
+ft15_piutangdetaillistsrch.Init();
+ft15_piutangdetaillist.Init();
 </script>
 <?php } ?>
 <?php
-$t14_piutang_list->ShowPageFooter();
+$t15_piutangdetail_list->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
-<?php if ($t14_piutang->Export == "") { ?>
+<?php if ($t15_piutangdetail->Export == "") { ?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
 // document.write("page loaded");
 
+$("#x0_NoBayar").val("<?php echo f_GetNextNoBayarPiutang();?>");
+$("#x0_Tgl").val("<?php echo date('d-m-Y');?>");
 </script>
 <?php } ?>
 <?php include_once "footer.php" ?>
 <?php
-$t14_piutang_list->Page_Terminate();
+$t15_piutangdetail_list->Page_Terminate();
 ?>

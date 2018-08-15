@@ -618,6 +618,9 @@
   <project>
     <phrase id="bodytitle" value="STOK Apps." />
     <phrase id="footertext" value="&amp;copy;2018 PT. LAB. All rights reserved." />
+    <menu id="10167">
+      <phrase id="menutext" value="Piutang Detail" />
+    </menu>
     <menu id="10098">
       <phrase id="menutext" value="Home" />
     </menu>
@@ -1138,6 +1141,24 @@
       </field>
       <field id="saldopiutang">
         <phrase id="fldcaption" value="Saldo Piutang" />
+      </field>
+    </table>
+    <table id="t15_piutangdetail">
+      <phrase id="tblcaption" value="Piutang Detail" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="piutangid">
+        <phrase id="fldcaption" value="Piutang ID" />
+      </field>
+      <field id="nobayar">
+        <phrase id="fldcaption" value="No Bayar" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="Tgl" />
+      </field>
+      <field id="jumlahbayar">
+        <phrase id="fldcaption" value="Jumlah Bayar" />
       </field>
     </table>
     <table id="t91_log_status">

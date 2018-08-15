@@ -335,6 +335,8 @@ class cdefault {
 			$this->Page_Terminate("t12_jualdetaillist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't14_piutang'))
 			$this->Page_Terminate("t14_piutanglist.php");
+		if ($Security->AllowList(CurrentProjectID() . 't15_piutangdetail'))
+			$this->Page_Terminate("t15_piutangdetaillist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't91_log_status'))
 			$this->Page_Terminate("t91_log_statuslist.php");
 		if ($Security->AllowList(CurrentProjectID() . 't92_log'))

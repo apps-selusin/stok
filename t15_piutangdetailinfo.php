@@ -1,12 +1,12 @@
 <?php
 
 // Global variable for table object
-$t14_piutang = NULL;
+$t15_piutangdetail = NULL;
 
 //
-// Table class for t14_piutang
+// Table class for t15_piutangdetail
 //
-class ct14_piutang extends cTable {
+class ct15_piutangdetail extends cTable {
 	var $AuditTrailOnAdd = TRUE;
 	var $AuditTrailOnEdit = TRUE;
 	var $AuditTrailOnDelete = TRUE;
@@ -14,11 +14,10 @@ class ct14_piutang extends cTable {
 	var $AuditTrailOnViewData = FALSE;
 	var $AuditTrailOnSearch = FALSE;
 	var $id;
-	var $NoPiutang;
-	var $JualID;
-	var $JumlahPiutang;
+	var $PiutangID;
+	var $NoBayar;
+	var $Tgl;
 	var $JumlahBayar;
-	var $SaldoPiutang;
 
 	//
 	// Table class constructor
@@ -28,12 +27,12 @@ class ct14_piutang extends cTable {
 
 		// Language object
 		if (!isset($Language)) $Language = new cLanguage();
-		$this->TableVar = 't14_piutang';
-		$this->TableName = 't14_piutang';
+		$this->TableVar = 't15_piutangdetail';
+		$this->TableName = 't15_piutangdetail';
 		$this->TableType = 'TABLE';
 
 		// Update Table
-		$this->UpdateTable = "`t14_piutang`";
+		$this->UpdateTable = "`t15_piutangdetail`";
 		$this->DBID = 'DB';
 		$this->ExportAll = TRUE;
 		$this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -43,8 +42,8 @@ class ct14_piutang extends cTable {
 		$this->ExportExcelPageSize = ""; // Page size (PHPExcel only)
 		$this->ExportWordPageOrientation = "portrait"; // Page orientation (PHPWord only)
 		$this->ExportWordColumnWidth = NULL; // Cell width (PHPWord only)
-		$this->DetailAdd = FALSE; // Allow detail add
-		$this->DetailEdit = FALSE; // Allow detail edit
+		$this->DetailAdd = TRUE; // Allow detail add
+		$this->DetailEdit = TRUE; // Allow detail edit
 		$this->DetailView = FALSE; // Allow detail view
 		$this->ShowMultipleDetails = FALSE; // Show multiple details
 		$this->GridAddRowCount = 5;
@@ -53,40 +52,33 @@ class ct14_piutang extends cTable {
 		$this->BasicSearch = new cBasicSearch($this->TableVar);
 
 		// id
-		$this->id = new cField('t14_piutang', 't14_piutang', 'x_id', 'id', '`id`', '`id`', 3, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
+		$this->id = new cField('t15_piutangdetail', 't15_piutangdetail', 'x_id', 'id', '`id`', '`id`', 3, -1, FALSE, '`id`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'NO');
 		$this->id->Sortable = TRUE; // Allow sort
 		$this->id->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
 		$this->fields['id'] = &$this->id;
 
-		// NoPiutang
-		$this->NoPiutang = new cField('t14_piutang', 't14_piutang', 'x_NoPiutang', 'NoPiutang', '`NoPiutang`', '`NoPiutang`', 200, -1, FALSE, '`NoPiutang`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->NoPiutang->Sortable = TRUE; // Allow sort
-		$this->fields['NoPiutang'] = &$this->NoPiutang;
+		// PiutangID
+		$this->PiutangID = new cField('t15_piutangdetail', 't15_piutangdetail', 'x_PiutangID', 'PiutangID', '`PiutangID`', '`PiutangID`', 3, -1, FALSE, '`PiutangID`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->PiutangID->Sortable = TRUE; // Allow sort
+		$this->PiutangID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
+		$this->fields['PiutangID'] = &$this->PiutangID;
 
-		// JualID
-		$this->JualID = new cField('t14_piutang', 't14_piutang', 'x_JualID', 'JualID', '`JualID`', '`JualID`', 3, -1, FALSE, '`JualID`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->JualID->Sortable = TRUE; // Allow sort
-		$this->JualID->FldDefaultErrMsg = $Language->Phrase("IncorrectInteger");
-		$this->fields['JualID'] = &$this->JualID;
+		// NoBayar
+		$this->NoBayar = new cField('t15_piutangdetail', 't15_piutangdetail', 'x_NoBayar', 'NoBayar', '`NoBayar`', '`NoBayar`', 200, -1, FALSE, '`NoBayar`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->NoBayar->Sortable = TRUE; // Allow sort
+		$this->fields['NoBayar'] = &$this->NoBayar;
 
-		// JumlahPiutang
-		$this->JumlahPiutang = new cField('t14_piutang', 't14_piutang', 'x_JumlahPiutang', 'JumlahPiutang', '`JumlahPiutang`', '`JumlahPiutang`', 4, -1, FALSE, '`JumlahPiutang`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->JumlahPiutang->Sortable = TRUE; // Allow sort
-		$this->JumlahPiutang->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
-		$this->fields['JumlahPiutang'] = &$this->JumlahPiutang;
+		// Tgl
+		$this->Tgl = new cField('t15_piutangdetail', 't15_piutangdetail', 'x_Tgl', 'Tgl', '`Tgl`', ew_CastDateFieldForLike('`Tgl`', 7, "DB"), 133, 7, FALSE, '`Tgl`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->Tgl->Sortable = TRUE; // Allow sort
+		$this->Tgl->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateDMY"));
+		$this->fields['Tgl'] = &$this->Tgl;
 
 		// JumlahBayar
-		$this->JumlahBayar = new cField('t14_piutang', 't14_piutang', 'x_JumlahBayar', 'JumlahBayar', '`JumlahBayar`', '`JumlahBayar`', 4, -1, FALSE, '`JumlahBayar`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->JumlahBayar = new cField('t15_piutangdetail', 't15_piutangdetail', 'x_JumlahBayar', 'JumlahBayar', '`JumlahBayar`', '`JumlahBayar`', 4, -1, FALSE, '`JumlahBayar`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->JumlahBayar->Sortable = TRUE; // Allow sort
 		$this->JumlahBayar->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
 		$this->fields['JumlahBayar'] = &$this->JumlahBayar;
-
-		// SaldoPiutang
-		$this->SaldoPiutang = new cField('t14_piutang', 't14_piutang', 'x_SaldoPiutang', 'SaldoPiutang', '(select jumlahpiutang - jumlahbayar)', '(select jumlahpiutang - jumlahbayar)', 5, -1, FALSE, '(select jumlahpiutang - jumlahbayar)', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
-		$this->SaldoPiutang->FldIsCustom = TRUE; // Custom field
-		$this->SaldoPiutang->Sortable = TRUE; // Allow sort
-		$this->SaldoPiutang->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
-		$this->fields['SaldoPiutang'] = &$this->SaldoPiutang;
 	}
 
 	// Field Visibility
@@ -137,35 +129,58 @@ class ct14_piutang extends cTable {
 		}
 	}
 
-	// Current detail table name
-	function getCurrentDetailTable() {
-		return @$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_DETAIL_TABLE];
+	// Current master table name
+	function getCurrentMasterTable() {
+		return @$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_MASTER_TABLE];
 	}
 
-	function setCurrentDetailTable($v) {
-		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_DETAIL_TABLE] = $v;
+	function setCurrentMasterTable($v) {
+		$_SESSION[EW_PROJECT_NAME . "_" . $this->TableVar . "_" . EW_TABLE_MASTER_TABLE] = $v;
 	}
 
-	// Get detail url
-	function GetDetailUrl() {
+	// Session master WHERE clause
+	function GetMasterFilter() {
 
-		// Detail url
-		$sDetailUrl = "";
-		if ($this->getCurrentDetailTable() == "t15_piutangdetail") {
-			$sDetailUrl = $GLOBALS["t15_piutangdetail"]->GetListUrl() . "?" . EW_TABLE_SHOW_MASTER . "=" . $this->TableVar;
-			$sDetailUrl .= "&fk_id=" . urlencode($this->id->CurrentValue);
+		// Master filter
+		$sMasterFilter = "";
+		if ($this->getCurrentMasterTable() == "t14_piutang") {
+			if ($this->PiutangID->getSessionValue() <> "")
+				$sMasterFilter .= "`id`=" . ew_QuotedValue($this->PiutangID->getSessionValue(), EW_DATATYPE_NUMBER, "DB");
+			else
+				return "";
 		}
-		if ($sDetailUrl == "") {
-			$sDetailUrl = "t14_piutanglist.php";
+		return $sMasterFilter;
+	}
+
+	// Session detail WHERE clause
+	function GetDetailFilter() {
+
+		// Detail filter
+		$sDetailFilter = "";
+		if ($this->getCurrentMasterTable() == "t14_piutang") {
+			if ($this->PiutangID->getSessionValue() <> "")
+				$sDetailFilter .= "`PiutangID`=" . ew_QuotedValue($this->PiutangID->getSessionValue(), EW_DATATYPE_NUMBER, "DB");
+			else
+				return "";
 		}
-		return $sDetailUrl;
+		return $sDetailFilter;
+	}
+
+	// Master filter
+	function SqlMasterFilter_t14_piutang() {
+		return "`id`=@id@";
+	}
+
+	// Detail filter
+	function SqlDetailFilter_t14_piutang() {
+		return "`PiutangID`=@PiutangID@";
 	}
 
 	// Table level SQL
 	var $_SqlFrom = "";
 
 	function getSqlFrom() { // From
-		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t14_piutang`";
+		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`t15_piutangdetail`";
 	}
 
 	function SqlFrom() { // For backward compatibility
@@ -178,7 +193,7 @@ class ct14_piutang extends cTable {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() { // Select
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, (select jumlahpiutang - jumlahbayar) AS `SaldoPiutang` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT * FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -233,7 +248,7 @@ class ct14_piutang extends cTable {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() { // Order By
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`NoPiutang` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`NoBayar` ASC,`Tgl` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -488,7 +503,7 @@ class ct14_piutang extends cTable {
 		if (@$_SESSION[$name] <> "") {
 			return $_SESSION[$name];
 		} else {
-			return "t14_piutanglist.php";
+			return "t15_piutangdetaillist.php";
 		}
 	}
 
@@ -499,11 +514,11 @@ class ct14_piutang extends cTable {
 	// Get modal caption
 	function GetModalCaption($pageName) {
 		global $Language;
-		if ($pageName == "t14_piutangview.php")
+		if ($pageName == "t15_piutangdetailview.php")
 			return $Language->Phrase("View");
-		elseif ($pageName == "t14_piutangedit.php")
+		elseif ($pageName == "t15_piutangdetailedit.php")
 			return $Language->Phrase("Edit");
-		elseif ($pageName == "t14_piutangadd.php")
+		elseif ($pageName == "t15_piutangdetailadd.php")
 			return $Language->Phrase("Add");
 		else
 			return "";
@@ -511,33 +526,30 @@ class ct14_piutang extends cTable {
 
 	// List URL
 	function GetListUrl() {
-		return "t14_piutanglist.php";
+		return "t15_piutangdetaillist.php";
 	}
 
 	// View URL
 	function GetViewUrl($parm = "") {
 		if ($parm <> "")
-			$url = $this->KeyUrl("t14_piutangview.php", $this->UrlParm($parm));
+			$url = $this->KeyUrl("t15_piutangdetailview.php", $this->UrlParm($parm));
 		else
-			$url = $this->KeyUrl("t14_piutangview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+			$url = $this->KeyUrl("t15_piutangdetailview.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
 		return $this->AddMasterUrl($url);
 	}
 
 	// Add URL
 	function GetAddUrl($parm = "") {
 		if ($parm <> "")
-			$url = "t14_piutangadd.php?" . $this->UrlParm($parm);
+			$url = "t15_piutangdetailadd.php?" . $this->UrlParm($parm);
 		else
-			$url = "t14_piutangadd.php";
+			$url = "t15_piutangdetailadd.php";
 		return $this->AddMasterUrl($url);
 	}
 
 	// Edit URL
 	function GetEditUrl($parm = "") {
-		if ($parm <> "")
-			$url = $this->KeyUrl("t14_piutangedit.php", $this->UrlParm($parm));
-		else
-			$url = $this->KeyUrl("t14_piutangedit.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+		$url = $this->KeyUrl("t15_piutangdetailedit.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -549,10 +561,7 @@ class ct14_piutang extends cTable {
 
 	// Copy URL
 	function GetCopyUrl($parm = "") {
-		if ($parm <> "")
-			$url = $this->KeyUrl("t14_piutangadd.php", $this->UrlParm($parm));
-		else
-			$url = $this->KeyUrl("t14_piutangadd.php", $this->UrlParm(EW_TABLE_SHOW_DETAIL . "="));
+		$url = $this->KeyUrl("t15_piutangdetailadd.php", $this->UrlParm($parm));
 		return $this->AddMasterUrl($url);
 	}
 
@@ -564,11 +573,15 @@ class ct14_piutang extends cTable {
 
 	// Delete URL
 	function GetDeleteUrl() {
-		return $this->KeyUrl("t14_piutangdelete.php", $this->UrlParm());
+		return $this->KeyUrl("t15_piutangdetaildelete.php", $this->UrlParm());
 	}
 
 	// Add master url
 	function AddMasterUrl($url) {
+		if ($this->getCurrentMasterTable() == "t14_piutang" && strpos($url, EW_TABLE_SHOW_MASTER . "=") === FALSE) {
+			$url .= (strpos($url, "?") !== FALSE ? "&" : "?") . EW_TABLE_SHOW_MASTER . "=" . $this->getCurrentMasterTable();
+			$url .= "&fk_id=" . urlencode($this->PiutangID->CurrentValue);
+		}
 		return $url;
 	}
 
@@ -666,11 +679,10 @@ class ct14_piutang extends cTable {
 	// Load row values from recordset
 	function LoadListRowValues(&$rs) {
 		$this->id->setDbValue($rs->fields('id'));
-		$this->NoPiutang->setDbValue($rs->fields('NoPiutang'));
-		$this->JualID->setDbValue($rs->fields('JualID'));
-		$this->JumlahPiutang->setDbValue($rs->fields('JumlahPiutang'));
+		$this->PiutangID->setDbValue($rs->fields('PiutangID'));
+		$this->NoBayar->setDbValue($rs->fields('NoBayar'));
+		$this->Tgl->setDbValue($rs->fields('Tgl'));
 		$this->JumlahBayar->setDbValue($rs->fields('JumlahBayar'));
-		$this->SaldoPiutang->setDbValue($rs->fields('SaldoPiutang'));
 	}
 
 	// Render list row values
@@ -682,92 +694,56 @@ class ct14_piutang extends cTable {
 
 	// Common render codes
 		// id
-		// NoPiutang
-		// JualID
-		// JumlahPiutang
+		// PiutangID
+		// NoBayar
+		// Tgl
 		// JumlahBayar
-		// SaldoPiutang
 		// id
 
 		$this->id->ViewValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// NoPiutang
-		$this->NoPiutang->ViewValue = $this->NoPiutang->CurrentValue;
-		$this->NoPiutang->ViewCustomAttributes = "";
+		// PiutangID
+		$this->PiutangID->ViewValue = $this->PiutangID->CurrentValue;
+		$this->PiutangID->ViewCustomAttributes = "";
 
-		// JualID
-		$this->JualID->ViewValue = $this->JualID->CurrentValue;
-		if (strval($this->JualID->CurrentValue) <> "") {
-			$sFilterWrk = "`id`" . ew_SearchString("=", $this->JualID->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `id`, `NoSO` AS `DispFld`, `TglSO` AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t11_jual`";
-		$sWhereWrk = "";
-		$this->JualID->LookupFilters = array("df2" => "7");
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->JualID, $sWhereWrk); // Call Lookup Selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$arwrk[2] = ew_FormatDateTime($rswrk->fields('Disp2Fld'), 7);
-				$this->JualID->ViewValue = $this->JualID->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->JualID->ViewValue = $this->JualID->CurrentValue;
-			}
-		} else {
-			$this->JualID->ViewValue = NULL;
-		}
-		$this->JualID->ViewCustomAttributes = "";
+		// NoBayar
+		$this->NoBayar->ViewValue = $this->NoBayar->CurrentValue;
+		$this->NoBayar->ViewCustomAttributes = "";
 
-		// JumlahPiutang
-		$this->JumlahPiutang->ViewValue = $this->JumlahPiutang->CurrentValue;
-		$this->JumlahPiutang->ViewValue = ew_FormatNumber($this->JumlahPiutang->ViewValue, 2, -2, -2, -2);
-		$this->JumlahPiutang->CellCssStyle .= "text-align: left;";
-		$this->JumlahPiutang->ViewCustomAttributes = "";
+		// Tgl
+		$this->Tgl->ViewValue = $this->Tgl->CurrentValue;
+		$this->Tgl->ViewValue = ew_FormatDateTime($this->Tgl->ViewValue, 7);
+		$this->Tgl->ViewCustomAttributes = "";
 
 		// JumlahBayar
 		$this->JumlahBayar->ViewValue = $this->JumlahBayar->CurrentValue;
-		$this->JumlahBayar->ViewValue = ew_FormatNumber($this->JumlahBayar->ViewValue, 2, -2, -2, -2);
-		$this->JumlahBayar->CellCssStyle .= "text-align: left;";
 		$this->JumlahBayar->ViewCustomAttributes = "";
-
-		// SaldoPiutang
-		$this->SaldoPiutang->ViewValue = $this->SaldoPiutang->CurrentValue;
-		$this->SaldoPiutang->ViewValue = ew_FormatNumber($this->SaldoPiutang->ViewValue, 2, -2, -2, -2);
-		$this->SaldoPiutang->CellCssStyle .= "text-align: left;";
-		$this->SaldoPiutang->ViewCustomAttributes = "";
 
 		// id
 		$this->id->LinkCustomAttributes = "";
 		$this->id->HrefValue = "";
 		$this->id->TooltipValue = "";
 
-		// NoPiutang
-		$this->NoPiutang->LinkCustomAttributes = "";
-		$this->NoPiutang->HrefValue = "";
-		$this->NoPiutang->TooltipValue = "";
+		// PiutangID
+		$this->PiutangID->LinkCustomAttributes = "";
+		$this->PiutangID->HrefValue = "";
+		$this->PiutangID->TooltipValue = "";
 
-		// JualID
-		$this->JualID->LinkCustomAttributes = "";
-		$this->JualID->HrefValue = "";
-		$this->JualID->TooltipValue = "";
+		// NoBayar
+		$this->NoBayar->LinkCustomAttributes = "";
+		$this->NoBayar->HrefValue = "";
+		$this->NoBayar->TooltipValue = "";
 
-		// JumlahPiutang
-		$this->JumlahPiutang->LinkCustomAttributes = "";
-		$this->JumlahPiutang->HrefValue = "";
-		$this->JumlahPiutang->TooltipValue = "";
+		// Tgl
+		$this->Tgl->LinkCustomAttributes = "";
+		$this->Tgl->HrefValue = "";
+		$this->Tgl->TooltipValue = "";
 
 		// JumlahBayar
 		$this->JumlahBayar->LinkCustomAttributes = "";
 		$this->JumlahBayar->HrefValue = "";
 		$this->JumlahBayar->TooltipValue = "";
-
-		// SaldoPiutang
-		$this->SaldoPiutang->LinkCustomAttributes = "";
-		$this->SaldoPiutang->HrefValue = "";
-		$this->SaldoPiutang->TooltipValue = "";
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -789,38 +765,36 @@ class ct14_piutang extends cTable {
 		$this->id->EditValue = $this->id->CurrentValue;
 		$this->id->ViewCustomAttributes = "";
 
-		// NoPiutang
-		$this->NoPiutang->EditAttrs["class"] = "form-control";
-		$this->NoPiutang->EditCustomAttributes = "";
-		$this->NoPiutang->EditValue = $this->NoPiutang->CurrentValue;
-		$this->NoPiutang->PlaceHolder = ew_RemoveHtml($this->NoPiutang->FldCaption());
+		// PiutangID
+		$this->PiutangID->EditAttrs["class"] = "form-control";
+		$this->PiutangID->EditCustomAttributes = "";
+		if ($this->PiutangID->getSessionValue() <> "") {
+			$this->PiutangID->CurrentValue = $this->PiutangID->getSessionValue();
+		$this->PiutangID->ViewValue = $this->PiutangID->CurrentValue;
+		$this->PiutangID->ViewCustomAttributes = "";
+		} else {
+		$this->PiutangID->EditValue = $this->PiutangID->CurrentValue;
+		$this->PiutangID->PlaceHolder = ew_RemoveHtml($this->PiutangID->FldCaption());
+		}
 
-		// JualID
-		$this->JualID->EditAttrs["class"] = "form-control";
-		$this->JualID->EditCustomAttributes = "";
-		$this->JualID->EditValue = $this->JualID->CurrentValue;
-		$this->JualID->PlaceHolder = ew_RemoveHtml($this->JualID->FldCaption());
+		// NoBayar
+		$this->NoBayar->EditAttrs["class"] = "form-control";
+		$this->NoBayar->EditCustomAttributes = "";
+		$this->NoBayar->EditValue = $this->NoBayar->CurrentValue;
+		$this->NoBayar->PlaceHolder = ew_RemoveHtml($this->NoBayar->FldCaption());
 
-		// JumlahPiutang
-		$this->JumlahPiutang->EditAttrs["class"] = "form-control";
-		$this->JumlahPiutang->EditCustomAttributes = "";
-		$this->JumlahPiutang->EditValue = $this->JumlahPiutang->CurrentValue;
-		$this->JumlahPiutang->PlaceHolder = ew_RemoveHtml($this->JumlahPiutang->FldCaption());
-		if (strval($this->JumlahPiutang->EditValue) <> "" && is_numeric($this->JumlahPiutang->EditValue)) $this->JumlahPiutang->EditValue = ew_FormatNumber($this->JumlahPiutang->EditValue, -2, -2, -2, -2);
+		// Tgl
+		$this->Tgl->EditAttrs["class"] = "form-control";
+		$this->Tgl->EditCustomAttributes = "";
+		$this->Tgl->EditValue = ew_FormatDateTime($this->Tgl->CurrentValue, 7);
+		$this->Tgl->PlaceHolder = ew_RemoveHtml($this->Tgl->FldCaption());
 
 		// JumlahBayar
 		$this->JumlahBayar->EditAttrs["class"] = "form-control";
 		$this->JumlahBayar->EditCustomAttributes = "";
 		$this->JumlahBayar->EditValue = $this->JumlahBayar->CurrentValue;
 		$this->JumlahBayar->PlaceHolder = ew_RemoveHtml($this->JumlahBayar->FldCaption());
-		if (strval($this->JumlahBayar->EditValue) <> "" && is_numeric($this->JumlahBayar->EditValue)) $this->JumlahBayar->EditValue = ew_FormatNumber($this->JumlahBayar->EditValue, -2, -2, -2, -2);
-
-		// SaldoPiutang
-		$this->SaldoPiutang->EditAttrs["class"] = "form-control";
-		$this->SaldoPiutang->EditCustomAttributes = "";
-		$this->SaldoPiutang->EditValue = $this->SaldoPiutang->CurrentValue;
-		$this->SaldoPiutang->PlaceHolder = ew_RemoveHtml($this->SaldoPiutang->FldCaption());
-		if (strval($this->SaldoPiutang->EditValue) <> "" && is_numeric($this->SaldoPiutang->EditValue)) $this->SaldoPiutang->EditValue = ew_FormatNumber($this->SaldoPiutang->EditValue, -2, -2, -2, -2);
+		if (strval($this->JumlahBayar->EditValue) <> "" && is_numeric($this->JumlahBayar->EditValue)) $this->JumlahBayar->EditValue = ew_FormatNumber($this->JumlahBayar->EditValue, -2, -1, -2, 0);
 
 		// Call Row Rendered event
 		$this->Row_Rendered();
@@ -849,18 +823,15 @@ class ct14_piutang extends cTable {
 			if ($Doc->Horizontal) { // Horizontal format, write header
 				$Doc->BeginExportRow();
 				if ($ExportPageType == "view") {
-					if ($this->NoPiutang->Exportable) $Doc->ExportCaption($this->NoPiutang);
-					if ($this->JualID->Exportable) $Doc->ExportCaption($this->JualID);
-					if ($this->JumlahPiutang->Exportable) $Doc->ExportCaption($this->JumlahPiutang);
+					if ($this->NoBayar->Exportable) $Doc->ExportCaption($this->NoBayar);
+					if ($this->Tgl->Exportable) $Doc->ExportCaption($this->Tgl);
 					if ($this->JumlahBayar->Exportable) $Doc->ExportCaption($this->JumlahBayar);
-					if ($this->SaldoPiutang->Exportable) $Doc->ExportCaption($this->SaldoPiutang);
 				} else {
 					if ($this->id->Exportable) $Doc->ExportCaption($this->id);
-					if ($this->NoPiutang->Exportable) $Doc->ExportCaption($this->NoPiutang);
-					if ($this->JualID->Exportable) $Doc->ExportCaption($this->JualID);
-					if ($this->JumlahPiutang->Exportable) $Doc->ExportCaption($this->JumlahPiutang);
+					if ($this->PiutangID->Exportable) $Doc->ExportCaption($this->PiutangID);
+					if ($this->NoBayar->Exportable) $Doc->ExportCaption($this->NoBayar);
+					if ($this->Tgl->Exportable) $Doc->ExportCaption($this->Tgl);
 					if ($this->JumlahBayar->Exportable) $Doc->ExportCaption($this->JumlahBayar);
-					if ($this->SaldoPiutang->Exportable) $Doc->ExportCaption($this->SaldoPiutang);
 				}
 				$Doc->EndExportRow();
 			}
@@ -892,18 +863,15 @@ class ct14_piutang extends cTable {
 				if (!$Doc->ExportCustom) {
 					$Doc->BeginExportRow($RowCnt); // Allow CSS styles if enabled
 					if ($ExportPageType == "view") {
-						if ($this->NoPiutang->Exportable) $Doc->ExportField($this->NoPiutang);
-						if ($this->JualID->Exportable) $Doc->ExportField($this->JualID);
-						if ($this->JumlahPiutang->Exportable) $Doc->ExportField($this->JumlahPiutang);
+						if ($this->NoBayar->Exportable) $Doc->ExportField($this->NoBayar);
+						if ($this->Tgl->Exportable) $Doc->ExportField($this->Tgl);
 						if ($this->JumlahBayar->Exportable) $Doc->ExportField($this->JumlahBayar);
-						if ($this->SaldoPiutang->Exportable) $Doc->ExportField($this->SaldoPiutang);
 					} else {
 						if ($this->id->Exportable) $Doc->ExportField($this->id);
-						if ($this->NoPiutang->Exportable) $Doc->ExportField($this->NoPiutang);
-						if ($this->JualID->Exportable) $Doc->ExportField($this->JualID);
-						if ($this->JumlahPiutang->Exportable) $Doc->ExportField($this->JumlahPiutang);
+						if ($this->PiutangID->Exportable) $Doc->ExportField($this->PiutangID);
+						if ($this->NoBayar->Exportable) $Doc->ExportField($this->NoBayar);
+						if ($this->Tgl->Exportable) $Doc->ExportField($this->Tgl);
 						if ($this->JumlahBayar->Exportable) $Doc->ExportField($this->JumlahBayar);
-						if ($this->SaldoPiutang->Exportable) $Doc->ExportField($this->SaldoPiutang);
 					}
 					$Doc->EndExportRow($RowCnt);
 				}
@@ -947,7 +915,7 @@ class ct14_piutang extends cTable {
 
 	// Write Audit Trail start/end for grid update
 	function WriteAuditTrailDummy($typ) {
-		$table = 't14_piutang';
+		$table = 't15_piutangdetail';
 		$usr = CurrentUserID();
 		ew_WriteAuditTrail("log", ew_StdCurrentDateTime(), ew_ScriptName(), $usr, $typ, $table, "", "", "", "");
 	}
@@ -956,7 +924,7 @@ class ct14_piutang extends cTable {
 	function WriteAuditTrailOnAdd(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnAdd) return;
-		$table = 't14_piutang';
+		$table = 't15_piutangdetail';
 
 		// Get key value
 		$key = "";
@@ -990,7 +958,7 @@ class ct14_piutang extends cTable {
 	function WriteAuditTrailOnEdit(&$rsold, &$rsnew) {
 		global $Language;
 		if (!$this->AuditTrailOnEdit) return;
-		$table = 't14_piutang';
+		$table = 't15_piutangdetail';
 
 		// Get key value
 		$key = "";
@@ -1037,7 +1005,7 @@ class ct14_piutang extends cTable {
 	function WriteAuditTrailOnDelete(&$rs) {
 		global $Language;
 		if (!$this->AuditTrailOnDelete) return;
-		$table = 't14_piutang';
+		$table = 't15_piutangdetail';
 
 		// Get key value
 		$key = "";
@@ -1112,7 +1080,9 @@ class ct14_piutang extends cTable {
 
 		// Enter your code here
 		// To cancel, set return value to FALSE
+		// default nomor hutang detail baru
 
+		$rsnew["NoBayar"] = f_GetNextNoBayarPiutang(); // mengantisipasi lebih satu user menginput data saat bersamaan
 		return TRUE;
 	}
 
@@ -1120,6 +1090,10 @@ class ct14_piutang extends cTable {
 	function Row_Inserted($rsold, &$rsnew) {
 
 		//echo "Row Inserted"
+		// simpan akumulasi jumlah bayar ke master
+
+		$tot_det = ew_ExecuteScalar("SELECT SUM(JumlahBayar) FROM t15_piutangdetail WHERE PiutangID = ".$rsnew["PiutangID"]."");
+		ew_Execute("UPDATE t14_piutang SET JumlahBayar = ".$tot_det." WHERE id = ".$rsnew["PiutangID"]."");
 	}
 
 	// Row Updating event
@@ -1135,6 +1109,10 @@ class ct14_piutang extends cTable {
 	function Row_Updated($rsold, &$rsnew) {
 
 		//echo "Row Updated";
+		// update akumulasi jumlah bayar ke master
+
+		$tot_det = ew_ExecuteScalar("SELECT SUM(JumlahBayar) FROM t15_piutangdetail WHERE PiutangID = ".$rsold["PiutangID"]."");
+		ew_Execute("UPDATE t14_piutang SET JumlahBayar = ".$tot_det." WHERE id = ".$rsold["PiutangID"]."");
 	}
 
 	// Row Update Conflict event
@@ -1189,6 +1167,16 @@ class ct14_piutang extends cTable {
 	function Row_Deleted(&$rs) {
 
 		//echo "Row Deleted";
+		// update akumulasi jumlah bayar ke master
+
+		$rec_cnt_det = ew_ExecuteScalar("SELECT COUNT(JumlahBayar) FROM t15_piutangdetail WHERE PiutangID = ".$rs["PiutangID"]."");
+		if ($rec_cnt_det > 0) {
+			$tot_det = ew_ExecuteScalar("SELECT SUM(JumlahBayar) FROM t15_piutangdetail WHERE PiutangID = ".$rs["PiutangID"]."");
+			ew_Execute("UPDATE t14_piutang SET JumlahBayar = ".$tot_det." WHERE id = ".$rs["PiutangID"]."");
+		}
+		else {
+			ew_Execute("UPDATE t14_piutang SET JumlahBayar = 0 WHERE id = ".$rs["PiutangID"]."");
+		}
 	}
 
 	// Email Sending event
@@ -1218,6 +1206,21 @@ class ct14_piutang extends cTable {
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
 
+		$this->NoBayar->ReadOnly = true;
+		$this->Tgl->ReadOnly = true;
+
+		// Kondisi saat form Tambah sedang terbuka (tidak dalam mode konfirmasi)
+		if (CurrentPageID() == "add" && $this->CurrentAction != "F") {
+			$this->NoBayar->CurrentValue = f_GetNextNoBayarPiutang(); // trik
+			$this->NoBayar->EditValue = $this->NoBayar->CurrentValue; // tampilkan
+
+			//$this->Kode->ReadOnly = TRUE; // supaya tidak bisa diubah
+		}
+
+		// Kondisi saat form Tambah sedang dalam mode konfirmasi
+		if ($this->CurrentAction == "add" && $this->CurrentAction=="F") {
+			$this->NoBayar->ViewValue = $this->NoBayar->CurrentValue; // ambil dari mode sebelumnya
+		}
 	}
 
 	// User ID Filtering event
