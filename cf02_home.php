@@ -396,8 +396,22 @@ function show_table($r) {
 	" FROM `categories` JOIN `products` ON (`categories`.`CategoryID` = `products`.`CategoryID`)" .
 	" WHERE " .
 	"`products`.`UnitsInStock` <= 0";
-	$q = "select * from t14_piutang";
-	echo $db->ExecuteHtml($q, ["fieldcaption" => TRUE, "tablename" => ["t14_piutang"]]); // Execute a SQL and show as HTML table
+	$q = "
+		select
+			nopiutang,
+			tglso,
+			noso,
+			nama,
+			customerpo,
+			jumlahpiutang,
+			jumlahbayar,
+			jumlahpiutang - jumlahbayar as saldopiutang
+		from
+			t14_piutang a
+			left join t11_jual b on a.jualid = b.id
+			left join t03_customer c on b.customerid = c.id
+			";
+	echo $db->ExecuteHtml($q, ["fieldcaption" => TRUE, "tablename" => ["t14_piutang", "t11_jual", "t03_customer"]]); // Execute a SQL and show as HTML table
 	?>
 </div>
 

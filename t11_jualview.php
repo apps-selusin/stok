@@ -385,53 +385,8 @@ class ct11_jual_view extends ct11_jual {
 		// 
 		// Security = null;
 		// 
-		// Get export parameters
 
-		$custom = "";
-		if (@$_GET["export"] <> "") {
-			$this->Export = $_GET["export"];
-			$custom = @$_GET["custom"];
-		} elseif (@$_POST["export"] <> "") {
-			$this->Export = $_POST["export"];
-			$custom = @$_POST["custom"];
-		} elseif (ew_IsPost()) {
-			if (@$_POST["exporttype"] <> "")
-				$this->Export = $_POST["exporttype"];
-			$custom = @$_POST["custom"];
-		} elseif (@$_GET["cmd"] == "json") {
-			$this->Export = $_GET["cmd"];
-		} else {
-			$this->setExportReturnUrl(ew_CurrentUrl());
-		}
-		$gsExportFile = $this->TableVar; // Get export file, used in header
-		if (@$_GET["id"] <> "") {
-			if ($gsExportFile <> "") $gsExportFile .= "_";
-			$gsExportFile .= $_GET["id"];
-		}
-
-		// Get custom export parameters
-		if ($this->Export <> "" && $custom <> "") {
-			$this->CustomExport = $this->Export;
-			$this->Export = "print";
-		}
-		$gsCustomExport = $this->CustomExport;
-		$gsExport = $this->Export; // Get export parameter, used in header
-
-		// Update Export URLs
-		if (defined("EW_USE_PHPEXCEL"))
-			$this->ExportExcelCustom = FALSE;
-		if ($this->ExportExcelCustom)
-			$this->ExportExcelUrl .= "&amp;custom=1";
-		if (defined("EW_USE_PHPWORD"))
-			$this->ExportWordCustom = FALSE;
-		if ($this->ExportWordCustom)
-			$this->ExportWordUrl .= "&amp;custom=1";
-		if ($this->ExportPdfCustom)
-			$this->ExportPdfUrl .= "&amp;custom=1";
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
-
-		// Setup export options
-		$this->SetupExportOptions();
 		$this->TglSO->SetVisibility();
 		$this->NoSO->SetVisibility();
 		$this->CustomerID->SetVisibility();
@@ -594,13 +549,6 @@ class ct11_jual_view extends ct11_jual {
 					} else {
 						$this->LoadRowValues($this->Recordset); // Load row values
 					}
-			}
-
-			// Export data only
-			if ($this->CustomExport == "" && in_array($this->Export, array_keys($EW_EXPORT))) {
-				$this->ExportData();
-				$this->Page_Terminate(); // Terminate response
-				exit();
 			}
 		} else {
 			$sReturnUrl = "t11_juallist.php"; // Not page request, return to list
@@ -992,265 +940,6 @@ class ct11_jual_view extends ct11_jual {
 			$this->Row_Rendered();
 	}
 
-	// Set up export options
-	function SetupExportOptions() {
-		global $Language;
-
-		// Printer friendly
-		$item = &$this->ExportOptions->Add("print");
-		$item->Body = "<a href=\"" . $this->ExportPrintUrl . "\" class=\"ewExportLink ewPrint\" title=\"" . ew_HtmlEncode($Language->Phrase("PrinterFriendlyText")) . "\" data-caption=\"" . ew_HtmlEncode($Language->Phrase("PrinterFriendlyText")) . "\">" . $Language->Phrase("PrinterFriendly") . "</a>";
-		$item->Visible = TRUE;
-
-		// Export to Excel
-		$item = &$this->ExportOptions->Add("excel");
-		$item->Body = "<a href=\"" . $this->ExportExcelUrl . "\" class=\"ewExportLink ewExcel\" title=\"" . ew_HtmlEncode($Language->Phrase("ExportToExcelText")) . "\" data-caption=\"" . ew_HtmlEncode($Language->Phrase("ExportToExcelText")) . "\">" . $Language->Phrase("ExportToExcel") . "</a>";
-		$item->Visible = TRUE;
-
-		// Export to Word
-		$item = &$this->ExportOptions->Add("word");
-		$item->Body = "<a href=\"" . $this->ExportWordUrl . "\" class=\"ewExportLink ewWord\" title=\"" . ew_HtmlEncode($Language->Phrase("ExportToWordText")) . "\" data-caption=\"" . ew_HtmlEncode($Language->Phrase("ExportToWordText")) . "\">" . $Language->Phrase("ExportToWord") . "</a>";
-		$item->Visible = TRUE;
-
-		// Export to Html
-		$item = &$this->ExportOptions->Add("html");
-		$item->Body = "<a href=\"" . $this->ExportHtmlUrl . "\" class=\"ewExportLink ewHtml\" title=\"" . ew_HtmlEncode($Language->Phrase("ExportToHtmlText")) . "\" data-caption=\"" . ew_HtmlEncode($Language->Phrase("ExportToHtmlText")) . "\">" . $Language->Phrase("ExportToHtml") . "</a>";
-		$item->Visible = TRUE;
-
-		// Export to Xml
-		$item = &$this->ExportOptions->Add("xml");
-		$item->Body = "<a href=\"" . $this->ExportXmlUrl . "\" class=\"ewExportLink ewXml\" title=\"" . ew_HtmlEncode($Language->Phrase("ExportToXmlText")) . "\" data-caption=\"" . ew_HtmlEncode($Language->Phrase("ExportToXmlText")) . "\">" . $Language->Phrase("ExportToXml") . "</a>";
-		$item->Visible = TRUE;
-
-		// Export to Csv
-		$item = &$this->ExportOptions->Add("csv");
-		$item->Body = "<a href=\"" . $this->ExportCsvUrl . "\" class=\"ewExportLink ewCsv\" title=\"" . ew_HtmlEncode($Language->Phrase("ExportToCsvText")) . "\" data-caption=\"" . ew_HtmlEncode($Language->Phrase("ExportToCsvText")) . "\">" . $Language->Phrase("ExportToCsv") . "</a>";
-		$item->Visible = TRUE;
-
-		// Export to Pdf
-		$item = &$this->ExportOptions->Add("pdf");
-		$item->Body = "<a href=\"" . $this->ExportPdfUrl . "\" class=\"ewExportLink ewPdf\" title=\"" . ew_HtmlEncode($Language->Phrase("ExportToPDFText")) . "\" data-caption=\"" . ew_HtmlEncode($Language->Phrase("ExportToPDFText")) . "\">" . $Language->Phrase("ExportToPDF") . "</a>";
-		$item->Visible = TRUE;
-
-		// Export to Email
-		$item = &$this->ExportOptions->Add("email");
-		$url = "";
-		$item->Body = "<button id=\"emf_t11_jual\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_t11_jual',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ft11_jualview,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
-		$item->Visible = TRUE;
-
-		// Drop down button for export
-		$this->ExportOptions->UseButtonGroup = TRUE;
-		$this->ExportOptions->UseImageAndText = TRUE;
-		$this->ExportOptions->UseDropDownButton = TRUE;
-		if ($this->ExportOptions->UseButtonGroup && ew_IsMobile())
-			$this->ExportOptions->UseDropDownButton = TRUE;
-		$this->ExportOptions->DropDownButtonPhrase = $Language->Phrase("ButtonExport");
-
-		// Add group option item
-		$item = &$this->ExportOptions->Add($this->ExportOptions->GroupOptionName);
-		$item->Body = "";
-		$item->Visible = FALSE;
-
-		// Hide options for export
-		if ($this->Export <> "")
-			$this->ExportOptions->HideAllOptions();
-	}
-
-	// Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
-	function ExportData() {
-		$utf8 = (strtolower(EW_CHARSET) == "utf-8");
-		$bSelectLimit = FALSE;
-
-		// Load recordset
-		if ($bSelectLimit) {
-			$this->TotalRecs = $this->ListRecordCount();
-		} else {
-			if (!$this->Recordset)
-				$this->Recordset = $this->LoadRecordset();
-			$rs = &$this->Recordset;
-			if ($rs)
-				$this->TotalRecs = $rs->RecordCount();
-		}
-		$this->StartRec = 1;
-		$this->SetupStartRec(); // Set up start record position
-
-		// Set the last record to display
-		if ($this->DisplayRecs <= 0) {
-			$this->StopRec = $this->TotalRecs;
-		} else {
-			$this->StopRec = $this->StartRec + $this->DisplayRecs - 1;
-		}
-		if (!$rs) {
-			header("Content-Type:"); // Remove header
-			header("Content-Disposition:");
-			$this->ShowMessage();
-			return;
-		}
-		$this->ExportDoc = ew_ExportDocument($this, "v");
-		$Doc = &$this->ExportDoc;
-		if ($bSelectLimit) {
-			$this->StartRec = 1;
-			$this->StopRec = $this->DisplayRecs <= 0 ? $this->TotalRecs : $this->DisplayRecs;
-		} else {
-
-			//$this->StartRec = $this->StartRec;
-			//$this->StopRec = $this->StopRec;
-
-		}
-
-		// Call Page Exporting server event
-		$this->ExportDoc->ExportCustom = !$this->Page_Exporting();
-		$ParentTable = "";
-		$sHeader = $this->PageHeader;
-		$this->Page_DataRendering($sHeader);
-		$Doc->Text .= $sHeader;
-		$this->ExportDocument($Doc, $rs, $this->StartRec, $this->StopRec, "view");
-
-		// Export detail records (t12_jualdetail)
-		if (EW_EXPORT_DETAIL_RECORDS && in_array("t12_jualdetail", explode(",", $this->getCurrentDetailTable()))) {
-			global $t12_jualdetail;
-			if (!isset($t12_jualdetail)) $t12_jualdetail = new ct12_jualdetail;
-			$rsdetail = $t12_jualdetail->LoadRs($t12_jualdetail->GetDetailFilter()); // Load detail records
-			if ($rsdetail && !$rsdetail->EOF) {
-				$ExportStyle = $Doc->Style;
-				$Doc->SetStyle("h"); // Change to horizontal
-				if ($this->Export <> "csv" || EW_EXPORT_DETAIL_RECORDS_FOR_CSV) {
-					$Doc->ExportEmptyRow();
-					$detailcnt = $rsdetail->RecordCount();
-					$oldtbl = $Doc->Table;
-					$Doc->Table = $t12_jualdetail;
-					$t12_jualdetail->ExportDocument($Doc, $rsdetail, 1, $detailcnt);
-					$Doc->Table = $oldtbl;
-				}
-				$Doc->SetStyle($ExportStyle); // Restore
-				$rsdetail->Close();
-			}
-		}
-		$sFooter = $this->PageFooter;
-		$this->Page_DataRendered($sFooter);
-		$Doc->Text .= $sFooter;
-
-		// Close recordset
-		$rs->Close();
-
-		// Call Page Exported server event
-		$this->Page_Exported();
-
-		// Export header and footer
-		$Doc->ExportHeaderAndFooter();
-
-		// Clean output buffer
-		if (!EW_DEBUG_ENABLED && ob_get_length())
-			ob_end_clean();
-
-		// Write debug message if enabled
-		if (EW_DEBUG_ENABLED && $this->Export <> "pdf")
-			echo ew_DebugMsg();
-
-		// Output data
-		if ($this->Export == "email") {
-			echo $this->ExportEmail($Doc->Text);
-		} else {
-			$Doc->Export();
-		}
-	}
-
-	// Export email
-	function ExportEmail($EmailContent) {
-		global $gTmpImages, $Language;
-		$sSender = @$_POST["sender"];
-		$sRecipient = @$_POST["recipient"];
-		$sCc = @$_POST["cc"];
-		$sBcc = @$_POST["bcc"];
-
-		// Subject
-		$sSubject = @$_POST["subject"];
-		$sEmailSubject = $sSubject;
-
-		// Message
-		$sContent = @$_POST["message"];
-		$sEmailMessage = $sContent;
-
-		// Check sender
-		if ($sSender == "") {
-			return "<p class=\"text-danger\">" . $Language->Phrase("EnterSenderEmail") . "</p>";
-		}
-		if (!ew_CheckEmail($sSender)) {
-			return "<p class=\"text-danger\">" . $Language->Phrase("EnterProperSenderEmail") . "</p>";
-		}
-
-		// Check recipient
-		if (!ew_CheckEmailList($sRecipient, EW_MAX_EMAIL_RECIPIENT)) {
-			return "<p class=\"text-danger\">" . $Language->Phrase("EnterProperRecipientEmail") . "</p>";
-		}
-
-		// Check cc
-		if (!ew_CheckEmailList($sCc, EW_MAX_EMAIL_RECIPIENT)) {
-			return "<p class=\"text-danger\">" . $Language->Phrase("EnterProperCcEmail") . "</p>";
-		}
-
-		// Check bcc
-		if (!ew_CheckEmailList($sBcc, EW_MAX_EMAIL_RECIPIENT)) {
-			return "<p class=\"text-danger\">" . $Language->Phrase("EnterProperBccEmail") . "</p>";
-		}
-
-		// Check email sent count
-		if (!isset($_SESSION[EW_EXPORT_EMAIL_COUNTER]))
-			$_SESSION[EW_EXPORT_EMAIL_COUNTER] = 0;
-		if (intval($_SESSION[EW_EXPORT_EMAIL_COUNTER]) > EW_MAX_EMAIL_SENT_COUNT) {
-			return "<p class=\"text-danger\">" . $Language->Phrase("ExceedMaxEmailExport") . "</p>";
-		}
-
-		// Send email
-		$Email = new cEmail();
-		$Email->Sender = $sSender; // Sender
-		$Email->Recipient = $sRecipient; // Recipient
-		$Email->Cc = $sCc; // Cc
-		$Email->Bcc = $sBcc; // Bcc
-		$Email->Subject = $sEmailSubject; // Subject
-		$Email->Format = "html";
-		if ($sEmailMessage <> "")
-			$sEmailMessage = ew_RemoveXSS($sEmailMessage) . "<br><br>";
-		foreach ($gTmpImages as $tmpimage)
-			$Email->AddEmbeddedImage($tmpimage);
-		$Email->Content = $sEmailMessage . ew_CleanEmailContent($EmailContent); // Content
-		$EventArgs = array();
-		if ($this->Recordset) {
-			$this->RecCnt = $this->StartRec - 1;
-			$this->Recordset->MoveFirst();
-			if ($this->StartRec > 1)
-				$this->Recordset->Move($this->StartRec - 1);
-			$EventArgs["rs"] = &$this->Recordset;
-		}
-		$bEmailSent = FALSE;
-		if ($this->Email_Sending($Email, $EventArgs))
-			$bEmailSent = $Email->Send();
-
-		// Check email sent status
-		if ($bEmailSent) {
-
-			// Update email sent count
-			$_SESSION[EW_EXPORT_EMAIL_COUNTER]++;
-
-			// Sent email success
-			return "<p class=\"text-success\">" . $Language->Phrase("SendEmailSuccess") . "</p>"; // Set up success message
-		} else {
-
-			// Sent email failure
-			return "<p class=\"text-danger\">" . $Email->SendErrDescription . "</p>";
-		}
-	}
-
-	// Export QueryString
-	function ExportQueryString() {
-
-		// Initialize
-		$sQry = "export=html";
-
-		// Add record key QueryString
-		$sQry .= "&" . substr($this->KeyUrl("", ""), 1);
-		return $sQry;
-	}
-
 	// Set up detail parms based on QueryString
 	function SetupDetailParms() {
 
@@ -1412,7 +1101,6 @@ Page_Rendering();
 $t11_jual_view->Page_Render();
 ?>
 <?php include_once "header.php" ?>
-<?php if ($t11_jual->Export == "") { ?>
 <script type="text/javascript">
 
 // Form object
@@ -1440,8 +1128,6 @@ ft11_jualview.Lists["x_CustomerID"].Data = "<?php echo $t11_jual_view->CustomerI
 
 // Write your client script here, no need to add script tags.
 </script>
-<?php } ?>
-<?php if ($t11_jual->Export == "") { ?>
 <div class="ewToolbar">
 <?php $t11_jual_view->ExportOptions->Render("body") ?>
 <?php
@@ -1450,13 +1136,11 @@ ft11_jualview.Lists["x_CustomerID"].Data = "<?php echo $t11_jual_view->CustomerI
 ?>
 <div class="clearfix"></div>
 </div>
-<?php } ?>
 <?php $t11_jual_view->ShowPageHeader(); ?>
 <?php
 $t11_jual_view->ShowMessage();
 ?>
 <?php if (!$t11_jual_view->IsModal) { ?>
-<?php if ($t11_jual->Export == "") { ?>
 <form name="ewPagerForm" class="form-inline ewForm ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
 <?php if (!isset($t11_jual_view->Pager)) $t11_jual_view->Pager = new cPrevNextPager($t11_jual_view->StartRec, $t11_jual_view->DisplayRecs, $t11_jual_view->TotalRecs, $t11_jual_view->AutoHidePager) ?>
 <?php if ($t11_jual_view->Pager->RecordCount > 0 && $t11_jual_view->Pager->Visible) { ?>
@@ -1500,7 +1184,6 @@ $t11_jual_view->ShowMessage();
 <?php } ?>
 <div class="clearfix"></div>
 </form>
-<?php } ?>
 <?php } ?>
 <form name="ft11_jualview" id="ft11_jualview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
 <?php if ($t11_jual_view->CheckToken) { ?>
@@ -1566,7 +1249,6 @@ $t11_jual_view->ShowMessage();
 <?php } ?>
 </table>
 <?php if (!$t11_jual_view->IsModal) { ?>
-<?php if ($t11_jual->Export == "") { ?>
 <?php if (!isset($t11_jual_view->Pager)) $t11_jual_view->Pager = new cPrevNextPager($t11_jual_view->StartRec, $t11_jual_view->DisplayRecs, $t11_jual_view->TotalRecs, $t11_jual_view->AutoHidePager) ?>
 <?php if ($t11_jual_view->Pager->RecordCount > 0 && $t11_jual_view->Pager->Visible) { ?>
 <div class="ewPager">
@@ -1609,7 +1291,6 @@ $t11_jual_view->ShowMessage();
 <?php } ?>
 <div class="clearfix"></div>
 <?php } ?>
-<?php } ?>
 <?php
 	if (in_array("t12_jualdetail", explode(",", $t11_jual->getCurrentDetailTable())) && $t12_jualdetail->DetailView) {
 ?>
@@ -1619,24 +1300,20 @@ $t11_jual_view->ShowMessage();
 <?php include_once "t12_jualdetailgrid.php" ?>
 <?php } ?>
 </form>
-<?php if ($t11_jual->Export == "") { ?>
 <script type="text/javascript">
 ft11_jualview.Init();
 </script>
-<?php } ?>
 <?php
 $t11_jual_view->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
-<?php if ($t11_jual->Export == "") { ?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
 // document.write("page loaded");
 
 </script>
-<?php } ?>
 <?php include_once "footer.php" ?>
 <?php
 $t11_jual_view->Page_Terminate();
