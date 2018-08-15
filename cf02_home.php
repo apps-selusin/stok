@@ -426,8 +426,21 @@ function show_table($r) {
 	" FROM `categories` JOIN `products` ON (`categories`.`CategoryID` = `products`.`CategoryID`)" .
 	" WHERE " .
 	"`products`.`Discontinued` = '1'";
-	$q = "select * from t09_hutang";
-	echo $db->ExecuteHtml($q, ["fieldcaption" => TRUE, "tablename" => ["t09_hutang"]]); // Execute a SQL and show as HTML table
+	$q = "
+		select
+			nohutang,
+			tglpo,
+			nopo,
+			nama,
+			jumlahhutang,
+			jumlahbayar,
+			jumlahhutang - jumlahbayar as saldohutang
+		from
+			t09_hutang a
+			left join t08_beli b on a.beliid = b.id
+			left join t02_vendor c on b.vendorid = c.id
+			";
+	echo $db->ExecuteHtml($q, ["fieldcaption" => TRUE, "tablename" => ["t09_hutang", "t08_beli", "t02_vendor"]]); // Execute a SQL and show as HTML table
 ?>
 </div>
 
