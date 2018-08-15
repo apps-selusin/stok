@@ -1886,6 +1886,8 @@ class ct15_piutangdetail_list extends ct15_piutangdetail {
 
 		// JumlahBayar
 		$this->JumlahBayar->ViewValue = $this->JumlahBayar->CurrentValue;
+		$this->JumlahBayar->ViewValue = ew_FormatNumber($this->JumlahBayar->ViewValue, 2, -2, -2, -2);
+		$this->JumlahBayar->CellCssStyle .= "text-align: right;";
 		$this->JumlahBayar->ViewCustomAttributes = "";
 
 			// NoBayar
@@ -1921,7 +1923,7 @@ class ct15_piutangdetail_list extends ct15_piutangdetail {
 			$this->JumlahBayar->EditCustomAttributes = "";
 			$this->JumlahBayar->EditValue = ew_HtmlEncode($this->JumlahBayar->CurrentValue);
 			$this->JumlahBayar->PlaceHolder = ew_RemoveHtml($this->JumlahBayar->FldCaption());
-			if (strval($this->JumlahBayar->EditValue) <> "" && is_numeric($this->JumlahBayar->EditValue)) $this->JumlahBayar->EditValue = ew_FormatNumber($this->JumlahBayar->EditValue, -2, -1, -2, 0);
+			if (strval($this->JumlahBayar->EditValue) <> "" && is_numeric($this->JumlahBayar->EditValue)) $this->JumlahBayar->EditValue = ew_FormatNumber($this->JumlahBayar->EditValue, -2, -2, -2, -2);
 
 			// Add refer script
 			// NoBayar
@@ -1955,7 +1957,7 @@ class ct15_piutangdetail_list extends ct15_piutangdetail {
 			$this->JumlahBayar->EditCustomAttributes = "";
 			$this->JumlahBayar->EditValue = ew_HtmlEncode($this->JumlahBayar->CurrentValue);
 			$this->JumlahBayar->PlaceHolder = ew_RemoveHtml($this->JumlahBayar->FldCaption());
-			if (strval($this->JumlahBayar->EditValue) <> "" && is_numeric($this->JumlahBayar->EditValue)) $this->JumlahBayar->EditValue = ew_FormatNumber($this->JumlahBayar->EditValue, -2, -1, -2, 0);
+			if (strval($this->JumlahBayar->EditValue) <> "" && is_numeric($this->JumlahBayar->EditValue)) $this->JumlahBayar->EditValue = ew_FormatNumber($this->JumlahBayar->EditValue, -2, -2, -2, -2);
 
 			// Edit refer script
 			// NoBayar

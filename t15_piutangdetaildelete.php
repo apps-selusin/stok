@@ -586,6 +586,8 @@ class ct15_piutangdetail_delete extends ct15_piutangdetail {
 
 		// JumlahBayar
 		$this->JumlahBayar->ViewValue = $this->JumlahBayar->CurrentValue;
+		$this->JumlahBayar->ViewValue = ew_FormatNumber($this->JumlahBayar->ViewValue, 2, -2, -2, -2);
+		$this->JumlahBayar->CellCssStyle .= "text-align: right;";
 		$this->JumlahBayar->ViewCustomAttributes = "";
 
 			// NoBayar
