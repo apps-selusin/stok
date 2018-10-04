@@ -449,7 +449,7 @@ function show_table($r) {
 	<div class="col-lg-12 col-md-12 col-sm-12">
 		<div class="panel panel-default">
 			<div class="panel-heading"><strong><a class='collapsed' data-toggle="collapse" href="#log">Log</a></strong></div>
-			<div id="log" class="panel-collapse collapse in">
+			<div id="log" class="panel-collapse collapse out">
 			<div class="panel-body">
 				<?php
 				$q = "
