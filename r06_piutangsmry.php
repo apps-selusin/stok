@@ -657,7 +657,7 @@ class crr06_piutang_summary extends crr06_piutang {
 		$this->Sort = $this->GetSort($this->GenOptions);
 
 		// Get total count
-		$sSql = ewr_BuildReportSql($this->getSqlSelect(), $this->getSqlWhere(), $this->getSqlGroupBy(), $this->getSqlHaving(), $this->getSqlOrderBy(), $this->Filter, $this->Sort);
+		$sSql = ewr_BuildReportSql($this->getSqlSelect(), $this->getSqlWhere(), $this->getSqlGroupBy(), $this->getSqlHaving(), "", $this->Filter, ""); // No need for ORDER BY for total count
 		$this->TotalGrps = $this->GetCnt($sSql);
 		if ($this->DisplayGrps <= 0 || $this->DrillDown || $grDashboardReport) // Display all groups
 			$this->DisplayGrps = $this->TotalGrps;
@@ -697,6 +697,7 @@ class crr06_piutang_summary extends crr06_piutang {
 		}
 
 		// Get current page records
+		$sSql = ewr_BuildReportSql($this->getSqlSelect(), $this->getSqlWhere(), $this->getSqlGroupBy(), $this->getSqlHaving(), $this->getSqlOrderBy(), $this->Filter, $this->Sort);
 		$rs = $this->GetRs($sSql, $this->StartGrp, $this->DisplayGrps);
 		$this->SetupFieldCount();
 	}

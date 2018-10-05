@@ -655,7 +655,7 @@ class crr04_jual_summary extends crr04_jual {
 
 		// Get total group count
 		$sGrpSort = ewr_UpdateSortFields($this->getSqlOrderByGroup(), $this->Sort, 2); // Get grouping field only
-		$sSql = ewr_BuildReportSql($this->getSqlSelectGroup(), $this->getSqlWhere(), $this->getSqlGroupBy(), $this->getSqlHaving(), $this->getSqlOrderByGroup(), $this->Filter, $sGrpSort);
+		$sSql = ewr_BuildReportSql($this->getSqlSelectGroup(), $this->getSqlWhere(), $this->getSqlGroupBy(), $this->getSqlHaving(), "", $this->Filter, ""); // No need for ORDER BY for total count
 		$this->TotalGrps = $this->GetGrpCnt($sSql);
 		if ($this->DisplayGrps <= 0 || $this->DrillDown || $grDashboardReport) // Display all groups
 			$this->DisplayGrps = $this->TotalGrps;
@@ -695,6 +695,7 @@ class crr04_jual_summary extends crr04_jual {
 		}
 
 		// Get current page groups
+		$sSql = ewr_BuildReportSql($this->getSqlSelectGroup(), $this->getSqlWhere(), $this->getSqlGroupBy(), $this->getSqlHaving(), $this->getSqlOrderByGroup(), $this->Filter, $sGrpSort);
 		$rsgrp = $this->GetGrpRs($sSql, $this->StartGrp, $this->DisplayGrps);
 
 		// Init detail recordset

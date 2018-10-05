@@ -10,7 +10,7 @@ insert into t13_mutasi
     
 select
 	id, concat('t06_articleview.php?showdetail=&id=', id), id, kode, 0,
-    '2018-06-01', '00:00', 'Stok Awal',
+    '2018-10-01', '00:00', 'Stok Awal',
     0,
     0,
     0,
